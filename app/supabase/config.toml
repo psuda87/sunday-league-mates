@@ -1,0 +1,5 @@
+project_id = "sunday-league-mates"
+
+# Login i refresh nie mają jeszcze JWT; pozostałe akcje weryfikuje handler przez Auth i bazę.
+[functions.accounts]
+verify_jwt = false
