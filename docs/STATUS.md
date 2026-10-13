@@ -3,7 +3,7 @@
 Aktualizacja: 13.10.2026. Branch: `feat/auth`. Projekt Supabase: `hjtcyybkxebvdropchac`.
 Stan wdrożeń i testów według ostatnich potwierdzonych przebiegów w [AUTH_PROOF.md](AUTH_PROOF.md).
 Podstawowe działanie modułu kont odebrane ręcznie na Androidzie; dodatkowe scenariusze nadal otwarte.
-Bieżące zadanie: zapis odbioru i publikacja modułu na `origin/feat/auth`, bez scalania do `main`.
+Bieżące zadanie: zapis decyzji o odłożonych testach i przygotowanie PR `feat/auth` → `main`, bez scalania.
 
 ## Wykonane
 
@@ -50,7 +50,7 @@ bez wykrytych sekretów lub artefaktów. Nie zmieniano kodu ani konfiguracji zda
 
 ## Otwarte problemy i ograniczenia
 
-- Do szczegółowego odbioru na telefonie: offline, pierwsza zmiana hasła nowego zawodnika oraz dodatkowe scenariusze odrzucania poprzednich zapisanych sesji po resecie i po zmianie nowego hasła. Tworzenie/reset z panelu, ponowne otwarcie z sesją i ponowne otwarcie po logout są już potwierdzone przez użytkownika.
+- Ręczne testy offline i unieważniania starej zapisanej sesji po resecie (również po zmianie nowego hasła) **odłożone decyzją użytkownika; niezaliczone, nie blokują dalszych prac**. Automatyczne testy tych mechanizmów nie są odbiorem na telefonie. Pierwsza zmiana hasła nowego zawodnika nie ma osobnego ręcznego potwierdzenia. Tworzenie/reset z panelu, ponowne otwarcie z sesją i ponowne otwarcie po logout są potwierdzone.
 - iOS: magazyn przewidziany w kodzie, platforma i testy urządzenia jeszcze nieprzygotowane.
 - CAPTCHA odłożona poza etap; istniejące limity pozostają aktywne.
 - Historyczne zasoby próby Auth pozostają do kontrolowanego usunięcia; brak publicznych endpointów testowych/bootstrap. Lista w [AUTH_MODULE.md](AUTH_MODULE.md).
@@ -59,4 +59,4 @@ bez wykrytych sekretów lub artefaktów. Nie zmieniano kodu ani konfiguracji zda
 
 ## Następny krok
 
-Domknąć pozostałe ręczne scenariusze Androida (offline i unieważnianie zapisanych sesji), następnie przejrzeć moduł na `feat/auth` przed decyzją o scaleniu. iOS wymaga osobnego środowiska i testów; CAPTCHA pozostaje odłożona. Nie rozpoczynać kolejnych funkcji biznesowych bez ustalenia zakresu.
+Przegląd PR `feat/auth` → `main` i ustalenie zakresu następnego etapu. Odłożone ręczne testy nie blokują dalszych prac i pozostają do wykonania w późniejszym terminie. iOS jest niezweryfikowany, CAPTCHA odłożona. Scalenie wymaga osobnej decyzji użytkownika.

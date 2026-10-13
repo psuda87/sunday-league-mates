@@ -57,11 +57,15 @@ wylogowanie z ponownym otwarciem oraz tworzenie i reset zawodnika z panelu.
 | Reset hasła zawodnika z panelu | POTWIERDZONY przez użytkownika |
 | Zapamiętywanie sesji po zamknięciu / ponownym otwarciu | POTWIERDZONY przez użytkownika: pozostaje zalogowany |
 | Wylogowanie i ponowne otwarcie | POTWIERDZONY przez użytkownika: ekran logowania |
-| Dodatkowe scenariusze unieważniania sesji po resecie, także po zmianie nowego hasła | NIE SPRAWDZONO RĘCZNIE; istnieją wyniki automatyczne |
-| Offline i pierwsza zmiana hasła nowego zawodnika z panelu | Brak osobnego potwierdzenia ręcznego |
+| Dodatkowe scenariusze unieważniania sesji po resecie, także po zmianie nowego hasła | ODŁOŻONE, NIEZALICZONE RĘCZNIE; istnieją wyniki automatyczne |
+| Offline | ODŁOŻONY, NIEZALICZONY RĘCZNIE |
+| Pierwsza zmiana hasła nowego zawodnika z panelu | Brak osobnego potwierdzenia ręcznego |
 | iOS | NIEZWERYFIKOWANY |
 
 Potwierdzenia zapisano 13.10.2026 wyłącznie na podstawie zgłoszenia użytkownika.
+Aktualna decyzja użytkownika: ręczne testy offline i unieważniania starej sesji
+po resecie są odłożone i nie blokują dalszych prac. Nie uznajemy ich za zaliczone;
+wyniki automatyczne zachowują swój zakres. iOS pozostaje niezweryfikowany.
 CAPTCHA pozostaje odłożona. Nie wykonywano ponownie testów zdalnych ani testów
 urządzenia przez agenta. Bieżące zadanie zmienia dokumentację; wykorzystano ostatnie
 wyniki kontroli (build/typy, lint, Vitest 24/24, bootstrap 6/6, Cypress 5/5,
