@@ -3,7 +3,8 @@
 Aktualizacja: 13.10.2026. Branch: `feat/auth`. Projekt Supabase: `hjtcyybkxebvdropchac`.
 Stan wdrożeń i testów według ostatnich potwierdzonych przebiegów w [AUTH_PROOF.md](AUTH_PROOF.md).
 Podstawowe działanie modułu kont odebrane ręcznie na Androidzie; dodatkowe scenariusze nadal otwarte.
-Bieżące zadanie: zapis decyzji o odłożonych testach i przygotowanie PR `feat/auth` → `main`, bez scalania.
+Decyzja o odłożonych testach zapisana i wysłana na `origin/feat/auth`.
+Utworzono [PR #1: moduł kont i zapamiętywanie sesji](https://github.com/psuda87/sunday-league-mates/pull/1), `feat/auth` → `main`; PR otwarty, niescalony.
 
 ## Wykonane
 
