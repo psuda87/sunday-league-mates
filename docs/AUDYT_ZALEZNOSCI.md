@@ -1,5 +1,11 @@
 # Audyt zależności — 13.10.2026
 
+Aktualizacja po zapamiętywaniu sesji: dodano `@aparajita/capacitor-secure-storage@8.0.1`
+(MIT, Capacitor 8) oraz jego zależność `@capacitor/ios@8.5.3`; nie dodano platformy iOS.
+Powtórzone `npm audit`: 6 moderate, 0 high, 0 critical. `--omit=dev`: 3 moderate
+routera. Wynik nie wzrósł; nie uruchamiano `audit fix --force`. Build, lint, typy,
+testy sesji i natywna kompilacja Androida przeszły; szczegóły w AUTH_PROOF.md.
+
 Zakres: `app/`, raport npm audit, rzeczywiste łańcuchy z `npm explain`, konfiguracja projektu i komunikaty bezpieczeństwa. Liczby npm oznaczają wpisy dla pakietów, także rodziców zależności, a nie liczbę niezależnych luk.
 
 Historia: początkowo 12 wpisów (1 critical, 2 high, 9 moderate); po aktualizacji Vitest 10 (0 critical, 2 high, 8 moderate); po migracji Cypress 16.1.1 **6 moderate, 0 high, 0 critical**. Końcowy raport: `npm-audit-2026-10-13.json`. Audyt z `--omit=dev` pozostaje bez zmian: **3 moderate, 0 high, 0 critical**; zapisano go w `npm-audit-production-2026-10-13.json`. Oba polecenia audit zwracają kod 1, ponieważ nadal istnieją podatności.

@@ -1,0 +1,18 @@
+.slm-accounts { max-width: 720px; margin: auto; padding: 24px 16px 48px; }
+.slm-brand { text-align: center; margin: 8px 0 28px; }
+.slm-brand span { display: inline-flex; border: 1px solid var(--ion-color-primary); border-radius: 18px; padding: 16px; font-weight: 800; color: var(--ion-color-primary); letter-spacing: .2em; }
+.slm-brand p, .slm-muted { color: var(--slm-text-secondary); font-size: .92rem; line-height: 1.6; }
+.slm-panel { background: var(--slm-panel); border: 1px solid var(--slm-border); border-radius: 20px; padding: 24px; margin-bottom: 20px; }
+.slm-panel h1 { font-size: 1.6rem; margin: 0 0 16px; }
+.slm-panel h2 { font-size: 1.2rem; margin-top: 0; }
+.slm-form { display: grid; gap: 18px; }
+.slm-form ion-input, .slm-form ion-select { --padding-top: 10px; --padding-bottom: 10px; }
+.slm-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 16px; }
+.slm-error, .slm-notice { padding: 16px; border-radius: 12px; line-height: 1.5; }
+.slm-error { color: var(--ion-color-danger); border: 1px solid var(--ion-color-danger); }
+.slm-notice { color: var(--ion-color-primary); border: 1px solid var(--ion-color-primary); }
+.slm-call { display: inline-block; color: var(--ion-color-primary); margin: 0 0 20px; }
+.slm-managed { padding: 16px 0; width: 100%; overflow-wrap: anywhere; }
+.slm-managed p { margin: 8px 0; }
+.slm-temporary { overflow-wrap: anywhere; user-select: all; font-family: monospace; padding: 12px; border: 1px dashed var(--ion-color-primary); }
+@media (max-width: 380px) { .slm-panel { padding: 18px 14px; } .slm-accounts { padding: 16px 10px; } }

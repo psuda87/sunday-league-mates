@@ -51,3 +51,8 @@ Pods/
 /android/capacitor-cordova-android-plugins/
 /cypress/screenshots/
 /cypress/videos/
+/app/.env.auth-proof
+
+# Supabase CLI local state
+/supabase/.temp/
+/supabase/.branches/

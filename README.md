@@ -2,9 +2,30 @@
 
 Aplikacja mobilna dla jednej zamkniętej grupy grającej w piłkę na orliku. Docelowo ma obsługiwać zapisy na mecze, gości i rezerwę, ewidencję składek, oceny zawodników i wyrównywanie drużyn. Pierwszą platformą jest Android; wspólny kod umożliwia późniejsze przygotowanie iOS.
 
-Obecny etap obejmuje polski ekran startowy, konfigurację i projekt Android. Konta, baza danych, rozliczenia i powiadomienia nie zostały zaimplementowane.
+Na `feat/auth` przygotowano moduł kont: logowanie loginem lub telefonem, wymuszoną zmianę hasła, zapamiętywanie sesji, profil i panel administratora. Backend Supabase jest wdrożony wyłącznie w `hjtcyybkxebvdropchac`; źródła i migracje znajdują się w repozytorium. Użytkownik utworzył administratora i potwierdził podstawowe testy Androida. Mecze, rozliczenia, oceny i powiadomienia pozostają poza bieżącym etapem.
 
-Wymagania: [specyfikacja](docs/SPECYFIKACJA_SOCCER_APP.md). Ustalenia są obowiązujące, propozycje wdrożeniowe i punkty otwarte wymagają zatwierdzenia. Nazwa **Sunday League Mates** i stos Ionic React + TypeScript + Capacitor zostały potwierdzone podczas przygotowania projektu; pozostałe decyzje otwarte nie zostały domknięte. Backend i usługi push pozostają propozycjami.
+Wymagania: [specyfikacja](docs/SPECYFIKACJA_SOCCER_APP.md), wersja 1.2. Ustalenia są obowiązujące, propozycje wdrożeniowe i pozostałe punkty otwarte wymagają zatwierdzenia. Nazwa **Sunday League Mates** i stos Ionic React + TypeScript + Capacitor są zatwierdzone.
+
+## Kierunek wizualny
+
+Zatwierdzony domyślny ciemny motyw inspirowany LocalSend: tło z zielonym odcieniem i stonowany miętowo-turkusowy akcent. Początkowa paleta: tło `#0D1613`, panele `#15221D`, akcent `#80D4C5`, tekst `#DFE7E3`; ekrany kont używają centralnych zmiennych motywu i opisowych oznaczeń błędów. Docelowa karta zawodnika ma własny styl inspirowany FIFA/EA FC Ultimate Team, dynamiczne dane w HTML/CSS oraz wariant pełny i kompaktowy. Szczegóły i status propozycji opisano w rozdziałach 4 i 12 specyfikacji; karta nie jest jeszcze zaimplementowana.
+
+Portret prototypu: cały dostarczony avatar anime z numerem 27, bez wycinania; dane przykładowe Piotr, 7,0, „Nowy zawodnik”. Plik `app/public/images/player-demo.png` nie istnieje (sprawdzono 13.10.2026) i wymaga ręcznego dodania; nie tworzymy zastępczego zdjęcia. Numer 27 nie jest polem profilu.
+
+## Zatwierdzone zasady kont i usług
+
+- Wszystkie usługi działają na bezpłatnych planach. Kierunek: Supabase Free oraz Firebase Spark wyłącznie do FCM. Nie włączamy płatnych planów ani rozliczania za użycie; zgodność wymaganych funkcji z limitami trzeba sprawdzić przed implementacją.
+- Administrator tworzy konta i ręcznie przekazuje dane początkowe. Brak publicznej rejestracji, zaproszeń mailowych, SMS-ów i automatycznej poczty.
+- Pole „Login lub numer telefonu” przyjmuje unikalny login/pseudonim lub unikalny numer telefonu; oba identyfikatory używają tego samego hasła. Numer nie wymaga weryfikacji SMS.
+- Administrator ustawia hasło tymczasowe, zmieniane obowiązkowo przy pierwszym logowaniu. Reset administratora ponownie wymusza zmianę hasła tymczasowego; administrator nie odczytuje obecnego hasła zawodnika.
+- Generowane hasło tymczasowe ma 12 znaków. Własne hasło użytkownika wymaga minimum 8 znaków (maksimum 72 bajty UTF-8); może być dłuższe niż 12 znaków.
+- Zawodnik może zmienić hasło, login i numer. Zmiana loginu lub numeru wymaga obecnego hasła i zachowania unikalności.
+- Profil zawiera login/pseudonim i opcjonalne imię i nazwisko. „Wyświetlaj mnie jako” wybiera jedną z tych nazw dla kart, list uczestników, ocen i grafiki składów; przy braku imienia i nazwiska używany jest login/pseudonim.
+- Numery są widoczne dla zalogowanych członków grupy. „Zadzwoń” na karcie i liście uczestników otwiera systemowy dialer. Gość może mieć opcjonalny numer; bez niego kontakt prowadzi do zapraszającego.
+
+Hasła obsługuje Supabase Auth; serwer mapuje oba aliasy na jedno konto z losowym technicznym adresem `.invalid`. Role, obowiązkowa zmiana hasła i unieważnione sesje są kontrolowane w bazie oraz API. [Instrukcja modułu i pierwszego administratora](docs/AUTH_MODULE.md), [wyniki testów i otwarta zmiana e-maila](docs/AUTH_PROOF.md). Scenariusze biznesowe opisano w rozdziale 14 specyfikacji.
+
+Procedura pierwszego administratora pozostaje w `app/scripts/bootstrap-admin.ps1`; istniejącego administratora nie twórz ponownie. Login/telefon wpisujesz lokalnie, hasło dwukrotnie z ukrytymi znakami, bez pliku z hasłem. [Dokładne kroki testowania Androida](docs/AUTH_MODULE.md). Test hooka zmiany technicznego e-maila przeszedł. CAPTCHA jest odłożona poza bieżący etap; istniejące limity pozostają. Użytkownik potwierdził na Androidzie zapamiętywanie sesji, ekran logowania po wylogowaniu oraz tworzenie/reset zawodnika z panelu. Dodatkowe scenariusze unieważniania sesji i iOS pozostają niezweryfikowane ręcznie.
 
 ## Struktura
 
@@ -12,10 +33,12 @@ Wymagania: [specyfikacja](docs/SPECYFIKACJA_SOCCER_APP.md). Ustalenia są obowi�
 - `app/public/` — statyczne zasoby i manifest webowy.
 - `app/cypress/` — testy przeglądarkowe.
 - `app/android/` — źródła projektu Android i Gradle Wrapper.
+- `app/supabase/` — migracje SQL, docelowa Edge Function `accounts` i jej testy.
+- `app/scripts/` — lokalne narzędzia konfiguracji, testów, pierwszego administratora i naprawy konta.
 - `docs/` — dokumentacja biznesowa.
 - `AGENTS.md` — instrukcje pracy nad repozytorium.
 
-Identyfikator aplikacji: `pl.psuda87.slm`. Interfejs i komunikaty: język polski. Ikony i ekrany splash pozostają zasobami szablonu; wygląd produktu wymaga osobnego ustalenia.
+Identyfikator aplikacji: `pl.psuda87.slm`. Interfejs i komunikaty: język polski. Ikony i ekrany splash pozostają zasobami szablonu; docelowa ikona aplikacji wymaga osobnego ustalenia.
 
 ## Środowisko i wersje
 
@@ -35,7 +58,7 @@ npm run dev
 
 Otwórz adres wypisany przez Vite (domyślnie `http://localhost:5173`). Serwer zatrzymasz przez `Ctrl+C`. Instalacja pakietów i pierwsza kompilacja Androida mogą wymagać dostępu do sieci.
 
-Ten etap nie wymaga pliku `.env`. Lokalne `.env` i `.env.*` są ignorowane, z wyjątkiem `.env.example`. Przykłady konfiguracji nie mogą zawierać sekretów; zmienne udostępniane klientowi nie są bezpiecznym miejscem na klucze serwera.
+Klient używa domyślnie wdrożonej funkcji wskazanego projektu i nie wymaga sekretu ani `.env`. Adres funkcji można jawnie ustawić przez `VITE_SLM_FUNCTION_URL` (przykład w `app/.env.example`). Zapisywany jest wyłącznie refresh token: Android Keystore/iOS Keychain przez bezpłatny plugin MIT, a web osobno w localStorage (nie jest to magazyn chroniący przed XSS). Access token pozostaje w pamięci. Start i powrót z tła wymagają weryfikacji serwerowej; bez internetu chronione dane pozostają ukryte. Szczegóły: [AUTH_MODULE.md](docs/AUTH_MODULE.md). Lokalne `.env` i `.env.*` są ignorowane, z wyjątkiem `.env.example`; klucze serwera nie mogą być zmiennymi `VITE_*`.
 
 ## Build webowy i Android
 
@@ -92,3 +115,11 @@ Weryfikacja przygotowania projektu (13.10.2026): build webowy, ESLint, test jedn
 Android `:app:lintDebug` i `:app:testDebugUnitTest` również zakończyły się powodzeniem (1 test szablonu). Nie uruchamiano testów instrumentacyjnych ani aplikacji na urządzeniu/emulatorze.
 
 Późniejszy [audyt zależności](docs/AUDYT_ZALEZNOSCI.md) z tego samego dnia: zaktualizowano Vitest do 4.1.11. Po migracji Cypress do 16.1.1 aktualny wynik to 0 critical, 0 high i 6 moderate. extract-zip został usunięty. Audyt produkcyjny pozostaje na poziomie 3 moderate dotyczących routera. Po poprawce ponownie przeszły build, lint, test jednostkowy, E2E, synchronizacja Androida i kompilacja APK.
+
+Po implementacji modułu kont: build i lint OK, Vitest 8/8, Cypress 3/3, siedem grup rzeczywistych testów API/Auth PASS, synchronizacja i kontrole Androida OK. Szczegóły, cleanup i niezweryfikowana zmiana e-maila: [AUTH_PROOF.md](docs/AUTH_PROOF.md). Bieżący stan i odbiór: [STATUS.md](docs/STATUS.md).
+
+Aktualizacja po zapamiętywaniu sesji: Vitest 23/23, Cypress 5/5, rzeczywiste Auth/API
+7 grup PASS, hook zmiany e-maila PASS, build/lint/typy/synchronizacja i kompilacja
+Androida OK. Podstawowe ręczne testy Androida potwierdził użytkownik; nowe scenariusze
+sesji oraz tworzenia/resetu zawodnika z panelu nie są jeszcze sprawdzone ręcznie.
+CAPTCHA odłożona, bez zmiany limitów. Aktualny stan: [AUTH_PROOF.md](docs/AUTH_PROOF.md).
