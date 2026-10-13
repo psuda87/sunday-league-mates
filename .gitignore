@@ -147,3 +147,24 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# Local IDE and native build output (keep platform sources)
+.vscode/
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+build/
+.gradle/
+.kotlin/
+local.properties
+DerivedData/
+Pods/
+*.jks
+*.keystore
+app/android/app/src/main/assets/public/
+app/android/app/src/main/assets/capacitor.config.json
+app/android/app/src/main/assets/capacitor.plugins.json
+app/android/capacitor-cordova-android-plugins/
+cypress/screenshots/
+cypress/videos/

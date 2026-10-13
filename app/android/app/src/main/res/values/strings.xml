@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Sunday League Mates</string>
+    <string name="title_activity_main">Sunday League Mates</string>
+    <string name="package_name">pl.psuda87.slm</string>
+    <string name="custom_url_scheme">pl.psuda87.slm</string>
+</resources>

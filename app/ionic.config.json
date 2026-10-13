@@ -1,0 +1,7 @@
+{
+  "name": "Sunday League Mates",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
