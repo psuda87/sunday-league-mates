@@ -3,6 +3,38 @@ import { webcrypto } from 'node:crypto';
 import { createHandler, displayName, normalizeLogin, normalizePhone, randomPassword } from './handler';
 
 afterEach(() => vi.unstubAllGlobals());
+describe('brama wydarzeń', () => {
+  async function attempt(temporary: boolean) {
+    vi.stubGlobal('crypto', webcrypto);
+    const id = webcrypto.randomUUID(), sid = webcrypto.randomUUID();
+    const token = ['synthetic', btoa(JSON.stringify({ sub: id, session_id: sid })), 'unsigned'].join('.');
+    let eventsCalled = false;
+    vi.stubGlobal('fetch', vi.fn(async (url: string, options: RequestInit) => {
+      const reply = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status });
+      if (url.includes('slm_account_rate')) return reply(true);
+      if (url.endsWith('/auth/v1/user')) return reply({ id });
+      if (url.includes('slm_account_context')) return reply({ user_id: id, role: 'member', must_change_password: temporary });
+      if (url.includes('slm_events_dispatch')) {
+        eventsCalled = true;
+        const body = JSON.parse(options.body as string);
+        expect(body.p_user).toBe(id); expect(body.p_session).toBe(sid); expect(body.p_action).toBe('join');
+        return reply({ code: 'P0001', message: 'event_full' }, 400);
+      }
+      throw new Error('Nieoczekiwane żądanie testowe');
+    }));
+    const handler = createHandler({ url: 'https://example.invalid', anon: '', service: '', origins: [] });
+    const response = await handler(new Request('https://example.invalid', { method: 'POST', headers: { authorization: 'Bearer ' + token },
+      body: JSON.stringify({ action: 'events_join', p_user: webcrypto.randomUUID(), role: 'admin' }) }));
+    return { response, eventsCalled };
+  }
+  it('wymaga zmiany hasła przed wywołaniem RPC wydarzeń', async () => {
+    const r = await attempt(true); expect(r.response.status).toBe(403); expect(r.eventsCalled).toBe(false);
+  });
+  it('przekazuje zweryfikowaną tożsamość i bezpiecznie tłumaczy odmowę limitu', async () => {
+    const r = await attempt(false); expect(r.eventsCalled).toBe(true); expect(r.response.status).toBe(409);
+    expect((await r.response.json()).code).toBe('event_full');
+  });
+});
 it('generuje hasła tymczasowe o długości dokładnie 12 znaków', () => {
   vi.stubGlobal('crypto', webcrypto);
   const samples = new Set(Array.from({ length: 100 }, () => randomPassword()));

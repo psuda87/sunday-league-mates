@@ -1,0 +1,8 @@
+.slm-form label { display: grid; gap: .4rem; }
+.slm-form input { padding: .8rem; border: 1px solid var(--slm-border); border-radius: .5rem; color: var(--ion-text-color); background: var(--ion-background-color); width: 100%; box-sizing: border-box; }
+.slm-participants { list-style: none; padding: 0; }
+.slm-participant { display: flex; gap: .8rem; border-bottom: 1px solid var(--slm-border); padding: 1rem 0; }
+.slm-participant > div { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.slm-avatar { display: grid; place-items: center; flex: 0 0 2.6rem; height: 2.6rem; border-radius: 50%; background: var(--ion-background-color); color: var(--ion-color-primary); border: 1px solid var(--slm-border); }
+.slm-match { border-bottom: 1px solid var(--slm-border); padding: .75rem 0; }
+.slm-match h2 { font-size: 1.1rem; }

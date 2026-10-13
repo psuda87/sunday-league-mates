@@ -201,6 +201,36 @@ export function createHandler(env: Environment) {
       if (action === 'status') return respond({ must_change_password: ctx.must_change_password, role: ctx.role, user_id: ctx.id });
       if (ctx.must_change_password && action !== 'password')
         throw new ApiError(403, 'password_required', 'Najpierw zmień hasło tymczasowe.');
+      if (action.startsWith('events_')) {
+        await rate('events:' + ctx.id, 90);
+        const r = await call('/rest/v1/rpc/slm_events_dispatch', 'POST', {
+          p_user: ctx.id, p_session: ctx.sid, p_action: action.slice(7), p_body: body,
+        }, undefined, true);
+        if (!r.ok) {
+          const messages: Record<string, [number, string]> = {
+            session_invalid: [401, 'Sesja wygasła. Zaloguj się ponownie.'],
+            forbidden: [403, 'Brak uprawnień do tej operacji.'],
+            not_found: [404, 'Nie znaleziono meczu lub uczestnika.'],
+            registration_closed: [409, 'Zapisy i rezygnacje są zamknięte od początku meczu.'],
+            event_cancelled: [409, 'Mecz został odwołany.'],
+            event_full: [409, 'Brak wolnych miejsc. Możesz dołączyć do rezerwy.'],
+            duplicate_signup: [409, 'Ten zapis już istnieje. Odśwież listę.'],
+            capacity_too_small: [409, 'Limit nie może być mniejszy od liczby zapisanych.'],
+            date_locked: [409, 'Po 17:00 nie można zmienić dnia meczu.'],
+            invalid_event: [400, 'Sprawdź termin, miejsce, koszt i limit (minimum 10).'],
+            invalid_guest: [400, 'Podaj nazwę gościa i poprawny opcjonalny numer z prefiksem kraju.'],
+            invalid_participant: [400, 'Nieprawidłowy uczestnik.'],
+            invalid_action: [400, 'Nieznana operacja wydarzenia.'],
+          };
+          const code = typeof r.data?.message === 'string' ? r.data.message : '';
+          if (messages[code]) throw new ApiError(messages[code][0], code, messages[code][1]);
+          if (['22P02', '22003', '22007', '22008', '23514'].includes(r.data?.code))
+            throw new ApiError(400, 'invalid_event', 'Sprawdź dane formularza wydarzenia.');
+          if (r.data?.code === '23505') throw new ApiError(409, 'duplicate_signup', 'Ten zapis już istnieje.');
+          throw new ApiError(503, 'service_unavailable', 'Nie udało się potwierdzić operacji. Odśwież listę przed ponowieniem.');
+        }
+        return respond(r.data);
+      }
       if (action === 'profile') return respond(await profile(ctx.id));
       if (action === 'save_profile') {
         const name = field(body, 'full_name', 100).trim();

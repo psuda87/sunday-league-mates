@@ -180,6 +180,23 @@ Propozycja wdrożeniowa: potwierdzanie całych pozycji (udział własny/gość) 
 
 ## 9. Faktyczna obecność i oceny
 
+### Zatwierdzone dodatki — bez implementacji w etapie wydarzeń
+
+- Odznaki za liczbę rozegranych meczów oraz serie co 10 spotkań. Szczegółowe progi liczby meczów i definicja ciągłości serii pozostają do dopracowania.
+- Odznaka za komplet obecności w miesiącu oraz odznaki okresowe: kwartał, półrocze i rok. Szczegółowe progi i zasady kwalifikacji wymagają dopracowania.
+- Odznaki zawierają datę zdobycia i opis. Nie ustalono jeszcze nazw ani wyglądu odznak.
+- Podsumowania frekwencji, bez rankingu duetów.
+- Status „Już jadę” i możliwość zgłoszenia spóźnienia. Nie zastępują faktycznej obecności oznaczanej przez administratora i nie zmieniają odpowiedzialności finansowej.
+
+### MVP — zatwierdzony kierunek, szczegóły otwarte
+
+Próg dotyczy liczby głosujących, a nie liczby głosów oddanych na zwycięzcę.
+Przy 10 uczestnikach wymagane jest minimum 6 głosujących. Wariant zastępczy
+jest oparty na średniej ocen meczowych. Nie ustalono jeszcze ogólnego progu
+dla innych liczebności ani warunków uruchomienia wariantu zastępczego.
+Remisy i uwzględnianie gości (jako głosujących i kandydatów) wymagają doprecyzowania.
+MVP, odznaki, statusy dojazdu i podsumowania nie są obecnie zaimplementowane.
+
 ### Ustalone
 
 - Zapisani uczestnicy są domyślnie obecni; administrator odznacza nieobecnych.
@@ -200,6 +217,11 @@ Propozycja wdrożeniowa: potwierdzanie całych pozycji (udział własny/gość) 
 - Jeśli administrator później oznaczy kogoś jako nieobecnego, oceny wystawione przez tę osobę i jej wystawione za ten mecz tracą ważność. Jej należność pozostaje niezależna.
 
 ## 10. Automatyczne składy
+
+### Dodatkowe ustalenia — do późniejszej implementacji
+
+- Mieszamy składy między meczami przy zachowaniu wyrównanego poziomu drużyn. Konkretny algorytm i waga różnorodności wymagają dopracowania; nie zatwierdzamy dotychczasowych propozycji algorytmicznych przez ten zapis.
+- Wskazujemy drużynę zakładającą narzutki. Sposób wskazania pozostaje do doprecyzowania.
 
 Ustalone: po zebraniu ocen aplikacja proponuje wyrównane drużyny; widok na grafice boiska z nazwami wybranymi w „Wyświetlaj mnie jako”, z loginem/pseudonimem przy braku imienia i nazwiska. Goście są podpisani podanym imieniem lub pseudonimem. Znacznik dobrego bramkarza jest wzmocnieniem drużyny, bez przydzielania stałej pozycji. Administrator może zmienić podział.
 

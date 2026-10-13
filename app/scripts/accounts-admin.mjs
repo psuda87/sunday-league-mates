@@ -11,9 +11,9 @@ export function readLocalEnv(name) {
       }));
   } catch { return {}; }
 }
-export function assertBranch() {
-  if (execFileSync('git', ['branch', '--show-current'], { cwd: new URL('../../', import.meta.url), encoding: 'utf8' }).trim() !== 'feat/auth')
-    throw new Error('Wymagany branch feat/auth');
+export function assertBranch(expected = 'feat/auth') {
+  if (execFileSync('git', ['branch', '--show-current'], { cwd: new URL('../../', import.meta.url), encoding: 'utf8' }).trim() !== expected)
+    throw new Error('Wymagany branch ' + expected);
 }
 export async function management(path, method = 'GET', body) {
   const token = process.env.SUPABASE_ACCESS_TOKEN || readLocalEnv('.env.auth-proof').SUPABASE_ACCESS_TOKEN;
