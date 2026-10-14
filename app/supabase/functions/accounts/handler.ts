@@ -1,3 +1,4 @@
+import { isPhoneIdentifier, normalizeLoginPhone, normalizePhoneUpdate } from '../_shared/phone.ts';
 export interface Environment { url: string; anon: string; service: string; origins: string[] }
 type Row = Record<string, unknown>;
 class ApiError extends Error {
@@ -11,12 +12,11 @@ export function normalizeLogin(value: string): string {
     throw new ApiError(400, 'invalid_login', 'Login: 3–32 znaki, pierwsza litera, dalej litery, cyfry, _, . lub -.');
   return result;
 }
-export function normalizePhone(value: string): string {
-  const result = value.replace(/[\s()-]/g, '');
-  if (!/^\+[1-9][0-9]{7,14}$/.test(result))
-    throw new ApiError(400, 'invalid_phone', 'Podaj numer z prefiksem kraju, np. +48, oraz 8–15 cyfr.');
-  return result;
+export function normalizePhone(value: string, existing?: string): string {
+  try { return normalizePhoneUpdate(value, existing); }
+  catch (e) { throw new ApiError(400, 'invalid_phone', (e as Error).message); }
 }
+
 function field(body: Row, key: string, max = 200): string {
   const value = body[key];
   if (typeof value !== 'string' || value.length > max) throw new ApiError(400, 'invalid_input', 'Sprawdź dane formularza.');
@@ -156,9 +156,9 @@ export function createHandler(env: Environment) {
         const pwd = password(body, 'password');
         let rows: Row[] = [];
         try {
-          const normalized = raw.startsWith('+') ? normalizePhone(raw) : normalizeLogin(raw).toLowerCase();
+          const normalized = isPhoneIdentifier(raw) ? normalizeLoginPhone(raw) : normalizeLogin(raw).toLowerCase();
           await rate('identifier:' + normalized, 16);
-          rows = await db(`slm_aliases?${raw.startsWith('+') ? 'phone' : 'login_normalized'}=eq.${encodeURIComponent(normalized)}`);
+          rows = await db(`slm_aliases?${isPhoneIdentifier(raw) ? 'phone' : 'login_normalized'}=eq.${encodeURIComponent(normalized)}`);
         } catch (e) { if (e instanceof ApiError && e.status === 429) throw e; }
         if (rows[0]) await rate('account:' + rows[0].user_id, 16);
         // Wersję odczytujemy PRZED sprawdzeniem hasła. Reset między tymi krokami
@@ -277,6 +277,19 @@ export function createHandler(env: Environment) {
         return respond(r.data);
       }
       if (action.startsWith('events_')) {
+        if (action === 'events_guest' || action === 'events_edit_guest') {
+          if (body.guest_phone !== undefined && typeof body.guest_phone !== 'string')
+            throw new ApiError(400, 'invalid_phone', 'Telefon musi być tekstem zawierającym 9 cyfr.');
+          const rawPhone = typeof body.guest_phone === 'string' ? body.guest_phone : '';
+          let existing: string | undefined;
+          if (action === 'events_edit_guest' && rawPhone.trim().startsWith('+') && !rawPhone.trim().startsWith('+48')) {
+            const id = field(body, 'participant_id', 36);
+            if (!/^[0-9a-f-]{36}$/i.test(id)) throw new ApiError(400, 'invalid_input', 'Nieprawidłowy identyfikator gościa.');
+            const rows = await db(`slm_event_participants?id=eq.${id}&select=guest_phone`);
+            existing = rows[0]?.guest_phone;
+          }
+          body.guest_phone = rawPhone.trim() ? normalizePhone(rawPhone, existing) : '';
+        }
         await rate('events:' + ctx.id, 90);
         const r = await call('/rest/v1/rpc/slm_events_dispatch', 'POST', {
           p_user: ctx.id, p_session: ctx.sid, p_action: action.slice(7), p_body: body,
@@ -293,7 +306,7 @@ export function createHandler(env: Environment) {
             capacity_too_small: [409, 'Limit nie może być mniejszy od liczby zapisanych.'],
             date_locked: [409, 'Po 17:00 nie można zmienić dnia meczu.'],
             invalid_event: [400, 'Sprawdź termin, miejsce, koszt i limit (minimum 10).'],
-            invalid_guest: [400, 'Podaj nazwę gościa i poprawny opcjonalny numer z prefiksem kraju.'],
+            invalid_guest: [400, 'Podaj nazwę gościa i opcjonalny polski numer telefonu (9 cyfr).'],
             invalid_participant: [400, 'Nieprawidłowy uczestnik.'],
             invalid_action: [400, 'Nieznana operacja wydarzenia.'],
             registration_not_allowed: [409, 'Konto nie ma teraz uprawnień do zapisu. Sprawdź aktualny dostęp i zaległości.'],
@@ -324,8 +337,8 @@ export function createHandler(env: Environment) {
         const next = action === 'password' ? password(body, 'new_password', true) : current;
         if (action === 'password' && next === current) throw new ApiError(400, 'same_password', 'Nowe hasło musi być inne.');
         const login = action === 'identifiers' ? normalizeLogin(field(body, 'login')) : null;
-        const phone = action === 'identifiers' ? normalizePhone(field(body, 'phone')) : null;
         const a = await verifyPassword(ctx, current);
+        const phone = action === 'identifiers' ? normalizePhone(field(body, 'phone'), a.phone as string) : null;
         if (action === 'identifiers') {
           const conflicts = await db(`slm_aliases?or=(login_normalized.eq.${encodeURIComponent(login!.toLowerCase())},phone.eq.${encodeURIComponent(phone!)})`);
           if (conflicts.some((row: Row) => row.user_id !== ctx.id))

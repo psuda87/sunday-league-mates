@@ -22,7 +22,7 @@ try {
     else {
         Write-Host 'Projekt: hjtcyybkxebvdropchac. Tworzenie pierwszego administratora.'
         $authBootstrapLogin = Read-Host 'Login/pseudonim'
-        $authBootstrapPhone = Read-Host 'Telefon z prefiksem kraju (np. +48)'
+        $authBootstrapPhone = Read-Host 'Telefon (9 cyfr, Polska; +48 opcjonalne)'
         $authBootstrapSecret = Read-Host 'Hasło tymczasowe (min. 8 znaków, do 72 bajtów)' -AsSecureString
         $authBootstrapRepeat = Read-Host 'Powtórz hasło tymczasowe' -AsSecureString
         $authBootstrapPtr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($authBootstrapSecret)

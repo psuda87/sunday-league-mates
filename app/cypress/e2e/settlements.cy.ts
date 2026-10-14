@@ -1,6 +1,6 @@
 describe('Rozliczenia — przygotowany interfejs z kontrolowanym API', () => {
   const input = (label: string, value: string) => cy.get('ion-input').filter((_, el) =>
-    (el as unknown as { label: string }).label === label).find('input').clear().type(value);
+    (el as unknown as { label: string }).label === label).find('input').clear({log:false}).type(value,{log:false});
   const session = (role: 'member' | 'admin') => ({ user_id: crypto.randomUUID(), access_token: crypto.randomUUID(),
     refresh_token: crypto.randomUUID(), role, must_change_password: false, expires_in: 3600 });
   const profile = (user_id: string) => ({ user_id, login: 'Fixture', phone: '+12025550150', full_name: '', display_as: 'nickname', display_name: 'Fixture' });

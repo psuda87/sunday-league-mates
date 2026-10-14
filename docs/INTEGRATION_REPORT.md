@@ -1,3 +1,5 @@
+> Aktualizacja 14.10.2026 po dalszych kontrolach: bieżące wyniki i blokada Docker w [LOCAL_VERIFICATION.md](LOCAL_VERIFICATION.md). Poniższy raport opisuje pierwszy etap; historyczne NIE WYKONANO dla Vitest/Cypress jest już zastąpione wynikami nowego raportu. SQL/Android pozostają niewykonane.
+
 # Integracja wydarzeń, rozliczeń i powiadomień — etap 1
 
 Data: 14.10.2026. Worktree: `I:/slm/sunday-league-mates-integration`.

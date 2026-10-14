@@ -1,11 +1,11 @@
+import { normalizePolishPhone } from '../supabase/functions/_shared/phone.ts';
 import { randomUUID } from 'node:crypto';
 
 export function validateBootstrap(input) {
   if (!input || typeof input !== 'object' || Array.isArray(input) || input.confirm !== 'CREATE_FIRST_ADMIN') throw new Error('Potwierdzenie utworzenia konta jest wymagane.');
   const login = typeof input.login === 'string' ? input.login.trim().normalize('NFC') : '';
-  const phone = typeof input.phone === 'string' ? input.phone.replace(/[\s()-]/g, '') : '';
+  const phone = normalizePolishPhone(typeof input.phone === 'string' ? input.phone : '');
   if (!/^[\p{L}][\p{L}\p{N}_.-]{2,31}$/u.test(login)) throw new Error('Login: 3–32 znaki, pierwsza litera; dalej litery, cyfry, _, . lub -.');
-  if (!/^\+[1-9][0-9]{7,14}$/.test(phone)) throw new Error('Numer wymaga prefiksu kraju i 8–15 cyfr po +.');
   if (typeof input.password !== 'string' || input.password.length < 8 || Buffer.byteLength(input.password) > 72)
     throw new Error('Hasło tymczasowe: minimum 8 znaków, maksimum 72 bajty UTF-8.');
   return { login, phone, password: input.password };

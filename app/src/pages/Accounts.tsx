@@ -1,3 +1,5 @@
+import PhoneInput from '../components/PhoneInput';
+import { normalizePolishPhone, normalizePhoneUpdate, nationalPhone } from '../../supabase/functions/_shared/phone';
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
@@ -116,7 +118,7 @@ export default function Accounts() {
     let cancelled = false;
     manager.call<Profile>('profile').then(p => {
       if (cancelled) return;
-      setProfile(p); setFullName(p.full_name); setDisplayAs(p.display_as); setLogin(p.login); setPhone(p.phone);
+      setProfile(p); setFullName(p.full_name); setDisplayAs(p.display_as); setLogin(p.login); setPhone(nationalPhone(p.phone));
     }).catch(e => { if (!cancelled) failed(e); });
     return () => { cancelled = true; };
   }, [session, failed, manager]);
@@ -221,13 +223,12 @@ export default function Accounts() {
           </section>
           <section className="slm-panel"><h2>Login i telefon</h2>
             <form className="slm-form" onSubmit={event => { event.preventDefault(); void perform(async () => {
-              await manager.changeSession('identifiers', { login, phone, current_password: identityPassword });
+              await manager.changeSession('identifiers', { login, phone: normalizePhoneUpdate(phone, profile?.phone), current_password: identityPassword });
               setNotice('Login i telefon zostały zapisane. Poprzednie sesje wylogowano.');
             }).finally(() => setIdentityPassword('')); }}>
               <IonInput label="Login/pseudonim" labelPlacement="stacked" required value={login}
                 onIonInput={e => setLogin(e.detail.value ?? '')} />
-              <IonInput label="Numer telefonu z prefiksem kraju" labelPlacement="stacked" type="tel" placeholder="+48…" required
-                value={phone} onIonInput={e => setPhone(e.detail.value ?? '')} />
+              <PhoneInput label="Numer telefonu" value={phone} onChange={setPhone} />
               <IonInput label="Obecne hasło" labelPlacement="stacked" type="password" autocomplete="current-password" required
                 value={identityPassword} onIonInput={e => setIdentityPassword(e.detail.value ?? '')} />
               <p className="slm-muted">Numer służy do logowania i kontaktu w grupie. Nie wysyłamy SMS-ów.</p>
@@ -243,13 +244,12 @@ export default function Accounts() {
           <section className="slm-panel"><h1>Utwórz konto zawodnika</h1>
             <form className="slm-form" onSubmit={event => { event.preventDefault(); void perform(async () => {
               setTemporary(null);
-              const result = await manager.call<{ temporary_password: string }>('create_account', { login: createLogin, phone: createPhone });
+              const result = await manager.call<{ temporary_password: string }>('create_account', { login: createLogin, phone: normalizePolishPhone(createPhone) });
               setTemporary(result.temporary_password); setCreateLogin(''); setCreatePhone(''); await loadAccounts();
             }); }}>
               <IonInput label="Login/pseudonim zawodnika" labelPlacement="stacked" required value={createLogin}
                 onIonInput={e => setCreateLogin(e.detail.value ?? '')} />
-              <IonInput label="Numer telefonu zawodnika" labelPlacement="stacked" type="tel" placeholder="+48…" required
-                value={createPhone} onIonInput={e => setCreatePhone(e.detail.value ?? '')} />
+              <PhoneInput label="Numer telefonu zawodnika" value={createPhone} onChange={setCreatePhone} />
               <IonButton type="submit" disabled={busy}>Utwórz konto</IonButton>
             </form>
           </section>

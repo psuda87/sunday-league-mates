@@ -1,3 +1,5 @@
+import PhoneInput from '../components/PhoneInput';
+import { normalizePhoneUpdate, nationalPhone } from '../../supabase/functions/_shared/phone';
 import { useEffect, useState } from 'react';
 import { IonButton, IonInput, IonSelect, IonSelectOption, IonSpinner } from '@ionic/react';
 import type { SessionManager } from '../auth/sessionManager';
@@ -101,7 +103,7 @@ export default function Events({ manager, session, initialEventId }: { manager: 
           <IonButton size="small" fill="outline" disabled={busy} onClick={() => void work(() => operation(p.member_id ? (p.status === 'reserve' ? 'join' : 'reserve') : 'move_guest',
             p.member_id ? { user_id: p.member_id } : { participant_id: p.id, list: p.status === 'reserve' ? 'registered' : 'reserve' }))}>
             {p.status === 'reserve' ? 'Zapisz na mecz' : 'Przenieś na rezerwę'}</IonButton>
-          {!p.member_id && <IonButton size="small" fill="outline" disabled={busy} onClick={() => { setGuestEdit(p.id); setGuestName(p.guest_name ?? ''); setGuestPhone(p.guest_phone ?? ''); }}>Edytuj gościa</IonButton>}
+          {!p.member_id && <IonButton size="small" fill="outline" disabled={busy} onClick={() => { setGuestEdit(p.id); setGuestName(p.guest_name ?? ''); setGuestPhone(nationalPhone(p.guest_phone ?? '')); }}>Edytuj gościa</IonButton>}
         </div>}
       </div>
     </li>;
@@ -174,12 +176,12 @@ export default function Events({ manager, session, initialEventId }: { manager: 
       {e.registration_open && <section className="slm-panel"><h2>{guestEdit ? 'Edytuj gościa' : 'Dodaj gościa'}</h2>
         <form className="slm-form" onSubmit={event => { event.preventDefault(); void work(async () => {
           await operation(guestEdit ? 'edit_guest' : 'guest', { participant_id: guestEdit, request_id: guestRequestId,
-            guest_name: guestName, guest_phone: guestPhone, list: guestList, user_id: responsible });
+            guest_name: guestName, guest_phone: guestPhone.trim() ? normalizePhoneUpdate(guestPhone, detail.participants.find(p => p.id === guestEdit)?.guest_phone ?? undefined) : '', list: guestList, user_id: responsible });
           setGuestName(''); setGuestPhone(''); setGuestEdit(null);
           setGuestRequestId(crypto.randomUUID());
         }); }}>
           <IonInput label="Imię/pseudonim gościa" labelPlacement="stacked" required maxlength={100} value={guestName} onIonInput={ev => setGuestName(ev.detail.value ?? '')} />
-          <IonInput label="Telefon gościa (opcjonalnie, z prefiksem kraju)" labelPlacement="stacked" type="tel" value={guestPhone} onIonInput={ev => setGuestPhone(ev.detail.value ?? '')} />
+          <PhoneInput label="Telefon gościa (opcjonalnie)" required={false} value={guestPhone} onChange={setGuestPhone} />
           {!guestEdit && <IonSelect label="Lista gościa" labelPlacement="stacked" value={guestList} onIonChange={ev => setGuestList(ev.detail.value)}>
             <IonSelectOption value="registered">Uczestnicy</IonSelectOption><IonSelectOption value="reserve">Rezerwa</IonSelectOption></IonSelect>}
           {admin && !guestEdit && <IonSelect label="Konto odpowiedzialne" labelPlacement="stacked" value={responsible} onIonChange={ev => setResponsible(ev.detail.value)}>

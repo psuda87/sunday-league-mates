@@ -87,9 +87,9 @@ describe('granice modułu kont', () => {
     expect(r.status).toBe(503);expect((await r.json()).code).toBe('service_unavailable');
     expect(fetchMock.mock.calls.some(call=>call[0].includes('logout'))).toBe(false);
   });
-  it('normalizuje aliasy bez zgadywania kraju i odrzuca login telefoniczny', () => {
+  it('normalizuje aliasy z domyślną Polską i odrzuca login telefoniczny', () => {
     expect(normalizePhone('+48 (555) 010-123')).toBe('+48555010123');
-    expect(() => normalizePhone('555010123')).toThrow();
+    expect(normalizePhone('555010123')).toBe('+48555010123');
     expect(normalizeLogin(' Żółw_27 ')).toBe('Żółw_27');
     expect(() => normalizeLogin('+48555010123')).toThrow();
     expect(() => normalizeLogin('login,phone.eq.other')).toThrow();

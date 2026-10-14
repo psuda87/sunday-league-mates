@@ -38,7 +38,7 @@ try {
     'Wymagane są docelowe hooki modułu kont.',
     'Potwierdzenie utworzenia konta jest wymagane.',
     'Login: 3–32 znaki, pierwsza litera; dalej litery, cyfry, _, . lub -.',
-    'Numer wymaga prefiksu kraju i 8–15 cyfr po +.',
+    'Podaj polski numer: dokładnie 9 cyfr, opcjonalnie z +48 lub 0048.',
     'Hasło tymczasowe: minimum 8 znaków, maksimum 72 bajty UTF-8.',
     'Nie ukończono bootstrap; własne nowe konto wymaga kontroli w panelu projektu.',
     'Nie ukończono bootstrap. Sprawdź stan projektu przed ponowieniem; nie zmieniaj istniejących kont.',

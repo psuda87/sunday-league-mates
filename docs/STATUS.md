@@ -1,46 +1,49 @@
 # Aktualny stan Sunday League Mates
 
-Aktualizacja: 14.10.2026. Branch: `feat/integration`, worktree `I:/slm/sunday-league-mates-integration`.
-Baza: `origin/feat/events` (`6638e18`); lokalnie zintegrowano `origin/feat/settlements`
-(`81d71c7`) i `origin/feat/push-notifications` (`103d08c`). Bez pusha i zmian innych gałęzi.
-Oryginalny katalog na feat/events i nieśledzony pics/ zachowano.
+14.10.2026 — feat/integration, I:/slm/sunday-league-mates-integration.
+Settlements i push-notifications zintegrowane na bazie feat/events.
+Sprawdzone poprawki i dokumentacja zapisane lokalnym commitem tego zadania; bez pusha. Oryginalny katalog i pics/ zachowano.
 
 ## Wykonane
 
-- Auth i sesje, wydarzenia, goście i rezerwa zachowane.
-- Połączono UI/API rozliczeń i centrum powiadomień, wspólny RPC zapisów z kontrolą
-  dwóch zaległych meczów oraz nawigację finansowego powiadomienia do Rozliczeń.
-- Adapter tworzy inbox/outbox dla rzeczywistych decyzji wpłat i zmian blokady
-  w tej samej transakcji, po końcowym przeliczeniu, z kluczem trwałego audytu.
-- Sześć nowych migracji jest przygotowanych i połączonych, ale **nie zastosowanych**.
-  Edge accounts/push-worker zmienione lokalnie, **nie wdrożone**. Firebase nie konfigurowano.
+Auth/sesje, wydarzenia, goście i rezerwa; połączone rozliczenia i centrum powiadomień.
+Transakcyjny adapter finansowego inbox/outbox przygotowany, SQL nadal niezweryfikowany.
+Polskie numery: 9 cyfr, +48/0048/separatory; wspólna normalizacja UI/Edge/bootstrap,
+stały prefiks, brak zmiany danych istniejących kont. Historyczne numery zachowane.
+Naprawiona atrapa otwierania powiadomienia w Cypress.
 
-## Kontrole zintegrowanej wersji
+## Wdrożenia
 
-| Kontrola | Wynik |
-|---|---|
-| npm ci z istniejącego lockfile | OK; binarium Cypress pominięte |
-| TypeScript klienta | OK |
-| Strict TypeScript accounts i push-worker | OK |
-| ESLint | OK, bez błędów i ostrzeżeń po poprawkach |
-| Build webowy | OK; ostrzeżenie chunków >500 kB |
-| git diff --check | OK |
-| Migracje / testy SQL / RLS / równoczesność | NIE WYKONANO |
-| Vitest / Cypress / Android / iOS / FCM | NIE WYKONANO w tej integracji |
+Sześć nowych migracji finansów/powiadomień NIE ZASTOSOWANO.
+Accounts i push-worker NIE WDROŻONO w tym etapie. Zdalny Supabase bez zmian.
+Firebase nie konfigurowano. Lokalna izolowana konfiguracja przygotowana, start zablokowany.
 
-Starsze wyniki Auth/events nie są dowodem działania integracji.
+## Faktyczne kontrole
 
-## Otwarte i następny krok
+- TypeScript klienta, Deno check trzech wejść Edge, lint, build web, git diff --check: OK.
+- Vitest 66/66 (11 plików), bootstrap mock 6/6, Cypress API mock 10/10 (4 pliki).
+- Audit: 6 moderate, produkcyjny 3 moderate, 0 high/critical; bez zmiany zależności.
+- Build: ostrzeżenie dużych chunków. Cypress: Electron deprecated/Browserslist.
+- Rzeczywiste migracje/SQL/RLS/wyścigi: NIEWYKONANE, brak Docker/Podman i WSL.
+- Android/iOS/FCM integracji: NIEWYKONANE. Starsze ręczne testy Auth nie dowodzą integracji.
 
-Kod przygotowany do kolejnego etapu lokalnej weryfikacji, ale poprawność SQL i adaptera
-nie jest potwierdzona wykonaniem. Docker, Supabase CLI i Deno nie są dostępne w PATH.
-Potrzebne jest jednorazowe lokalne środowisko Supabase, sześć migracji w kolejności,
-testy finansów/powiadomień oraz wyścigi i RLS. Nie używać zdalnego projektu ani
-starych skryptów test-events z DELETE nieusuwalnej historii finansów.
-Worktree ma ignorowany `.env.local` z wyłącznie lokalnym URL accounts, bez sekretów;
-nie skopiowano żadnej konfiguracji kont z oryginalnego katalogu. Push domyślnie wyłączony.
-CAPTCHA i ręczne testy offline/starych sesji odłożone, iOS niezweryfikowany.
-Zatrzymano pracę po pierwszej weryfikacji; dalsze testy/wdrożenia wymagają polecenia.
+## Następny etap / ograniczenia
 
-Szczegóły: [INTEGRATION_REPORT.md](INTEGRATION_REPORT.md),
-[SETTLEMENTS_MODULE.md](SETTLEMENTS_MODULE.md), [PUSH_NOTIFICATIONS.md](PUSH_NOTIFICATIONS.md).
+Uruchomić Docker Desktop, izolowane migracje i przygotowane SQL, uzupełnić prawdziwe
+równoległe RPC oraz test adaptera finansowego/rollback; potem lokalny Auth i Android.
+CLI 2.121.0 i Deno 2.9.6 działają przez cache npm, nie wymagają globalnej instalacji.
+CAPTCHA odłożona; iOS, FCM i dodatkowe ręczne scenariusze sesji niezweryfikowane.
+Nie uruchamiać starych zdalnych harnessów testowych ani resetować bazy.
+
+Szczegóły, lista migracji i instrukcje: [LOCAL_VERIFICATION.md](LOCAL_VERIFICATION.md).
+
+## Ponowne sprawdzenie środowiska
+
+Git diff --check: OK; przegląd zmienionych plików nie wykazał sekretów ani artefaktów.
+Supabase CLI 2.121.0 działa także przez npx supabase. Docker Desktop nie znaleziono
+w standardowych lokalizacjach ani rejestrze aplikacji; brak docker.exe w PATH,
+usługi com.docker.service i procesów silnika. Etap bazodanowy zatrzymany.
+Nie wykonywano startu, migracji, SQL, RPC/RLS ani testów atomowości w tym zadaniu.
+Nie resetowano baz, nie instalowano Dockera, nie zmieniano Windows ani zdalnego Supabase.
+Wyniki testów kodu powyżej pochodzą z poprzedniego etapu; nie powtarzano ich przy
+samym przeglądzie i aktualizacji dokumentacji.

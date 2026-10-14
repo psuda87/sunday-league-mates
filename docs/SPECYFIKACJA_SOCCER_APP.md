@@ -48,6 +48,7 @@ Zasady oznaczone jako „ustalone” wynikają z rozmowy z użytkownikiem. „Pr
 
 - Nie ma publicznej rejestracji ani zaproszeń mailowych. Nie wysyłamy SMS-ów ani automatycznej poczty, także przy tworzeniu konta i resetowaniu hasła.
 - Konto pozwala logować się numerem telefonu lub unikalnym loginem/pseudonimem, z tym samym hasłem. Pole logowania ma etykietę „Login lub numer telefonu”. Numer jest identyfikatorem, bez weryfikacji SMS.
+- Ustalenie 14.10.2026: domyślnie polskie numery, dokładnie 9 cyfr, również wejście z +48, 0048 i spacjami. Formularze mają stały prefiks +48; zapis +48XXXXXXXXX. Za krótki lub za długi numer jest odrzucany. Istniejące konta i zagraniczne aliasy zachowujemy bez migracji danych; niezmieniony historyczny numer może pozostać przy edycji innych danych.
 - Administrator ustawia hasło tymczasowe. Pierwsze logowanie wymaga jego zmiany przed korzystaniem z pozostałych funkcji aplikacji.
 - Generowane hasło tymczasowe ma maksymalnie 12 znaków; moduł generuje dokładnie 12 znaków kryptograficznie losowych. Hasło ustawiane przez użytkownika wymaga minimum 8 znaków (maksimum 72 bajty UTF-8 w obecnym Supabase Auth); maksimum 12 znaków nie dotyczy własnego hasła użytkownika.
 - Administrator może resetować hasło do tymczasowego i przekazać je ręcznie. Po takim resecie następne logowanie ponownie wymaga zmiany hasła. Administrator nie może odczytać obecnego hasła zawodnika.

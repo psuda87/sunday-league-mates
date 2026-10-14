@@ -15,12 +15,12 @@ describe('Centrum powiadomień z kontrolowanym API (przygotowane)', () => {
       else if (req.body.action==='notifications_count') req.reply({ unread: read ? 0 : 1 });
       else if (req.body.action==='notifications_list') req.reply({ notifications: [item()],unread: read ? 0 : 1,
         preferences: { new_match: true,vacancy: true,reminder: true,match_changed: true,finance: true } });
-      else if (req.body.action==='notifications_open') { expect(req.body.notification_id).to.eq(id); read=true; req.reply(item()); }
+      else if (req.body.action==='notifications_open') { expect(req.body.notification_id).to.eq(id); read=true; req.reply({ body: item() }); }
       else if (req.body.action==='events_list') req.reply({ events: [event],server_now: '2026-10-14T12:00:00Z' });
       else if (req.body.action==='events_detail') req.reply({ event,participants: [],server_now: '2026-10-14T12:00:00Z' });
       else req.reply({ ok: true });
     });
-    const input = (label: string,value: string) => cy.get('ion-input').filter((_,el) => (el as unknown as { label: string }).label===label).find('input').type(value);
+    const input = (label: string,value: string) => cy.get('ion-input').filter((_,el) => (el as unknown as { label: string }).label===label).find('input').type(value, {log:false});
     cy.visit('/'); input('Login lub numer telefonu','Fixture'); input('Hasło',crypto.randomUUID()); cy.contains('ion-button','Zaloguj się').click();
     cy.contains('ion-button','Powiadomienia (1)').click(); cy.contains('Centrum powiadomień').should('be.visible');
     cy.contains('Historia i licznik w aplikacji działają niezależnie').should('be.visible');
