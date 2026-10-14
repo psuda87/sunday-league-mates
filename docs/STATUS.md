@@ -1,5 +1,32 @@
 # Aktualny stan Sunday League Mates
 
+Aktualizacja 14.10.2026: **`feat/push-notifications`**, baza
+`origin/feat/events` (`6638e18b4ed763e5bdee45ea61416a576e00bbec`). Checkout był
+czysty. Potwierdzono zapis i push `origin/feat/settlements`:
+`81d71c7fb24dc4b410f178c3fa4101a5fa2ce410`; nie skopiowano rozliczeń ani nie scalano gałęzi.
+
+Przygotowano inbox/nieprzeczytane/kategorie, zdarzenia wydarzeń, przypomnienia
+24h/2h z harmonogramem pg_cron, chronione urządzenia i detach przy logout,
+worker Edge FCM HTTP v1 z lease/ponowieniami, Android 13+ i opcjonalną konfigurację,
+adapter tokenu FCM dla przyszłego iOS oraz osobny kontrakt finansów bez emisji atrap.
+Dodano `@capacitor/push-notifications@8.0.0`; odświeżono wyłącznie package-lock
+z wyłączonymi skryptami. Instalacja i synchronizacja natywna pozostają do wykonania.
+
+Oczekują migracje `20261014120000_notifications_core.sql`,
+`20261014121000_notifications_rpc_and_worker.sql`,
+`20261014122000_notifications_events_eligibility.sql` oraz osobny skrypt
+konfiguracji harmonogramu `enable_push_schedule.sql`.
+**Nie uruchomiono żadnych testów, Cypress, lintowania/typów, buildów, emulatorów,
+cap sync, migracji ani wdrożeń. Implementacja jest nieprzetestowana i niewdrożona.**
+Commit/push źródeł tej gałęzi są autoryzowane; nie oznaczają wdrożenia lub odbioru.
+Ryzyka i wieczorny plan: [PUSH_NOTIFICATIONS.md](PUSH_NOTIFICATIONS.md).
+Integracja finansów: [PUSH_FINANCE_ADAPTER.md](PUSH_FINANCE_ADAPTER.md).
+Następny krok: izolowana weryfikacja SQL/RLS i Androida, późniejsza konfiguracja
+Firebase Spark/FCM, Edge Secrets i Vault. iOS i prawdziwe dostawy pozostają otwarte.
+
+Poniżej zachowano wcześniejszy stan i historyczne wyniki Auth/events; nie są
+wynikami nowego modułu powiadomień.
+
 Aktualizacja: 13.10.2026. Branch: `feat/events`. Projekt Supabase: `hjtcyybkxebvdropchac`.
 Stan wdrożeń i testów: [AUTH_PROOF.md](AUTH_PROOF.md) i [EVENTS_MODULE.md](EVENTS_MODULE.md).
 Podstawowe działanie modułu kont odebrane ręcznie na Androidzie; dodatkowe scenariusze nadal otwarte.

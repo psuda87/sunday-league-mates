@@ -1,6 +1,7 @@
 # Instrukcje pracy nad Sunday League Mates
 
 - Kod aplikacji znajduje się w `app/`, dokumentacja w `docs/`.
+- Etap 14.10.2026: push na `feat/push-notifications` z `origin/feat/events`, bez kodu rozliczeń. Użytkownik autoryzował commit i push tej gałęzi, bez scalania. Nie uruchamiać w tym zadaniu testów, Cypress, lintowania/typów, buildów, emulatorów, cap sync, migracji ani wdrożeń. Zasady i przyszła konfiguracja: `docs/PUSH_NOTIFICATIONS.md`, kontrakt finansów: `docs/PUSH_FINANCE_ADAPTER.md`. Brak Firebase nie może blokować aplikacji; używać tylko FCM, bez Firebase Auth/Firestore i bez płatnych planów.
 - Po każdym zakończonym zadaniu aktualizuj `docs/STATUS.md` jako krótkie źródło aktualnego stanu: data, bieżący branch, wykonane funkcje, wdrożone migracje i Edge Functions, faktyczne wyniki testów, otwarte problemy oraz następny krok. Rozróżniaj testy automatyczne od ręcznych i nie oznaczaj niewykonanych kontroli jako zaliczonych. Nie zapisuj w tym pliku sekretów, haseł, tokenów ani danych kont.
 - Przed każdą zmianą sprawdzaj aktualny branch (`git branch --show-current`). Nowe funkcje realizujemy na osobnych branchach; `main` przechowuje sprawdzoną wersję. Moduł Auth scalono z `feat/auth` do `main`; użytkownik autoryzował implementację wydarzeń na `feat/events`. Historyczne narzędzia Auth wymagające `feat/auth` zachowują własne zabezpieczenia brancha.
 - Stos projektu: TypeScript, Ionic React i Capacitor. Zachowuj identyfikator aplikacji `pl.psuda87.slm` i nazwę wyświetlaną `Sunday League Mates`.

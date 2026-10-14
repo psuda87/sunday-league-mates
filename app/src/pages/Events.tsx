@@ -6,7 +6,7 @@ import { emptyMatchForm, matchDate, money, nextMatchDay, warsawFields } from '..
 import type { Detail, Match, MatchForm, Participant } from '../events/model';
 import './Events.css';
 
-export default function Events({ manager, session }: { manager: SessionManager; session: Session }) {
+export default function Events({ manager, session, initialEventId }: { manager: SessionManager; session: Session; initialEventId?: string | null }) {
   const [matches, setMatches] = useState<Match[]>([]);
   const [detail, setDetail] = useState<Detail | null>(null);
   const [form, setForm] = useState<MatchForm | null>(null);
@@ -46,6 +46,14 @@ export default function Events({ manager, session }: { manager: SessionManager; 
       .catch(e => { if (alive) setError(e instanceof Error ? e.message : 'Nie udało się pobrać meczów.'); });
     return () => { alive = false; };
   }, [manager]);
+  useEffect(() => {
+    if (!initialEventId) return;
+    let alive = true;
+    manager.call<Detail>('events_detail',{ event_id: initialEventId }).then(r => {
+      if (alive) { setDetail(r); setServerNow(r.server_now); setForm(null); }
+    }).catch(e => { if (alive) setError(e instanceof Error ? e.message : 'Nie udało się otworzyć meczu.'); });
+    return () => { alive = false; };
+  },[manager,initialEventId]);
   async function operation(action: string, values: Record<string, unknown> = {}) {
     if (!detail) return;
     await manager.call('events_' + action, { event_id: detail.event.id, ...values });
@@ -107,7 +115,7 @@ export default function Events({ manager, session }: { manager: SessionManager; 
       <form className="slm-form" onSubmit={event => { event.preventDefault(); void work(async () => {
         const result = await manager.call<{ event_id: string }>(editId ? 'events_edit' : 'events_create', { ...form, event_id: editId,
           duration_minutes: Number(form.duration_minutes), hourly_rate: Number(form.hourly_rate), total_cost: Number(form.total_cost), capacity: Number(form.capacity) });
-        await open(result.event_id); setNotice('Mecz zapisany. Powiadomienia push nie są jeszcze aktywne.');
+        await open(result.event_id); setNotice('Mecz zapisany. Powiadomienia obsługuje centrum; systemowy push wymaga konfiguracji.');
       }); }}>
         <label>Data<input type="date" required value={form.date} onChange={ev => update('date', ev.target.value)} /></label>
         <label>Godzina<input type="time" required value={form.time} onChange={ev => update('time', ev.target.value)} /></label>
@@ -135,7 +143,7 @@ export default function Events({ manager, session }: { manager: SessionManager; 
         </div>}
       </section>
       <section className="slm-panel"><h2>Uczestnicy</h2><ul className="slm-participants">{detail.participants.filter(p => p.status === 'registered').map(participant)}</ul>{!e.registered_count && <p>Brak zapisanych.</p>}</section>
-      <section className="slm-panel"><h2>Rezerwa</h2><p className="slm-muted">Nie zajmuje miejsc. Bez automatycznego awansu: pierwszy skuteczny zapis zajmuje wolne miejsce. Push nie jest jeszcze aktywny.</p>
+      <section className="slm-panel"><h2>Rezerwa</h2><p className="slm-muted">Nie zajmuje miejsc. Bez automatycznego awansu: pierwszy skuteczny zapis zajmuje wolne miejsce. Powiadomienie o miejscu nie jest potwierdzeniem zapisu.</p>
         <ul className="slm-participants">{detail.participants.filter(p => p.status === 'reserve').map(participant)}</ul>{!e.reserve_count && <p>Rezerwa jest pusta.</p>}</section>
       {admin && e.registration_open && <section className="slm-panel"><h2>Zarządzaj uczestnikami</h2>
         <IonButton fill="outline" disabled={busy} onClick={() => void work(() => loadPeople())}>Wczytaj zawodników</IonButton>

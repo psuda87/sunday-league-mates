@@ -9,13 +9,23 @@ import { SessionManager } from '../auth/sessionManager';
 import { tokenStore } from '../auth/tokenStore';
 import './Accounts.css';
 import Events from './Events';
+import Notifications from './Notifications';
+import { NativePush } from '../notifications/nativePush';
+import type { NotificationItem } from '../notifications/model';
 
 export default function Accounts() {
   const [manager] = useState(() => new SessionManager(tokenStore, accountRequest));
   const auth = useSyncExternalStore(manager.subscribe, manager.getSnapshot);
   const session = auth.session;
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [screen, setScreen] = useState<'profile' | 'admin' | 'events'>('profile');
+  const [screen, setScreen] = useState<'profile' | 'admin' | 'events' | 'notifications'>('profile');
+  const [eventTarget, setEventTarget] = useState<string | null>(null);
+  const [pendingNotification, setPendingNotification] = useState<string | null>(null);
+  const [unread, setUnread] = useState<number | null>(null);
+  const [notificationVersion, setNotificationVersion] = useState(0);
+  const [pushStatus, setPushStatus] = useState('Systemowy push jest opcjonalny.');
+  const [push] = useState(() => new NativePush(manager,setPendingNotification,
+    () => setNotificationVersion(v => v+1),setPushStatus));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -49,6 +59,40 @@ export default function Accounts() {
     setBusy(true); setError(''); setNotice('');
     try { await work(); } catch (e) { failed(e); } finally { setBusy(false); }
   }
+  async function logout() { await push.beforeLogout(); await manager.logout(); }
+  const openNotification = useCallback(async (id: string) => {
+    // Cel pochodzi z własnego rekordu bazy, nigdy bezpośrednio z payloadu FCM.
+    const notification = await manager.call<NotificationItem>('notifications_open',{ notification_id: id });
+    setNotificationVersion(v => v+1);
+    if (notification.event_id) { setEventTarget(notification.event_id); setScreen('events'); }
+    else {
+      setScreen('notifications');
+      if (notification.category === 'finance') setNotice('Integracja widoku rozliczeń będzie dostępna po połączeniu modułów.');
+    }
+  },[manager]);
+  useEffect(() => { void push.start(); return () => { void push.stop(); }; },[push]);
+  useEffect(() => {
+    if (auth.phase === 'ready' && session && !session.must_change_password) void push.resume();
+    else push.pause();
+  },[push,auth.phase,session]);
+  useEffect(() => {
+    if (auth.phase !== 'ready' || !session || session.must_change_password) { setUnread(null); return; }
+    let alive = true;
+    const refresh = () => {
+      void manager.call<{ unread: number }>('notifications_count')
+        .then(r => { if (alive) setUnread(Number.isInteger(r.unread) ? r.unread : null); })
+        .catch(() => { if (alive) setUnread(null); });
+    };
+    refresh(); const timer = window.setInterval(refresh,60000);
+    return () => { alive = false; window.clearInterval(timer); };
+  },[manager,auth.phase,session,notificationVersion]);
+  useEffect(() => {
+    if (!pendingNotification || auth.phase !== 'ready' || !session || session.must_change_password) return;
+    let alive = true;
+    void openNotification(pendingNotification).catch(e => { if (alive) failed(e); })
+      .finally(() => { if (alive) setPendingNotification(null); });
+    return () => { alive = false; };
+  },[pendingNotification,auth.phase,session,openNotification,failed]);
   useEffect(() => { void manager.refresh(); }, [manager]);
   useEffect(() => {
     if (auth.phase !== 'ready') { setProfile(null); setAccounts([]); clearSecrets(); }
@@ -117,11 +161,11 @@ export default function Accounts() {
       {auth.message && <p role="alert" className="slm-error">⚠ {auth.message}</p>}
       {busy && <div role="status" aria-label="Trwa operacja"><IonSpinner /></div>}
       {auth.phase === 'checking' ? <section className="slm-panel" role="status"><IonSpinner /><p>Sprawdzanie sesji…</p>
-        <IonButton onClick={() => void perform(() => manager.logout())}>Wyloguj się</IonButton></section> :
+        <IonButton onClick={() => void perform(logout)}>Wyloguj się</IonButton></section> :
         auth.phase === 'unavailable' || auth.phase === 'storage_error' ? <section className="slm-panel">
           <h1>Potwierdź dostęp do konta</h1><p>Chronione dane będą dostępne po sprawdzeniu sesji.</p>
           <IonButton disabled={busy} onClick={() => void perform(() => manager.refresh())}>Spróbuj ponownie</IonButton>
-          <IonButton fill="outline" disabled={busy} onClick={() => void perform(() => manager.logout())}>Wyloguj się</IonButton>
+          <IonButton fill="outline" disabled={busy} onClick={() => void perform(logout)}>Wyloguj się</IonButton>
         </section> : !session ? <section className="slm-panel">
         <h1>Zaloguj się</h1><p className="slm-muted">Dane konta otrzymasz od administratora grupy.</p>
         <form className="slm-form" onSubmit={event => {
@@ -137,20 +181,24 @@ export default function Accounts() {
         </form><p className="slm-muted">Nie pamiętasz hasła? Poproś administratora o reset.</p>
       </section> : <>
         <nav className="slm-actions" aria-label="Konto">
+          {!session.must_change_password && <IonButton fill={screen === 'notifications' ? 'solid' : 'outline'}
+            onClick={() => { setScreen('notifications'); setTemporary(null); }}>Powiadomienia{unread !== null && unread>0 ? ` (${unread})` : ''}</IonButton>}
           {!session.must_change_password && <IonButton fill={screen === 'events' ? 'solid' : 'outline'}
-            onClick={() => { setScreen('events'); setTemporary(null); }}>Mecze</IonButton>}
+            onClick={() => { setScreen('events'); setEventTarget(null); setTemporary(null); }}>Mecze</IonButton>}
           {!session.must_change_password && <IonButton fill={screen === 'profile' ? 'solid' : 'outline'}
             onClick={() => { setScreen('profile'); setTemporary(null); }}>Mój profil</IonButton>}
           {!session.must_change_password && session.role === 'admin' && <IonButton fill={screen === 'admin' ? 'solid' : 'outline'}
             disabled={busy} onClick={() => { setScreen('admin'); setTemporary(null); void perform(() => loadAccounts(0)); }}>Zarządzaj kontami</IonButton>}
           <IonButton fill="clear" disabled={busy} onClick={() => {
-            void perform(async () => { try { await manager.logout(); }
+            void perform(async () => { try { await logout(); }
               finally { setProfile(null); setAccounts([]); clearSecrets(); } });
           }}>Wyloguj się</IonButton>
         </nav>
         {session.must_change_password ? <section className="slm-panel">
           <h1>Zmień hasło tymczasowe</h1><p>Przed korzystaniem z grupy ustaw własne hasło.</p>{passwordForm}
-        </section> : screen === 'events' ? <Events manager={manager} session={session} /> : screen === 'profile' || session.role !== 'admin' ? <>
+        </section> : screen === 'notifications' ? <Notifications manager={manager} push={push} pushStatus={pushStatus}
+          onOpen={openNotification} onRefresh={() => setNotificationVersion(v => v+1)} /> :
+          screen === 'events' ? <Events manager={manager} session={session} initialEventId={eventTarget} /> : screen === 'profile' || session.role !== 'admin' ? <>
           <section className="slm-panel">
             <h1>{profile?.display_name || 'Mój profil'}</h1>
             {profile && <a className="slm-call" href={`tel:${profile.phone}`}>Zadzwoń</a>}
