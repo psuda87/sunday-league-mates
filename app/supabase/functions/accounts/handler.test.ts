@@ -3,6 +3,42 @@ import { webcrypto } from 'node:crypto';
 import { createHandler, displayName, normalizeLogin, normalizePhone, randomPassword } from './handler';
 
 afterEach(() => vi.unstubAllGlobals());
+describe('brama rozliczeń (kontrolowane RPC)', () => {
+  async function attempt(code: string, temporary = false) {
+    vi.stubGlobal('crypto', webcrypto);
+    const id = webcrypto.randomUUID(), sid = webcrypto.randomUUID(), request = webcrypto.randomUUID();
+    const token = ['synthetic', btoa(JSON.stringify({ sub: id, session_id: sid })), 'unsigned'].join('.');
+    let called = false;
+    vi.stubGlobal('fetch', vi.fn(async (url: string, options: RequestInit) => {
+      const reply = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status });
+      if (url.includes('slm_account_rate')) return reply(true);
+      if (url.endsWith('/auth/v1/user')) return reply({ id });
+      if (url.includes('slm_account_context')) return reply({ role: 'member', must_change_password: temporary });
+      if (url.includes('slm_settlements_dispatch')) {
+        called = true;
+        const body = JSON.parse(options.body as string);
+        expect(body.p_user).toBe(id); expect(body.p_session).toBe(sid); expect(body.p_action).toBe('approve');
+        expect(body.p_body.request_id).toBe(request);
+        return reply({ code: 'P0001', message: code }, 400);
+      }
+      throw new Error('Nieoczekiwane żądanie');
+    }));
+    const handler = createHandler({ url: 'https://example.invalid', anon: '', service: '', origins: [] });
+    const response = await handler(new Request('https://example.invalid', { method: 'POST', headers: { authorization: 'Bearer ' + token },
+      body: JSON.stringify({ action: 'settlements_approve', request_id: request, p_user: webcrypto.randomUUID(), role: 'admin' }) }));
+    return { response, called };
+  }
+  it('nie ufa roli ani tożsamości z formularza i zachowuje identyfikator operacji', async () => {
+    const r = await attempt('forbidden');
+    expect(r.called).toBe(true); expect(r.response.status).toBe(403); expect((await r.response.json()).code).toBe('forbidden');
+  });
+  it('odrzuca hasło tymczasowe przed wywołaniem finansowego RPC', async () => {
+    const r = await attempt('forbidden', true); expect(r.called).toBe(false); expect(r.response.status).toBe(403);
+  });
+  it.each(['stale_version', 'already_approved', 'payment_processed', 'idempotency_conflict'])('tłumaczy bezpiecznie konflikt %s', async code => {
+    const r = await attempt(code); expect(r.response.status).toBe(409); expect((await r.response.json()).code).toBe(code);
+  });
+});
 describe('brama wydarzeń', () => {
   async function attempt(temporary: boolean) {
     vi.stubGlobal('crypto', webcrypto);

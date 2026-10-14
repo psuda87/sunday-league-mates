@@ -9,13 +9,14 @@ import { SessionManager } from '../auth/sessionManager';
 import { tokenStore } from '../auth/tokenStore';
 import './Accounts.css';
 import Events from './Events';
+import Settlements from './Settlements';
 
 export default function Accounts() {
   const [manager] = useState(() => new SessionManager(tokenStore, accountRequest));
   const auth = useSyncExternalStore(manager.subscribe, manager.getSnapshot);
   const session = auth.session;
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [screen, setScreen] = useState<'profile' | 'admin' | 'events'>('profile');
+  const [screen, setScreen] = useState<'profile' | 'admin' | 'events' | 'settlements'>('profile');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -137,6 +138,8 @@ export default function Accounts() {
         </form><p className="slm-muted">Nie pamiętasz hasła? Poproś administratora o reset.</p>
       </section> : <>
         <nav className="slm-actions" aria-label="Konto">
+          {!session.must_change_password && <IonButton fill={screen === 'settlements' ? 'solid' : 'outline'}
+            onClick={() => { setScreen('settlements'); setTemporary(null); }}>Rozliczenia</IonButton>}
           {!session.must_change_password && <IonButton fill={screen === 'events' ? 'solid' : 'outline'}
             onClick={() => { setScreen('events'); setTemporary(null); }}>Mecze</IonButton>}
           {!session.must_change_password && <IonButton fill={screen === 'profile' ? 'solid' : 'outline'}
@@ -150,7 +153,7 @@ export default function Accounts() {
         </nav>
         {session.must_change_password ? <section className="slm-panel">
           <h1>Zmień hasło tymczasowe</h1><p>Przed korzystaniem z grupy ustaw własne hasło.</p>{passwordForm}
-        </section> : screen === 'events' ? <Events manager={manager} session={session} /> : screen === 'profile' || session.role !== 'admin' ? <>
+        </section> : screen === 'settlements' ? <Settlements manager={manager} session={session} /> : screen === 'events' ? <Events manager={manager} session={session} /> : screen === 'profile' || session.role !== 'admin' ? <>
           <section className="slm-panel">
             <h1>{profile?.display_name || 'Mój profil'}</h1>
             {profile && <a className="slm-call" href={`tel:${profile.phone}`}>Zadzwoń</a>}

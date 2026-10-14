@@ -201,6 +201,44 @@ export function createHandler(env: Environment) {
       if (action === 'status') return respond({ must_change_password: ctx.must_change_password, role: ctx.role, user_id: ctx.id });
       if (ctx.must_change_password && action !== 'password')
         throw new ApiError(403, 'password_required', 'Najpierw zmień hasło tymczasowe.');
+      if (action.startsWith('settlements_')) {
+        await rate('settlements:' + ctx.id, 60);
+        const r = await call('/rest/v1/rpc/slm_settlements_dispatch', 'POST', {
+          p_user: ctx.id, p_session: ctx.sid, p_action: action.slice(12), p_body: body,
+        }, undefined, true);
+        if (!r.ok) {
+          const messages: Record<string, [number, string]> = {
+            session_invalid: [401, 'Sesja wygasła. Zaloguj się ponownie.'],
+            forbidden: [403, 'Brak uprawnień do tej operacji.'],
+            not_found: [404, 'Nie znaleziono rozliczenia, uczestnika lub wpłaty.'],
+            invalid_action: [400, 'Nieznana operacja rozliczeń.'],
+            invalid_amount: [400, 'Podaj kwotę w pełnych groszach; wpłata musi być dodatnia.'],
+            invalid_participant: [400, 'Nieprawidłowy zawodnik lub decyzja o opłacie.'],
+            invalid_replacement: [409, 'Ten udział nie może przejąć wskazanego zobowiązania. Odśwież rozliczenie.'],
+            reason_required: [400, 'Podaj powód decyzji (1–500 znaków).'],
+            request_required: [400, 'Brak identyfikatora operacji.'],
+            request_closed: [409, 'Żądanie zostało zamknięte bez księgowania. Sprawdź historię i rozpocznij nową operację.'],
+            idempotency_conflict: [409, 'Ten identyfikator jest przypisany do innej operacji.'],
+            stale_version: [409, 'Rozliczenie lub wpłata zostały zmienione. Odśwież dane przed ponowną decyzją.'],
+            already_approved: [409, 'Mecz został już zatwierdzony. Dalsze zmiany są korektami.'],
+            match_not_finished: [409, 'Zatwierdzenie jest możliwe dopiero po planowanym końcu meczu.'],
+            event_cancelled: [409, 'Mecz został odwołany.'],
+            no_payers: [409, 'Nie można podzielić dodatniego kosztu bez osób zobowiązanych do zapłaty.'],
+            payment_processed: [409, 'Zgłoszenie wpłaty zostało już rozpatrzone.'],
+            payment_not_accepted: [409, 'Można korygować tylko zaksięgowaną wpłatę.'],
+            no_change: [409, 'Nowa kwota nie zmienia zaksięgowanej wpłaty.'],
+          };
+          const code = typeof r.data?.message === 'string' ? r.data.message : '';
+          if (messages[code]) throw new ApiError(messages[code][0], code, messages[code][1]);
+          if (['22P02', '22003', '23514', '23502'].includes(r.data?.code))
+            throw new ApiError(400, 'invalid_input', 'Sprawdź kwotę i wymagane pola.');
+          if (r.data?.code === '23505')
+            throw new ApiError(409, 'operation_conflict', 'Operacja już istnieje. Odśwież dane.');
+          // Wynik może być nieznany po timeout. Ponowienie MUSI użyć tego samego request_id.
+          throw new ApiError(503, 'service_unavailable', 'Nie udało się potwierdzić operacji. Ponów ją z tym samym identyfikatorem.');
+        }
+        return respond(r.data);
+      }
       if (action.startsWith('events_')) {
         await rate('events:' + ctx.id, 90);
         const r = await call('/rest/v1/rpc/slm_events_dispatch', 'POST', {
@@ -221,6 +259,9 @@ export function createHandler(env: Environment) {
             invalid_guest: [400, 'Podaj nazwę gościa i poprawny opcjonalny numer z prefiksem kraju.'],
             invalid_participant: [400, 'Nieprawidłowy uczestnik.'],
             invalid_action: [400, 'Nieznana operacja wydarzenia.'],
+            settlement_blocked: [409, 'Dwa nieuregulowane mecze blokują nowy zapis i dodawanie gości. Sprawdź Rozliczenia.'],
+            use_settlements: [409, 'Obecność po zatwierdzeniu zmień w panelu rozliczenia z powodem korekty.'],
+            reason_required: [400, 'Podaj powód odwołania zatwierdzonego meczu.'],
           };
           const code = typeof r.data?.message === 'string' ? r.data.message : '';
           if (messages[code]) throw new ApiError(messages[code][0], code, messages[code][1]);

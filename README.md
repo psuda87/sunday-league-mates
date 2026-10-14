@@ -1,5 +1,11 @@
 # Sunday League Mates
 
+Na osobnej gałęzi `feat/settlements`, opartej na ukończonym `feat/events`,
+przygotowano lokalnie moduł rozliczeń: saldo, wpłaty i zgłoszenia, obecność,
+zatwierdzanie/korekty kosztu oraz serwerową blokadę zapisów. **Nowe migracje,
+testy, lint i build nie zostały uruchomione; moduł nie jest wdrożony.**
+[Zasady, trzy oczekujące migracje i plan lokalnej weryfikacji](docs/SETTLEMENTS_MODULE.md).
+
 Aplikacja mobilna dla jednej zamkniętej grupy grającej w piłkę na orliku. Docelowo ma obsługiwać zapisy na mecze, gości i rezerwę, ewidencję składek, oceny zawodników i wyrównywanie drużyn. Pierwszą platformą jest Android; wspólny kod umożliwia późniejsze przygotowanie iOS.
 
 Na `feat/auth` przygotowano moduł kont: logowanie loginem lub telefonem, wymuszoną zmianę hasła, zapamiętywanie sesji, profil i panel administratora. Backend Supabase jest wdrożony wyłącznie w `hjtcyybkxebvdropchac`; źródła i migracje znajdują się w repozytorium. Użytkownik utworzył administratora i potwierdził podstawowe testy Androida. Mecze, rozliczenia, oceny i powiadomienia pozostają poza bieżącym etapem.

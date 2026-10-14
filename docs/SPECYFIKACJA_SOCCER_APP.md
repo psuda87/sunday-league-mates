@@ -2,6 +2,10 @@
 
 Wersja: 1.2 • Data: 13.10.2026 • Język aplikacji: polski
 
+Uzupełnienie 14.10.2026: bieżące zasady rozliczeń mają pierwszeństwo zgodnie
+z sekcją „Aktualizacja zasad rozliczeń” po rozdziale 6. Moduł na
+`feat/settlements` jest przygotowany lokalnie, bez uruchomionej weryfikacji ani wdrożenia.
+
 Dokument przeznaczony do dalszej pracy w VS Code, Android Studio i Codexie. Przygotowano repozytorium i szkielet Ionic React + TypeScript + Capacitor. Zatwierdzona nazwa produktu: Sunday League Mates; identyfikator: pl.psuda87.slm. Kierunek wizualny i karta zawodnika są zatwierdzone zgodnie z rozdziałami 4 i 12. Wersja 1.2 aktualizuje wyłącznie dokumentację, bez implementacji wyglądu ani uwierzytelniania.
 
 Status realizacji 13.10.2026: na polecenie użytkownika rozpoczęto moduł kont na `feat/auth`. Minimalne ekrany używają ciemnego motywu; docelowa karta, mecze, rozliczenia i oceny nie są implementowane na tym etapie. `AUTH_MODULE.md` opisuje rozwiązanie i procedury, `AUTH_PROOF.md` wyniki oraz potwierdzone przez użytkownika podstawowe testy Androida. Pojedyncza próba zmiany technicznego e-maila potwierdziła blokadę przez hook. CAPTCHA jest odłożona poza bieżący etap; zachowujemy ograniczenia prób. Zatwierdzono zapamiętywanie sesji bez hasła: natywne tokeny w Keystore/Keychain, sprawdzanie dostępu na serwerze przy starcie, obsługa offline/odświeżania/wygaśnięcia, lokalne usunięcie po logout i odmowa starych sesji po resecie. Nowy magazyn oraz tworzenie/reset zawodnika z panelu wymagają jeszcze testów ręcznych.
@@ -146,6 +150,35 @@ Sama nieobecność nie anuluje opłaty. Administrator może rozstrzygnąć wyją
 | Zastępca zajmuje miejsce tej osoby | 10 udziałów po 27 zł; płaci zastępca zamiast rezygnującego |
 | Z 13 osób jedna rezygnuje, administrator anuluje jej opłatę | 12 udziałów po 22,50 zł |
 | Wśród 10 osób jest zawodnik i jego jeden gość | Zawodnik odpowiada za 54 zł: dwa udziały po 27 zł |
+
+### Aktualizacja zasad rozliczeń — 14.10.2026, polecenie użytkownika
+
+Poniższe ustalenia mają pierwszeństwo przed historycznymi zapisami rozdziałów
+6 i 8 dotyczącymi obowiązku każdej rezygnacji po 17:00, automatycznego naliczania
+na początku oraz odłożonych częściowych wpłat:
+
+- Po rezygnacji od 17:00, w lokalnej strefie wydarzenia, domyślny obowiązek
+  pozostaje tylko wtedy, gdy liczba zapisanych spada poniżej minimum 10 i nie
+  nastąpi skuteczne zastępstwo. Przy pozostającym minimum 10 domyślnie brak opłaty.
+  Skuteczny zastępca przejmuje domyślne zobowiązanie FIFO. Administrator może
+  zmienić decyzję; jego jawne rozstrzygnięcie ma pierwszeństwo.
+- Obecność fizyczna nie oznacza automatycznego zwolnienia ani naliczenia.
+  Administrator może ją poprawiać przed, podczas i po meczu. Roboczy podział
+  jest dynamiczny, a ostateczny wymaga zatwierdzenia administratora po zakończeniu.
+- Koszt dzieli się równo na płatne udziały, również gości, z dokładnym rozdziałem
+  groszy. Gości finansuje zapraszający; nie mają własnych sald.
+- Administrator rejestruje dowolną dodatnią wpłatę; zawodnik zgłasza wpłatę do
+  akceptacji/odrzucenia. Zgłoszenie nie zmienia salda. Wpłaty pokrywają najstarsze
+  należności, mogą być częściowe i tworzyć nadpłatę. Dodatnie saldo to nadpłata,
+  ujemne to zadłużenie. Brak banków, bramek i BLIK.
+- Dwa różne zakończone i zatwierdzone mecze z kwotą pozostałą po pokryciu wpłatami
+  blokują nowe zapisy i gości po stronie serwera. Jedno wydarzenie z kilkoma
+  udziałami pozostaje jednym meczem. Wpłata/korekta może odblokować konto.
+- Korekta po zatwierdzeniu przelicza równy podział i dopisuje różnice bez usuwania
+  poprzednich kwot. Zachowuje powód i wykonawcę. Operacje są atomowe, kontrolują
+  role/RLS oraz chronią przed powtórnym zatwierdzeniem meczu lub wpłaty.
+
+Szczegóły implementacji i niewykonanej weryfikacji: [SETTLEMENTS_MODULE.md](SETTLEMENTS_MODULE.md).
 
 ## 7. Goście — ustalone
 

@@ -1,6 +1,7 @@
 # Instrukcje pracy nad Sunday League Mates
 
 - Kod aplikacji znajduje się w `app/`, dokumentacja w `docs/`.
+- Zatwierdzony etap 14.10.2026: rozliczenia na `feat/settlements`, bazą jest ukończony `origin/feat/events` (`6638e18`). Zasady i lokalne migracje opisano w `docs/SETTLEMENTS_MODULE.md`; aktualne polecenie użytkownika zastępuje wcześniejsze odłożenie rozliczeń. W zadaniu implementacji nie uruchamiaj testów, lintowania, kompilacji, buildów, emulatorów, synchronizacji Capacitor ani migracji. Nie wdrażaj, nie scalaj, nie commituj i nie pushuj bez osobnego polecenia. Wieczorny plan kontroli nie jest zgodą na wykonywanie go w tym zadaniu.
 - Po każdym zakończonym zadaniu aktualizuj `docs/STATUS.md` jako krótkie źródło aktualnego stanu: data, bieżący branch, wykonane funkcje, wdrożone migracje i Edge Functions, faktyczne wyniki testów, otwarte problemy oraz następny krok. Rozróżniaj testy automatyczne od ręcznych i nie oznaczaj niewykonanych kontroli jako zaliczonych. Nie zapisuj w tym pliku sekretów, haseł, tokenów ani danych kont.
 - Przed każdą zmianą sprawdzaj aktualny branch (`git branch --show-current`). Nowe funkcje realizujemy na osobnych branchach; `main` przechowuje sprawdzoną wersję. Moduł Auth scalono z `feat/auth` do `main`; użytkownik autoryzował implementację wydarzeń na `feat/events`. Historyczne narzędzia Auth wymagające `feat/auth` zachowują własne zabezpieczenia brancha.
 - Stos projektu: TypeScript, Ionic React i Capacitor. Zachowuj identyfikator aplikacji `pl.psuda87.slm` i nazwę wyświetlaną `Sunday League Mates`.

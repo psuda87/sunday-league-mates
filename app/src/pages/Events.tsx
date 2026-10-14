@@ -5,6 +5,7 @@ import type { ManagedAccount, Session } from '../auth/api';
 import { emptyMatchForm, matchDate, money, nextMatchDay, warsawFields } from '../events/model';
 import type { Detail, Match, MatchForm, Participant } from '../events/model';
 import './Events.css';
+import MatchSettlement from './MatchSettlement';
 
 export default function Events({ manager, session }: { manager: SessionManager; session: Session }) {
   const [matches, setMatches] = useState<Match[]>([]);
@@ -25,6 +26,7 @@ export default function Events({ manager, session }: { manager: SessionManager; 
   const [selectedMember, setSelectedMember] = useState('');
   const [responsible, setResponsible] = useState(session.user_id);
   const [offset, setOffset] = useState(0);
+  const [finance, setFinance] = useState<{ blocked: boolean; unpaid_matches: number } | null>(null);
   const admin = session.role === 'admin';
   async function list(page = offset) {
     const result = await manager.call<{ events: Match[]; server_now: string }>('events_list', { offset: page });
@@ -46,6 +48,13 @@ export default function Events({ manager, session }: { manager: SessionManager; 
       .catch(e => { if (alive) setError(e instanceof Error ? e.message : 'Nie udało się pobrać meczów.'); });
     return () => { alive = false; };
   }, [manager]);
+  useEffect(() => {
+    let alive = true;
+    manager.call<{ blocked: boolean; unpaid_matches: number }>('settlements_account')
+      .then(r => { if (alive) setFinance(r); })
+      .catch(e => { if (alive) setError(e instanceof Error ? e.message : 'Nie udało się sprawdzić zaległości.'); });
+    return () => { alive = false; };
+  }, [manager, detail]);
   async function operation(action: string, values: Record<string, unknown> = {}) {
     if (!detail) return;
     await manager.call('events_' + action, { event_id: detail.event.id, ...values });
@@ -86,8 +95,6 @@ export default function Events({ manager, session }: { manager: SessionManager; 
             {p.status === 'reserve' ? 'Zapisz na mecz' : 'Przenieś na rezerwę'}</IonButton>
           {!p.member_id && <IonButton size="small" fill="outline" disabled={busy} onClick={() => { setGuestEdit(p.id); setGuestName(p.guest_name ?? ''); setGuestPhone(p.guest_phone ?? ''); }}>Edytuj gościa</IonButton>}
         </div>}
-        {admin && e?.status === 'scheduled' && p.status === 'registered' && <IonButton size="small" fill="outline" disabled={busy}
-          onClick={() => void work(() => operation('attendance', { participant_id: p.id, absent: !p.absent }))}>{p.absent ? 'Oznacz obecność' : 'Oznacz nieobecność'}</IonButton>}
       </div>
     </li>;
   }
@@ -122,18 +129,27 @@ export default function Events({ manager, session }: { manager: SessionManager; 
       <section className="slm-panel"><h1>{matchDate(e.starts_at)}</h1><p>{e.location} · {e.duration_minutes} minut</p>
         <p>{money(e.hourly_rate)}/h · razem {money(e.total_cost)}</p>
         <p>Uczestnicy: {e.registered_count}/{e.capacity} · minimum 10 · rezerwa: {e.reserve_count}</p>
-        <p className="slm-muted">Szacunkowo na osobę: {e.estimated_per_person === null ? 'brak zapisanych' : money(e.estimated_per_person)}. Rozliczenia nie są jeszcze aktywne.</p>
+        <p className="slm-muted">Podział należności uwzględnia decyzje o opłacie i zastępstwa. Administrator widzi go w rozliczeniu meczu; zatwierdzone należności są w zakładce Rozliczenia.</p>
+        {finance && <p role="status" className={finance.blocked ? 'slm-error' : ''}>{finance.blocked
+          ? `🔒 Dwa nieuregulowane mecze blokują nowe zapisy i dodawanie gości (${finance.unpaid_matches}). Przejdź do Rozliczeń.`
+          : `Nieuregulowane mecze: ${finance.unpaid_matches} · brak blokady zapisów.`}</p>}
         {e.status === 'cancelled' ? <p role="status">⛔ Mecz odwołany</p> : !e.registration_open && <p role="status">🔒 Zapisy zamknięte — mecz już się rozpoczął.</p>}
         {e.decision_required && <p role="status" className="slm-error">⚠ Po 17:00 jest mniej niż 10 osób. Wymagana decyzja administratora; mecz nie został automatycznie odwołany.</p>}
         {e.registration_open && <div className="slm-actions">
-          {mine?.status !== 'registered' && <IonButton disabled={busy} onClick={() => void work(() => operation('join'))}>Zapisz się</IonButton>}
-          {!mine && <IonButton fill="outline" disabled={busy} onClick={() => void work(() => operation('reserve'))}>Dołącz do rezerwy</IonButton>}
+          {mine?.status !== 'registered' && <IonButton disabled={busy || finance?.blocked} onClick={() => void work(() => operation('join'))}>Zapisz się</IonButton>}
+          {!mine && <IonButton fill="outline" disabled={busy || finance?.blocked} onClick={() => void work(() => operation('reserve'))}>Dołącz do rezerwy</IonButton>}
         </div>}
         {admin && e.status === 'scheduled' && <div className="slm-actions">
           {e.registration_open && <IonButton fill="outline" disabled={busy} onClick={() => beginForm(e)}>Edytuj mecz</IonButton>}
-          <IonButton fill="outline" disabled={busy} onClick={() => { if (window.confirm('Odwołać mecz? Zapisy zostaną zamknięte. Rozliczenia nie są aktywne.')) void work(() => operation('cancel')); }}>Odwołaj mecz</IonButton>
+          <IonButton fill="outline" disabled={busy} onClick={() => {
+            if (!window.confirm('Odwołać mecz? Zapisy zostaną zamknięte, a zatwierdzone należności wycofane korektą.')) return;
+            const reason = window.prompt('Powód odwołania (1–500 znaków):');
+            if (!reason?.trim() || reason.trim().length > 500) return;
+            void work(() => operation('cancel', { reason: reason.trim() }));
+          }}>Odwołaj mecz</IonButton>
         </div>}
       </section>
+      {admin && <MatchSettlement key={`${e.id}:${e.settlement_version ?? e.status}`} manager={manager} eventId={e.id} onChange={() => open(e.id)} />}
       <section className="slm-panel"><h2>Uczestnicy</h2><ul className="slm-participants">{detail.participants.filter(p => p.status === 'registered').map(participant)}</ul>{!e.registered_count && <p>Brak zapisanych.</p>}</section>
       <section className="slm-panel"><h2>Rezerwa</h2><p className="slm-muted">Nie zajmuje miejsc. Bez automatycznego awansu: pierwszy skuteczny zapis zajmuje wolne miejsce. Push nie jest jeszcze aktywny.</p>
         <ul className="slm-participants">{detail.participants.filter(p => p.status === 'reserve').map(participant)}</ul>{!e.reserve_count && <p>Rezerwa jest pusta.</p>}</section>
@@ -161,8 +177,8 @@ export default function Events({ manager, session }: { manager: SessionManager; 
           {admin && !guestEdit && <IonSelect label="Konto odpowiedzialne" labelPlacement="stacked" value={responsible} onIonChange={ev => setResponsible(ev.detail.value)}>
             <IonSelectOption value={session.user_id}>Moje konto</IonSelectOption>{people.filter(p => p.user_id !== session.user_id).map(p => <IonSelectOption key={p.user_id} value={p.user_id}>{p.display_name}</IonSelectOption>)}
           </IonSelect>}
-          <p className="slm-muted">Gość zajmuje osobne miejsce. Konto zapraszającego będzie odpowiedzialne za opłatę w przyszłym module rozliczeń. Bez telefonu kontakt prowadzi do zapraszającego.</p>
-          <IonButton type="submit" disabled={busy}>{guestEdit ? 'Zapisz gościa' : 'Dodaj gościa'}</IonButton>
+          <p className="slm-muted">Gość zajmuje osobne miejsce i udział w kosztach. Za jego opłatę odpowiada zapraszający. Bez telefonu kontakt prowadzi do zapraszającego.</p>
+          <IonButton type="submit" disabled={busy || (!guestEdit && responsible === session.user_id && finance?.blocked)}>{guestEdit ? 'Zapisz gościa' : 'Dodaj gościa'}</IonButton>
           {guestEdit && <IonButton fill="clear" onClick={() => { setGuestEdit(null); setGuestName(''); setGuestPhone(''); }}>Anuluj edycję</IonButton>}
         </form></section>}
     </> : <section className="slm-panel"><h1>Mecze</h1>

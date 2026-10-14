@@ -1,5 +1,37 @@
 # Aktualny stan Sunday League Mates
 
+Zapis postępu 14.10.2026: użytkownik zlecił commit zmian rozliczeń i push wyłącznie
+do `origin/feat/settlements`, bez scalania. Przed zapisem sprawdzono `git status`,
+`git diff --check` oraz 22 zmienione/nowe pliki: bez wykrytych sekretów,
+plików `.env`, danych uwierzytelniających lub zbędnych artefaktów. Nie zmieniano
+logiki aplikacji i nie uruchamiano testów, lintowania, buildów, migracji ani wdrożeń.
+SHA zapisu i potwierdzenie zdalnej gałęzi są podawane po wykonaniu operacji;
+moduł nadal wymaga weryfikacji opisanej w SETTLEMENTS_MODULE.md.
+
+Aktualizacja zadania: **14.10.2026, `feat/settlements`**. Gałąź utworzona z
+`origin/feat/events` (`6638e18b4ed763e5bdee45ea61416a576e00bbec`), bez założenia
+scalenia wydarzeń do main. Początkowo brak lokalnych zmian; istniejąca historia
+i kod zachowane. Przygotowano lokalnie rozliczenia: grosze i równy podział,
+rezygnacje przy minimum 10, FIFO zastępstw, osobne udziały gości, zatwierdzenie
+po końcu meczu, saldo/FIFO wpłat, zgłoszenia i decyzje administratora, korekty,
+audyt, RLS, atomowość, idempotencja z rozstrzyganiem po restarcie oraz serwerowa
+blokada dwóch zaległych meczów. UI: Rozliczenia i panel rozliczenia w szczegółach meczu.
+
+**Nie uruchomiono testów, lintowania, kompilacji, buildów, emulatorów,
+synchronizacji Capacitor ani żadnych migracji — zgodnie z poleceniem.**
+Przygotowane testy nie są zaliczone. Nie wdrożono Edge, nie zmieniono zdalnej bazy,
+nie wykonano commita/pusha/scalenia. Brak deklaracji gotowości produkcyjnej.
+Oczekują `20261014100000_settlements_ledger.sql`,
+`20261014101000_settlements_rpc.sql`,
+`20261014102000_settlements_events_integration.sql`.
+Ryzyka, zasady korekt, ograniczenia i **plan wieczornej weryfikacji wyłącznie
+na lokalnym backendzie**: [SETTLEMENTS_MODULE.md](SETTLEMENTS_MODULE.md).
+Następny krok: lokalna weryfikacja SQL/RLS/wyścigów i web/Android; decyzje
+o zdalnych migracjach, wdrożeniu i scaleniu dopiero w osobnym zadaniu.
+
+Poniżej zachowano historyczny stan wydarzeń i wcześniejsze wyniki. Nie są one
+wynikami ani potwierdzeniem działania nowego modułu rozliczeń.
+
 Aktualizacja: 13.10.2026. Branch: `feat/events`. Projekt Supabase: `hjtcyybkxebvdropchac`.
 Stan wdrożeń i testów: [AUTH_PROOF.md](AUTH_PROOF.md) i [EVENTS_MODULE.md](EVENTS_MODULE.md).
 Podstawowe działanie modułu kont odebrane ręcznie na Androidzie; dodatkowe scenariusze nadal otwarte.

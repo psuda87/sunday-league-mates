@@ -3,7 +3,7 @@ export interface Match {
   hourly_rate: number; total_cost: number; capacity: number; status: 'scheduled' | 'cancelled';
   registered_count: number; reserve_count: number; registration_open: boolean;
   decision_required: boolean; cutoff_at: string; estimated_per_person: number | null;
-  settlements_active: false;
+  settlements_active: boolean; settlement_version?: number;
 }
 export interface Participant {
   id: string; member_id: string | null; responsible_user_id: string;
