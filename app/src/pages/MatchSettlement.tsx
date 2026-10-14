@@ -16,6 +16,7 @@ export default function MatchSettlement({ manager, eventId, onChange }: {
   const [loading, setLoading] = useState(false);
   const [replacements, setReplacements] = useState<Record<string, string>>({});
   const op = useFinanceOperation(manager);
+  const { setError: setOperationError } = op;
   async function load() {
     const result = await manager.call<SettlementDetail>('settlements_detail', { event_id: eventId, offset: historyOffset });
     setDetail(result); setCost(centsText(result.cost_cents));
@@ -26,10 +27,10 @@ export default function MatchSettlement({ manager, eventId, onChange }: {
     setDetail(null); setLoading(true);
     manager.call<SettlementDetail>('settlements_detail', { event_id: eventId, offset: historyOffset })
       .then(r => { if (alive) { setDetail(r); setCost(centsText(r.cost_cents)); } })
-      .catch(e => { if (alive) op.setError(e instanceof Error ? e.message : 'Nie udało się pobrać rozliczenia.'); })
+      .catch(e => { if (alive) setOperationError(e instanceof Error ? e.message : 'Nie udało się pobrać rozliczenia.'); })
       .finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
-  }, [manager, eventId, historyOffset, op.setError]);
+  }, [manager, eventId, historyOffset, setOperationError]);
   async function change(action: string, body: Record<string, unknown> = {}) {
     if (!detail) return;
     if (!reason.trim()) { op.setError('Podaj powód decyzji.'); return; }

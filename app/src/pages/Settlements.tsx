@@ -23,6 +23,7 @@ export default function Settlements({ manager, session }: { manager: SessionMana
   const [correctedAmount, setCorrectedAmount] = useState('');
   const [loading, setLoading] = useState(false);
   const op = useFinanceOperation(manager);
+  const { setError: setOperationError } = op;
   const date = (value: string) => new Intl.DateTimeFormat('pl-PL', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Warsaw' }).format(new Date(value));
   async function refresh() {
     const result = await manager.call<FinanceAccount>('settlements_account', { user_id: userId, offset });
@@ -44,11 +45,11 @@ export default function Settlements({ manager, session }: { manager: SessionMana
       manager.call<FinanceAccount>('settlements_account', { user_id: userId, offset }),
       admin ? manager.call<{ payments: Payment[] }>('settlements_pending', { offset: pendingOffset }) : Promise.resolve({ payments: [] }),
     ]).then(([a, p]) => { if (alive) { setAccount(a); setPayments(p.payments); } })
-      .catch(e => { if (alive) op.setError(e instanceof Error ? e.message : 'Nie udało się pobrać rozliczeń.'); })
+      .catch(e => { if (alive) setOperationError(e instanceof Error ? e.message : 'Nie udało się pobrać rozliczeń.'); })
       .finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
     // setError jest stabilnym setterem useState.
-  }, [manager, userId, offset, pendingOffset, admin, op.setError]);
+  }, [manager, userId, offset, pendingOffset, admin, setOperationError]);
   const disabled = op.busy || loading || !!op.pending;
   async function loadPeople(page: number) {
     setPeople(await manager.call<ManagedAccount[]>('list_accounts', { offset: page })); setPeopleOffset(page);

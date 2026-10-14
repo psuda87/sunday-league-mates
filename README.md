@@ -1,10 +1,11 @@
 # Sunday League Mates
 
-Na osobnej gałęzi `feat/settlements`, opartej na ukończonym `feat/events`,
-przygotowano lokalnie moduł rozliczeń: saldo, wpłaty i zgłoszenia, obecność,
-zatwierdzanie/korekty kosztu oraz serwerową blokadę zapisów. **Nowe migracje,
-testy, lint i build nie zostały uruchomione; moduł nie jest wdrożony.**
-[Zasady, trzy oczekujące migracje i plan lokalnej weryfikacji](docs/SETTLEMENTS_MODULE.md).
+Na `feat/integration` połączono lokalnie moduły wydarzeń, rozliczeń i powiadomień.
+TypeScript, ESLint i build webowy przeszły. Migracje, SQL/RLS/wyścigi, Cypress,
+Android oraz rzeczywiste FCM pozostają niewykonane na zintegrowanej wersji.
+[Raport integracji i kolejność sześciu migracji](docs/INTEGRATION_REPORT.md).
+[Rozliczenia](docs/SETTLEMENTS_MODULE.md), [powiadomienia](docs/PUSH_NOTIFICATIONS.md),
+[adapter finansowy](docs/PUSH_FINANCE_ADAPTER.md). Brak Firebase nie blokuje inbox.
 
 Aplikacja mobilna dla jednej zamkniętej grupy grającej w piłkę na orliku. Docelowo ma obsługiwać zapisy na mecze, gości i rezerwę, ewidencję składek, oceny zawodników i wyrównywanie drużyn. Pierwszą platformą jest Android; wspólny kod umożliwia późniejsze przygotowanie iOS.
 

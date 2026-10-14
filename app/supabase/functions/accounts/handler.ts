@@ -189,6 +189,17 @@ export function createHandler(env: Environment) {
         }
       }
       const token = request.headers.get('authorization')?.replace(/^Bearer /, '') ?? '';
+      if (action === 'notifications_detach') {
+        // Capability urządzenia pozwala dokończyć logout offline bez refresh tokenu.
+        const device = field(body, 'device_id', 36), secret = field(body, 'device_secret', 72), binding = field(body, 'binding_id', 36);
+        if (!/^[0-9a-f-]{36}$/.test(device) || !/^[0-9a-f-]{36}$/.test(binding) || !/^[0-9a-f-]{72}$/.test(secret))
+          throw new ApiError(400, 'invalid_device', 'Nieprawidłowy identyfikator urządzenia.');
+        await rate('device-detach:' + device, 20);
+        if (!Number.isSafeInteger(body.binding_version) || (body.binding_version as number)<=0)
+          throw new ApiError(400, 'invalid_device', 'Nieprawidłowa wersja powiązania.');
+        await db('rpc/slm_push_detach', 'POST', { p_device: device, p_secret: secret, p_binding: binding, p_version: body.binding_version });
+        return respond({ ok: true });
+      }
       if (action === 'logout') {
         const u = await verify(token);
         await rpc('revoke_session', { p_user: u.id, p_session: u.sid });
@@ -239,6 +250,32 @@ export function createHandler(env: Environment) {
         }
         return respond(r.data);
       }
+      if (action.startsWith('notifications_')) {
+        await rate('notifications:' + ctx.id, 90);
+        const r = await call('/rest/v1/rpc/slm_notifications_dispatch', 'POST', {
+          p_user: ctx.id, p_session: ctx.sid, p_action: action.slice(14), p_body: body,
+        }, undefined, true);
+        if (!r.ok) {
+          const messages: Record<string, [number, string]> = {
+            session_invalid: [401, 'Sesja wygasła. Zaloguj się ponownie.'],
+            not_found: [404, 'Powiadomienie nie istnieje lub należy do innego konta.'],
+            invalid_device: [400, 'Nieprawidłowe dane urządzenia.'],
+            device_mismatch: [409, 'Nie można powiązać tego urządzenia. Wyłącz i ponownie włącz powiadomienia.'],
+            device_unprepared: [409, 'Najpierw przygotuj urządzenie do powiadomień. Włącz push ponownie.'],
+            device_revoked: [409, 'Powiązanie zostało wycofane przy wylogowaniu. Włącz push ponownie na właściwym koncie.'],
+            stale_device_binding: [409, 'Nowsze powiązanie urządzenia już istnieje. Odśwież konfigurację push.'],
+            invalid_input: [400, 'Sprawdź ustawienia powiadomień.'],
+            invalid_action: [400, 'Nieznana operacja powiadomień.'],
+          };
+          const code = typeof r.data?.message === 'string' ? r.data.message : '';
+          if (messages[code]) throw new ApiError(messages[code][0], code, messages[code][1]);
+          if (['22P02','23514','23502'].includes(r.data?.code)) throw new ApiError(400, 'invalid_input', 'Sprawdź dane powiadomienia.');
+          if (r.data?.code === '23505') throw new ApiError(409, 'device_conflict', 'Token jest już powiązany z urządzeniem. Wyłącz i ponownie włącz push.');
+          // Awaria opcjonalnego modułu nie zmienia stanu sesji Auth.
+          throw new ApiError(503, 'notifications_unavailable', 'Centrum powiadomień jest chwilowo niedostępne lub nie zostało skonfigurowane.');
+        }
+        return respond(r.data);
+      }
       if (action.startsWith('events_')) {
         await rate('events:' + ctx.id, 90);
         const r = await call('/rest/v1/rpc/slm_events_dispatch', 'POST', {
@@ -259,6 +296,7 @@ export function createHandler(env: Environment) {
             invalid_guest: [400, 'Podaj nazwę gościa i poprawny opcjonalny numer z prefiksem kraju.'],
             invalid_participant: [400, 'Nieprawidłowy uczestnik.'],
             invalid_action: [400, 'Nieznana operacja wydarzenia.'],
+            registration_not_allowed: [409, 'Konto nie ma teraz uprawnień do zapisu. Sprawdź aktualny dostęp i zaległości.'],
             settlement_blocked: [409, 'Dwa nieuregulowane mecze blokują nowy zapis i dodawanie gości. Sprawdź Rozliczenia.'],
             use_settlements: [409, 'Obecność po zatwierdzeniu zmień w panelu rozliczenia z powodem korekty.'],
             reason_required: [400, 'Podaj powód odwołania zatwierdzonego meczu.'],

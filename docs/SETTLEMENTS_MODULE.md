@@ -1,5 +1,11 @@
 # Rozliczenia — Sunday League Mates / Soccer Room 2.0
 
+Aktualizacja integracji 14.10.2026: na `feat/integration` połączono oba moduły.
+TypeScript, lint i build: OK; SQL, migracje, RLS, FCM i testy urządzeń niewykonane.
+Adapter finansowy podłączono w kodzie migracji, bez zastosowania do bazy.
+Aktualny zakres i ograniczenia: [INTEGRATION_REPORT.md](INTEGRATION_REPORT.md).
+Poniższy opis zachowuje historyczny stan gałęzi źródłowej oraz plan przyszłej weryfikacji.
+
 Stan 14.10.2026: **implementacja lokalna, nieweryfikowana, niewdrożona**.
 Gałąź `feat/settlements` utworzona z `origin/feat/events`, commit
 `6638e18b4ed763e5bdee45ea61416a576e00bbec`. `main` nie zawierał wydarzeń.

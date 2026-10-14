@@ -1,106 +1,46 @@
 # Aktualny stan Sunday League Mates
 
-Zapis postępu 14.10.2026: użytkownik zlecił commit zmian rozliczeń i push wyłącznie
-do `origin/feat/settlements`, bez scalania. Przed zapisem sprawdzono `git status`,
-`git diff --check` oraz 22 zmienione/nowe pliki: bez wykrytych sekretów,
-plików `.env`, danych uwierzytelniających lub zbędnych artefaktów. Nie zmieniano
-logiki aplikacji i nie uruchamiano testów, lintowania, buildów, migracji ani wdrożeń.
-SHA zapisu i potwierdzenie zdalnej gałęzi są podawane po wykonaniu operacji;
-moduł nadal wymaga weryfikacji opisanej w SETTLEMENTS_MODULE.md.
-
-Aktualizacja zadania: **14.10.2026, `feat/settlements`**. Gałąź utworzona z
-`origin/feat/events` (`6638e18b4ed763e5bdee45ea61416a576e00bbec`), bez założenia
-scalenia wydarzeń do main. Początkowo brak lokalnych zmian; istniejąca historia
-i kod zachowane. Przygotowano lokalnie rozliczenia: grosze i równy podział,
-rezygnacje przy minimum 10, FIFO zastępstw, osobne udziały gości, zatwierdzenie
-po końcu meczu, saldo/FIFO wpłat, zgłoszenia i decyzje administratora, korekty,
-audyt, RLS, atomowość, idempotencja z rozstrzyganiem po restarcie oraz serwerowa
-blokada dwóch zaległych meczów. UI: Rozliczenia i panel rozliczenia w szczegółach meczu.
-
-**Nie uruchomiono testów, lintowania, kompilacji, buildów, emulatorów,
-synchronizacji Capacitor ani żadnych migracji — zgodnie z poleceniem.**
-Przygotowane testy nie są zaliczone. Nie wdrożono Edge, nie zmieniono zdalnej bazy,
-nie wykonano commita/pusha/scalenia. Brak deklaracji gotowości produkcyjnej.
-Oczekują `20261014100000_settlements_ledger.sql`,
-`20261014101000_settlements_rpc.sql`,
-`20261014102000_settlements_events_integration.sql`.
-Ryzyka, zasady korekt, ograniczenia i **plan wieczornej weryfikacji wyłącznie
-na lokalnym backendzie**: [SETTLEMENTS_MODULE.md](SETTLEMENTS_MODULE.md).
-Następny krok: lokalna weryfikacja SQL/RLS/wyścigów i web/Android; decyzje
-o zdalnych migracjach, wdrożeniu i scaleniu dopiero w osobnym zadaniu.
-
-Poniżej zachowano historyczny stan wydarzeń i wcześniejsze wyniki. Nie są one
-wynikami ani potwierdzeniem działania nowego modułu rozliczeń.
-
-Aktualizacja: 13.10.2026. Branch: `feat/events`. Projekt Supabase: `hjtcyybkxebvdropchac`.
-Stan wdrożeń i testów: [AUTH_PROOF.md](AUTH_PROOF.md) i [EVENTS_MODULE.md](EVENTS_MODULE.md).
-Podstawowe działanie modułu kont odebrane ręcznie na Androidzie; dodatkowe scenariusze nadal otwarte.
-Zapis postępu na koniec dnia: **moduł wydarzeń zaimplementowany i sprawdzony automatycznie; ręczny odbiór Androida jeszcze niewykonany**. Nowe ustalenia dotyczące odznak, MVP, frekwencji, dojazdu i mieszania składów zapisane tylko w specyfikacji, bez implementacji.
-Scalono [PR #1: moduł kont i zapamiętywanie sesji](https://github.com/psuda87/sunday-league-mates/pull/1), `feat/auth` → `main`, zwykłym merge bez omijania zabezpieczeń.
-Commit scalenia Auth: `4db97ba679a412834869fc5c05df4622a1afcb86`. Lokalny `main` zaktualizowano przez `git pull --ff-only origin main`, a z niego utworzono `feat/events`. Branch `feat/auth` zachowany lokalnie i zdalnie; lokalne pliki zachowane. Następnie użytkownik autoryzował wydarzenia; moduł wdrożono do wskazanego Supabase, bez zmian rzeczywistego administratora. Użytkownik autoryzował commit i push zapisu postępu na `feat/events`, bez scalania do `main`.
+Aktualizacja: 14.10.2026. Branch: `feat/integration`, worktree `I:/slm/sunday-league-mates-integration`.
+Baza: `origin/feat/events` (`6638e18`); lokalnie zintegrowano `origin/feat/settlements`
+(`81d71c7`) i `origin/feat/push-notifications` (`103d08c`). Bez pusha i zmian innych gałęzi.
+Oryginalny katalog na feat/events i nieśledzony pics/ zachowano.
 
 ## Wykonane
 
-- Szkielet Ionic React / TypeScript / Capacitor, Android, polski interfejs i ciemny motyw z miętowym akcentem.
-- Logowanie loginem lub telefonem do jednego konta Supabase Auth; bez publicznej rejestracji, maili i SMS-ów.
-- Profile i wybór nazwy; panel administratora tworzący konta i resetujący hasła; zmiana własnych identyfikatorów i hasła po sprawdzeniu obecnego hasła.
-- Serwerowe role, RLS, wymuszona zmiana hasła tymczasowego, ograniczenia prób logowania i odrzucanie starych sesji po resecie.
-- Zapamiętywanie refresh tokenu: Android Keystore / iOS Keychain; osobna polityka web. Weryfikacja dostępu przy uruchomieniu, odświeżanie, obsługa offline i usuwanie zapisu przy wylogowaniu.
-- Generowane hasła tymczasowe: 12 znaków. Własne hasło: minimum 8 znaków, maksimum 72 bajty UTF-8.
-- Lokalna procedura pierwszego administratora, bez publicznego bootstrap.
-- Wydarzenia: lista/szczegóły, formularz administratora, atomowe zapisy do początku, goście i osobna rezerwa, zarządzanie uczestnikami, odwołanie oraz obecność. Nazwy z profili, kontakt do gościa lub zapraszającego. Minimum po 17:00 wymaga decyzji, bez automatycznego odwołania.
-- Historia i odpowiedzialne konto pod przyszłe rozliczenia zachowane również po rezygnacji. Koszt na osobę tylko szacunkowy. Naliczanie, FIFO, wpłaty, blokada zaległości, oceny, składy i push nie są wdrożone.
+- Auth i sesje, wydarzenia, goście i rezerwa zachowane.
+- Połączono UI/API rozliczeń i centrum powiadomień, wspólny RPC zapisów z kontrolą
+  dwóch zaległych meczów oraz nawigację finansowego powiadomienia do Rozliczeń.
+- Adapter tworzy inbox/outbox dla rzeczywistych decyzji wpłat i zmian blokady
+  w tej samej transakcji, po końcowym przeliczeniu, z kluczem trwałego audytu.
+- Sześć nowych migracji jest przygotowanych i połączonych, ale **nie zastosowanych**.
+  Edge accounts/push-worker zmienione lokalnie, **nie wdrożone**. Firebase nie konfigurowano.
 
-## Wdrożenia
-
-Migracje w `app/supabase/migrations/`, zastosowane do wskazanego projektu:
-
-- `20261013185250_slm_auth_proof_setup.sql` — historyczna infrastruktura próby Auth.
-- `20261013191910_accounts_module.sql` — docelowy moduł kont i blokady wiadomości.
-- `20261013193036_accounts_session_hardening.sql` — zabezpieczenia sesji.
-- `20261013193844_accounts_recovery_and_permissions.sql` — naprawa przerwanych operacji i uprawnienia.
-- `20261013212841_events_module.sql` — wydarzenia, uczestnicy, historia, RLS i atomowy RPC.
-- `20261013213423_events_edit_validation.sql` — edycja daty i walidacja 24:00.
-- `20261013213917_events_finite_costs.sql` — odrzucanie NaN w kwotach.
-
-Edge Function: **`accounts`, aktywna wersja 6**, źródła w `app/supabase/functions/accounts/`; dodane operacje `events_*`, bez nowego publicznego endpointu testowego.
-Auth: rejestracja i CAPTCHA wyłączone, hooki blokujące e-mail/SMS aktywne, minimum hasła 8.
-Zmiana polityki odtwarzalna przez `app/scripts/configure-password-policy.mjs`; limity pozostały bez zmian.
-
-## Ostatnie wyniki kontroli
+## Kontrole zintegrowanej wersji
 
 | Kontrola | Wynik |
 |---|---|
-| Build webowy, typy klienta i strict Edge / lint | OK |
-| Vitest | 29/29, 6 plików |
-| Testy narzędzia bootstrap | 6/6 |
-| Cypress, przeglądarka z kontrolowanym API | 7/7 (2 wydarzenia + 5 Auth) |
-| Rzeczywiste testy Auth/API na fikcyjnych kontach | 7 grup zaliczonych; dane własnych testów usunięte |
-| Rzeczywiste testy wydarzeń/API | 7 grup PASS: uprawnienia, wyścig o miejsce, goście, rezerwa, historia po17, reset starych sesji, zamknięcie/cancel |
-| SELECT granic Europe/Warsaw | 17:00 zimą i latem oraz dokładny początek: OK |
-| Granice haseł | 7 znaków odrzucone, 8 przyjęte; tworzenie i reset generują 12 |
-| Zmiana technicznego e-maila | Hook odmawia (403), adres bez zmian, wysyłka zablokowana |
-| Synchronizacja Androida / assembleDebug, lintDebug, testDebugUnitTest | OK |
-| Android — ręczne potwierdzenie użytkownika | Pierwsze logowanie, wymuszona zmiana, oba aliasy, panel; zachowanie sesji po otwarciu, ekran logowania po logout, tworzenie zawodnika i reset z panelu |
+| npm ci z istniejącego lockfile | OK; binarium Cypress pominięte |
+| TypeScript klienta | OK |
+| Strict TypeScript accounts i push-worker | OK |
+| ESLint | OK, bez błędów i ostrzeżeń po poprawkach |
+| Build webowy | OK; ostrzeżenie chunków >500 kB |
+| git diff --check | OK |
+| Migracje / testy SQL / RLS / równoczesność | NIE WYKONANO |
+| Vitest / Cypress / Android / iOS / FCM | NIE WYKONANO w tej integracji |
 
-Testy automatyczne i kompilacja nie są testami na urządzeniu. Szczegóły: [AUTH_PROOF.md](AUTH_PROOF.md).
-Bieżące kontrole wydarzeń wykonano automatycznie; nie są nowym ręcznym odbiorem Androida.
-Fikcyjne konta, mecze i ich dane usunięto; nie wykonywano testów na rzeczywistym administratorze.
-Niezależny odczyt: 0 testowych meczów, uczestników i historii wydarzeń. Kontrola
-nieignorowanych plików nie wykryła sekretów; `git diff --check` bez błędów.
+Starsze wyniki Auth/events nie są dowodem działania integracji.
 
-## Otwarte problemy i ograniczenia
+## Otwarte i następny krok
 
-- Ręczne testy offline i unieważniania starej zapisanej sesji po resecie (również po zmianie nowego hasła) **odłożone decyzją użytkownika; niezaliczone, nie blokują dalszych prac**. Automatyczne testy tych mechanizmów nie są odbiorem na telefonie. Pierwsza zmiana hasła nowego zawodnika nie ma osobnego ręcznego potwierdzenia. Tworzenie/reset z panelu, ponowne otwarcie z sesją i ponowne otwarcie po logout są potwierdzone.
-- iOS: magazyn przewidziany w kodzie, platforma i testy urządzenia jeszcze nieprzygotowane.
-- Wydarzenia wymagają odbioru na telefonie; odświeżanie ręczne, brak Realtime. Dwuznaczne godziny zmiany na czas zimowy przyjmują standardową interpretację PostgreSQL.
-- CAPTCHA odłożona poza etap; istniejące limity pozostają aktywne.
-- Historyczne zasoby próby Auth pozostają do kontrolowanego usunięcia; brak publicznych endpointów testowych/bootstrap. Lista w [AUTH_MODULE.md](AUTH_MODULE.md).
-- Ostatni audyt: 6 moderate, bez high/critical; produkcyjne: 3 moderate dotyczące routera. Szczegóły: [AUDYT_ZALEZNOSCI.md](AUDYT_ZALEZNOSCI.md).
-- Ostrzeżenia wielkości chunków i danych Browserslist; webowy localStorage nie zapewnia ochrony tokenu przed XSS. Brak portretu `app/public/images/player-demo.png`.
+Kod przygotowany do kolejnego etapu lokalnej weryfikacji, ale poprawność SQL i adaptera
+nie jest potwierdzona wykonaniem. Docker, Supabase CLI i Deno nie są dostępne w PATH.
+Potrzebne jest jednorazowe lokalne środowisko Supabase, sześć migracji w kolejności,
+testy finansów/powiadomień oraz wyścigi i RLS. Nie używać zdalnego projektu ani
+starych skryptów test-events z DELETE nieusuwalnej historii finansów.
+Worktree ma ignorowany `.env.local` z wyłącznie lokalnym URL accounts, bez sekretów;
+nie skopiowano żadnej konfiguracji kont z oryginalnego katalogu. Push domyślnie wyłączony.
+CAPTCHA i ręczne testy offline/starych sesji odłożone, iOS niezweryfikowany.
+Zatrzymano pracę po pierwszej weryfikacji; dalsze testy/wdrożenia wymagają polecenia.
 
-## Następny krok
-
-Ręcznie sprawdzić moduł wydarzeń na Androidzie według EVENTS_MODULE.md, potem ustalić etap rozliczeń (pełne naliczanie, FIFO, wpłaty i blokada dwóch zaległych meczów). Odłożone ręczne testy Auth nie blokują dalszych prac i nie są zaliczone. iOS niezweryfikowany, CAPTCHA odłożona.
-
-Kontrola scalenia: brak konfliktów; brak zgłoszonych statusów CI, check runs i recenzji. Odczyt konfiguracji ochrony `main` przez integrację zwrócił 403 `Resource not accessible by integration`; zwykłe API merge zaakceptowało scalenie. Nie zmieniano zabezpieczeń. Dotychczasowe wyniki testów aplikacji pozostają aktualne; nie wykonywano nowych testów.
+Szczegóły: [INTEGRATION_REPORT.md](INTEGRATION_REPORT.md),
+[SETTLEMENTS_MODULE.md](SETTLEMENTS_MODULE.md), [PUSH_NOTIFICATIONS.md](PUSH_NOTIFICATIONS.md).

@@ -6,7 +6,8 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   // Most natywny nie może logować argumentów SecureStorage (tokenów).
   loggingBehavior: 'none',
-  android: { webContentsDebuggingEnabled: false }
+  android: { webContentsDebuggingEnabled: false },
+  plugins: { PushNotifications: { presentationOptions: [] } }
 };
 
 export default config;
