@@ -19,6 +19,10 @@ export default function Demo() {
   const content = useRef<HTMLIonContentElement>(null);
   const [view, setView] = useState<View>(readView);
   const [count, setCount] = useState(12);
+  const [selected, setSelected] = useState(0);
+  const fixtures = [demo, { ...demo, id: 'demo-2', starts_at: '2026-10-29T17:00:00Z', registered_count: 8 }, { ...demo, id: 'demo-3', starts_at: '2026-11-05T17:00:00Z', registered_count: 5 }];
+  const current = fixtures[selected];
+  const currentCount = selected === 0 ? count : current.registered_count;
   const [tab, setTab] = useState<Tab>('events');
   useEffect(() => {
     const sync = () => { setView(readView()); setTab('events'); void content.current?.scrollToTop?.(0); };
@@ -30,9 +34,9 @@ export default function Demo() {
     <IonContent ref={content}><main className="slm-accounts"><p className="slm-demo-badge">Dane przykładowe</p>
       {tab === 'events' ? <>
         {view !== 'home' && <div className="slm-actions"><IonButton fill="clear" onClick={() => navigate('home')}>← Wróć do meczów</IonButton></div>}
-        {view === 'home' ? <MatchHero match={{ ...demo, registered_count: count }} onOpen={() => navigate('details-b')}>
+        {view === 'home' ? <><MatchHero match={{ ...demo, registered_count: count }} onOpen={() => { setSelected(0); navigate('details-b'); }}>
           <IonButton expand="block" className="slm-match-cta" disabled>ZAPISZ SIĘ NA MECZ</IonButton>
-        </MatchHero> : view === 'compare' ? <>
+        </MatchHero><div className="slm-demo-fixtures" aria-label="Kolejne przykładowe mecze">{fixtures.slice(1).map((fixture, index) => <MatchHero key={fixture.id} match={fixture} compact title="Przykładowy mecz" onOpen={() => { setSelected(index + 1); navigate('details-b'); }} />)}</div></> : view === 'compare' ? <>
           <h1>Porównaj szczegóły meczu</h1><p className="slm-muted">Dwa układy tego samego wydarzenia. Wariant docelowy nie został wybrany.</p>
           {(['a', 'b'] as const).map(variant => <section key={variant} className="slm-variant-preview" aria-label={`Wariant ${variant.toUpperCase()}`}>
             <p className="slm-eyebrow">WARIANT {variant.toUpperCase()}</p><h2>{variant === 'a' ? 'A · Sekcje jedna pod drugą' : 'B · Przełączane zakładki'}</h2>
@@ -40,8 +44,8 @@ export default function Demo() {
             <DemoMatchDetails variant={variant} count={count} />
           </section>)}
         </> : <>
-          <MatchHero match={{ ...demo, registered_count: count }} title="Szczegóły meczu" />
-          <section className="slm-variant-full" aria-label={`Pełny wariant ${view === 'details-a' ? 'A' : 'B'}`}><DemoMatchDetails key={view} variant={view === 'details-a' ? 'a' : 'b'} count={count} /></section>
+          <MatchHero match={{ ...current, registered_count: currentCount }} title="Szczegóły meczu" />
+          <section className="slm-variant-full" aria-label={`Pełny wariant ${view === 'details-a' ? 'A' : 'B'}`}><DemoMatchDetails key={view} variant={view === 'details-a' ? 'a' : 'b'} count={currentCount} startsAt={current.starts_at} /></section>
         </>}
       </> : tab === 'players' && <section className="slm-panel"><h1>Zawodnicy</h1><p className="slm-planned">Planowane</p><p>Katalog zawodników nie jest dostępny w demonstracji.</p></section>}
       <details className="slm-demo-tools"><summary>Narzędzia demo</summary>

@@ -1,3 +1,28 @@
+# UI Beta 3.0 — Premium España
+
+Nowe grafiki Premium rzeczywiście dostarczono i obejrzano. Pełna specyfikacja,
+trzy cykle render/korekta i zestawienie referencja/render:
+[PREMIUM_VISUAL_SPEC.md](ui/PREMIUM_VISUAL_SPEC.md).
+
+MatchHero to wspólna fotograficzna karta z datownikiem, lokalizacją i czasem,
+wersją kompaktową listy i większą fotografią szczegółów. Cały kafelek klikalny,
+CTA pozostaje osobno. Prawdziwa lista używa dotychczasowego matches/open/RPC.
+Uczestnicy są wizualnie podzieleni na zawodników, gości i rezerwę. Dostępne
+kontakty i operacje pozostają zależne od dotychczasowych uprawnień.
+Herb oryginalny, centralny; systemowe fonty bez sieci. Tokeny wyłącznie variables.css.
+Składy: dekoracyjne boisko/koszulki i Planowane, bez nazw/algorytmu.
+
+Izolowane demo:3 fikcyjne mecze, wybór odpowiada dacie i liczbie uczestników;
+uczestnicy z fikcyjnymi imionami/inicjałami, rezerwa osobno. Żadnych telefonów,
+kont, prawdziwych sald. Narzędzia i motywy nadal zwijane; Auto/Light/Dark bez zmian.
+allowlista/env/CSP/zasoby bez rozszerzenia. Zasób herbu nadal sprawdzany bajtowo.
+Vitest85/85; Chromium320/390/768 i izolacja OK, Cypress brak Xvfb.
+Nie jest to deklaracja pełnej zgodności ani weryfikacji Androida/backendu.
+Poniższe etapy są historyczne; ich stwierdzenia o braku obrazów lub osób w demo
+zostały zastąpione niniejszym etapem. Nigdy nie dodawać fikcyjnych osób do aplikacji.
+
+---
+
 # UI Beta 2.3 — referencja i wybrany B
 
 Oryginalny slm-crest-espana.svg z assets/branding zastępuje placeholder w obu

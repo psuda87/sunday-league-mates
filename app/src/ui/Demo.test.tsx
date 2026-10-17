@@ -23,7 +23,7 @@ it('opens chosen B directly from the whole card, defaults to Participants and re
   expect(screen.getByRole('img', { name: 'Sunday League Mates' }).getAttribute('src')).toBe('/assets/branding/slm-crest-espana.svg');
   const nav = screen.getByRole('navigation', { name: 'Główna nawigacja' });
   expect(nav.querySelectorAll('button')).toHaveLength(3);
-  const card = screen.getByRole('button', { name: /Otwórz szczegóły meczu:/ });
+  const card = screen.getAllByRole('button', { name: /Otwórz szczegóły meczu:/ })[0];
   expect(card.querySelector('button, ion-button, a')).toBeNull(); fireEvent.click(card);
   expect(screen.getByRole('heading', { name: 'Szczegóły meczu' })).toBeTruthy();
   expect(screen.queryByText('Porównaj szczegóły meczu')).toBeNull();
@@ -49,4 +49,18 @@ it('supports a direct details URL with Participants selected', () => {
   window.history.replaceState(null, '', '/#details'); render(<Demo />);
   expect(screen.getByRole('heading', { name: 'Szczegóły meczu' })).toBeTruthy();
   expect(screen.getByRole('tab', { name: 'Uczestnicy' })).toHaveAttribute('aria-selected', 'true');
+});
+it('opens the selected fictional match with matching date, capacity and roster totals', () => {
+  render(<Demo />);
+  fireEvent.click(screen.getAllByRole('button', { name: /Otwórz szczegóły meczu:/ })[1]);
+  expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '8');
+  const panel = screen.getByRole('tabpanel');
+  expect(panel.querySelectorAll('.slm-roster-group')[0].querySelectorAll('li')).toHaveLength(6);
+  expect(panel.querySelectorAll('.slm-roster-group')[1].querySelectorAll('li')).toHaveLength(2);
+  expect(panel.querySelectorAll('.slm-roster-group')[2].querySelectorAll('li')).toHaveLength(2);
+  fireEvent.click(screen.getByRole('tab', { name: 'Informacje' }));
+  expect(screen.getByRole('tabpanel')).toHaveTextContent('29 października 2026');
+  fireEvent.click(screen.getByRole('tab', { name: 'Składy' }));
+  expect(screen.getByRole('tabpanel')).toHaveTextContent('Planowane');
+  expect(screen.getByRole('tabpanel').querySelectorAll('.slm-team-side ion-icon')).toHaveLength(10);
 });

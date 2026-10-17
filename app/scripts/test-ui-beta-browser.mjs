@@ -59,7 +59,10 @@ try {
     assert.equal(await evaluate("document.querySelectorAll('.slm-variant-preview').length"), 0, 'A/B in normal flow');
     assert.equal(await evaluate("document.querySelector('[role=tab][aria-selected=true]').textContent"), 'Uczestnicy');
     assert.equal(await evaluate("[...document.querySelectorAll('[role=tabpanel]')].filter(panel=>!panel.hidden).length"), 1);
-    await widths(); await shot(`details-${mode}`);
+    await widths(); await shot(`participants-${mode}`);
+    await evaluate("document.querySelectorAll('[role=tab]')[0].click()"); await widths(); await shot(`details-${mode}`);
+    await evaluate("document.querySelectorAll('[role=tab]')[2].click()"); await widths(); await shot(`teams-${mode}`);
+    await evaluate("document.querySelectorAll('[role=tab]')[1].click()");
     await evaluate("document.querySelector('[role=tab][aria-selected=true]').focus()"); await press('End', 'End', 35);
     assert.equal(await evaluate('document.activeElement.textContent'), 'Rozliczenie');
     assert.equal(await evaluate("document.querySelector('[role=tabpanel]:not([hidden])').textContent.includes('Nie pokazujemy fikcyjnych')"), true);

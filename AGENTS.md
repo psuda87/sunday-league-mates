@@ -1,3 +1,7 @@
+# Aktualny kierunek UI 3.0
+
+- Premium España: obowiązują obie rzeczywiście dostarczone grafiki docs/ui/reference/slm-premium-*.jpg. Analiza i trzy iteracje w docs/ui/PREMIUM_VISUAL_SPEC.md. Paleta bazowa bordo #880000, złoto #D4AF37, prawie czarne tło (komponenty od #0B0C10), ciepły Light; ten wpis zastępuje wcześniejszy kierunek Beta2.3 w zakresie wyglądu. Centralne tokeny CSS, datownik i fotografia w tle karty, oryginalny herb centralnie; bez zmiany backendu/logiki. Demo ma jawnie fikcyjne spotkania i osoby, Składy tylko Planowane. Auto pozostaje domyślne.
+
 # Instrukcje pracy nad Sunday League Mates
 
 - Raportowanie użytkownikowi: każdą końcową odpowiedź/raport dopisuj chronologicznie do jednego pliku `docs/ODPOWIEDZI_CODEX.txt`, z datą i godziną Europe/Warsaw. Nie zastępuj wcześniejszych wpisów. W odpowiedzi zawsze podawaj nazwę tego pliku. Zrzuty podglądu UI zapisuj w `docs/ui/` i wypychaj z powiązanymi zmianami na bieżącą gałąź; podawaj linki GitHub z nazwą gałęzi, dostępne na telefonie. Nigdy nie zapisuj sekretów, tokenów ani prywatnych danych w raportach lub obrazach. Nie twórz pustych commitów; te zasady nie upoważniają do scalania, wdrożeń ani nadpisywania cudzych zmian.

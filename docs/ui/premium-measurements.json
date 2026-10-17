@@ -1,0 +1,78 @@
+{
+  "dark": {
+    ".slm-crest": {
+      "x": 161,
+      "y": 5,
+      "width": 68,
+      "height": 76
+    },
+    ".slm-next-match h1": {
+      "x": 16,
+      "y": 110,
+      "width": 358,
+      "height": 33.59375
+    },
+    ".slm-hero-card": {
+      "x": 16,
+      "y": 159.59375,
+      "width": 358,
+      "height": 192.390625
+    },
+    ".slm-stadium-frame": {
+      "x": 17,
+      "y": 160.59375,
+      "width": 356,
+      "height": 190.390625
+    },
+    ".slm-match-cta": {
+      "x": 16,
+      "y": 365.984375,
+      "width": 358,
+      "height": 54
+    },
+    ".slm-bottom-nav": {
+      "x": 0,
+      "y": 777,
+      "width": 390,
+      "height": 67
+    }
+  },
+  "light": {
+    ".slm-crest": {
+      "x": 161,
+      "y": 5,
+      "width": 68,
+      "height": 76
+    },
+    ".slm-next-match h1": {
+      "x": 16,
+      "y": 110,
+      "width": 358,
+      "height": 33.59375
+    },
+    ".slm-hero-card": {
+      "x": 16,
+      "y": 159.59375,
+      "width": 358,
+      "height": 192.390625
+    },
+    ".slm-stadium-frame": {
+      "x": 17,
+      "y": 160.59375,
+      "width": 356,
+      "height": 190.390625
+    },
+    ".slm-match-cta": {
+      "x": 16,
+      "y": 365.984375,
+      "width": 358,
+      "height": 54
+    },
+    ".slm-bottom-nav": {
+      "x": 0,
+      "y": 777,
+      "width": 390,
+      "height": 67
+    }
+  }
+}

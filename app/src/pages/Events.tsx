@@ -203,7 +203,8 @@ export default function Events({ manager, session, initialEventId }: { manager: 
         </div>}
       </section>
       </>} participants={<>
-      <section className="slm-panel"><h3>Zapisani na mecz</h3><ul className="slm-participants">{detail.participants.filter(p => p.status === 'registered').map(participant)}</ul>{!e.registered_count && <p>Brak zapisanych.</p>}</section>
+      <section className="slm-panel"><h3>Zapisani na mecz</h3><ul className="slm-participants">{detail.participants.filter(p => p.status === 'registered' && p.member_id).map(participant)}</ul>{!detail.participants.some(p => p.status === 'registered' && p.member_id) && <p>Brak zapisanych zawodników.</p>}</section>
+      <section className="slm-panel"><h3>Goście</h3><ul className="slm-participants">{detail.participants.filter(p => p.status === 'registered' && !p.member_id).map(participant)}</ul>{!detail.participants.some(p => p.status === 'registered' && !p.member_id) && <p>Brak gości.</p>}</section>
       <section className="slm-panel"><h2>Rezerwa</h2><p className="slm-muted">Nie zajmuje miejsc. Bez automatycznego awansu: pierwszy skuteczny zapis zajmuje wolne miejsce. Powiadomienie o miejscu nie jest potwierdzeniem zapisu.</p>
         <ul className="slm-participants">{detail.participants.filter(p => p.status === 'reserve').map(participant)}</ul>{!e.reserve_count && <p>Rezerwa jest pusta.</p>}</section>
       {admin && e.registration_open && <section className="slm-panel"><h2>Zarządzaj uczestnikami</h2>
@@ -237,10 +238,9 @@ export default function Events({ manager, session, initialEventId }: { manager: 
       </>} settlement={admin ? <MatchSettlement key={`${e.id}:${e.settlement_version ?? e.status}`} manager={manager} eventId={e.id} onChange={() => open(e.id)} /> : <section className="slm-panel"><p>Zatwierdzone należności za ten mecz sprawdzisz w swoich Rozliczeniach. Podział administracyjny nie jest dostępny w tym widoku.</p></section>} />
     </> : <section className="slm-panel"><h1>Mecze</h1>
       {!matches.length && <p>Brak wydarzeń.</p>}
-      {matches.map(match => <article key={match.id} className="slm-match"><h2>{matchDate(match.starts_at)}</h2><p>{match.location}</p>
-        <p>{match.status === 'cancelled' ? '⛔ Odwołany' : match.registration_open ? 'Zapisy otwarte' : '🔒 Zapisy zamknięte'} · {match.registered_count}/{match.capacity}</p>
-        {match.decision_required && <p>⚠ Brak minimum po 17:00 — decyzja administratora</p>}
-        <IonButton fill="outline" disabled={busy} onClick={() => void work(() => open(match.id))}>Szczegóły</IonButton></article>)}
+      {matches.map(match => <div key={match.id} className="slm-match-list-item"><MatchHero match={match} compact title="Mecz" openDisabled={busy} onOpen={() => void work(() => open(match.id))} />
+        <p className="slm-muted">{match.status === 'cancelled' ? '⛔ Odwołany' : match.registration_open ? 'Zapisy otwarte' : '🔒 Zapisy zamknięte'}</p>
+        {match.decision_required && <p>⚠ Brak minimum po 17:00 — decyzja administratora</p>}</div>)}
       <div className="slm-actions"><IonButton fill="outline" disabled={busy || !offset} onClick={() => void work(() => list(Math.max(0, offset - 50)))}>Poprzednie mecze</IonButton>
         <IonButton fill="outline" disabled={busy || matches.length < 50} onClick={() => void work(() => list(offset + 50))}>Następne mecze</IonButton></div>
     </section>}

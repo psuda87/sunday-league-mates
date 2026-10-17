@@ -1,3 +1,13 @@
+## Premium 3.0
+
+Demo nadal samodzielne: te same Root app / npm run build:demo / dist-demo / brak env.
+Żadnych zmian CSP, allowlisty modułów ani konfiguracji Vercel. Dodano wyłącznie UI
+w istniejących modułach:3 jawnie fikcyjne wydarzenia, przykładowych uczestników
+i dekorację planowanych składów. Nie ma App/Auth/API/Supabase ani prawdziwych osób.
+Demo12 plików zweryfikowane podczas build; brak żądań zewnętrznych w Chromium.
+Końcowe zrzuty: ui/premium-*.png. Nie uruchamiano ręcznego wdrożenia.
+Odczyt GitHub deployment API zwrócił Forbidden; nie ma potwierdzonego URL/statusu.
+
 ## UI Beta 2.3 — wybrany B i oryginalny herb
 
 Normalny przepływ: home -> #details-b (alias #details), domyślnie Uczestnicy.
