@@ -1,3 +1,8 @@
+Uzupełnienie Git: zachowano równoległy commit d1f65b2 z SLM_PREMIUM_DIRECTION.md;
+własne commity przeniesiono bezkonfliktowym rebase, bez force i bez zmiany kodu app.
+Wskazane tam dwa nowe obrazy premium nadal nie są dostarczone; nie były oglądane.
+Bieżące dwie iteracje bazują na istniejącej approved-three-themes.jpg.
+
 # UI Beta 2.3 — 2026-10-17 23:45:46 CEST (Europe/Warsaw)
 
 feat/ui-beta zaktualizowano fast-forward do0243660 z oryginalnym herbem.

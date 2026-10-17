@@ -128,3 +128,65 @@ Użytkownik potwierdził automatyczny podgląd Vercel po push. Nie uruchamiano r
 wdrożenia i nie potwierdzano sukcesu konkretnego autodeploy. Linku domeny nie zgaduję.
 Plik raportu: docs/ODPOWIEDZI_CODEX.txt.
 
+=== 2026-10-17 23:47:16 CEST (Europe/Warsaw) — UI Beta 2.3: referencja, oryginalny herb i wybrany B ===
+Przed zmianami rzeczywiście obejrzano approved-three-themes.jpg (trzeci telefon),
+beta22-home-dark/light.png i render SVG w Chromium. Fast-forward do0243660 dostarczył
+nowy oryginalny herb; bez nadpisywania zmian i bez merge do innych gałęzi.
+
+Konkretne różnice i poprawki:
+- Placeholder SLM zastąpiono oryginalnym SVG54x61, w x18/y8, także w Light.
+- Tytuł przesunięto z około y159 do101, usunięto kicker i banner techniczny z góry.
+- Karta z około290px wysokości do212 w iteracji1, potem200 w iteracji2.
+- Zdjęcie z pionowego142x164 do poziomego144x104, usunięto podpis i rozjaśniono dół.
+- Mniejsze paddingi i promienie23->14px, ciaśniejsze metadane i odstępy licznika.
+- CTA z y516 do około368, szeroki czerwony54px, pod kartą, bez osobnego Szczegóły meczu.
+- Niemal czarne tło z górną bordową poświatą zamiast rozlanego bordo na całym ekranie.
+- Dolna nawigacja67px z trzema pozycjami, akcent ikony zamiast dużego aktywnego panelu.
+- Suwak i motywy przeniesione do zwijanych Narzędzi demo, tylko subtelne Dane przykładowe.
+
+Dwie iteracje: rzeczywisty render390x844, obejrzenie/porównanie, korekta i ponowny render
+oraz ocena obu motywów. Zachowano pierwsze Home Dark/Light, finalne cztery rendery,
+pomiary DOM w beta23-measurements.json i szczegółową analizę BETA23_VISUAL_REVIEW.md.
+Pozostałe różnice: inna fotografia bez potwierdzenia Harcerskiej1, pionowy kształt nowego
+herbu wobec szerszego znaku referencji,3 zamiast4 zakładek, data/minimum i oznaczenie demo.
+Na844px pozostaje więcej wolnego tła niż w krótszym referencyjnym kadrze telefonu.
+Nie dodawano fikcyjnych funkcji, statusbara ani obudowy. Nie deklaruję zgodności piksel w piksel.
+
+Wybrany B w rzeczywistej aplikacji i demo: wspólny MatchTabs, jeden poziomy pasek
+z ikonami, domyślnie Uczestnicy, jeden widoczny panel. Na320px pasek może przewijać się
+lokalnie; dokument pozostaje bez poziomego przewijania. ARIA i strzałki/Home/End.
+Panele/formularze pozostają zamontowane, więc zachowują stan; operacje i uprawnienia bez zmian.
+Składy planowane, finanse demo niedostępne. Karta nadal działa Enter/Spacja, zapis osobno.
+Normalny demo-flow prowadzi do #details-b (#details alias); A/B tylko archiwalnie w narzędziach.
+
+Wyniki: ESLint, TypeScript, build aplikacji i demo OK; duże chunki Ionic pozostają.
+Vitest84/84 w14 plikach. Chromium home/details320/390/768, natywna klawiatura karty i narzędzi,
+zakładki i domyślni Uczestnicy, jeden panel, motywy/live system, rzeczywista niewidoczność
+zamkniętych narzędzi, suwak0/10/15 i brak zewnętrznych żądań/naruszeń CSP OK.
+Cypress próbowano: brak Xvfb, niewykonany. Android/iOS i prawdziwy Supabase niewykonane.
+Izolacja demo12 plików OK, bez App/Auth/Supabase/Edge. SVG jawnie emitowany przy publicDir=false,
+weryfikator wymaga obecności i bajtowej zgodności z oryginałem; SVG nie zmieniano.
+
+Finalne rzeczywiste rendery React/Ionic390x844:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/beta23-home-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/beta23-home-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/beta23-details-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/beta23-details-light.png
+Analiza: docs/ui/BETA23_VISUAL_REVIEW.md. Referencja: docs/ui/reference/approved-three-themes.jpg.
+
+SHA końcowej implementacji i zrzutów: d3f71efa797fe18c91027a0d497a82f23d6785b5.
+Raport stanowi kolejny commit dokumentacyjny, którego własny SHA jest w historii i odpowiedzi.
+Commit/push tylko feat/ui-beta, bez merge do innych gałęzi, migracji i ręcznego wdrożenia.
+Backend/Auth/RPC/RLS/finanse/push/Firebase bez zmian. Historyczne braki SQL/FIFO/Docker pozostają.
+Automatyczny Vercel: niezweryfikowany, odczyt deploymentów GitHub API zwrócił Forbidden.
+Brak potwierdzonego URL; nie oznacza to porażki autodeploy i nie deklaruję gotowości produkcyjnej.
+Plik raportu: docs/ODPOWIEDZI_CODEX.txt.
+
+Uzupełnienie po przeglądzie origin: zwykły push odrzucono, ponieważ pojawił się
+nowy d1f65b2 z docs/ui/reference/SLM_PREMIUM_DIRECTION.md. Dokument przeczytano,
+zachowano i wykonano bezkonfliktowy rebase tylko własnych dwóch lokalnych commitów.
+Nie użyto force push. Kod app i zrzuty są identyczne przed/po rebase; dodatkowe testy
+nie były potrzebne dla samego dokumentu. SHA implementacji powyżej zaktualizowano.
+Dokument wskazuje dwie dalsze grafiki premium, ale ich JPG/paczki nie ma w repo;
+nie deklarujemy ich obejrzenia. Bieżącą pracę porównano z dostępną approved-three-themes.jpg.
+
