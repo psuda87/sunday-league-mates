@@ -1,3 +1,53 @@
+# UI Beta 2.2 — klikalna karta i porównanie A/B
+
+Karta MatchHero ma opcjonalne onOpen/openDisabled. Natywny button jest na całej
+powierzchni article, a treść (w tym dostępny progressbar) pozostaje jego rodzeństwem.
+Przycisk zapisu znajduje się poza article. Brak zagnieżdżonych przycisków i ręcznego
+udawania obsługi klawiszy; natywne Enter/Spacja, focus ring i hover. Events usuwa
+osobny przycisk Szczegóły meczu, nadal używa istniejącego open/RPC i obsługi błędów.
+
+Demo: kliknięcie karty prowadzi do porównania, nie wybiera docelowej wersji:
+- `/#compare`: A i B jeden pod drugim, jasno opisane, działające przykłady.
+- `/#details-a`: pełny widok sekcji przewijanych.
+- `/#details-b`: pełny widok zakładek z jednym widocznym panelem.
+Fragmenty URL nie wymagają rewrites ani importu routera pełnej aplikacji. Bezpieczna
+lista widoków, obsługa hashchange/back/forward, ręczne otwarcie i reload. W podglądzie
+pełnej aplikacji analogiczne fragmenty po /ui-demo. Powrót do meczów dostępny w każdym
+widoku. Nie przeniesiono zakładek do rzeczywistego modułu wydarzeń.
+
+DemoMatchDetails zawiera wyłącznie fikcyjny opis i licznik; Składy planowane,
+Rozliczenie niedostępne, bez sald. Wariant B: tablist/tab/tabpanel, aria-selected,
+aria-controls/labelledby, roving tabindex; strzałki z zawijaniem oraz Home/End.
+Niewidoczne panele mają hidden. Identyfikatory unikalne także na stronie porównawczej.
+Dokładnie ten sam opis wydarzenia i licznik w A i B. Wariant nie jest utrwalany jako
+wybór docelowy. Realna aplikacja zachowuje istniejące sekcje i reguły biznesowe.
+
+Dopracowano głębię bordo/grafitu, krawędź karty i kadr zdjęcia; ciepły Light zachowany.
+Wszystkie kolory nadal w centralnych tokenach. Brak herbu: pozostaje slot, bez nowego logo.
+Referencja dostępna i zapisana: [zatwierdzone trzy ekrany](ui/reference/approved-three-themes.jpg).
+Korzystano z niej, bez deklarowania zgodności piksel w piksel; inne zdjęcie i brak herbu
+nadal odróżniają render od grafiki. Referencja jest dokumentacją, nie zasobem bundle demo.
+
+Zrzuty prawdziwego renderu React/Ionic, z dolną nawigacją:
+[Home Dark](ui/beta22-home-dark.png), [Home Light](ui/beta22-home-light.png),
+[Porównanie Dark](ui/beta22-compare-dark.png), [Porównanie Light](ui/beta22-compare-light.png),
+[A Dark](ui/beta22-a-dark.png), [A Light](ui/beta22-a-light.png),
+[B Dark](ui/beta22-b-dark.png), [B Light](ui/beta22-b-light.png).
+Home390x844, porównanie390x2500, A390x2200, B390x1600; wyższe viewporty pozwalają
+obejrzeć sekcje bez montażu obrazu. To rendery Chromium, nie test fizycznego telefonu.
+
+Testy: lint/TypeScript/oba buildy OK, Vitest84/84 (14 plików), Chromium320/390/768
+home/compare/A/B bez przewijania poziomego, natywna klawiatura i nawigacja zakładek,
+tryby/live system/suwak oraz brak API/wywołań zewnętrznych/naruszeń CSP OK.
+Cypress brak Xvfb, niewykonany; Android/iOS/prawdziwy backend niewykonane.
+Duże chunki Ionic pozostają. Allowlista dodaje tylko DemoMatchDetails, nie Auth/App.
+
+Automatyczny podgląd Vercel po push skonfigurowany zgodnie z informacją użytkownika;
+nie uruchamiano ręcznej publikacji ani nie potwierdzano sukcesu wdrożenia.
+Poniżej historia poprzednich etapów.
+
+---
+
 # UI Beta 2.1 — nawigacja i szczegóły meczu
 
 Dolna nawigacja zawiera teraz trzy pozycje: Mecze, Zawodnicy, Profil. Składy nie

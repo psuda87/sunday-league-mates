@@ -18,33 +18,56 @@ if(!await evaluate("!!document.querySelector('[role=progressbar]')"))throw Error
 await evaluate("Promise.all([...document.images].map(image => image.decode()))");
 if(!await evaluate("document.querySelector('.slm-stadium').naturalWidth > 0"))throw Error('Match image failed to load');
 await fs.mkdir(output,{recursive:true});
-for(const mode of ['dark','light']){
- await evaluate(`document.querySelector('input[value=${mode}]').click()`);
- await new Promise(r=>setTimeout(r,200));
- const shot=await cmd('Page.captureScreenshot',{format:'png'});await fs.writeFile(`${output}/espana-${mode}.png`,Buffer.from(shot.data,'base64'));
- await cmd('Emulation.setDeviceMetricsOverride',{width:390,height:1280,deviceScaleFactor:1,mobile:true});
+async function press(key, code, number) {
+ const text = key === 'Enter' ? '\r' : key === ' ' ? ' ' : undefined;
+ await cmd('Input.dispatchKeyEvent',{type:text ? 'keyDown' : 'rawKeyDown',key,code,windowsVirtualKeyCode:number,nativeVirtualKeyCode:number,text,unmodifiedText:text});
+ await cmd('Input.dispatchKeyEvent',{type:'keyUp',key,code,windowsVirtualKeyCode:number});
+}
+async function screenshot(name, height=844, selector) {
+ await cmd('Emulation.setDeviceMetricsOverride',{width:390,height,deviceScaleFactor:1,mobile:true});
+ if(selector)await evaluate(`document.querySelector('${selector}').scrollIntoView({block:'start'})`);
+ await new Promise(r=>setTimeout(r,150));
+ const shot=await cmd('Page.captureScreenshot',{format:'png'});
+ await fs.writeFile(`${output}/${name}.png`,Buffer.from(shot.data,'base64'));
+}
+async function clickText(text) {
+ await evaluate(`[...document.querySelectorAll('ion-button')].find(button => button.textContent === ${JSON.stringify(text)}).click()`);
  await new Promise(r=>setTimeout(r,100));
- const full=await cmd('Page.captureScreenshot',{format:'png'});await fs.writeFile(`${output}/espana-${mode}-full.png`,Buffer.from(full.data,'base64'));
- await cmd('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
- await evaluate("[...document.querySelectorAll('ion-button')].find(button => button.textContent === 'Szczegóły meczu').click()");
- await new Promise(r=>setTimeout(r,100));
- if(!await evaluate("!!document.querySelector('nav[aria-label=\"Sekcje meczu\"]')"))throw Error('Missing event sections');
- if(await evaluate("document.querySelectorAll('nav[aria-label=\"Główna nawigacja\"] button').length")!==3)throw Error('Main nav must contain 3 items');
+}
+async function checkWidths() {
  for(const width of [320,390,768]) {
   await cmd('Emulation.setDeviceMetricsOverride',{width,height:844,deviceScaleFactor:1,mobile:true});
-  const overflow=await evaluate("document.documentElement.scrollWidth > innerWidth || [...document.querySelectorAll('.slm-match-sections')].some(el=>el.scrollWidth>el.clientWidth)");
-  if(overflow)throw Error('Event detail overflow');
+  if(await evaluate("document.documentElement.scrollWidth > innerWidth || [...document.querySelectorAll('.slm-detail-tabs,.slm-match-sections')].some(el=>el.scrollWidth>el.clientWidth)"))throw Error('Layout overflow');
  }
- await cmd('Emulation.setDeviceMetricsOverride',{width:390,height:1280,deviceScaleFactor:1,mobile:true});
- await evaluate("document.querySelector('.slm-match-sections').scrollIntoView({block:'start'})");
- await new Promise(r=>setTimeout(r,100));
- const detailShot=await cmd('Page.captureScreenshot',{format:'png'});await fs.writeFile(`${output}/details-${mode}.png`,Buffer.from(detailShot.data,'base64'));
- await evaluate("[...document.querySelectorAll('ion-button')].find(button => button.textContent.includes('Wróć do meczów')).click()");
- await new Promise(r=>setTimeout(r,100));
- if(await evaluate("!!document.querySelector('.slm-match-sections')"))throw Error('Back action did not leave details');
- await cmd('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
 }
-for(const width of [320,390,768]){await cmd('Emulation.setDeviceMetricsOverride',{width,height:844,deviceScaleFactor:1,mobile:true});const actual=await evaluate('document.documentElement.scrollWidth');if(actual>width)throw Error(`overflow ${actual}>${width}`);console.log(`Mobile layout ${width}px: OK`);}
+for(const mode of ['dark','light']){
+ await evaluate(`document.querySelector('input[value=${mode}]').click()`);
+ await checkWidths(); await screenshot(`espana-${mode}`);
+ if(await evaluate("document.querySelector('.slm-hero-card').querySelectorAll('button').length")!==1)throw Error('Card must have exactly one native button');
+ if(await evaluate("!!document.querySelector('.slm-card-link').querySelector('button,ion-button,a')"))throw Error('Nested card controls');
+ await evaluate("document.querySelector('.slm-card-link').focus()");
+ await press('Enter','Enter',13); await new Promise(r=>setTimeout(r,100));
+ if(await evaluate("document.querySelectorAll('.slm-variant-preview').length")!==2)throw Error('Comparison must display A and B');
+ await checkWidths(); await screenshot(`compare-${mode}`,2500);
+ for(const variant of ['A','B']) {
+  await clickText(`Otwórz ${variant} w pełnym widoku`);
+  await checkWidths(); await screenshot(`variant-${variant.toLowerCase()}-${mode}`,variant === 'A' ? 2200 : 1600);
+  if(variant==='B') {
+   if(await evaluate("[...document.querySelectorAll('[role=tabpanel]')].filter(panel=>!panel.hidden).length")!==1)throw Error('More than one tab panel');
+   await evaluate("document.querySelector('[role=tab]').focus()");
+   await press('End','End',35); await new Promise(r=>setTimeout(r,50));
+   if(!await evaluate("document.activeElement.textContent==='Rozliczenie' && document.activeElement.getAttribute('aria-selected')==='true'"))throw Error('Tab keyboard navigation failed');
+  }
+  await clickText('Porównaj A i B');
+ }
+ await clickText('← Wróć do meczów');
+ // Space also activates the native card; signup is an independent sibling.
+ await evaluate("document.querySelector('.slm-card-link').focus()");
+ await press(' ','Space',32); await new Promise(r=>setTimeout(r,100));
+ if(await evaluate("location.hash")!=='#compare')throw Error('Space did not open details');
+ await clickText('← Wróć do meczów');
+}
+console.log('Home/comparison/full A/full B at 320/390/768, native Enter/Space, keyboard tabs: OK');
 for (const value of [0,10,15,12]) {
  await evaluate(`(() => { const slider=document.querySelector('#demo-count'); const setter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set; setter.call(slider,'${value}'); slider.dispatchEvent(new Event('input',{bubbles:true})); slider.dispatchEvent(new Event('change',{bubbles:true})); })()`);
  await new Promise(r=>setTimeout(r,50));
@@ -52,7 +75,7 @@ for (const value of [0,10,15,12]) {
  if(actual!==String(value))throw Error('Capacity slider did not update');
 }
 console.log('Demo capacity slider 0/10/15: OK');
-console.log('Three main tabs, match details/back, detail layout 320/390/768: OK');
+if(await evaluate("document.querySelectorAll('nav[aria-label=\"Główna nawigacja\"] button').length")!==3)throw Error('Expected three main tabs');
 const progress=await evaluate("document.querySelector('[role=progressbar]').getAttribute('aria-valuenow')");if(progress!=='12')throw Error('Wrong capacity');
 await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:'dark'}]});
 await evaluate("document.querySelector('input[value=auto]').click()");

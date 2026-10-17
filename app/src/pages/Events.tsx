@@ -150,9 +150,8 @@ export default function Events({ manager, session, initialEventId }: { manager: 
     {error && <p role="alert" className="slm-error">⚠ {error}</p>}
     {notice && <p role="status" className="slm-notice">✓ {notice}</p>}
     {busy && <IonSpinner aria-label="Trwa operacja wydarzenia" />}
-    {!detail && !form && offset === 0 && upcoming && <MatchHero match={preview?.event ?? upcoming}>
+    {!detail && !form && offset === 0 && upcoming && <MatchHero match={preview?.event ?? upcoming} openDisabled={busy} onOpen={() => void work(() => open(upcoming.id))}>
       {matchAction(preview)}
-      <IonButton fill="clear" expand="block" disabled={busy} onClick={() => void work(() => open(upcoming.id))}>Szczegóły meczu i uczestnicy</IonButton>
     </MatchHero>}
     <div className="slm-actions">
       <IonButton fill="outline" disabled={busy} onClick={() => void work(async () => { setDetail(null); setForm(null); await list(0); })}>Lista meczów</IonButton>

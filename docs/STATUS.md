@@ -1,3 +1,30 @@
+# UI Beta 2.2 — 2026-10-17 23:09:22 CEST (Europe/Warsaw)
+
+feat/ui-beta. Cały kafelek najbliższego meczu otwiera szczegóły: natywny button
+jako warstwa interakcji, Enter/Spacja/fokus/hover, bez zagnieżdżonych przycisków.
+Przycisk zapisu pozostaje osobnym rodzeństwem i używa dotychczasowych operacji.
+W demo kafelek otwiera #compare: A i B jeden pod drugim, jasno podpisane.
+#details-a to wszystkie sekcje; #details-b to jedna widoczna zakładka, ARIA,
+strzałki/Home/End. Oba mają osobny pełny widok, powrót i możliwość odświeżenia URL.
+Nie wybrano wariantu docelowego; rzeczywiste szczegóły zachowują dotychczasowy układ.
+Dark: dopracowany grafit/bordo, obramowanie i kadr; Light tylko drobne poprawki.
+Referencja zapisana w docs/ui/reference/approved-three-themes.jpg. Herb nadal brak.
+
+Weryfikacja: ESLint/TypeScript/build aplikacji/build demo OK (duże chunki Ionic).
+Vitest84/84, 14 plików. Chromium: home/compare/A/B przy320/390/768 bez poziomego
+przepełnienia, Enter/Spacja, zakładki, powrót, tryby/live system, suwak i izolacja OK.
+11 plików demo przeszło kontrolę, bez App/Auth/Supabase/Edge i naruszeń CSP.
+Cypress próbowano: brak Xvfb, niewykonany. Android/iOS/prawdziwy Supabase niewykonane.
+Zrzuty prawdziwego renderu React/Ionic docs/ui/beta22-*.png, osiem plików.
+
+Bez backendu, migracji, finansów, zmian zasad zapisów i merge. Użytkownik potwierdził
+konfigurację automatycznego podglądu Vercel tej gałęzi. Nie uruchamiano ręcznej
+publikacji; sukces konkretnego wdrożenia niepotwierdzony w tej sesji.
+Historyczne braki SQL/RLS/FIFO/Docker i niezastosowane migracje pozostają poniżej.
+Następnie: użytkownik porównuje A/B; implementacja docelowego wariantu dopiero po wyborze.
+
+---
+
 # UI Beta 2.1 — 2026-10-17 22:56:13 CEST (Europe/Warsaw)
 
 feat/ui-beta: dolna nawigacja Mecze/Zawodnicy/Profil. Składy wyłącznie w szczegółach

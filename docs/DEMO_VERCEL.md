@@ -1,3 +1,13 @@
+## UI Beta 2.2 — porównanie
+
+Automatyczny podgląd po push jest skonfigurowany zgodnie z informacją użytkownika.
+Nie uruchamiać ręcznych wdrożeń. Bieżący build nie zmienia Root/Build/Output/env/CSP.
+Punkt wejścia nadal tylko demo; DemoMatchDetails to dodatkowy jawnie dozwolony moduł UI.
+Fragmenty: /#compare, /#details-a, /#details-b. Wyłącznie statyczny index.html i lokalne
+fragmenty, bez API lub nowych funkcji serwerowych. Nie wybrano wariantu docelowego.
+84/84 Vitest, oba buildy i Chromium widoków320/390/768 OK, izolacja11 plików OK.
+Sukces konkretnego wdrożenia nie był potwierdzany; sam push nie jest dowodem publikacji.
+
 ## UI Beta 2.1 — stan publikacji
 
 Wspólne szczegóły meczu i trzy zakładki. Demo nie wywołuje API, nie ma prawdziwych
@@ -9,7 +19,8 @@ URL Vercel; dawne wpisy NIE OPUBLIKOWANO opisują stan poprzednich sesji.
 
 # Samodzielna demonstracja UI España — przygotowanie Vercel
 
-Gałąź feat/ui-beta. NIE OPUBLIKOWANO. Wymaga osobnej zgody na publikację.
+Gałąź feat/ui-beta. Wcześniejszy etap przygotowano bez publikacji.
+Aktualnie użytkownik potwierdził automatyczny podgląd tej gałęzi po push (UI Beta 2.2).
 
 | Ustawienie Vercel | Wartość |
 |---|---|

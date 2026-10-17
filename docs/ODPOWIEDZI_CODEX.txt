@@ -98,3 +98,33 @@ Nie oznacza to, że autodeploy nie działa — brak dostępu nie rozstrzyga wyni
 Bez merge, migracji i zmian produkcyjnego backendu. Commit i push tylko feat/ui-beta.
 Plik raportu: docs/ODPOWIEDZI_CODEX.txt.
 
+=== 2026-10-17 23:09:22 CEST (Europe/Warsaw) — UI Beta 2.2: klikalna karta i porównanie A/B ===
+Cały kafelek otwiera szczegóły, natywny button z obsługą Enter/Spacji i widocznym
+fokusem. Przycisk zapisu jest poza kartą; usunięto osobny przycisk Szczegóły meczu.
+W rzeczywistej aplikacji nadal dotychczasowy open/RPC, bez zmian finansów i zapisów.
+Demo #compare pokazuje A i B jeden pod drugim, bez wyboru docelowego wariantu.
+#details-a otwiera wszystkie sekcje, #details-b dostępne zakładki z jednym panelem.
+Pełne widoki mają powrót; adresy można otwierać osobno i odświeżać. Brak prawdziwych
+osób, transakcji i API. Składy planowane; rozliczenia demo niedostępne.
+Dark dopracowano: bordo/grafit, głębia i krawędź karty, kadr boiska. Light zachowany.
+Referencja dostępna, zapisana docs/ui/reference/approved-three-themes.jpg.
+Brak zatwierdzonego herbu, nadal slot; nie deklaruję odwzorowania piksel w piksel.
+ESLint/TypeScript/oba buildy OK, duże chunki Ionic pozostają; Vitest84/84, 14 plików.
+Chromium home/compare/A/B przy320/390/768 bez poziomego przewijania; Enter/Spacja,
+zakładki/strzałki/Home/End, nawigacja, motywy/live system i suwak sprawdzone.
+Izolacja demo11 plików OK, bez App/Auth/Supabase/Edge, żądań zewnętrznych i naruszeń CSP.
+Cypress próbowano: brak Xvfb, niewykonany. Android/iOS i prawdziwy Supabase niewykonane.
+Rzeczywiste zrzuty React/Ionic:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/beta22-home-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/beta22-home-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/beta22-compare-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/beta22-compare-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/beta22-a-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/beta22-a-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/beta22-b-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/beta22-b-light.png
+Commit i zwykły push tylko feat/ui-beta, bez merge/migracji/backendu.
+Użytkownik potwierdził automatyczny podgląd Vercel po push. Nie uruchamiano ręcznego
+wdrożenia i nie potwierdzano sukcesu konkretnego autodeploy. Linku domeny nie zgaduję.
+Plik raportu: docs/ODPOWIEDZI_CODEX.txt.
+

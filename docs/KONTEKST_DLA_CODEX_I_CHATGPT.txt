@@ -1,3 +1,12 @@
+UI BETA 2.2 — feat/ui-beta
+Klikalna cała karta, native Enter/Spacja, zapis osobno. Demo #compare pokazuje A/B
+jeden pod drugim; #details-a i #details-b to osobne pełne widoki. Bez wyboru docelowego
+wariantu i bez zmian realnych reguł biznesowych. B ma dostępne zakładki i jeden panel.
+Referencja zapisana docs/ui/reference/approved-three-themes.jpg; zrzuty beta22-*.png.
+Vitest84/84, lint/TypeScript/buildy/Chromium320/390/768/izolacja OK. Cypress brak Xvfb.
+Nie uruchamiać ręcznego Vercel; użytkownik skonfigurował auto-preview po push tej gałęzi.
+Backend, migracje, RLS/FIFO i weryfikacja urządzeń nadal poza odebranym zakresem UI.
+
 UI BETA 2.1 — feat/ui-beta
 Główna nawigacja3: Mecze/Zawodnicy/Profil. Składy planowane tylko w wydarzeniu.
 MatchSections wspólne: Informacje/Uczestnicy/Składy/Rozliczenie. Demo ma przejście
