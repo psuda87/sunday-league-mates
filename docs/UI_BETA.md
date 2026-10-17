@@ -1,3 +1,37 @@
+# Aktualizacja UI Beta 2.0 — 17.10.2026
+
+Dark ma bordowe tło, głębszą kartę, większą godzinę, czerwony przycisk z cieniem,
+stonowane złote akcenty i aktywną nawigację. Light zachowuje ciepłą jasną paletę.
+Wszystkie kolory są centralnymi tokenami CSS; komponenty są wspólne dla aplikacji i demo.
+
+MatchHero przyjmuje opcjonalne imageSrc, domyślnie /images/match-evening.jpg.
+Kadr CSS object-fit cover, object-position 60% 65%, stałe proporcje/obszar obrazu,
+width/height i async decoding. Błąd ładowania przywraca istniejący stadium.svg bez
+pętli ponowień. Zdjęcie dostarczone przez użytkownika (73 KB, 1280x785, bez EXIF),
+bez pobierania zdjęć z sieci; nie przedstawiamy go jako potwierdzonej lokalizacji
+Harcerska 1. Dekoracyjny obraz nie przekazuje istotnych danych meczu.
+
+Nie znaleziono zatwierdzonego herbu SLM. Slot logo 64x48 i prosty napis są tymczasowe;
+nie tworzono nowego herbu. Referencję trzech telefonów z wcześniejszego załącznika
+ponownie obejrzano, lecz nie odtworzono dokładnie zdjęcia stadionu i herbu.
+
+Naprawa Auto: utrzymanie subskrybowanego MediaQueryList przez cały czas aplikacji,
+bez tworzenia kolejnych obiektów przy każdym odczycie. Początkowo test headless
+wykrywał brak reakcji live; po poprawce końcowy przebieg przeszedł. Regresja w Vitest.
+
+Zrzuty z prawdziwego renderu statycznego demo React/Ionic, bez przeróbek graficznych:
+[Dark](ui/beta2-dark.png), [Light](ui/beta2-light.png),
+[Dark rozszerzony](ui/beta2-dark-full.png), [Light rozszerzony](ui/beta2-light-full.png).
+Podstawowe 390x844 obejmują footer; rozszerzone 390x1280 pokazują więcej kontrolek.
+
+Lint/TypeScript/oba buildy OK, Vitest 81/81; Chromium 320/390/768, brak przewijania
+poziomego, motywy/live system/suwak i obraz OK. Brak API i naruszeń CSP w demo.
+Cypress: brak Xvfb, niewykonany. Android/iOS niewykonane. Duże chunki pozostają.
+Nie zmieniono RPC, RLS, Edge, Auth, ledgera ani konfiguracji Firebase. Brak publikacji.
+Dalsze informacje o granicy demo w DEMO_VERCEL.md; poprzednie etapy poniżej.
+
+---
+
 # UI Beta — España Light & Dark
 
 17.10.2026, feat/ui-beta z origin/feat/integration 2026754. Referencję trzech ekranów

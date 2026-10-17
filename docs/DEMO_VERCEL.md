@@ -28,7 +28,9 @@ Nie wykonano operacji na koncie Vercel ani zdalnej bazie.
   Wspólne komponenty UI, tokeny oraz Accounts.css są tylko warstwą wizualną.
   Importy `type Match` z modelu wydarzeń są usuwane przez TypeScript.
 - `publicDir: false`: żadnego automatycznego kopiowania publicznych plików pełnej
-  aplikacji. Jedynym dodatkowym zasobem jest wyraźnie dołączony stadion.svg.
+  aplikacji. Dodatkowe zasoby to jawnie dołączone stadium.svg (fallback) i match-evening.jpg
+  (zdjęcie użytkownika, 73 KB). JPG jest dopuszczony tylko pod konkretną ścieżką,
+  z kontrolą nagłówka JPEG i rozmiaru poniżej 100 KB; bez ogólnego kopiowania public/.
   Brak source map, service workera, plików Edge czy funkcji serverless.
 - `envDir: false`, `envPrefix: []`: pliki env i zmienne VITE nie wchodzą do demo.
   Budowanie z kontrolnymi zmiennymi VITE potwierdziło brak ich markerów w output.
@@ -61,7 +63,7 @@ Cypress w środowisku z Xvfb: z app `npx cypress run --spec cypress/e2e/ui-beta.
 (jedno polecenie). Ten zestaw nie testuje Supabase.
 
 Wykonane: lint i TypeScript OK, oba buildy OK, Vitest 81/81 w 14 plikach,
-10 plików statycznego demo przeszło kontrolę. Chromium 320/390/768, trzy tryby,
+11 plików statycznego demo przeszło kontrolę. Chromium 320/390/768, trzy tryby,
 suwak i izolacja sieci OK. CSP odczytano także z odpowiedzi HTTP. Ostrzeżenia
 rozmiaru chunków Ionic pozostają. Cypress NIE WYKONANO — brak Xvfb; Android/iOS
 NIE WYKONANO. Zrzuty: [Dark](ui/demo-dark.png), [Light](ui/demo-light.png).
@@ -70,3 +72,7 @@ Po osobno autoryzowanej publikacji sprawdzić na faktycznej domenie Vercel: nag�
 brak zewnętrznego ruchu, tryby i suwak, odpowiedzi 404 dla plików źródłowych i brak
 logowania/administracji. Tego etapu nie wykonano. Backend i migracje bez zmian;
 historyczne braki weryfikacji bazy, Dockera, FIFO i RLS nadal obowiązują.
+
+Beta 2: bieżące podglądy [Dark](ui/beta2-dark.png) i [Light](ui/beta2-light.png),
+wspólne komponenty i poprawione utrzymywanie subskrypcji Auto. Izolacja modułów,
+CSP i wyłączenie env niezmienione. Wyniki i brak weryfikacji Androida w STATUS.md.

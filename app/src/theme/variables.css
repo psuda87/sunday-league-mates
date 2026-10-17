@@ -1,6 +1,11 @@
 /* Palette registry: add future families with [data-theme="..."] selectors. España only in beta. */
 :root {
   color-scheme: light;
+  --slm-canvas-glow: #B72C3809; --slm-canvas-shade: #F7F5F000;
+  --slm-card-top: #FFFFFF; --slm-card-bottom: #FBF9F6; --slm-card-edge: #FFFFFF;
+  --slm-header-glow: #B72C3806; --slm-nav-active: #C59A3914;
+  --slm-button-top: #BE3040; --slm-button-bottom: #A72433; --slm-button-shadow: #B72C3829;
+  --slm-gold-edge: #F0D38C; --slm-photo-shade: #10131999; --slm-photo-text: #FFF5DE;
   --ion-background-color: #F7F5F0; --ion-background-color-rgb: 247,245,240;
   --ion-text-color: #20242A; --ion-text-color-rgb: 32,36,42;
   --slm-panel: #FFFFFF; --slm-text-secondary: #62636A; --slm-border: #DEDAD3;
@@ -15,6 +20,11 @@
 }
 :root.ion-palette-dark {
   color-scheme: dark;
+  --slm-canvas-glow: #6C18274A; --slm-canvas-shade: #21101D30;
+  --slm-card-top: #2D2830; --slm-card-bottom: #1D222A; --slm-card-edge: #FFFFFF12;
+  --slm-header-glow: #681B2B24; --slm-nav-active: #E4B65210;
+  --slm-button-top: #C53242; --slm-button-bottom: #A42131; --slm-button-shadow: #8D192C38;
+  --slm-gold-edge: #F2D388; --slm-photo-shade: #101319BB; --slm-photo-text: #FFF5DE;
   --ion-background-color: #15191F; --ion-background-color-rgb: 21,25,31;
   --ion-text-color: #F5F5F5; --ion-text-color-rgb: 245,245,245;
   --slm-panel: #24272D; --slm-text-secondary: #B7B8BF; --slm-border: #3B3E46;
@@ -78,3 +88,51 @@ button, input, select { font: inherit; }
 .slm-call, .slm-notice { color: var(--slm-gold); }
 /* The disabled demo CTA previews actual button colors; it never sends a request. */
 .slm-demo .slm-match-cta.button-disabled { opacity: 1; }
+
+/* Beta 2: shared matchday composition. Theme-specific colors live above. */
+ion-content { --background: radial-gradient(ellipse at 105% 0%, var(--slm-canvas-glow), transparent 62%), linear-gradient(155deg, var(--slm-canvas-shade), transparent 65%), var(--ion-background-color); }
+ion-toolbar { --background: linear-gradient(110deg, var(--ion-background-color), var(--slm-header-glow)), var(--ion-background-color); }
+ion-header { box-shadow: none !important; }
+.slm-shell-header { padding: 10px 20px; min-height: 70px; }
+.slm-logo { display: inline-flex; align-items: center; justify-content: flex-start; width: 64px; height: 48px; padding: 0; border: 0; border-radius: 0; font-size: 1.65rem; }
+.slm-demo-header { display: flex; align-items: center; gap: 20px; color: var(--slm-gold); }
+.slm-demo-header small { font-size: .6rem; letter-spacing: .14em; color: var(--slm-text-secondary); }
+.slm-demo-header ion-icon { font-size: 23px; }
+.slm-demo-banner { margin: 0 0 16px; padding-left: 10px; border-left: 2px solid var(--slm-gold); font-size: .65rem; line-height: 1.65; color: var(--slm-text-secondary); }
+.slm-next-match { margin: 6px 0 26px; }
+.slm-eyebrow { font-size: .56rem; letter-spacing: .17em; margin: 0 0 10px; }
+.slm-next-match h1 { font-size: clamp(1.7rem, 7vw, 2.25rem); font-weight: 800; margin: 0 0 20px; letter-spacing: -.045em; }
+.slm-hero-card { position: relative; padding: 20px; border-radius: 23px; background: radial-gradient(ellipse at top right, var(--slm-glow), transparent 75%), linear-gradient(145deg, var(--slm-card-top), var(--slm-card-bottom)); box-shadow: inset 0 1px 0 var(--slm-card-edge), 0 18px 36px -10px var(--slm-shadow); }
+.slm-match-top { grid-template-columns: minmax(0,1fr) 45%; gap: 12px; align-items: stretch; }
+.slm-weekday { color: var(--slm-gold); font-size: .86rem !important; font-weight: 750; margin-top: 3px !important; }
+.slm-kickoff { font-size: clamp(2.8rem, 12vw, 4.25rem); font-weight: 850; line-height: 1.08; margin: 6px 0 9px; font-variant-numeric: tabular-nums; letter-spacing: -.065em; }
+.slm-match-date { font-size: .74rem !important; line-height: 1.5; }
+.slm-location { font-size: .75rem !important; line-height: 1.45; margin-top: 10px !important; }
+.slm-stadium-frame { position: relative; min-width: 0; min-height: 175px; border-radius: 14px; overflow: hidden; align-self: stretch; }
+.slm-stadium { display: block; width: 100%; height: 100%; position: absolute; inset: 0; min-height: 0; border-radius: 0; object-fit: cover; object-position: 60% 65%; }
+.slm-stadium-frame::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 50%, var(--slm-photo-shade)); pointer-events: none; }
+.slm-stadium-frame > span { position: absolute; z-index: 1; bottom: 11px; left: 10px; right: 5px; color: var(--slm-photo-text); font-size: .46rem; font-weight: 700; letter-spacing: .13em; line-height: 1.6; }
+.slm-capacity p { margin: 20px 0 10px; font-size: .8rem; }
+.slm-capacity strong { font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.slm-capacity-track { height: 11px; box-shadow: inset 0 2px 4px var(--slm-shadow); }
+.slm-capacity-track > span { background: linear-gradient(90deg, var(--slm-fill), var(--slm-gold-edge)); }
+.slm-capacity-track i { width: 1px; top: -2px; bottom: -2px; opacity: .8; }
+.slm-capacity small { font-size: .62rem; margin-top: 10px; }
+.slm-match-cta { min-height: 56px; margin-top: 20px; --background: linear-gradient(130deg, var(--slm-button-top), var(--slm-button-bottom)); --box-shadow: 0 8px 22px var(--slm-button-shadow); --border-radius: 14px; font-size: .83rem; font-weight: 800; letter-spacing: .04em; }
+.slm-bottom-nav { padding-top: 10px; background: linear-gradient(180deg, var(--slm-card-top), var(--slm-panel)); box-shadow: 0 -10px 26px var(--slm-shadow); }
+.slm-bottom-nav button { position: relative; border-radius: 12px; min-height: 55px; gap: 5px; font-size: .66rem; }
+.slm-bottom-nav button[aria-current="page"] { background: var(--slm-nav-active); }
+.slm-bottom-nav button[aria-current="page"]::before { content: ''; position: absolute; top: -10px; width: 22px; height: 2px; background: var(--slm-gold); border-radius: 4px; }
+.slm-bottom-nav ion-icon { font-size: 22px; }
+.slm-demo-capacity { padding: 16px 20px; }
+.slm-demo-capacity h2 { font-size: .95rem; margin-bottom: 12px; }
+.slm-demo-capacity label { font-size: .76rem; }
+.slm-demo-capacity .slm-muted { font-size: .7rem; margin: 4px 0 0; }
+.slm-demo-capacity input { accent-color: var(--slm-gold); }
+@media (max-width: 350px) {
+  .slm-hero-card { padding: 16px; }
+  .slm-match-top { gap: 8px; grid-template-columns: minmax(0,1fr) 43%; }
+  .slm-stadium-frame { min-height: 165px; }
+  .slm-kickoff { font-size: 2.65rem; }
+  .slm-stadium-frame > span { font-size: .4rem; left: 7px; }
+}

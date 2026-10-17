@@ -15,11 +15,17 @@ await cmd('Page.navigate',{url:process.env.SLM_UI_URL || 'http://localhost:5174/
 await loaded;
 for(let i=0;i<100;i++){if(await evaluate("!!document.querySelector('[role=progressbar]')"))break;await new Promise(r=>setTimeout(r,100));}
 if(!await evaluate("!!document.querySelector('[role=progressbar]')"))throw Error('Demo did not render');
+await evaluate("Promise.all([...document.images].map(image => image.decode()))");
+if(!await evaluate("document.querySelector('.slm-stadium').naturalWidth > 0"))throw Error('Match image failed to load');
 await fs.mkdir(output,{recursive:true});
 for(const mode of ['dark','light']){
  await evaluate(`document.querySelector('input[value=${mode}]').click()`);
  await new Promise(r=>setTimeout(r,200));
  const shot=await cmd('Page.captureScreenshot',{format:'png'});await fs.writeFile(`${output}/espana-${mode}.png`,Buffer.from(shot.data,'base64'));
+ await cmd('Emulation.setDeviceMetricsOverride',{width:390,height:1280,deviceScaleFactor:1,mobile:true});
+ await new Promise(r=>setTimeout(r,100));
+ const full=await cmd('Page.captureScreenshot',{format:'png'});await fs.writeFile(`${output}/espana-${mode}-full.png`,Buffer.from(full.data,'base64'));
+ await cmd('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
 }
 for(const width of [320,390,768]){await cmd('Emulation.setDeviceMetricsOverride',{width,height:844,deviceScaleFactor:1,mobile:true});const actual=await evaluate('document.documentElement.scrollWidth');if(actual>width)throw Error(`overflow ${actual}>${width}`);console.log(`Mobile layout ${width}px: OK`);}
 for (const value of [0,10,15,12]) {
@@ -34,6 +40,9 @@ await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',v
 await evaluate("document.querySelector('input[value=auto]').click()");
 if(!await evaluate("document.documentElement.classList.contains('ion-palette-dark')"))throw Error('System dark not followed');
 await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:'light'}]});
+// Flush a real compositor frame after CDP media emulation (headless may remain idle).
+await evaluate('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
+await cmd('Page.captureScreenshot',{format:'png'});
 for(let i=0;i<30;i++){if(!await evaluate("document.documentElement.classList.contains('ion-palette-dark')"))break;await new Promise(r=>setTimeout(r,100));}
 if(await evaluate("document.documentElement.classList.contains('ion-palette-dark')"))throw Error('System light not followed live');
 if(backend.length)throw Error('Demo called backend');

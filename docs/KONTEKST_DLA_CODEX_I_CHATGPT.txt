@@ -1,3 +1,11 @@
+UI BETA 2.0 — 17.10.2026, feat/ui-beta
+Dopracowany Dark, zachowany Light, wspólne komponenty i lokalne zdjęcie użytkownika
+match-evening.jpg (niepotwierdzona lokalizacja); brak zatwierdzonego herbu SLM.
+Stabilniejsze Auto: utrzymywany MediaQueryList. Aktualne zrzuty docs/ui/beta2-*.png.
+ESLint/TypeScript/oba buildy OK, Vitest81/81, Chromium320/390/768 + izolacja OK.
+Cypress brak Xvfb; Android/iOS niewykonane. Bez wdrożeń i zmian biznesowych.
+Demo nadal tylko dist-demo, 11 plików, whitelist modułów/CSP/env zachowane.
+
 DEMO VERCEL — 17.10.2026, feat/ui-beta
 Osobny build npm run build:demo z app/demo/main.tsx do app/dist-demo.
 Nie publikować pełnej aplikacji dist ani używać npm run build jako buildu demo.

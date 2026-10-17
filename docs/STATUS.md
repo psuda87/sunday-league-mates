@@ -1,3 +1,34 @@
+# UI Beta 2.0 — 2026-10-17 22:23:35 CEST (Europe/Warsaw)
+
+España Dark: bordowo-grafitowe gradienty tła i karty, większa godzina, dopracowane
+złote akcenty, czerwony CTA z cieniem, aktywna dolna nawigacja i spójny nagłówek.
+Light zachowuje ciepłą bazę, ma dopracowane odstępy, typografię i cienie.
+Zdjęcie użytkownika (1280x785, około 73 KB, bez EXIF) w match-evening.jpg;
+nie przypisujemy mu autentyczności Harcerskiej. Brak zatwierdzonego herbu w repo;
+pozostawiono typograficzny placeholder i miejsce 64x48, bez wymyślania nowego herbu.
+Wcześniejsza referencja trzech telefonów jest dostępna w załącznikach rozmowy i
+została ponownie obejrzana; nie odtworzono herbu ani dokładnie stadionu z grafiki.
+Poprawiono stabilność Auto: utrzymywany MediaQueryList, ten sam obiekt do odczytu
+i subskrypcji, test regresji jednego zapytania. Bez zmian reguł biznesowych.
+
+Kontrole: ESLint i TypeScript OK; build aplikacji i demo OK (duże chunki Ionic);
+Vitest 81/81, 14 plików; Chromium 320/390/768 bez poziomego przewijania, ręczne
+Light/Dark/Auto i zmiana systemu live, suwak 0/10/15, obraz i izolacja sieci OK.
+Cypress próbowano: brak Xvfb, nie wykonano. Android/iOS nie wykonano.
+Izolacja: allowlista modułów/CSP/env bez poluzowania; jawnie dodano tylko lokalny
+JPG do zasobów, walidowany jako JPEG <100 KB. 11 plików demo przeszło kontrolę.
+Brak App/Auth/Supabase/Edge w demo, brak zewnętrznych żądań i naruszeń CSP.
+Nie wdrażano Vercel, backendu, migracji; bez merge. Backend/Docker/FIFO/RLS nadal
+mają ograniczenia udokumentowane w poprzednich etapach, nie są zaliczone przez UI.
+
+Rzeczywiste rendery React/Ionic: docs/ui/beta2-dark.png i beta2-light.png (390x844,
+razem z dolną nawigacją); dodatkowo *-full.png (rozszerzony viewport 390x1280,
+widoczne sterowanie demo i motywem). To nie test urządzenia ani montaż graficzny.
+Demo zachowuje warunki bezpiecznej publikacji statycznej opisane w DEMO_VERCEL.md;
+publikacja wymaga osobnej decyzji i późniejszego sprawdzenia domeny/nagłówków.
+
+---
+
 # Samodzielne demo Vercel — 2026-10-17 22:11:47 CEST (Europe/Warsaw)
 
 Branch feat/ui-beta. Oddzielne demo/main.tsx i vite.demo.config.ts, output dist-demo.

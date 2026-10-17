@@ -159,7 +159,7 @@ export default function Accounts() {
   </form>;
 
   return <IonPage>
-    <IonHeader><IonToolbar><div className="slm-shell-header"><span className="slm-logo" aria-label="Sunday League Mates">SLM</span>
+    <IonHeader><IonToolbar><div className="slm-shell-header"><span className="slm-logo" title="Miejsce na zatwierdzony herb SLM" aria-label="Sunday League Mates">SLM</span>
       {auth.phase === 'ready' && session && !session.must_change_password && <IonButton fill="clear" aria-label={`Powiadomienia${unread ? `, nieprzeczytane: ${unread}` : ''}`} onClick={() => setScreen('notifications')}><IonIcon icon={notificationsOutline} aria-hidden="true" /> {unread ? `(${unread})` : ''}</IonButton>}</div></IonToolbar></IonHeader>
     <IonContent><main className="slm-accounts">
 

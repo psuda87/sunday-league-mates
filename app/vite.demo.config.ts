@@ -27,8 +27,8 @@ export default defineConfig({
             this.error(`Non-demo module in demo bundle: ${id.slice(app.length)}`);
         }
       }
-      this.emitFile({ type: 'asset', fileName: 'images/stadium.svg',
-        source: readFileSync(new URL('./public/images/stadium.svg', import.meta.url)) });
+      for (const name of ['stadium.svg', 'match-evening.jpg']) this.emitFile({ type: 'asset', fileName: `images/${name}`,
+        source: readFileSync(new URL(`./public/images/${name}`, import.meta.url)) });
     },
   }],
   preview: { host: '127.0.0.1', port: 5175, strictPort: true, headers: Object.fromEntries(JSON.parse(readFileSync(new URL('./vercel.json', import.meta.url), 'utf8')).headers[0].headers.map((h: { key: string; value: string }) => [h.key, h.value])) },

@@ -9,13 +9,15 @@ describe('España appearance', () => {
   it('manual choice overrides system', () => { expect(resolveDark('auto', true)).toBe(true); expect(resolveDark('light', true)).toBe(false); expect(resolveDark('dark', false)).toBe(true); });
   it('follows live system changes only in automatic mode', () => {
     const media = new EventTarget() as EventTarget & { matches: boolean }; media.matches = false;
-    vi.stubGlobal('matchMedia', () => media);
+    const query = vi.fn(() => media);
+    vi.stubGlobal('matchMedia', query);
     const stop = initializeTheme();
     media.matches = true; media.dispatchEvent(new Event('change'));
     expect(document.documentElement.classList.contains('ion-palette-dark')).toBe(true);
     setAppearance('light'); media.dispatchEvent(new Event('change'));
     expect(document.documentElement.classList.contains('ion-palette-dark')).toBe(false);
     setAppearance('auto'); expect(document.documentElement.classList.contains('ion-palette-dark')).toBe(true);
+    expect(query).toHaveBeenCalledTimes(1); // Apply the same retained subscription, not a fresh query.
     stop();
   });
   it('persists and immediately applies selection', () => {
