@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
 import type { Match } from '../events/model';
 import MatchCapacityProgress from './MatchCapacityProgress';
-export default function MatchHero({ match, children, imageSrc = '/images/match-evening.jpg' }: { match: Match; children?: ReactNode; imageSrc?: string }) {
+export default function MatchHero({ match, children, imageSrc = '/images/match-evening.jpg', title = 'Następny mecz' }: { match: Match; children?: ReactNode; imageSrc?: string; title?: string }) {
   const date = new Date(match.starts_at);
   const format = (options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('pl-PL', { timeZone: 'Europe/Warsaw', ...options }).format(date);
-  return <section className="slm-next-match" aria-label="Najbliższy mecz"><p className="slm-eyebrow">PIŁKA ŁĄCZY · SUNDAY LEAGUE MATES</p><h1>Następny mecz</h1>
+  return <section className="slm-next-match" aria-label={title}><p className="slm-eyebrow">PIŁKA ŁĄCZY · SUNDAY LEAGUE MATES</p><h1>{title}</h1>
     <article className="slm-hero-card"><div className="slm-match-top"><div><p className="slm-weekday">{format({ weekday: 'long' })}</p>
       <strong className="slm-kickoff">{format({ hour: '2-digit', minute: '2-digit' })}</strong>
       <p className="slm-match-date">{format({ day: 'numeric', month: 'long', year: 'numeric' })}</p><p className="slm-location">⌖ {match.location}</p></div>

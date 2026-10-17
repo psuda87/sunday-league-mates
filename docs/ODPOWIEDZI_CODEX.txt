@@ -74,3 +74,27 @@ Raport jest osobnym następnym commitem dokumentacyjnym. Jego własny SHA jest d
 w historii pliku i odpowiedzi końcowej (własnego SHA nie da się wpisać do tej samej rewizji).
 Plik raportu: docs/ODPOWIEDZI_CODEX.txt. Instrukcja Vercel bez zmian: docs/DEMO_VERCEL.md.
 
+=== 2026-10-17 22:56:13 CEST (Europe/Warsaw) — UI Beta 2.1: nawigacja i szczegóły meczu ===
+Dolna nawigacja: Mecze/Zawodnicy/Profil. Składy usunięto z ekranu globalnego;
+są sekcją konkretnego meczu, oznaczoną Planowane, bez algorytmu.
+Wspólne MatchSections: Informacje, Uczestnicy, Składy, Rozliczenie. Aplikacja
+zachowuje operacje i role, formularze gości, rezerwę oraz istniejący panel finansów.
+Demo pozwala wejść z karty w szczegóły i wrócić na początek. Informacje są jawnie
+przykładowe, uczestnicy to tylko licznik, rozliczenia są niedostępne, bez fikcyjnych sald.
+Light/Dark/Auto, suwak i zabezpieczenia zachowane; allowlista dodaje tylko komponent UI.
+ESLint, TypeScript i oba buildy OK (duże chunki Ionic). Vitest82/82, 14 plików.
+Chromium: 320/390/768 dla home i szczegółów, brak poziomego przewijania,
+trzy zakładki, wejście/powrót, motywy/live system, suwak i izolacja sieci/CSP OK.
+Demo11 plików przeszło kontrolę bez App/Auth/Supabase/Edge. Cypress: brak Xvfb,
+niewykonany. Android/iOS i prawdziwy Supabase niewykonane. Backend bez zmian.
+Rzeczywiste zrzuty React/Ionic:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/beta21-home-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/beta21-home-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/beta21-details-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/beta21-details-light.png
+Nie wykonywano ręcznego wdrożenia Vercel. Automatyczna publikacja NIEPOTWIERDZONA:
+odczyt deploymentów GitHub API zwrócił Forbidden, brak zweryfikowanego linku.
+Nie oznacza to, że autodeploy nie działa — brak dostępu nie rozstrzyga wyniku.
+Bez merge, migracji i zmian produkcyjnego backendu. Commit i push tylko feat/ui-beta.
+Plik raportu: docs/ODPOWIEDZI_CODEX.txt.
+

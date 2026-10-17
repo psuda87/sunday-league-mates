@@ -1,3 +1,35 @@
+# UI Beta 2.1 — nawigacja i szczegóły meczu
+
+Dolna nawigacja zawiera teraz trzy pozycje: Mecze, Zawodnicy, Profil. Składy nie
+są ekranem globalnym. Nowy wspólny MatchSections porządkuje szczegóły wydarzenia:
+Informacje, Uczestnicy, Składy, Rozliczenie. Przyciski sekcji nie udają zakładek:
+wszystkie sekcje są widoczne, a przycisk przewija i ustawia dostępny fokus.
+
+Istniejące operacje i formularze Events zachowane, tak samo role i API. Sekcja
+Uczestnicy obejmuje zapisanych, rezerwę, gości i dozwolone operacje administratora.
+Składy oznaczono Planowane. Rozliczenie administratora nadal pobiera prawdziwe dane
+istniejącym mechanizmem; zawodnik otrzymuje wskazanie swoich Rozliczeń, bez cudzych
+danych. Szczegóły mają własny tytuł, zamiast nazywania starszego meczu Następnym.
+
+Odseparowane demo: przycisk Szczegóły meczu na karcie otwiera przykład tego eventu,
+Wróć do meczów wraca na listę i przewija na początek. Nawigacja główna resetuje
+widok szczegółów. Demo nie ma prawdziwych osób ani transakcji; wyłącznie licznik,
+przykładowy termin i opisy planowanych funkcji. Light/Dark/Auto i suwak zachowane.
+Do allowlisty dodano wyłącznie MatchSections, bez dostępu do App/Auth/Edge.
+
+Weryfikacja: lint/TypeScript/buildy OK, Vitest82/82, Chromium home i szczegóły
+320/390/768 bez przepełnienia, nawigacja/powrót, motywy, suwak, CSP/izolacja OK.
+Cypress brak Xvfb, niewykonany; Android/iOS niewykonane. Nie testowano prawdziwego SQL.
+Nowe rendery: [Home Dark](ui/beta21-home-dark.png), [Home Light](ui/beta21-home-light.png),
+[Szczegóły Dark](ui/beta21-details-dark.png), [Szczegóły Light](ui/beta21-details-light.png).
+Home390x844 obejmuje nawigację; szczegóły390x1280 przewinięto do czterech sekcji.
+
+Nie wykonywano ręcznego wdrożenia. Status automatycznej publikacji niepotwierdzony
+(API deploymentów GitHub: Forbidden); nie podajemy niezweryfikowanych adresów.
+Poniżej historia poprzednich etapów.
+
+---
+
 # Aktualizacja UI Beta 2.0 — 17.10.2026
 
 Dark ma bordowe tło, głębszą kartę, większą godzinę, czerwony przycisk z cieniem,

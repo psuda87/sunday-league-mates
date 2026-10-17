@@ -1,3 +1,11 @@
+UI BETA 2.1 — feat/ui-beta
+Główna nawigacja3: Mecze/Zawodnicy/Profil. Składy planowane tylko w wydarzeniu.
+MatchSections wspólne: Informacje/Uczestnicy/Składy/Rozliczenie. Demo ma przejście
+karta->szczegóły->powrót bez API. Vitest82/82, buildy/lint/TypeScript/Chromium OK.
+Cypress brak Xvfb, Android/iOS niewykonane. Bez zmian backendu, migracji i merge.
+Nie wykonano ręcznego Vercel; autodeploy niezweryfikowany, API GitHub Forbidden.
+Najnowsze zrzuty docs/ui/beta21-*.png; raport docs/ODPOWIEDZI_CODEX.txt.
+
 UI BETA 2.0 — 17.10.2026, feat/ui-beta
 Dopracowany Dark, zachowany Light, wspólne komponenty i lokalne zdjęcie użytkownika
 match-evening.jpg (niepotwierdzona lokalizacja); brak zatwierdzonego herbu SLM.

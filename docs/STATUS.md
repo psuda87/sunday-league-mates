@@ -1,3 +1,28 @@
+# UI Beta 2.1 — 2026-10-17 22:56:13 CEST (Europe/Warsaw)
+
+feat/ui-beta: dolna nawigacja Mecze/Zawodnicy/Profil. Składy wyłącznie w szczegółach
+konkretnego wydarzenia, jawnie planowane, bez algorytmu. Wspólny MatchSections:
+Informacje/Uczestnicy/Składy/Rozliczenie, przyciski przewijają i ustawiają fokus.
+Aplikacja zachowuje istniejące formularze, zapis/gości/rezerwę i uprawnienia;
+admin widzi dotychczasowe rozliczenie eventu, zawodnik wskazanie swoich Rozliczeń.
+Demo: karta -> Szczegóły meczu -> Wróć do meczów, bez API i rzeczywistych osób.
+Zajętość pozostaje lokalną symulacją, rozliczenia demo tylko opis niedostępności.
+
+ESLint/TypeScript/oba buildy OK (duże chunki Ionic); Vitest82/82, 14 plików.
+Chromium: home i szczegóły 320/390/768 bez poziomego przepełnienia, trzy zakładki,
+wejście/powrót, motywy/live system, suwak0/10/15 i izolacja OK. Build demo11 plików
+przeszedł kontrolę. CSP/env/rola/separacja zachowane, bez backendu w bundle.
+Cypress próbowano: brak Xvfb, nie wykonano; Android/iOS nie wykonano.
+Zrzuty rzeczywistego renderu: docs/ui/beta21-home-dark.png, beta21-home-light.png,
+beta21-details-dark.png, beta21-details-light.png (szczegóły pokazują cztery sekcje).
+
+Nie wykonywano ręcznej publikacji. Próba odczytu deploymentów GitHub API zwróciła
+Forbidden; automatycznej publikacji nie potwierdzono i brak zweryfikowanego URL.
+Bez merge, migracji i zmian backendu. Historyczne ograniczenia SQL/RLS/FIFO,
+niezastosowane migracje i problem Docker na Windows pozostają aktualne poniżej.
+
+---
+
 # UI Beta 2.0 — 2026-10-17 22:23:35 CEST (Europe/Warsaw)
 
 España Dark: bordowo-grafitowe gradienty tła i karty, większa godzina, dopracowane

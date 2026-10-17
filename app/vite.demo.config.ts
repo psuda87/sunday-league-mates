@@ -8,7 +8,7 @@ const app = fileURLToPath(new URL('.', import.meta.url));
 const allowed = new Set([
   'demo/index.html', 'demo/main.tsx', 'src/ui/Demo.tsx', 'src/ui/MatchHero.tsx',
   'src/ui/MatchCapacityProgress.tsx', 'src/ui/capacity.ts', 'src/ui/BottomNav.tsx',
-  'src/ui/AppearanceSettings.tsx', 'src/ui/theme.ts', 'src/theme/variables.css',
+  'src/ui/AppearanceSettings.tsx', 'src/ui/MatchSections.tsx', 'src/ui/theme.ts', 'src/theme/variables.css',
   'src/pages/Accounts.css',
 ]);
 export default defineConfig({

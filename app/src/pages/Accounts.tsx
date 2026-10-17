@@ -24,7 +24,7 @@ export default function Accounts() {
   const auth = useSyncExternalStore(manager.subscribe, manager.getSnapshot);
   const session = auth.session;
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [screen, setScreen] = useState<'profile' | 'admin' | 'events' | 'notifications' | 'settlements' | 'players' | 'teams'>('events');
+  const [screen, setScreen] = useState<'profile' | 'admin' | 'events' | 'notifications' | 'settlements' | 'players'>('events');
   const [eventTarget, setEventTarget] = useState<string | null>(null);
   const [pendingNotification, setPendingNotification] = useState<string | null>(null);
   const [unread, setUnread] = useState<number | null>(null);
@@ -206,7 +206,7 @@ export default function Accounts() {
         {!session.must_change_password && screen === 'profile' && <AppearanceSettings />}
         {session.must_change_password ? <section className="slm-panel">
           <h1>Zmień hasło tymczasowe</h1><p>Przed korzystaniem z grupy ustaw własne hasło.</p>{passwordForm}
-        </section> : screen === 'players' || screen === 'teams' ? <section className="slm-panel"><h1>{screen === 'players' ? 'Zawodnicy' : 'Składy'}</h1><p>{screen === 'players' ? 'Listę zawodników i kontakt znajdziesz w szczegółach meczu. Katalog zawodników nie jest jeszcze dostępny.' : 'Składy nie są jeszcze dostępne w wersji beta.'}</p><IonButton onClick={() => setScreen('events')}>Przejdź do meczów</IonButton></section> : screen === 'settlements' ? <Settlements manager={manager} session={session} /> : screen === 'notifications' ? <Notifications manager={manager} push={push} pushStatus={pushStatus}
+        </section> : screen === 'players' ? <section className="slm-panel"><h1>Zawodnicy</h1><p>Listę zawodników i kontakt znajdziesz w szczegółach meczu. Katalog zawodników jest planowany.</p><IonButton onClick={() => setScreen('events')}>Przejdź do meczów</IonButton></section> : screen === 'settlements' ? <Settlements manager={manager} session={session} /> : screen === 'notifications' ? <Notifications manager={manager} push={push} pushStatus={pushStatus}
           onOpen={openNotification} onRefresh={() => setNotificationVersion(v => v+1)} /> :
           screen === 'events' ? <Events manager={manager} session={session} initialEventId={eventTarget} /> : screen === 'profile' || session.role !== 'admin' ? <>
           <section className="slm-panel">

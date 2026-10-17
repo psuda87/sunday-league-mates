@@ -11,7 +11,10 @@ describe('España UI isolated demo', () => {
     if (width === 390) cy.screenshot('espana-light', { capture: 'viewport' });
     cy.reload(); cy.get('input[value=light]').should('be.checked');
     cy.document().then(doc => expect(doc.documentElement.scrollWidth).at.most(width));
-    cy.get('nav[aria-label="Główna nawigacja"] button').should('have.length', 4);
-    cy.contains('button', 'Składy').click(); cy.contains('Ten ekran nie jest częścią demonstracji.').should('be.visible');
+    cy.get('nav[aria-label="Główna nawigacja"] button').should('have.length', 3);
+    cy.contains('ion-button', 'Szczegóły meczu').click();
+    cy.get('nav[aria-label="Sekcje meczu"]').should('be.visible');
+    cy.contains('button', 'Składy').click(); cy.contains('Składy dla tego meczu nie są jeszcze dostępne.').should('be.visible');
+    cy.contains('ion-button', 'Wróć do meczów').click(); cy.contains('h1', 'Następny mecz').should('be.visible');
   });
 });

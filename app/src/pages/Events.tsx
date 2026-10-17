@@ -1,3 +1,4 @@
+import MatchSections from '../ui/MatchSections';
 import MatchHero from '../ui/MatchHero';
 import PhoneInput from '../components/PhoneInput';
 import { normalizePhoneUpdate, nationalPhone } from '../../supabase/functions/_shared/phone';
@@ -177,8 +178,9 @@ export default function Events({ manager, session, initialEventId }: { manager: 
         <p className="slm-muted">Minimum do gry: 10 osób. Koszt wyliczamy z czasu i stawki; możesz poprawić koszt całkowity.</p>
         <IonButton type="submit" disabled={busy}>Zapisz mecz</IonButton>
       </form></section> : detail && e ? <>
-      <MatchHero match={e}>{matchAction(detail)}</MatchHero>
-      <section className="slm-panel"><h1>{matchDate(e.starts_at)}</h1><p>{e.location} · {e.duration_minutes} minut</p>
+      <MatchHero match={e} title="Szczegóły meczu">{matchAction(detail)}</MatchHero>
+      <MatchSections information={<>
+      <section className="slm-panel"><h3>{matchDate(e.starts_at)}</h3><p>{e.location} · {e.duration_minutes} minut</p>
         <p>{money(e.hourly_rate)}/h · razem {money(e.total_cost)}</p>
         <p>Uczestnicy: {e.registered_count}/{e.capacity} · minimum 10 · rezerwa: {e.reserve_count}</p>
         <p className="slm-muted">Podział należności uwzględnia decyzje o opłacie i zastępstwa. Administrator widzi go w rozliczeniu meczu; zatwierdzone należności są w zakładce Rozliczenia.</p>
@@ -201,8 +203,8 @@ export default function Events({ manager, session, initialEventId }: { manager: 
           }}>Odwołaj mecz</IonButton>
         </div>}
       </section>
-      {admin && <MatchSettlement key={`${e.id}:${e.settlement_version ?? e.status}`} manager={manager} eventId={e.id} onChange={() => open(e.id)} />}
-      <section className="slm-panel"><h2>Uczestnicy</h2><ul className="slm-participants">{detail.participants.filter(p => p.status === 'registered').map(participant)}</ul>{!e.registered_count && <p>Brak zapisanych.</p>}</section>
+      </>} participants={<>
+      <section className="slm-panel"><h3>Zapisani na mecz</h3><ul className="slm-participants">{detail.participants.filter(p => p.status === 'registered').map(participant)}</ul>{!e.registered_count && <p>Brak zapisanych.</p>}</section>
       <section className="slm-panel"><h2>Rezerwa</h2><p className="slm-muted">Nie zajmuje miejsc. Bez automatycznego awansu: pierwszy skuteczny zapis zajmuje wolne miejsce. Powiadomienie o miejscu nie jest potwierdzeniem zapisu.</p>
         <ul className="slm-participants">{detail.participants.filter(p => p.status === 'reserve').map(participant)}</ul>{!e.reserve_count && <p>Rezerwa jest pusta.</p>}</section>
       {admin && e.registration_open && <section className="slm-panel"><h2>Zarządzaj uczestnikami</h2>
@@ -233,6 +235,7 @@ export default function Events({ manager, session, initialEventId }: { manager: 
           <IonButton type="submit" disabled={busy || (!guestEdit && responsible === session.user_id && finance?.blocked)}>{guestEdit ? 'Zapisz gościa' : 'Dodaj gościa'}</IonButton>
           {guestEdit && <IonButton fill="clear" onClick={() => { setGuestEdit(null); setGuestName(''); setGuestPhone(''); }}>Anuluj edycję</IonButton>}
         </form></section>}
+      </>} settlement={admin ? <MatchSettlement key={`${e.id}:${e.settlement_version ?? e.status}`} manager={manager} eventId={e.id} onChange={() => open(e.id)} /> : <section className="slm-panel"><p>Zatwierdzone należności za ten mecz sprawdzisz w swoich Rozliczeniach. Podział administracyjny nie jest dostępny w tym widoku.</p></section>} />
     </> : <section className="slm-panel"><h1>Mecze</h1>
       {!matches.length && <p>Brak wydarzeń.</p>}
       {matches.map(match => <article key={match.id} className="slm-match"><h2>{matchDate(match.starts_at)}</h2><p>{match.location}</p>

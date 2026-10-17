@@ -1,3 +1,12 @@
+## UI Beta 2.1 — stan publikacji
+
+Wspólne szczegóły meczu i trzy zakładki. Demo nie wywołuje API, nie ma prawdziwych
+rozliczeń. Nowy MatchSections jest pojedynczym dozwolonym modułem UI; CSP, env,
+statyczny output i granica separacji pozostają bez zmian. Wyniki w STATUS.md.
+Nie wykonano ręcznej publikacji. Automatyczna publikacja po push nie została
+potwierdzona: odczyt deploymentów GitHub API zwraca Forbidden. Brak zweryfikowanego
+URL Vercel; dawne wpisy NIE OPUBLIKOWANO opisują stan poprzednich sesji.
+
 # Samodzielna demonstracja UI España — przygotowanie Vercel
 
 Gałąź feat/ui-beta. NIE OPUBLIKOWANO. Wymaga osobnej zgody na publikację.

@@ -26,6 +26,23 @@ for(const mode of ['dark','light']){
  await new Promise(r=>setTimeout(r,100));
  const full=await cmd('Page.captureScreenshot',{format:'png'});await fs.writeFile(`${output}/espana-${mode}-full.png`,Buffer.from(full.data,'base64'));
  await cmd('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
+ await evaluate("[...document.querySelectorAll('ion-button')].find(button => button.textContent === 'Szczegóły meczu').click()");
+ await new Promise(r=>setTimeout(r,100));
+ if(!await evaluate("!!document.querySelector('nav[aria-label=\"Sekcje meczu\"]')"))throw Error('Missing event sections');
+ if(await evaluate("document.querySelectorAll('nav[aria-label=\"Główna nawigacja\"] button').length")!==3)throw Error('Main nav must contain 3 items');
+ for(const width of [320,390,768]) {
+  await cmd('Emulation.setDeviceMetricsOverride',{width,height:844,deviceScaleFactor:1,mobile:true});
+  const overflow=await evaluate("document.documentElement.scrollWidth > innerWidth || [...document.querySelectorAll('.slm-match-sections')].some(el=>el.scrollWidth>el.clientWidth)");
+  if(overflow)throw Error('Event detail overflow');
+ }
+ await cmd('Emulation.setDeviceMetricsOverride',{width:390,height:1280,deviceScaleFactor:1,mobile:true});
+ await evaluate("document.querySelector('.slm-match-sections').scrollIntoView({block:'start'})");
+ await new Promise(r=>setTimeout(r,100));
+ const detailShot=await cmd('Page.captureScreenshot',{format:'png'});await fs.writeFile(`${output}/details-${mode}.png`,Buffer.from(detailShot.data,'base64'));
+ await evaluate("[...document.querySelectorAll('ion-button')].find(button => button.textContent.includes('Wróć do meczów')).click()");
+ await new Promise(r=>setTimeout(r,100));
+ if(await evaluate("!!document.querySelector('.slm-match-sections')"))throw Error('Back action did not leave details');
+ await cmd('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
 }
 for(const width of [320,390,768]){await cmd('Emulation.setDeviceMetricsOverride',{width,height:844,deviceScaleFactor:1,mobile:true});const actual=await evaluate('document.documentElement.scrollWidth');if(actual>width)throw Error(`overflow ${actual}>${width}`);console.log(`Mobile layout ${width}px: OK`);}
 for (const value of [0,10,15,12]) {
@@ -35,6 +52,7 @@ for (const value of [0,10,15,12]) {
  if(actual!==String(value))throw Error('Capacity slider did not update');
 }
 console.log('Demo capacity slider 0/10/15: OK');
+console.log('Three main tabs, match details/back, detail layout 320/390/768: OK');
 const progress=await evaluate("document.querySelector('[role=progressbar]').getAttribute('aria-valuenow')");if(progress!=='12')throw Error('Wrong capacity');
 await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:'dark'}]});
 await evaluate("document.querySelector('input[value=auto]').click()");

@@ -13,3 +13,18 @@ it('simulates capacity without login, administrator or real registration', () =>
   expect(screen.queryByText('Zaloguj się')).toBeNull();
   expect(screen.queryByText('Zarządzaj kontami')).toBeNull();
 });
+
+it('opens event details and returns, with teams scoped to the event', () => {
+  render(<Demo />);
+  const nav = screen.getByRole('navigation', { name: 'Główna nawigacja' });
+  expect(nav.querySelectorAll('button')).toHaveLength(3);
+  expect(nav.textContent).not.toContain('Składy');
+  fireEvent.click(screen.getByText('Szczegóły meczu'));
+  expect(screen.getByRole('heading', { name: 'Szczegóły meczu' })).toBeTruthy();
+  for (const name of ['Informacje', 'Uczestnicy', 'Składy', 'Rozliczenie']) expect(screen.getByRole('region', { name })).toBeTruthy();
+  expect(screen.getByText('Podgląd planowany')).toBeTruthy();
+  expect(screen.getByText(/Nie pokazujemy fikcyjnych należności/)).toBeTruthy();
+  fireEvent.click(screen.getByText('← Wróć do meczów'));
+  expect(screen.getByRole('heading', { name: 'Następny mecz' })).toBeTruthy();
+  expect(screen.queryByRole('navigation', { name: 'Sekcje meczu' })).toBeNull();
+});
