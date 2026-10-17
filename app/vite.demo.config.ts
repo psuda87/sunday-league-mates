@@ -27,7 +27,7 @@ export default defineConfig({
             this.error(`Non-demo module in demo bundle: ${id.slice(app.length)}`);
         }
       }
-      for (const name of ['slm-logo-header.png', 'slm-favicon-64.png', 'stadium-bg-card.jpg', 'stadium-bg-main.jpg', 'espana-dark-texture.jpg']) {
+      for (const name of ['slm-logo-header-transparent.png', 'slm-favicon-64.png', 'stadium-bg-card.jpg', 'stadium-bg-main.jpg', 'espana-dark-texture.jpg']) {
         this.emitFile({ type: 'asset', fileName: `assets/branding/${name}`, source: readFileSync(new URL(`./public/assets/branding/${name}`, import.meta.url)) });
       }
     },

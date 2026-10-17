@@ -20,7 +20,7 @@ it('keeps tools collapsed and allows local capacity testing without login', () =
 });
 it('opens chosen B directly from the whole card, defaults to Participants and returns', () => {
   render(<Demo />);
-  expect(screen.getByRole('img', { name: 'Sunday League Mates' }).getAttribute('src')).toBe('/assets/branding/slm-logo-header.png');
+  expect(screen.getByRole('img', { name: 'Sunday League Mates' }).getAttribute('src')).toBe('/assets/branding/slm-logo-header-transparent.png');
   const nav = screen.getByRole('navigation', { name: 'Główna nawigacja' });
   expect(nav.querySelectorAll('button')).toHaveLength(3);
   const card = screen.getAllByRole('button', { name: /Otwórz szczegóły meczu:/ })[0];

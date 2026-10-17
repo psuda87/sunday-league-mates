@@ -1,3 +1,22 @@
+# UI Beta3.2 — naturalne logo i stadionowe karty
+
+Nowe prawdziwe RGBA: header-transparent290x280 oraz primary-transparent450x505.
+Maski na oryginalnych pikselach, wnętrze tarczy chronione, oryginałów nie nadpisano.
+Header82px/branding84px zamiast92/96; tytuł y94, pierwsza karta y196 zamiast227
+na390x844. Safe areas pozostają po stronie Ionic. Light ma jasny nagłówek i cień
+herbu bez kwadratu. Karty121px, jaśniejsze zdjęcia, refleks, cienki złoty rant,
+głębia datownika i kontrastowe tła badge. Bez zmian danych, filtrów i operacji.
+
+[Analiza/iteracje](ui/PREMIUM32_VISUAL_REVIEW.md), [Dark](ui/premium32-home-dark.png),
+[Light](ui/premium32-home-light.png), [header](ui/premium32-header-detail.png),
+[logo Dark](ui/premium32-logo-preview-dark.png), [logo Light](ui/premium32-logo-preview-light.png).
+Node weryfikuje alfa i narożniki, build demo sprawdza też dokładne bajty pochodnej.
+87/87 Vitest i wszystkie kontrole web OK; urządzenia i prawdziwy Supabase nieweryfikowane.
+Niżej historia. Nakaz3.1 zachowania tła oryginalnego PNG zastępuje osobna pochodna
+z przezroczystością; same oryginały nadal pozostają bez zmian.
+
+---
+
 # UI Beta 3.1 — oficjalne logo i lista Mecze
 
 B. Urban Club — Hiszpania: oryginalny slm-logo-header.png, proporcje290:280,

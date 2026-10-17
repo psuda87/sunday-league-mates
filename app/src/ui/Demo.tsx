@@ -34,7 +34,7 @@ export default function Demo() {
     return () => window.removeEventListener('hashchange', sync);
   }, []);
   function navigate(next: View) { setView(next); window.location.hash = next; void content.current?.scrollToTop?.(0); }
-  return <IonPage className="slm-demo"><IonHeader><IonToolbar><div className="slm-shell-header"><img className="slm-logo slm-crest" src="/assets/branding/slm-logo-header.png" alt="Sunday League Mates" width="290" height="280" /></div></IonToolbar></IonHeader>
+  return <IonPage className="slm-demo"><IonHeader><IonToolbar><div className="slm-shell-header"><img className="slm-logo slm-crest" src="/assets/branding/slm-logo-header-transparent.png" alt="Sunday League Mates" width="290" height="280" /></div></IonToolbar></IonHeader>
     <IonContent ref={content}><main className="slm-accounts"><p className="slm-demo-badge">Dane przykładowe</p>
       {tab === 'events' ? <>
         {view !== 'home' && <div className="slm-actions"><IonButton fill="clear" onClick={() => navigate('home')}>← Wróć do meczów</IonButton></div>}

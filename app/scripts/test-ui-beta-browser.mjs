@@ -45,7 +45,7 @@ try {
   await cmd('Page.navigate', { url: base }); await loaded;
   for (let i = 0; i < 100; i++) { if (await evaluate("!!document.querySelector('.slm-card-link')")) break; await pause(); }
   await evaluate('Promise.all([...document.images].map(image=>image.decode()))');
-  assert.equal(await evaluate("document.querySelector('.slm-crest').getAttribute('src')"), '/assets/branding/slm-logo-header.png');
+  assert.equal(await evaluate("document.querySelector('.slm-crest').getAttribute('src')"), '/assets/branding/slm-logo-header-transparent.png');
   assert.equal(await evaluate("document.querySelector('.slm-crest').naturalWidth"), 290, 'Official logo did not load');
   assert.equal(await evaluate("document.querySelector('.slm-stadium').naturalWidth"), 1400, 'Official stadium did not load');
   await fs.mkdir(output, { recursive: true });
@@ -56,6 +56,10 @@ try {
     assert.equal(await evaluate("document.querySelector('#demo-count').checkVisibility()"), false, 'Closed demo tools must hide the slider');
     assert.equal(await evaluate("document.querySelector('.slm-card-link').querySelectorAll('button,ion-button,a').length"), 0);
     await shot(`home-${mode}`);
+    if (mode === 'dark') {
+      const detail=await cmd('Page.captureScreenshot', { format:'png', clip:{x:0,y:0,width:390,height:194,scale:2} });
+      await fs.writeFile(`${output}/header-detail.png`,Buffer.from(detail.data,'base64'));
+    }
     if (mode === 'dark') for (const width of [320, 768]) { await viewport(width); await shot(`home-${width}`); } await viewport();
     for (const [filter, number] of [['Moje', 2], ['Historia', 1], ['Nadchodzące', 4]]) {
       await evaluate(`[...document.querySelectorAll('.slm-match-filters button')].find(button=>button.textContent==='${filter}').focus()`); await press('Enter', 'Enter', 13);

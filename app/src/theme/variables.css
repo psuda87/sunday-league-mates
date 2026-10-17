@@ -257,3 +257,34 @@ ion-toolbar:has(.slm-shell-header) { --background:var(--slm-brand-header-bg); }
 
 /* Final crop review: retain the pitch as well as the stands. */
 .slm-match-compact .slm-stadium { object-position:center 70%; }
+/* Premium 3.2 — alpha logo, compact safe-area-aware shell, stadium depth. */
+:root {
+ --slm-brand-header-bg:var(--ion-background-color);
+ --slm-card-light:#F6D98738; --slm-card-rim:#C7A46C80;
+ --slm-card-side:#080A10CE; --slm-card-floor:#080A1050;
+ --slm-card-burgundy:#88000026; --slm-date-glass:#11131CE6;
+ --slm-date-floor:#88000080; --slm-card-depth:#080A105C;
+}
+.slm-shell-header { min-height:78px; padding:2px 18px; }
+.slm-logo.slm-crest { width:76px; height:auto; aspect-ratio:290/280; filter:drop-shadow(0 2px 3px var(--slm-shadow)); }
+.slm-shell-header::before { opacity:.13; }
+.slm-matches-screen > h1 { margin:0 0 12px; font-size:2.15rem; }
+.slm-match-filters { margin-bottom:14px; }
+.slm-match-compact .slm-hero-card { border-color:var(--slm-card-rim); box-shadow:inset 0 1px 0 var(--slm-card-light),0 9px 21px -12px var(--slm-card-depth); }
+.slm-match-compact .slm-stadium-frame::after { background:linear-gradient(90deg,var(--slm-card-side),transparent 94%),linear-gradient(0deg,var(--slm-card-floor),transparent 75%),radial-gradient(ellipse at 4% 105%,var(--slm-card-burgundy),transparent 65%); }
+.slm-match-compact .slm-stadium { filter:contrast(1.08) saturate(1.06); object-position:center 66%; }
+.slm-match-compact .slm-date-tile { background:linear-gradient(160deg,var(--slm-date-glass) 45%,var(--slm-date-floor)); box-shadow:inset 0 1px 0 var(--slm-card-light),2px 0 8px var(--slm-card-depth); }
+.slm-card-name { text-shadow:0 1px 4px var(--slm-card-depth); }
+.slm-compact-count { box-shadow:inset 0 1px 0 var(--slm-card-light),0 2px 5px var(--slm-card-depth); font-variant-numeric:tabular-nums; }
+/* 3.2 iteration 2: readable crest without the previous empty content padding. */
+:root { --slm-card-rim:#C7A46C52; }
+.slm-shell-header { min-height:84px; }
+.slm-logo.slm-crest { width:82px; }
+.slm-accounts:has(.slm-matches-screen) { padding-top:10px; }
+.slm-match-compact .slm-date-tile strong { font-size:2rem; letter-spacing:-.035em; }
+.slm-match-compact .slm-hero-card::after { content:''; position:absolute; inset:0; pointer-events:none; border-radius:inherit; box-shadow:inset 0 1px 0 var(--slm-card-light),inset 1px 0 0 var(--slm-card-burgundy); }
+/* 3.2 iteration 3: floodlight reflection and solid readable capacity chips. */
+:root.ion-palette-dark { --slm-count-ready-bg:#113D2B; --slm-count-low-bg:#4C3815; --slm-count-empty-bg:#4B1723; }
+.slm-match-compact .slm-stadium { object-position:center 60%; }
+.slm-match-compact .slm-stadium-frame::after { background:radial-gradient(ellipse 50% 65% at 85% 0%,var(--slm-card-light),transparent 70%),linear-gradient(90deg,var(--slm-card-side),transparent 94%),linear-gradient(0deg,var(--slm-card-floor),transparent 75%),radial-gradient(ellipse at 4% 105%,var(--slm-card-burgundy),transparent 65%); }
+.slm-match-compact .slm-location,.slm-match-compact .slm-match-date { text-shadow:0 1px 3px var(--slm-card-side); }

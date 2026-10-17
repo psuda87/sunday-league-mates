@@ -1,3 +1,14 @@
+## UI Beta3.2 — rzeczywiste alfa logo
+
+Demo nadal14 statycznych plików i5 jawnych zasobów branding. Zmieniono jedynie
+emitowany header na slm-logo-header-transparent.png. Build verifier sprawdza zgodność
+bajtów i rzeczywisty kanał alfa poprzez rozpakowanie PNG w Node; source primary
+sprawdzany osobno poleceniem node scripts/verify-logo-alpha.mjs.
+Allowlista modułów/CSP/env/publicDir/Root/Build/Output i app/vercel.json bez zmian.
+Bez Auth/Supabase/API/Edge i prawdziwych danych. Skrypt maskowania to narzędzie
+offline w docs/ui, nie moduł UI ani zależność builda. W produkcyjnej konfiguracji
+nie wprowadzono zmian. Nie uruchamiano ręcznego deploymentu.
+
 ## UI Beta3.1 — zasoby oficjalne, granica separacji zachowana
 
 Root app / npm run build:demo / dist-demo / brak env i app/vercel.json bez zmian.
