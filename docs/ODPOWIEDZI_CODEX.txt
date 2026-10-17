@@ -278,3 +278,66 @@ finansów/FCM/migracji, nie uruchamiano cap sync ani ręcznego wdrożenia.
 Vercel: próba odczytu deploymentów API GitHub zwróciła Forbidden; status i URL
 niezweryfikowane. Zwykły push może uruchomić skonfigurowany podgląd automatyczny.
 Raport zapisany w docs/ODPOWIEDZI_CODEX.txt, z zachowaniem wcześniejszej historii.
+
+
+=== 2026-10-18 01:37:36 CEST — UI Beta3.1 / B. Urban Club — Hiszpania ===
+Przeczytano dokumentację i obejrzano oba Premium JPG, premium-home-dark oraz nowe
+logo/obrazy stadionowe. Zestaw pobrano fast-forward do301e7e3 bez nadpisywania zmian.
+Wykorzystano oryginalne slm-logo-header.png (290x280), stadium-bg-card.jpg i
+stadium-bg-main.jpg (1400x800), espana-dark-texture.jpg (1080x1920), favicon64,
+PWA ikony192/512. PNG to RGB z własnym tłem; nie usuwano go i nie deformowano logo.
+Logo92px centralnie, oryginalne pliki bez zmian. Stary SVG archiwalny, nieużywany
+w UI i niewysyłany w demo. Primary/icon1024/favicon-source zachowane oryginały.
+PWA purpose any; brak maskowalnego/adaptacyjnego zestawu Androida, nie deklaruję
+ukończenia ikon natywnych, nie zmieniano ich i nie uruchamiano cap sync.
+
+Demo przebudowane kompozycyjnie: Mecze,3 filtry i4 karty121px, bez dominującego
+Następny mecz i dużego CTA na liście. Datownik, nazwa demo, lokalizacja, czas,
+kontrastowy licznik miejsc, stadion pełnej karty i cienkie bordowo-złote krawędzie.
+Cała karta klikalna, bez osobnego Szczegóły. Nadchodzące4, Moje2, Historia1;
+wybór zachowuje właściwą datę i licznik. Dane wyłącznie fikcyjne, oznaczone demo.
+Realna aplikacja zachowuje istniejące dane, zapis/gości/rezerwę/uprawnienia.
+Nadchodzące i Historia tylko na pobranej stronie events_list, według server_now;
+Historia obejmuje rozpoczęte/odwołane. Moje jawnie nieaktywne i opisane jako
+niedostępne bez danych o uczestnictwie. Nie dodano backendu ani fikcyjnych tytułów.
+Najbliższa karta zachowuje istniejące CTA i nie jest dublowana. Ostrzeżenie17/minimum
+pozostaje widoczne. Auto/Light/Dark zachowane; Light ma jasną treść i ciemny brand header.
+
+Iteracje390x844:1 logo100px/karty128px/pierwsza y249, czwarta pod footerem;
+2 logo92px/karty121px/pierwsza y227, cztery przed footerem777;
+3 ciemny header także w Light i korekta kadru; po porównaniu finalny kadr70%,
+więcej boiska, zapas pod metadanymi. Końcowy ponowny render i kontrola.
+Analiza, porównanie i różnice: docs/ui/PREMIUM31_VISUAL_REVIEW.md.
+Pozostały font systemowy, własne prostokątne tło i inny rysunek zatwierdzonego
+logo względem konceptu, miękkość dostarczonych JPEG/kadr, różne teksty i limit15
+z danych zamiast16 z ilustracji. Brak fikcyjnych ikon akcji w demo. Prawdziwa
+aplikacja zawiera dodatkowe potrzebne akcje, CTA i ograniczenia filtrów.
+Nie deklaruję identyczności pikselowej ani gotowości produkcyjnej.
+
+Końcowo: ESLint/TypeScript/oba buildy OK; Vitest87/87 w14 plikach. Pierwszy test
+suwaka miał wieloznaczne wyszukiwanie etykiety kilku kart; asercję ograniczono
+do badanego badge i wykonano ponownie cały zestaw. Chromium320/390/768,
+Enter/Spacja kart, Enter filtrów4/2/1, taby/powrót/motywy/live system i suwak0/10/15,
+brak poziomego przewijania, oficjalne zasoby i CSP OK. Brak zewnętrznych żądań.
+Build demo14 plików,5 zasobów branding sprawdzonych bajtowo, po sygnaturach
+PNG/JPEG i limicie rozmiaru. Allowlista rozszerzona tylko o MatchFilters UI.
+Brak App/Auth/Supabase/Edge, starego SVG i starych obrazów w bundle. CSP, env,
+publicDir false i app/vercel.json bez zmian. Brak sekretów i nowych zależności.
+Testy API to atrapy, nie test prawdziwego Supabase. Ostrzeżenia chunków pozostają.
+Cypress nie ponawiano ze względu na znany brak Xvfb; Android/iOS/PWA na urządzeniu
+niewykonane. Na komputerze: odbiór logo/ikon, safe areas, powiększenie fontu,
+scroll/filtry/stronicowanie, powrót z tła i role na izolowanym backendzie testowym.
+
+Rzeczywiste zrzuty React/Ionic (bez retuszu):
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium31-home-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium31-home-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium31-home-320.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium31-home-768.png
+W repo także obrazy cykli1/2 i premium31-measurements.json.
+
+Commit implementacji: f5658fa7231a00db378545cfa829bba479e66e09. SHA końcowego commita raportowego
+podano w odpowiedzi końcowej; historia Git identyfikuje commit tego wpisu.
+Gałąź feat/ui-beta. Bez merge, backendu/finansów/push/Firebase/migracji,
+zmian konfiguracji Vercel i ręcznego wdrożenia. Automatyczny Vercel niezweryfikowany.
+Pełny wykaz zmian w git show --stat; dokumenty STATUS/UI_BETA/DEMO_VERCEL/AGENTS,
+PREMIUM_VISUAL_SPEC i PREMIUM31_VISUAL_REVIEW zaktualizowane; raport w tym pliku.

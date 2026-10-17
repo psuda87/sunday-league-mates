@@ -1,3 +1,38 @@
+# UI Beta3.1 — B. Urban Club i Mecze — 2026-10-18 01:37:36 CEST
+
+Gałąź feat/ui-beta. Implementacja: f5658fa7231a00db378545cfa829bba479e66e09.
+Pobrano zestaw oficjalnych zasobów do301e7e3. Logo-header290x280 RGB z własnym tłem,
+bez przeróbek; centralne92px, stary SVG tylko archiwum. Stadium-card1400x800 w kartach,
+stadium-main1400x800 nagłówek/szczegóły, texture1080x1920 delikatnie tylko Dark.
+Demo: Mecze,3 działające filtry,4 kompaktowe karty121px widoczne na390x844,
+bez dominującego Następny mecz/CTA na liście. Szczegóły i motywy zachowane.
+Realne Nadchodzące/Historia wyłącznie na pobranej stronie i server_now;
+Moje jawnie niedostępne bez danych o uczestnictwie. CTA/RPC/goście/rezerwa bez zmian.
+PWA favicon64 i ikony192/512 purpose any. Android adaptive/maskable nieukończone;
+nie zmieniano natywnych ikon ani nie uruchamiano cap sync.
+
+Kontrole końcowe: ESLint OK; TypeScript obu wejść OK; build aplikacji i demo OK
+(duże chunki Ionic); Vitest87/87 w14 plikach. Trzy iteracje Chromium + końcowy render:
+320/390/768 bez overflow dokumentu; karta/filtry Enter/Spacja, zakładki, powrót,
+Light/Dark/Auto/live system, suwak0/10/15, zasoby oficjalne i CSP/izolacja OK.
+Demo14 plików,5 nowych zasobów sprawdzonych bajtowo/sygnaturami, brak starego SVG,
+App/Auth/Supabase/Edge i zewnętrznych żądań. Vercel/CSP/env bez zmian.
+Cypress nie ponawiano (znany brak Xvfb); Android/iOS/PWA na urządzeniu niewykonane.
+Testy API na atrapach, nie potwierdzają prawdziwego Supabase.
+
+Zrzuty: ui/premium31-home-dark/light.png i premium31-home-320/768.png.
+Porównanie z referencją i iteracje: ui/PREMIUM31_VISUAL_REVIEW.md.
+Pozostają font systemowy, własne tło/inny rysunek oficjalnego logo, miękkość JPEG,
+kadrowanie i dodatkowe prawdziwe akcje/CTA/opisy ograniczeń w produkcji.
+Bez pełnej zgodności pikselowej i bez deklaracji gotowości produkcyjnej.
+
+Nie zmieniano backendu, Auth, migracji/RPC/RLS/finansów/push/Firebase/Vercel.
+Bez merge i ręcznego wdrożenia; automatyczny podgląd po push niezweryfikowany.
+Następnie odbiór na telefonie, safe areas/fonty/PWA, Cypress z Xvfb i Android.
+Historyczne ograniczenia SQL/RLS/FIFO/Docker i niezastosowanych migracji bez zmian.
+
+---
+
 # Premium España / UI Beta 3.0 — 2026-10-18 01:01:33 CEST
 
 Gałąź feat/ui-beta. Implementacja: 021aee91758f89fccf151d4330a6abd6205a2b38.
