@@ -4,7 +4,7 @@ describe('España UI isolated demo', () => {
     cy.intercept('**/functions/v1/**', () => { throw new Error('Demo must not call backend'); });
     cy.visit(Cypress.env('standaloneDemo') ? '/' : '/ui-demo');
     cy.contains('Dane przykładowe').should('be.visible');
-    cy.get('[role=progressbar]').should('have.attr', 'aria-valuenow', '12');
+    cy.get('.slm-compact-count strong').first().should('have.text', '12/15');
     cy.get('.slm-demo-tools summary').click();
     cy.get('input[value=dark]').check(); cy.get('html').should('have.class', 'ion-palette-dark');
     if (width === 390) cy.screenshot('espana-dark', { capture: 'viewport' });
@@ -17,6 +17,6 @@ describe('España UI isolated demo', () => {
     cy.contains('h1', 'Szczegóły meczu').should('exist');
     cy.get('[role=tab][aria-selected=true]').should('contain', 'Uczestnicy');
     cy.contains('[role=tab]', 'Składy').click(); cy.contains('Składy dla tego meczu nie są jeszcze dostępne.').should('be.visible');
-    cy.contains('ion-button', 'Wróć do meczów').click(); cy.contains('h1', 'Następny mecz').should('be.visible');
+    cy.contains('ion-button', 'Wróć do meczów').click(); cy.contains('h1', 'Mecze').should('be.visible');
   });
 });

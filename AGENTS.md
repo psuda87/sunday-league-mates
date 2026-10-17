@@ -1,3 +1,7 @@
+# UI Beta 3.1 — aktualizacja brandingu i listy
+
+- Oficjalny zestaw B. Urban Club — Hiszpania: app/public/assets/branding/slm-logo-header.png w nagłówku zamiast SVG. Oryginalne proporcje i własne tło zachować; stary SVG tylko archiwalny. stadium-bg-card.jpg karty, stadium-bg-main.jpg nagłówek/szczegóły, espana-dark-texture.jpg subtelnie tylko Dark. Nie generować zamienników. Demo Mecze = filtry i kompaktowa lista, bez dominującego Następny mecz/CTA. W demo filtry działają na fikcyjnych danych, w produkcji Nadchodzące/Historia tylko aktualna strona i server_now, Moje jawnie niedostępne do czasu kontraktu danych. Nie dodawać backendu. Szczegóły nadal domyślnie Uczestnicy. Manifest PWA ikony192/512 wyłącznie purpose any; brak adaptacyjnych warstw Androida. Ta instrukcja zastępuje wcześniejsze nakazy używania SVG w UI/demo. Analiza i trzy iteracje: docs/ui/PREMIUM31_VISUAL_REVIEW.md.
+
 # Aktualny kierunek UI 3.0
 
 - Premium España: obowiązują obie rzeczywiście dostarczone grafiki docs/ui/reference/slm-premium-*.jpg. Analiza i trzy iteracje w docs/ui/PREMIUM_VISUAL_SPEC.md. Paleta bazowa bordo #880000, złoto #D4AF37, prawie czarne tło (komponenty od #0B0C10), ciepły Light; ten wpis zastępuje wcześniejszy kierunek Beta2.3 w zakresie wyglądu. Centralne tokeny CSS, datownik i fotografia w tle karty, oryginalny herb centralnie; bez zmiany backendu/logiki. Demo ma jawnie fikcyjne spotkania i osoby, Składy tylko Planowane. Auto pozostaje domyślne.

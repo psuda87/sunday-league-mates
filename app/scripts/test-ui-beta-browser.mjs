@@ -45,7 +45,9 @@ try {
   await cmd('Page.navigate', { url: base }); await loaded;
   for (let i = 0; i < 100; i++) { if (await evaluate("!!document.querySelector('.slm-card-link')")) break; await pause(); }
   await evaluate('Promise.all([...document.images].map(image=>image.decode()))');
-  assert.equal(await evaluate("document.querySelector('.slm-crest').naturalWidth > 0"), true, 'Crest did not load');
+  assert.equal(await evaluate("document.querySelector('.slm-crest').getAttribute('src')"), '/assets/branding/slm-logo-header.png');
+  assert.equal(await evaluate("document.querySelector('.slm-crest').naturalWidth"), 290, 'Official logo did not load');
+  assert.equal(await evaluate("document.querySelector('.slm-stadium').naturalWidth"), 1400, 'Official stadium did not load');
   await fs.mkdir(output, { recursive: true });
   const metrics = {};
   for (const mode of ['dark', 'light']) {
@@ -54,7 +56,12 @@ try {
     assert.equal(await evaluate("document.querySelector('#demo-count').checkVisibility()"), false, 'Closed demo tools must hide the slider');
     assert.equal(await evaluate("document.querySelector('.slm-card-link').querySelectorAll('button,ion-button,a').length"), 0);
     await shot(`home-${mode}`);
-    metrics[mode] = await evaluate("Object.fromEntries(['.slm-crest','.slm-next-match h1','.slm-hero-card','.slm-stadium-frame','.slm-match-cta','.slm-bottom-nav'].map(selector=>{const r=document.querySelector(selector).getBoundingClientRect();return [selector,{x:r.x,y:r.y,width:r.width,height:r.height}]}))");
+    if (mode === 'dark') for (const width of [320, 768]) { await viewport(width); await shot(`home-${width}`); } await viewport();
+    for (const [filter, number] of [['Moje', 2], ['Historia', 1], ['Nadchodzące', 4]]) {
+      await evaluate(`[...document.querySelectorAll('.slm-match-filters button')].find(button=>button.textContent==='${filter}').focus()`); await press('Enter', 'Enter', 13);
+      assert.equal(await evaluate("document.querySelectorAll('.slm-card-link').length"), number);
+    }
+    metrics[mode] = await evaluate("Object.fromEntries(['.slm-crest','.slm-matches-screen h1','.slm-hero-card','.slm-stadium-frame','.slm-match-filters','.slm-bottom-nav'].map(selector=>{const r=document.querySelector(selector).getBoundingClientRect();return [selector,{x:r.x,y:r.y,width:r.width,height:r.height}]}))");
     await evaluate("document.querySelector('.slm-card-link').focus()"); await press('Enter', 'Enter', 13);
     assert.equal(await evaluate("document.querySelectorAll('.slm-variant-preview').length"), 0, 'A/B in normal flow');
     assert.equal(await evaluate("document.querySelector('[role=tab][aria-selected=true]').textContent"), 'Uczestnicy');
@@ -75,7 +82,7 @@ try {
   assert.equal(await evaluate("document.querySelector('.slm-demo-tools').open"), true, 'Tools must open with native keyboard');
   for (const value of [0, 10, 15, 12]) {
     await evaluate(`(() => { const slider=document.querySelector('#demo-count');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(slider,'${value}');slider.dispatchEvent(new Event('input',{bubbles:true}));slider.dispatchEvent(new Event('change',{bubbles:true})); })()`); await pause();
-    assert.equal(await evaluate("document.querySelector('[role=progressbar]').getAttribute('aria-valuenow')"), String(value));
+    assert.equal(await evaluate("document.querySelector('.slm-compact-count strong').textContent"), `${value}/15`);
   }
   await cmd('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'dark' }] });
   await evaluate("document.querySelector('input[value=auto]').click()"); assert.equal(await evaluate("document.documentElement.classList.contains('ion-palette-dark')"), true);
@@ -87,6 +94,6 @@ try {
   assert.equal(requests.some(url => url.startsWith('http') && new URL(url).origin !== new URL(base).origin), false);
   assert.deepEqual(errors, []);
   await fs.writeFile(`${output}/metrics.json`, JSON.stringify(metrics, null, 2));
-  console.log('PASS: crest, home/details 320/390/768, horizontal tabs/default Participants, Enter/Space/Home/End/arrows, one panel, themes/live system, slider 0/10/15, isolation/CSP.');
+  console.log('PASS: official logo/assets, filters (4/2/1), home/details 320/390/768, horizontal tabs/default Participants, Enter/Space/Home/End/arrows, one panel, themes/live system, slider 0/10/15, isolation/CSP.');
   console.log(JSON.stringify(metrics.dark));
 } finally { ws.close(); }

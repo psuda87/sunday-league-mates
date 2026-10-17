@@ -39,3 +39,19 @@ describe('Hero uses existing registration RPC, controlled API only', () => {
     mount({ ...match, registration_open: false }); expect((await screen.findByText('Zapisy zamknięte')).getAttribute('disabled')).not.toBeNull();
   });
 });
+it('filters the loaded page using server time and explicitly disables unavailable membership filtering', async () => {
+  const old = { ...match, id: 'past', starts_at: '2026-10-15T18:00:00Z', location: 'Archiwum' };
+  const call = vi.fn(async (action: string) => {
+    if (action === 'events_list') return { events: [old, match], server_now: '2026-10-22T16:00:00Z' };
+    if (action === 'events_detail') return { event: match, participants: [], server_now: '2026-10-22T16:00:00Z' };
+    if (action === 'settlements_account') return { blocked: false, unpaid_matches: 0 };
+    return {};
+  });
+  render(<Events manager={{ call } as unknown as SessionManager} session={session} />);
+  await screen.findByText('Nadchodzące');
+  expect(screen.getByRole('button', { name: 'Moje' })).toBeDisabled();
+  expect(screen.queryByText('Archiwum')).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: 'Historia' }));
+  expect(await screen.findByText('Archiwum')).toBeTruthy();
+  expect(call.mock.calls.every(([name]) => ['events_list', 'events_detail', 'settlements_account'].includes(name))).toBe(true);
+});

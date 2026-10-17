@@ -12,15 +12,15 @@ it('keeps tools collapsed and allows local capacity testing without login', () =
   const slider = screen.getByRole('slider');
   for (const [value, label] of [[0, 'Do minimum brakuje 10'], [10, 'Minimum osiągnięte'], [15, 'Komplet miejsc']] as const) {
     fireEvent.change(slider, { target: { value: String(value) } });
-    expect(screen.getByRole('progressbar').getAttribute('aria-valuenow')).toBe(String(value));
-    expect(screen.getByText(label, { exact: false })).toBeTruthy();
+    expect(document.querySelector('.slm-compact-count strong')).toHaveTextContent(`${value}/15`);
+    expect(document.querySelector('.slm-compact-count')).toHaveTextContent(label);
   }
   expect(screen.queryByText('Zaloguj się')).toBeNull();
   expect(screen.queryByText('Zarządzaj kontami')).toBeNull();
 });
 it('opens chosen B directly from the whole card, defaults to Participants and returns', () => {
   render(<Demo />);
-  expect(screen.getByRole('img', { name: 'Sunday League Mates' }).getAttribute('src')).toBe('/assets/branding/slm-crest-espana.svg');
+  expect(screen.getByRole('img', { name: 'Sunday League Mates' }).getAttribute('src')).toBe('/assets/branding/slm-logo-header.png');
   const nav = screen.getByRole('navigation', { name: 'Główna nawigacja' });
   expect(nav.querySelectorAll('button')).toHaveLength(3);
   const card = screen.getAllByRole('button', { name: /Otwórz szczegóły meczu:/ })[0];
@@ -32,7 +32,7 @@ it('opens chosen B directly from the whole card, defaults to Participants and re
   fireEvent.click(screen.getByRole('tab', { name: 'Rozliczenie' }));
   expect(screen.getByRole('tabpanel')).toHaveTextContent('Nie pokazujemy fikcyjnych należności');
   fireEvent.click(screen.getByText('← Wróć do meczów'));
-  expect(screen.getByRole('heading', { name: 'Następny mecz' })).toBeTruthy();
+  expect(screen.getByRole('heading', { name: 'Mecze' })).toBeTruthy();
 });
 it('supports tab keyboard navigation and one visible panel', () => {
   render(<DemoMatchDetails variant="b" count={12} />);
@@ -63,4 +63,21 @@ it('opens the selected fictional match with matching date, capacity and roster t
   fireEvent.click(screen.getByRole('tab', { name: 'Składy' }));
   expect(screen.getByRole('tabpanel')).toHaveTextContent('Planowane');
   expect(screen.getByRole('tabpanel').querySelectorAll('.slm-team-side ion-icon')).toHaveLength(10);
+});
+it('filters fictional fixtures without inventing membership or changing the chosen card', () => {
+  render(<Demo />);
+  expect(screen.getAllByRole('button', { name: /Otwórz szczegóły meczu:/ })).toHaveLength(4);
+  fireEvent.click(screen.getByRole('button', { name: 'Moje' }));
+  expect(screen.getAllByRole('button', { name: /Otwórz szczegóły meczu:/ })).toHaveLength(2);
+  fireEvent.click(screen.getByRole('button', { name: 'Historia' }));
+  expect(screen.getAllByRole('button', { name: /Otwórz szczegóły meczu:/ })).toHaveLength(1);
+  fireEvent.click(screen.getByRole('button', { name: /Otwórz szczegóły meczu:/ }));
+  expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '15');
+  fireEvent.click(screen.getByRole('tab', { name: 'Informacje' }));
+  expect(screen.getByRole('tabpanel')).toHaveTextContent('8 października 2026');
+  fireEvent.click(screen.getByText('← Wróć do meczów'));
+  expect(screen.getByRole('button', { name: 'Historia' })).toHaveAttribute('aria-pressed', 'true');
+  fireEvent.click(screen.getByRole('button', { name: 'Nadchodzące' }));
+  expect(screen.getAllByRole('button', { name: /Otwórz szczegóły meczu:/ })).toHaveLength(4);
+  expect(screen.queryByRole('heading', { name: 'Następny mecz' })).toBeNull();
 });

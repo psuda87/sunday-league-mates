@@ -191,3 +191,69 @@ ion-header { box-shadow:none !important; }
 .slm-match-list-item > .slm-muted { font-size:.75rem; }
 .slm-compact-count { font-weight:650; }
 .slm-roster-group li small { font-size:.64rem; }
+/* UI 3.1 — official B. Urban Club assets and compact match list. */
+:root {
+ --slm-count-ready:#17613B; --slm-count-ready-bg:#E1F3E7;
+ --slm-count-low:#805A08; --slm-count-low-bg:#FCF0D3;
+ --slm-count-empty:#9A2133; --slm-count-empty-bg:#FFE6EB;
+ --slm-stadium-main:url('/assets/branding/stadium-bg-main.jpg');
+ --slm-dark-texture:none;
+}
+:root.ion-palette-dark {
+ --slm-count-ready:#83EBA5; --slm-count-ready-bg:#10432CBF;
+ --slm-count-low:#F5D579; --slm-count-low-bg:#5A4218CC;
+ --slm-count-empty:#FFB3BC; --slm-count-empty-bg:#5D1726CC;
+ --slm-dark-texture:url('/assets/branding/espana-dark-texture.jpg');
+ --slm-match-border:#A17B615C;
+}
+ion-content { --background:linear-gradient(180deg,var(--slm-header-glow),transparent 65%),var(--slm-dark-texture) center top/cover no-repeat,var(--ion-background-color); }
+.slm-shell-header { min-height:106px; padding:6px 18px; }
+.slm-logo.slm-crest { width:100px; height:auto; aspect-ratio:290/280; object-fit:contain; filter:none; border-radius:0; }
+.slm-shell-header::before { content:''; position:absolute; inset:0; z-index:-1; background:linear-gradient(0deg,var(--ion-background-color),transparent),var(--slm-stadium-main) center 30%/cover; opacity:.3; }
+.slm-matches-screen > h1 { font-size:2.15rem; line-height:1.1; font-weight:850; letter-spacing:-.045em; margin:5px 0 16px; }
+.slm-match-filters { display:flex; gap:9px; margin:0 0 18px; }
+.slm-match-filters button { min-height:40px; padding:8px 17px; border:1px solid var(--slm-border); border-radius:22px; color:var(--slm-text-secondary); background:var(--slm-panel); font-size:.78rem; cursor:pointer; }
+.slm-match-filters button[aria-pressed="true"] { color:var(--ion-color-primary-contrast); background:linear-gradient(130deg,var(--slm-button-top),var(--slm-button-bottom)); border-color:var(--slm-button-top); font-weight:750; box-shadow:0 3px 12px var(--slm-button-shadow); }
+.slm-match-filters button:disabled { opacity:.55; cursor:not-allowed; }
+.slm-match-list { display:grid; gap:12px; }
+.slm-match-list .slm-next-match { margin:0; }
+.slm-match-compact .slm-hero-card { padding:13px 14px; min-height:128px; border-radius:14px; }
+.slm-match-compact .slm-match-top { grid-template-columns:51px minmax(0,1fr); gap:13px; align-items:start; padding-right:14px; }
+.slm-match-compact .slm-date-tile { min-height:94px; border-radius:9px; border-color:var(--slm-photo-line); background:linear-gradient(180deg,var(--slm-photo-bottom) 35%,var(--slm-active-top)); }
+.slm-match-compact .slm-date-tile strong { font-size:1.95rem; }
+.slm-card-name { font-size:1.12rem; font-weight:800; line-height:1.25; margin:3px 0 7px; letter-spacing:-.025em; color:var(--slm-photo-text); overflow-wrap:anywhere; }
+.slm-match-compact .slm-location { margin:0 0 5px; font-size:.73rem; }
+.slm-match-compact .slm-match-date { margin:0; font-size:.73rem; }
+.slm-match-compact .slm-stadium { object-position:center 65%; }
+.slm-match-compact .slm-stadium-frame::after { background:linear-gradient(90deg,var(--slm-photo-veil),transparent 115%),linear-gradient(0deg,var(--slm-photo-veil),transparent 125%); }
+.slm-match-compact .slm-card-link > span { top:44%; right:16px; }
+.slm-compact-count { position:absolute; right:38px; bottom:12px; margin:0; min-width:52px; border:1px solid currentColor; padding:3px 10px; border-radius:20px; line-height:1.2; text-align:center; font-size:.78rem; color:var(--slm-count-ready); background:var(--slm-count-ready-bg); }
+.slm-compact-count[data-state="low"] { color:var(--slm-count-low); background:var(--slm-count-low-bg); }
+.slm-compact-count[data-state="empty"] { color:var(--slm-count-empty); background:var(--slm-count-empty-bg); }
+.slm-sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.slm-filter-limit { font-size:.72rem; line-height:1.5; color:var(--slm-text-secondary); margin:0 0 16px; }
+.slm-match-list-item .slm-match-compact { margin-bottom:6px; }
+@media(max-width:350px) { .slm-match-filters { gap:7px; } .slm-match-filters button { padding:8px 13px; } .slm-match-compact .slm-match-top { gap:9px; grid-template-columns:45px minmax(0,1fr); } .slm-card-name { font-size:1rem; } }
+/* Iteration 2: four cards fit above the footer; the official logo keeps its own background. */
+.slm-shell-header { min-height:96px; padding-top:3px; padding-bottom:3px; }
+.slm-logo.slm-crest { width:92px; }
+.slm-shell-header::before { opacity:.16; }
+.slm-matches-screen > h1 { font-size:2.3rem; margin:1px 0 13px; }
+.slm-match-filters { margin-bottom:15px; gap:9px; }
+.slm-match-filters button { min-height:38px; }
+.slm-match-compact .slm-hero-card { min-height:121px; padding-top:12px; padding-bottom:12px; }
+.slm-match-compact .slm-date-tile { min-height:94px; }
+.slm-match-compact .slm-stadium { object-position:center 76%; }
+.slm-match-compact .slm-stadium-frame::after { background:linear-gradient(90deg,var(--slm-photo-veil),transparent 105%),linear-gradient(0deg,var(--slm-photo-veil),transparent 145%); }
+/* Iteration 3: dark brand header in both modes and a crop that retains floodlights. */
+:root { --slm-brand-header-bg:#0B0C10; }
+ion-toolbar:has(.slm-shell-header) { --background:var(--slm-brand-header-bg); }
+.slm-shell-header::before { background:linear-gradient(0deg,var(--slm-brand-header-bg),transparent),var(--slm-stadium-main) center 30%/cover; opacity:.2; }
+.slm-match-compact .slm-stadium { object-position:center 38%; }
+.slm-match-compact .slm-card-link > span { right:15px; }
+.slm-demo .slm-matches-screen { margin-bottom:2px; }
+
+.slm-match-compact .slm-match-meta { padding-bottom:24px; }
+
+/* Final crop review: retain the pitch as well as the stands. */
+.slm-match-compact .slm-stadium { object-position:center 70%; }

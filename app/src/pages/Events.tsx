@@ -1,5 +1,7 @@
 import MatchSections from '../ui/MatchSections';
 import MatchHero from '../ui/MatchHero';
+import MatchFilters from '../ui/MatchFilters';
+import type { MatchFilter } from '../ui/MatchFilters';
 import PhoneInput from '../components/PhoneInput';
 import { normalizePhoneUpdate, nationalPhone } from '../../supabase/functions/_shared/phone';
 import { useCallback, useEffect, useState } from 'react';
@@ -13,6 +15,7 @@ import MatchSettlement from './MatchSettlement';
 
 export default function Events({ manager, session, initialEventId }: { manager: SessionManager; session: Session; initialEventId?: string | null }) {
   const [nextMatch, setNextMatch] = useState<Match | null>(null);
+  const [filter, setFilter] = useState<MatchFilter>('upcoming');
   const [matches, setMatches] = useState<Match[]>([]);
   const [preview, setPreview] = useState<Detail | null>(null);
   const [detail, setDetail] = useState<Detail | null>(null);
@@ -106,6 +109,11 @@ export default function Events({ manager, session, initialEventId }: { manager: 
     });
   }
   const upcoming = nextMatch;
+  const filteredMatches = matches.filter(match => {
+    if (!serverNow) return false;
+    const historical = Date.parse(match.starts_at) <= Date.parse(serverNow) || match.status === 'cancelled';
+    return filter === 'history' ? historical : !historical;
+  }).sort((a, b) => filter === 'history' ? Date.parse(b.starts_at) - Date.parse(a.starts_at) : Date.parse(a.starts_at) - Date.parse(b.starts_at));
   useEffect(() => {
     let alive = true;
     setPreview(null);
@@ -150,9 +158,6 @@ export default function Events({ manager, session, initialEventId }: { manager: 
     {error && <p role="alert" className="slm-error">⚠ {error}</p>}
     {notice && <p role="status" className="slm-notice">✓ {notice}</p>}
     {busy && <IonSpinner aria-label="Trwa operacja wydarzenia" />}
-    {!detail && !form && offset === 0 && upcoming && <MatchHero match={preview?.event ?? upcoming} openDisabled={busy} onOpen={() => void work(() => open(upcoming.id))}>
-      {matchAction(preview)}
-    </MatchHero>}
     <div className="slm-actions">
       <IonButton fill="outline" disabled={busy} onClick={() => void work(async () => { setDetail(null); setForm(null); await list(0); })}>Lista meczów</IonButton>
       {admin && <IonButton disabled={busy} onClick={() => beginForm()}>Utwórz mecz</IonButton>}
@@ -236,11 +241,14 @@ export default function Events({ manager, session, initialEventId }: { manager: 
           {guestEdit && <IonButton fill="clear" onClick={() => { setGuestEdit(null); setGuestName(''); setGuestPhone(''); }}>Anuluj edycję</IonButton>}
         </form></section>}
       </>} settlement={admin ? <MatchSettlement key={`${e.id}:${e.settlement_version ?? e.status}`} manager={manager} eventId={e.id} onChange={() => open(e.id)} /> : <section className="slm-panel"><p>Zatwierdzone należności za ten mecz sprawdzisz w swoich Rozliczeniach. Podział administracyjny nie jest dostępny w tym widoku.</p></section>} />
-    </> : <section className="slm-panel"><h1>Mecze</h1>
-      {!matches.length && <p>Brak wydarzeń.</p>}
-      {matches.map(match => <div key={match.id} className="slm-match-list-item"><MatchHero match={match} compact title="Mecz" openDisabled={busy} onOpen={() => void work(() => open(match.id))} />
-        <p className="slm-muted">{match.status === 'cancelled' ? '⛔ Odwołany' : match.registration_open ? 'Zapisy otwarte' : '🔒 Zapisy zamknięte'}</p>
-        {match.decision_required && <p>⚠ Brak minimum po 17:00 — decyzja administratora</p>}</div>)}
+    </> : <section className="slm-matches-screen"><h1>Mecze</h1><MatchFilters value={filter} onChange={setFilter} mineUnavailable />
+      <p className="slm-filter-limit">Filtry obejmują pobraną stronę. Starsze mecze: przyciski stronicowania. „Moje” niedostępne — lista nie zawiera informacji o Twoich zapisach.</p>
+      {filter === 'upcoming' && offset === 0 && upcoming && <MatchHero compact title="Najbliższy mecz" match={preview?.event ?? upcoming} openDisabled={busy} onOpen={() => void work(() => open(upcoming.id))}>
+        {matchAction(preview)}
+      </MatchHero>}
+      {!filteredMatches.length && !(filter === 'upcoming' && offset === 0 && upcoming) && <p role="status">Brak meczów dla tego filtra na pobranej stronie.</p>}
+      {filteredMatches.filter(match => !(filter === 'upcoming' && offset === 0 && upcoming?.id === match.id)).map(match => <div key={match.id} className="slm-match-list-item"><MatchHero match={match} compact title="Mecz" openDisabled={busy} onOpen={() => void work(() => open(match.id))} />
+        <p className="slm-muted">{match.status === 'cancelled' ? '⛔ Odwołany' : match.registration_open ? 'Zapisy otwarte' : '🔒 Zapisy zamknięte'}</p></div>)}
       <div className="slm-actions"><IonButton fill="outline" disabled={busy || !offset} onClick={() => void work(() => list(Math.max(0, offset - 50)))}>Poprzednie mecze</IonButton>
         <IonButton fill="outline" disabled={busy || matches.length < 50} onClick={() => void work(() => list(offset + 50))}>Następne mecze</IonButton></div>
     </section>}

@@ -1,3 +1,11 @@
+# Uzupełnienie Premium3.1
+
+Oficjalne logo B. Urban Club zastępuje stary SVG w nowym UI. Nowe zasoby stadionu,
+lista Mecze z filtrami i trzy iteracje: [PREMIUM31_VISUAL_REVIEW.md](PREMIUM31_VISUAL_REVIEW.md).
+Starsze decyzje poniżej o używaniu SVG/starej fotografii opisują etap3.0.
+
+---
+
 # Premium España — specyfikacja wizualna 3.0
 
 ## Materiały obejrzane przed implementacją

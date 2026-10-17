@@ -1,3 +1,29 @@
+# UI Beta 3.1 — oficjalne logo i lista Mecze
+
+B. Urban Club — Hiszpania: oryginalny slm-logo-header.png, proporcje290:280,
+wyświetlenie92px; RGB bez przezroczystości. Nie wycinano tła. SVG tylko archiwum.
+Nowe tła stadionu i tekstura pochodzą wyłącznie z dostarczonego zestawu.
+Ciemny brand header także w Light; reszta Light zachowuje jasne powierzchnie.
+
+Demo usuwa dominujący Następny mecz i CTA z listy. Tytuł Mecze i MatchFilters,
+cztery zwarte klikalne karty121px z datownikiem, nazwą wyłącznie demo, lokalizacją,
+godziną i badge miejsc. Na390x844 cztery karty mieszczą się przed footerem.
+Nadchodzące4/Moje2/Historia1, powrót zachowuje filtr. Suwak i Auto/Light/Dark
+nadal w zwijanych Narzędziach demo; szczegóły i nieaktywny przycisk zapisu pozostają.
+Realna lista filtruje tylko istniejącą stronę i czas serwera; Historia obejmuje
+rozpoczęte/odwołane. Moje jawnie nieaktywne bez danych o uczestnictwie na liście.
+Istniejące CTA, blokada, rezygnacja, goście i uprawnienia bez zmian.
+PWA:192/512 purpose any oraz favicon64. Android adaptive/maskable nieukończone.
+
+[Analiza i porównanie](ui/PREMIUM31_VISUAL_REVIEW.md),
+[Dark](ui/premium31-home-dark.png), [Light](ui/premium31-home-light.png),
+[320px](ui/premium31-home-320.png), [768px](ui/premium31-home-768.png).
+Lint/TypeScript/oba buildy i Vitest87/87 OK, Chromium320/390/768/motywy/filtry/CSP OK.
+Nie jest to test urządzenia ani prawdziwego Supabase; szczegóły w STATUS.md.
+Poniższe etapy historyczne:3.1 zastępuje nakazy używania starego herbu w UI.
+
+---
+
 # UI Beta 3.0 — Premium España
 
 Nowe grafiki Premium rzeczywiście dostarczono i obejrzano. Pełna specyfikacja,

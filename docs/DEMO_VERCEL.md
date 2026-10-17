@@ -1,3 +1,16 @@
+## UI Beta3.1 — zasoby oficjalne, granica separacji zachowana
+
+Root app / npm run build:demo / dist-demo / brak env i app/vercel.json bez zmian.
+Nowy moduł dozwolony wyłącznie UI: MatchFilters. publicDir nadal false.
+Jawnie emitowane5 zatwierdzonych plików: slm-logo-header.png, slm-favicon-64.png,
+stadium-bg-card.jpg, stadium-bg-main.jpg, espana-dark-texture.jpg. Weryfikacja
+zgodności bajtów z oryginałami, rozmiaru i sygnatur PNG/JPEG. Nie kopiować całego public/.
+Stary SVG i stare tła nie są emitowane; pozostają źródłami archiwalnymi w repo.
+Demo14 plików, bez Auth/API/Supabase, źródeł App, prawdziwych kont i danych.
+CSP/env/allowlista aplikacji bez poluzowania. Filtry korzystają wyłącznie z fixture.
+Manifest PWA dotyczy właściwej aplikacji; nie dołączono go automatycznie do demo.
+Bez ręcznej publikacji. Zwykły push autoryzowany, status automatyczny niepotwierdzony.
+
 ## Premium 3.0
 
 Demo nadal samodzielne: te same Root app / npm run build:demo / dist-demo / brak env.
