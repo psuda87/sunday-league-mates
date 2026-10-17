@@ -2,7 +2,7 @@ describe('España UI isolated demo', () => {
   for (const width of [320, 390, 768]) it(`fits ${width}px and switches themes without API`, () => {
     cy.viewport(width, 844);
     cy.intercept('**/functions/v1/**', () => { throw new Error('Demo must not call backend'); });
-    cy.visit('/ui-demo');
+    cy.visit(Cypress.env('standaloneDemo') ? '/' : '/ui-demo');
     cy.contains('PODGLĄD UI').should('be.visible');
     cy.get('[role=progressbar]').should('have.attr', 'aria-valuenow', '12');
     cy.get('input[value=dark]').check(); cy.get('html').should('have.class', 'ion-palette-dark');

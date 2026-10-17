@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "test.e2e": "cypress run",
     "test.unit": "vitest",
-    "lint": "eslint"
+    "lint": "eslint",
+    "build:demo": "tsc --noEmit && tsc --project tsconfig.demo.json && vite build --config vite.demo.config.ts && node scripts/verify-demo-build.mjs",
+    "preview:demo": "vite preview --config vite.demo.config.ts"
   },
   "dependencies": {
     "@aparajita/capacitor-secure-storage": "8.0.1",

@@ -175,3 +175,6 @@ GoogleService-Info.plist
 *service-account*.json
 *.p8
 *.p12
+
+# Standalone UI demonstration output
+app/dist-demo/

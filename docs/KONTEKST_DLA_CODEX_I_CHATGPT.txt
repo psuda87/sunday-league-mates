@@ -1,3 +1,13 @@
+DEMO VERCEL — 17.10.2026, feat/ui-beta
+Osobny build npm run build:demo z app/demo/main.tsx do app/dist-demo.
+Nie publikować pełnej aplikacji dist ani używać npm run build jako buildu demo.
+Vercel Root app, build npm run build:demo, output dist-demo, env brak.
+Allowlista modułów, wyłączone env/publicDir, CSP connect-src none, skan output.
+Demo ma lokalny suwak 0–15 i motywy; brak Auth/API/admin/Edge/FCM w bundle.
+Nie opublikowano; publikacja wymaga osobnej decyzji. Szczegóły DEMO_VERCEL.md.
+Kontrole: lint/TypeScript/oba buildy OK, Vitest81/81, Chromium statycznego demo OK;
+Cypress brak Xvfb, Android/iOS niewykonane. Backend i migracje bez zmian.
+
 AKTUALIZACJA UI BETA — 17.10.2026
 Gałąź bieżącego UI: feat/ui-beta, baza origin/feat/integration (2026754).
 Nowy zatwierdzony wygląd: España Light/Dark, automatyczny według systemu.

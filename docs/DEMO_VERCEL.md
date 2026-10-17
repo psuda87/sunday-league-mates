@@ -1,0 +1,72 @@
+# Samodzielna demonstracja UI España — przygotowanie Vercel
+
+Gałąź feat/ui-beta. NIE OPUBLIKOWANO. Wymaga osobnej zgody na publikację.
+
+| Ustawienie Vercel | Wartość |
+|---|---|
+| Root Directory | `app` |
+| Framework Preset | `Other` |
+| Build Command | `npm run build:demo` |
+| Output Directory | `dist-demo` |
+| Install Command | `npm ci --ignore-scripts --no-audit --no-fund` |
+| Node.js | `22.x`, minimum 22.12 |
+| Environment Variables | Żadne |
+
+Konfiguracja `app/vercel.json` dotyczy osobnego projektu demonstracyjnego Vercel.
+Nie podłączać go do projektu produkcyjnej aplikacji, nie kopiować env z innych
+projektów, nie dodawać kluczy Supabase/Firebase, kont ani tokenów. Wybierać źródłową
+gałąź feat/ui-beta; nie scalać jej w celu publikacji. Nie korzystać z `npm run build`
+i `dist`: to pełna aplikacja. Istniejące vite.config.ts, build i Capacitor niezmienione.
+Nie wykonano operacji na koncie Vercel ani zdalnej bazie.
+
+## Granica separacji
+
+- `demo/index.html` i `demo/main.tsx` renderują wyłącznie komponent Demo w IonApp.
+  Brak App.tsx, routera aplikacji, SessionManager, API, administratora i FCM.
+- `vite.demo.config.ts`: osobny root/output; allowlista rzeczywistych modułów
+  źródłowych generowanego bundle. Niedozwolony kod aplikacji przerywa build.
+  Wspólne komponenty UI, tokeny oraz Accounts.css są tylko warstwą wizualną.
+  Importy `type Match` z modelu wydarzeń są usuwane przez TypeScript.
+- `publicDir: false`: żadnego automatycznego kopiowania publicznych plików pełnej
+  aplikacji. Jedynym dodatkowym zasobem jest wyraźnie dołączony stadion.svg.
+  Brak source map, service workera, plików Edge czy funkcji serverless.
+- `envDir: false`, `envPrefix: []`: pliki env i zmienne VITE nie wchodzą do demo.
+  Budowanie z kontrolnymi zmiennymi VITE potwierdziło brak ich markerów w output.
+- Automatyczna kontrola wszystkich plików `dist-demo` kończy build błędem, jeśli
+  wykryje nieoczekiwany typ pliku, oznaczenia Auth/Supabase/Edge lub markery sekretów.
+- Vercel serwuje wyłącznie statyczne dist-demo. Brak rewrites do pełnej aplikacji;
+  nieznane ścieżki nie odsłonią logowania ani innych źródeł repozytorium.
+- CSP: connect-src none, form-action none, skrypty self, brak ramek/obiektów;
+  style unsafe-inline są wymagane przez Ionic i dynamiczny pasek.
+  Dane fikcyjne; jedyny zapis w przeglądarce to lokalna preferencja wyglądu.
+
+Separacja dotyczy gotowego artefaktu, a nie tylko ukrywania routingu. Repozytorium
+nadal przechowuje źródła właściwej aplikacji, ale nie ma ich w output demo.
+Skan znanych markerów nie zastępuje kontroli modułów i CSP; użyto wszystkich trzech.
+
+## Lokalna weryfikacja
+
+Z `app`: `npm ci --ignore-scripts`, `npm run lint`, `npm run build:demo`,
+`npm run test.unit -- --run`, `npm run build` (ostatnie tylko regresja pełnej aplikacji).
+`build:demo` sprawdza także TypeScript punktu demo przez tsconfig.demo.json.
+`npm run preview:demo` uruchamia wyłącznie statyczne demo na 127.0.0.1:5175 z tymi
+samymi nagłówkami CSP co konfiguracja Vercel. Nie jest publicznym podglądem.
+
+Smoke Chromium opisany w UI_BETA.md: ustawić SLM_UI_URL=http://127.0.0.1:5175/
+i uruchomić `node scripts/test-ui-beta-browser.mjs`. SLM_UI_ARTIFACTS to opcjonalny
+lokalny katalog zrzutów, nie zmienna Vercel. Kontroluje układ, live system theme,
+suwak 0/10/15, brak wywołań zewnętrznych i naruszeń CSP. Chromium/CDP tylko lokalnie.
+Cypress w środowisku z Xvfb: z app `npx cypress run --spec cypress/e2e/ui-beta.cy.ts
+--config baseUrl=http://127.0.0.1:5175 --env standaloneDemo=true --browser electron`
+(jedno polecenie). Ten zestaw nie testuje Supabase.
+
+Wykonane: lint i TypeScript OK, oba buildy OK, Vitest 81/81 w 14 plikach,
+10 plików statycznego demo przeszło kontrolę. Chromium 320/390/768, trzy tryby,
+suwak i izolacja sieci OK. CSP odczytano także z odpowiedzi HTTP. Ostrzeżenia
+rozmiaru chunków Ionic pozostają. Cypress NIE WYKONANO — brak Xvfb; Android/iOS
+NIE WYKONANO. Zrzuty: [Dark](ui/demo-dark.png), [Light](ui/demo-light.png).
+
+Po osobno autoryzowanej publikacji sprawdzić na faktycznej domenie Vercel: nagłówki,
+brak zewnętrznego ruchu, tryby i suwak, odpowiedzi 404 dla plików źródłowych i brak
+logowania/administracji. Tego etapu nie wykonano. Backend i migracje bez zmian;
+historyczne braki weryfikacji bazy, Dockera, FIFO i RLS nadal obowiązują.

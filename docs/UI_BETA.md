@@ -82,3 +82,10 @@ Powtarzalny smoke Chromium (Node z WebSocket): uruchomić Vite na 5174 oraz Chro
 --user-data-dir=/tmp/slm-ui-chromium about:blank; następnie z app
 node scripts/test-ui-beta-browser.mjs. Wyłącznie izolowany Cloud/lokalny profil,
 port debug na loopback; bez publikacji. Zrzuty domyślnie w /tmp/slm-ui-preview.
+
+## Samodzielny build do Vercel — 17.10.2026
+
+`/ui-demo` w pełnej aplikacji nie jest granicą publikacji. Osobny `npm run build:demo`
+buduje odrębne `demo/main.tsx` do `dist-demo`, bez App/Auth/Edge/Supabase.
+Demo ma teraz suwak zajętości 0–15. Konfiguracja i wyniki: [DEMO_VERCEL.md](DEMO_VERCEL.md).
+Brak wdrożenia. Nie publikować pełnego `dist`.

@@ -16,3 +16,28 @@ Europe/Warsaw, bez usuwania wcześniejszych wpisów. Zasadę zapisano w AGENTS.m
 W odpowiedziach będę podawać nazwę tego pliku i linki GitHub do podglądów.
 Bieżąca zmiana obejmuje wyłącznie dokumentację; nie wymaga testów aplikacji.
 
+=== 2026-10-17 22:11:47 CEST (Europe/Warsaw) — Samodzielne demo Vercel (bez publikacji) ===
+Przygotowano samodzielny build demo UI Beta España Light/Dark/Auto.
+Osobny punkt wejścia app/demo/main.tsx nie importuje App.tsx, Auth, administratora,
+Supabase, Edge ani natywnych tokenów. Wspólne komponenty UI i CSS są dozwolone.
+Kontrola listy modułów przerywa build przy imporcie niedozwolonych źródeł.
+Wyłączono odczyt .env i eksport VITE_*. Publiczne zasoby są wyłączone poza
+wyraźnie dodaną ilustracją stadionu. CSP blokuje połączenia sieciowe i formularze.
+Demo ma suwak lokalnej zajętości 0–15, minimum 10, trzy motywy i fikcyjne dane.
+Vercel: Root Directory app; Framework Other; Build Command npm run build:demo;
+Output Directory dist-demo; Install Command npm ci --ignore-scripts --no-audit --no-fund;
+Node.js 22.x (minimum 22.12); zmienne środowiskowe: żadne.
+Nie używać npm run build ani dist: zawierają właściwą aplikację.
+TypeScript aplikacji i punktu demo, ESLint, oba buildy: OK.
+Vitest 81/81 (14 plików). Kontrola 10 plików builda demo: OK, bez treści aplikacji,
+Supabase i Edge; przykładowe zmienne VITE z markerem kontrolnym nie weszły do bundle.
+Chromium na statycznym demo z CSP: 320/390/768 px, motywy i zmiana systemowa,
+suwak 0/10/15, brak zewnętrznych wywołań i brak naruszeń CSP: OK.
+Cypress: próba zablokowana brakiem Xvfb; nie zaliczono. Android/iOS niewykonane.
+Nie zmieniono logiki biznesowej, produkcyjnego Vite, bazy, sesji, RPC/RLS ani Edge.
+Nie publikowano na Vercel; nie wykonywano wdrożeń, migracji ani merge.
+Gotowy artefakt dist-demo jest odseparowany od aplikacji; po przyszłej publikacji
+należy jeszcze zweryfikować nagłówki i działanie pod rzeczywistą domeną Vercel.
+Dokumentacja: docs/DEMO_VERCEL.md. Raport: docs/ODPOWIEDZI_CODEX.txt.
+Podgląd: docs/ui/demo-dark.png i docs/ui/demo-light.png na feat/ui-beta.
+

@@ -1,3 +1,24 @@
+# Samodzielne demo Vercel — 2026-10-17 22:11:47 CEST (Europe/Warsaw)
+
+Branch feat/ui-beta. Oddzielne demo/main.tsx i vite.demo.config.ts, output dist-demo.
+Build nie importuje właściwej aplikacji; allowlista modułów, skan gotowych plików,
+.env/VITE wyłączone, publicDir wyłączony, CSP connect-src none. Lokalny suwak 0–15.
+Vercel Root app, build npm run build:demo, output dist-demo, bez env; NIE OPUBLIKOWANO.
+Nie używać pełnego builda dist do demonstracji. Instrukcja: DEMO_VERCEL.md.
+
+Kontrole tej sesji: ESLint OK; TypeScript klienta i demo OK; build aplikacji i demo OK
+(ostrzeżenia dużych chunków); Vitest 81/81, 14 plików; weryfikator 10 plików demo OK.
+Markery kontrolnych VITE nie weszły do bundle. Chromium statycznego demo z CSP:
+320/390/768 px, trzy motywy/live system, suwak 0/10/15, brak zewnętrznych żądań
+oraz naruszeń CSP OK. Cypress zablokowany brakiem Xvfb; Android/iOS nie wykonano.
+Zrzuty docs/ui/demo-dark.png i demo-light.png. Bez zmian produkcyjnego Vite, backendu,
+RPC/RLS/Auth/sesji; bez migracji, deploy i merge. SQL/RLS/FIFO/wyścigi i sześć migracji
+integracji nadal nieweryfikowane/niewdrożone; historyczna blokada Docker zachowana poniżej.
+Następnie: osobna decyzja o publikacji statycznego demo; potem weryfikacja domeny i
+nagłówków Vercel. Kontrole backendu i urządzeń pozostają osobnymi etapami.
+
+---
+
 Raportowanie — 2026-10-17 21:51:44 CEST (Europe/Warsaw): raporty chronologicznie w `ODPOWIEDZI_CODEX.txt`,
 podglądy UI w `docs/ui/`, zasada utrwalona w AGENTS.md. Zmiana dokumentacyjna,
 bez nowych testów, migracji i wdrożeń; wyniki UI Beta poniżej bez zmian.
