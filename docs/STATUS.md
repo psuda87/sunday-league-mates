@@ -1,3 +1,40 @@
+# Premium España / UI Beta 3.0 — 2026-10-18 01:01:33 CEST
+
+Gałąź feat/ui-beta. Implementacja: 021aee91758f89fccf151d4330a6abd6205a2b38.
+Obie nowe grafiki Premium dostarczone w2f2d8a2, obejrzane i wykorzystane.
+Analiza przed CSS, trzy rzeczywiste cykle Chromium i porównanie w
+ui/PREMIUM_VISUAL_SPEC.md. Poprzedni brak materiałów jest już nieaktualny.
+
+Wspólne karty ze zdjęciem w tle i datownikiem, centralny oryginalny herb,
+kompaktowa lista prawdziwych wydarzeń, większy nagłówek zdjęciowy szczegółów,
+poziome zakładki domyślnie Uczestnicy, osobne wizualne grupy gości i rezerwy,
+planowane dekoracyjne boisko bez algorytmu. Dark bordo/gold i ciepły Light;
+Auto bez zmian. Demo3 fikcyjne daty i fikcyjne osoby, zwijane narzędzia.
+
+Końcowe kontrole: ESLint OK; TypeScript klienta i demo OK; build aplikacji
+oraz build demo OK (duże chunki Ionic); Vitest85/85 w14 plikach. Trzy przebiegi
+Chromium:320/390/768 home/details i wszystkie panele bez overflow dokumentu,
+klawiatura kart/zakładek, jeden panel, powrót, motywy/live system, suwak0/10/15 OK.
+Moduły/artefakty demo12 plików/herb/CSP OK, bez żądań backendu i zewnętrznych.
+Testy UI używają atrap RPC; nie weryfikują prawdziwego Supabase.
+Cypress próbowano: brak Xvfb (ENOENT), scenariusze nie wykonały się.
+Android/iOS/Capacitor niewykonane. Bez nowych zależności, cap sync i zmian natywnych.
+
+Zrzuty rzeczywistego React/Ionic390x844: ui/premium-home-dark/light.png,
+premium-details-dark/light.png, premium-participants-dark.png, premium-teams-dark.png.
+Pozostały inne zdjęcie (bez potwierdzenia Harcerskiej), prostszy istniejący herb,
+systemowy font i inicjały zamiast zdjęć osób; bez deklaracji pełnej zgodności.
+
+Bez backendu/Auth/RPC/RLS/migracji/Firebase/finansów i zmiany zasad zapisów.
+Bez merge i ręcznego wdrożenia. Vercel automatyczny po push niepotwierdzony:
+GitHub API deployments Forbidden, brak zweryfikowanego URL.
+Następnie: odbiór wizualny telefonu, Cypress na komputerze z Xvfb, Android:
+safe areas, powiększenie tekstu, scroll list i boiska, obrót, powrót z tła,
+Light/Dark/Auto oraz rzeczywiste stany uprawnień na izolowanym backendzie testowym.
+Historyczne niezweryfikowane SQL/RLS/FIFO/Docker i migracje pozostają poniżej.
+
+---
+
 # Referencje Premium dostępne — 2026-10-18 00:54:02 CEST
 
 Oba wymagane JPG dodano w 2f2d8a2 na feat/ui-beta, pobrano i obejrzano.

@@ -220,3 +220,61 @@ slm-premium-three-phones.jpg oraz slm-premium-ui-branding-board.jpg.
 Widoczne: stadionowe tła kart, datowniki, listy uczestników, poziome zakładki,
 planowane składy i trzy pozycje nawigacji. Poprzednia blokada materiałów ustąpiła.
 To potwierdzenie dostępności, nie deklaracja wykonania UI Premium ani nowych testów.
+
+
+=== 2026-10-18 01:01:33 CEST — Premium España / UI Beta 3.0 ===
+Wznowiono po dostarczeniu obu slm-premium-three-phones.jpg i
+slm-premium-ui-branding-board.jpg w2f2d8a2. Rzeczywiście obejrzano oba obrazy,
+beta23-home/details oraz kolejne rendery. Specyfikacja przed implementacją i trzy
+cykle porównania/korekty: docs/ui/PREMIUM_VISUAL_SPEC.md.
+
+Zmieniono kompozycję, a nie tylko kolory: centralny oryginalny herb, fotografia
+w tle całej karty, bordowy datownik, zwarte metadane, złoty pasek i osobny czerwony
+CTA. Prawdziwa lista używa istniejącego matches/open(), bez osobnego Szczegóły.
+Szczegóły: większe zdjęcie, jeden poziomy pasek ikon, domyślnie Uczestnicy.
+Uczestnicy produkcji oddzielają wizualnie zawodników/gości/rezerwę; operacje,
+telefony i uprawnienia pozostają dotychczasowe. Demo3 fikcyjne mecze z poprawnymi
+datami i licznikami po wyborze, fikcyjne imiona/inicjały, bez danych użytkowników.
+Składy tylko Planowane i dekoracja dwóch drużyn, bez przydziałów/algorytmu.
+Light zachowuje ciepłe tło i te same proporcje. Auto i zwijane narzędzia zachowane.
+
+Cykl1: karta192px, centralny herb74x82, ale szczegóły zajmowały za dużo wysokości.
+Cykl2: herb68x76, krótszy back i zdjęcie szczegółów, lista wiersze44px;
+po obejrzeniu nadal zbyt długi opis planowania i za niskie boisko.
+Cykl3: skrócony opis, dopracowane paddingi i typografia; ponowny render/ocena.
+Pozostały inne zdjęcie i brak trybun, inny/prostszy oryginalny herb, systemowy font,
+inicjały zamiast portretów, brak fikcyjnych tytułów/filtrów w prawdziwej aplikacji.
+Nie deklaruję pełnej zgodności z wizualizacją ani gotowości produkcyjnej.
+
+Końcowe wyniki: lint/TypeScript/oba buildy OK, Vitest85/85 (14 plików);
+Chromium3 przebiegi, home/panele320/390/768 bez poziomego przewijania,
+Enter/Spacja/strzałki/Home/End, taby/jeden panel, powrót, motywy/live system,
+suwak0/10/15, CSP/izolacja OK.12 statycznych plików demo, oryginalny herb zgodny
+bajtowo, bez App/Auth/API/Supabase/Edge i zewnętrznych żądań. Konfiguracja Vercel,
+CSP i allowlista bez rozszerzenia. Brak nowych zależności i sekretów.
+Cypress próbowano, brak Xvfb: testy nie wykonały się. Android/iOS niewykonane;
+sprawdzenie rzeczywistych urządzeń i backendu testowego pozostaje na komputerze.
+Testy na atrapach nie są testami Supabase. Pozostają ostrzeżenia dużych chunków.
+
+Zrzuty (rzeczywisty React/Ionic, bez retuszu):
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium-home-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium-home-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium-details-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium-details-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium-participants-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium-teams-dark.png
+Zachowano także po2 obrazy z wcześniejszych cykli i pomiary JSON.
+
+Zmienione źródła: app/src/theme/variables.css, ui/MatchHero.tsx, MatchSections.tsx,
+BottomNav.tsx, Demo.tsx, DemoMatchDetails.tsx, Demo.test.tsx, pages/Events.tsx,
+scripts/test-ui-beta-browser.mjs i cypress/e2e/ui-beta.cy.ts. Dokumentacja: AGENTS.md,
+STATUS.md, UI_BETA.md, DEMO_VERCEL.md, PREMIUM_VISUAL_SPEC.md,
+SLM_PREMIUM_DIRECTION.md oraz ten raport. Dokładny wykaz: git show --stat.
+
+Commit implementacji: 021aee91758f89fccf151d4330a6abd6205a2b38. Końcowy commit dokumentacji identyfikuje
+historia Git tego wpisu; jego SHA podano w odpowiedzi końcowej.
+Gałąź wyłącznie feat/ui-beta. Nie scalano, nie zmieniano backendu/Auth/RPC/RLS,
+finansów/FCM/migracji, nie uruchamiano cap sync ani ręcznego wdrożenia.
+Vercel: próba odczytu deploymentów API GitHub zwróciła Forbidden; status i URL
+niezweryfikowane. Zwykły push może uruchomić skonfigurowany podgląd automatyczny.
+Raport zapisany w docs/ODPOWIEDZI_CODEX.txt, z zachowaniem wcześniejszej historii.
