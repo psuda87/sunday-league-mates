@@ -41,3 +41,36 @@ należy jeszcze zweryfikować nagłówki i działanie pod rzeczywistą domeną V
 Dokumentacja: docs/DEMO_VERCEL.md. Raport: docs/ODPOWIEDZI_CODEX.txt.
 Podgląd: docs/ui/demo-dark.png i docs/ui/demo-light.png na feat/ui-beta.
 
+=== 2026-10-17 22:24:12 CEST (Europe/Warsaw) — UI Beta 2.0 España (bez publikacji) ===
+Dopracowano wspólne komponenty aplikacji i demo. Dark: bordowe gradienty,
+głębsza karta, duża godzina, delikatne złoto, czerwony CTA z cieniem i aktywna
+nawigacja. Light zachował ciepłą bazę; dopracowano odstępy i typografię.
+Załączone zdjęcie użytkownika (73 KB, bez EXIF) jest dekoracją, nie potwierdzonym
+boiskiem przy Harcerskiej. Nie pobierano przypadkowych zdjęć z internetu.
+MatchHero ma imageSrc, mobilne kadrowanie i fallback do poprzedniego SVG.
+Brak zatwierdzonego herbu SLM w repo: pozostaje tymczasowy napis i slot 64x48.
+Obejrzano wcześniejszą referencję trzech ekranów z załącznika; nie odtworzono
+dokładnie herbu i zdjęcia stadionu. Nie deklaruję zgodności piksel w piksel.
+Naprawiono wykrytą niestabilność Auto przez utrzymanie subskrybowanego MediaQueryList.
+Kontrole: ESLint/TypeScript/build aplikacji/build demo OK; duże chunki Ionic pozostają.
+Vitest 81/81, 14 plików; Chromium 320/390/768 bez poziomego przewijania, motywy
+Light/Dark/Auto i live system, suwak 0/10/15, wczytywanie obrazu oraz izolacja OK.
+Cypress próbowano, brak Xvfb — niewykonany. Android/iOS niewykonane.
+Rzeczywiste zrzuty React/Ionic ze statycznego demo, z widoczną dolną nawigacją:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/beta2-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/beta2-light.png
+Rozszerzone viewporty 390x1280 z kontrolkami (podstawowe: 390x844):
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/beta2-dark-full.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/beta2-light-full.png
+Demo pozostaje odseparowane: 11 plików przeszło kontrolę, bez App/Auth/Supabase/Edge,
+bez żądań zewnętrznych i naruszeń CSP. Nie poluzowano modułów/CSP/env; jedynym
+rozszerzeniem zasobów jest wskazany lokalny JPEG z walidacją sygnatury i rozmiaru.
+Nadaje się do osobno autoryzowanej publikacji statycznej; domena Vercel i urządzenia
+nadal wymagają weryfikacji. Nie zmieniono RPC, biznesu, backendu ani konfiguracji FCM.
+Bez publikacji, wdrożeń, migracji i merge. Historyczne braki SQL/RLS/FIFO nadal aktualne.
+Gałąź: feat/ui-beta. SHA końcowego commita kodu i zrzutów:
+587d350437ac4e0d3ea76c885a958b0490fdf56d
+Raport jest osobnym następnym commitem dokumentacyjnym. Jego własny SHA jest dostępny
+w historii pliku i odpowiedzi końcowej (własnego SHA nie da się wpisać do tej samej rewizji).
+Plik raportu: docs/ODPOWIEDZI_CODEX.txt. Instrukcja Vercel bez zmian: docs/DEMO_VERCEL.md.
+
