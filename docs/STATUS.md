@@ -1,3 +1,45 @@
+# UI Beta — aktualny etap 17.10.2026
+
+Branch: feat/ui-beta, baza origin/feat/integration 2026754. Przygotowany commit i
+zwykły push tej gałęzi autoryzowane przez użytkownika; bez merge do integracji/main.
+
+## Wykonane
+
+España Light/Dark/Automatyczny, centralne zmienne Ionic, preferencja lokalna i
+reakcja live na system. Nowa karta najbliższego meczu, rzeczywiste zajęcie miejsc,
+minimum 10 i CTA przez istniejące RPC. Dolna nawigacja i ustawienia wyglądu.
+Zachowane funkcje kont, administratora, rozliczeń i powiadomień. Składy/katalog
+zawodników jawnie niedostępne; listy i kontakt pozostają w szczegółach meczu.
+Demo /ui-demo nie łączy się z backendem. Zrzuty Light/Dark w docs/ui/.
+Szczegóły: [UI_BETA.md](UI_BETA.md).
+
+## Faktyczne kontrole UI Beta w Cloud
+
+- ESLint: OK, bez ostrzeżeń. Build web/TypeScript: OK, ostrzeżenia rozmiaru chunków.
+- Vitest: 80/80, 13 plików, bez błędów nieobsłużonych. Testy operacji mają atrapy API.
+- Chromium headless: OK, szerokości 320/390/768 bez poziomego przepełnienia,
+  ręczne motywy, live prefers-color-scheme, progressbar i zero wywołań API demo.
+- HTTP lokalnego /ui-demo: 200. Brak publicznego adresu Cloud dostępnego z telefonu.
+- Cypress: NIE WYKONANO; pobrano 16.1.1, próba startu zablokowana brakiem Xvfb.
+  Dodano testy demo i dostosowano testy Auth do startu na ekranie meczów; nie zaliczono.
+- git diff --check: OK. Kontrola zmian: bez sekretów i rzeczywistych danych kont.
+- Android/iOS/realny FCM: NIE WYKONANO. Brak cap sync, baz, migracji i wdrożeń.
+
+## Nadal otwarte
+
+Etap wyłącznie frontendowy, bez zmian SQL/RPC/RLS, ledgera/FIFO, Edge, Auth,
+magazynu sesji, zależności i konfiguracji Firebase. Sześć migracji integracji nadal
+NIEZASTOSOWANYCH, accounts/push-worker NIEWDROŻONE. SQL/RLS/FIFO/wyścigi/adapter
+nadal niewykonane. Historia blokady silnika Docker na Windows pozostaje poniżej;
+w tej sesji nie uruchamiano Supabase ani nie sprawdzano baz w zastępstwie.
+Następnie: Cypress w środowisku z Xvfb, Android (safe areas, system bars, klawiatura,
+font scaling, overlaye, sesje i powrót z tła); backend osobnym etapem na izolowanej bazie.
+Ilustrację stadionu można zastąpić zaakceptowanym zdjęciem; nie deklarować pełnego
+odwzorowania fotografii referencyjnej ani pełnego audytu dostępności.
+
+---
+Poniżej zachowany stan integracji z komputera i jego historyczne wyniki.
+
 # Aktualny stan Sunday League Mates
 
 Aktualizacja: 17.10.2026. Branch feat/integration.

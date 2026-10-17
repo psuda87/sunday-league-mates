@@ -1,3 +1,14 @@
+AKTUALIZACJA UI BETA — 17.10.2026
+Gałąź bieżącego UI: feat/ui-beta, baza origin/feat/integration (2026754).
+Nowy zatwierdzony wygląd: España Light/Dark, automatyczny według systemu.
+Przeczytaj docs/UI_BETA.md i najnowszą sekcję docs/STATUS.md.
+Użytkownik autoryzował frontend, testy, commit i zwykły push feat/ui-beta.
+Bez merge, zmian backendu, zdalnych migracji i wdrożeń. Backend i Docker nadal
+mają poniższe historyczne ograniczenia, których etap UI nie rozwiązuje.
+Demo /ui-demo ma wyłącznie fikcyjne dane, bez SessionManager i połączeń z API.
+Brak publicznego tunelu podglądu w Cloud; nie podawać localhost jako linku na telefon.
+Poniższa gałąź kontynuacji feat/integration dotyczy integracji backendu, a nie UI Beta.
+
 SUNDAY LEAGUE MATES — KONTEKST DLA CODEX CLOUD I CHATGPT
 Aktualizacja: 17.10.2026 (Europe/Warsaw)
 

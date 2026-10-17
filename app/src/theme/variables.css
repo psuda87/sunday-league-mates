@@ -1,23 +1,80 @@
-:root, :root.ion-palette-dark, .ion-palette-dark {
-  color-scheme: dark;
-  --ion-background-color: #0D1613;
-  --ion-background-color-rgb: 13, 22, 19;
-  --ion-text-color: #DFE7E3;
-  --ion-text-color-rgb: 223, 231, 227;
-  --ion-color-primary: #80D4C5;
-  --ion-color-primary-rgb: 128, 212, 197;
-  --ion-color-primary-contrast: #0D1613;
-  --ion-color-primary-contrast-rgb: 13, 22, 19;
-  --ion-color-primary-shade: #71bbae;
-  --ion-color-primary-tint: #8dd8cb;
-  --ion-color-danger: #ff9d9d;
-  --ion-color-danger-contrast: #0D1613;
-  --ion-color-danger-shade: #e08a8a;
-  --ion-color-danger-tint: #ffa7a7;
-  --slm-panel: #15221D;
-  --slm-text-secondary: #A9BBB2;
-  --slm-border: #304A3D;
-  --ion-toolbar-background: var(--slm-panel);
-  --ion-item-background: var(--slm-panel);
-  --ion-card-background: var(--slm-panel);
+/* Palette registry: add future families with [data-theme="..."] selectors. España only in beta. */
+:root {
+  color-scheme: light;
+  --ion-background-color: #F7F5F0; --ion-background-color-rgb: 247,245,240;
+  --ion-text-color: #20242A; --ion-text-color-rgb: 32,36,42;
+  --slm-panel: #FFFFFF; --slm-text-secondary: #62636A; --slm-border: #DEDAD3;
+  --slm-gold: #866315; --slm-fill: #C59A39; --slm-track: #E9E4DB;
+  --slm-glow: #B72C3810; --slm-shadow: #20242A0D;
+  --ion-color-danger: #A91E31; --ion-color-danger-contrast: #FFFFFF;
+  --ion-color-danger-rgb: 169,30,49; --ion-color-danger-shade: #951A2B; --ion-color-danger-tint: #B23546;
+  --ion-color-step-50: #EEECE7; --ion-color-step-100: #E3E1DD; --ion-color-step-150: #D9D7D3;
+  --ion-color-step-200: #CECCCA; --ion-color-step-300: #BAB8B7; --ion-color-step-400: #A5A4A3;
+  --ion-color-step-500: #8B8B8B; --ion-color-step-600: #747577; --ion-color-step-700: #5F6164;
+  --ion-color-step-800: #4A4D51; --ion-color-step-900: #35393D;
 }
+:root.ion-palette-dark {
+  color-scheme: dark;
+  --ion-background-color: #15191F; --ion-background-color-rgb: 21,25,31;
+  --ion-text-color: #F5F5F5; --ion-text-color-rgb: 245,245,245;
+  --slm-panel: #24272D; --slm-text-secondary: #B7B8BF; --slm-border: #3B3E46;
+  --slm-gold: #E4B652; --slm-fill: #E4B652; --slm-track: #393C43;
+  --slm-glow: #B72C3826; --slm-shadow: #00000030;
+  --ion-color-danger: #FF9AA6; --ion-color-danger-rgb: 255,154,166; --ion-color-danger-contrast: #15191F;
+  --ion-color-danger-shade: #E08792; --ion-color-danger-tint: #FFA4AF;
+  --ion-color-step-50: #20242A; --ion-color-step-100: #2B2F35; --ion-color-step-150: #363A40;
+  --ion-color-step-200: #42454B; --ion-color-step-300: #585B60; --ion-color-step-400: #6E7175;
+  --ion-color-step-500: #85878A; --ion-color-step-600: #9B9D9F; --ion-color-step-700: #B2B3B5;
+  --ion-color-step-800: #C8C9CA; --ion-color-step-900: #DFDFE0;
+}
+:root, :root.ion-palette-dark {
+  --ion-color-primary: #B72C38; --ion-color-primary-rgb: 183,44,56;
+  --ion-color-primary-contrast: #FFFFFF; --ion-color-primary-contrast-rgb: 255,255,255;
+  --ion-color-primary-shade: #A12731; --ion-color-primary-tint: #BE414C;
+  --ion-color-secondary: var(--slm-fill); --ion-color-secondary-contrast: #20242A;
+  --ion-toolbar-background: var(--ion-background-color); --ion-toolbar-color: var(--ion-text-color);
+  --ion-item-background: var(--slm-panel); --ion-card-background: var(--slm-panel);
+  --ion-tab-bar-background: var(--slm-panel); --ion-tab-bar-color: var(--slm-text-secondary);
+  --ion-tab-bar-color-selected: var(--slm-gold); --ion-overlay-background-color: var(--slm-panel);
+  --ion-border-color: var(--slm-border); --ion-placeholder-color: var(--slm-text-secondary);
+}
+ion-button { --border-radius: 14px; font-weight: 750; min-height: 44px; letter-spacing: .02em; }
+ion-button.button-outline, ion-button.button-clear { --color: var(--slm-gold); --border-color: var(--slm-border); }
+a { color: var(--slm-gold); }
+button, input, select { font: inherit; }
+:focus-visible { outline: 3px solid var(--slm-gold); outline-offset: 3px; }
+.slm-accounts { padding-bottom: calc(100px + env(safe-area-inset-bottom)) !important; }
+.slm-shell-header { display: flex; align-items: center; justify-content: space-between; max-width: 720px; margin: auto; padding: 12px 18px; }
+.slm-logo { font-weight: 950; letter-spacing: -.06em; font-size: 1.6rem; color: var(--slm-gold); text-decoration: none; border: 1px solid var(--slm-gold); padding: 7px 12px; border-radius: 12px 4px; }
+.slm-next-match { margin: 14px 0 30px; }
+.slm-next-match h1 { font-size: clamp(1.8rem, 6vw, 2.3rem); font-weight: 850; letter-spacing: -.04em; margin: 10px 0 22px; }
+.slm-eyebrow { color: var(--slm-gold); letter-spacing: .14em; font-size: .65rem; font-weight: 800; }
+.slm-hero-card { overflow: hidden; background: radial-gradient(ellipse at top right, var(--slm-glow), transparent 70%), var(--slm-panel); border: 1px solid var(--slm-border); border-radius: 22px; padding: 20px; box-shadow: 0 14px 34px var(--slm-shadow); }
+.slm-match-top { display: grid; grid-template-columns: minmax(0, 1fr) 42%; gap: 12px; }
+.slm-match-top p { font-size: .85rem; margin: 7px 0; }
+.slm-weekday { text-transform: capitalize; font-weight: 700; }
+.slm-kickoff { display: block; font-size: clamp(2.5rem, 10vw, 3.6rem); line-height: 1.1; letter-spacing: -.06em; }
+.slm-location { color: var(--slm-text-secondary); overflow-wrap: anywhere; }
+.slm-stadium { width: 100%; height: 100%; min-height: 145px; object-fit: cover; border-radius: 12px; }
+.slm-capacity p { color: var(--slm-text-secondary); font-size: .85rem; margin: 20px 0 10px; }
+.slm-capacity strong { color: var(--slm-gold); font-size: 1.1rem; }
+.slm-capacity-track { height: 13px; border-radius: 20px; background: var(--slm-track); position: relative; }
+.slm-capacity-track > span { display: block; height: 100%; background: var(--slm-fill); border-radius: inherit; transition: width .25s; }
+.slm-capacity-track i { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ion-text-color); transform: translateX(-2px); }
+.slm-capacity small { display: flex; justify-content: space-between; gap: 10px; color: var(--slm-text-secondary); font-size: .68rem; margin-top: 12px; }
+.slm-match-cta { display: block; margin: 18px 0 0; min-height: 54px; }
+.slm-bottom-nav { display: grid; grid-template-columns: repeat(4,1fr); background: var(--slm-panel); border-top: 1px solid var(--slm-border); padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); }
+.slm-bottom-nav button { background: transparent; color: var(--slm-text-secondary); border: 0; display: grid; place-items: center; gap: 5px; min-height: 52px; font-size: .72rem; cursor: pointer; }
+.slm-bottom-nav ion-icon { font-size: 23px; }
+.slm-bottom-nav button[aria-current="page"] { color: var(--slm-gold); font-weight: 800; }
+.slm-appearance fieldset { border: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.slm-appearance legend { font-size: .85rem; margin-bottom: 14px; }
+.slm-appearance label { display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 5px 10px; border: 1px solid var(--slm-border); border-radius: 12px; }
+.slm-appearance input { accent-color: var(--ion-color-primary); }
+.slm-demo-banner { color: var(--slm-gold); font-size: .8rem; line-height: 1.6; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+.slm-accounts { display: flex; flex-direction: column; }
+.slm-accounts > nav[aria-label="Konto"] { order: 10; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--slm-border); }
+.slm-call, .slm-notice { color: var(--slm-gold); }
+/* The disabled demo CTA previews actual button colors; it never sends a request. */
+.slm-demo .slm-match-cta.button-disabled { opacity: 1; }

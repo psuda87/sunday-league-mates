@@ -15,7 +15,8 @@ describe('Rozliczenia — przygotowany interfejs z kontrolowanym API', () => {
         reason: 'Zatwierdzenie fixture', actor_name: 'Admin fixture', participant_name: 'Gość fixture', is_guest: true,
         starts_at: '2026-10-08T17:30:00Z', created_at: '2026-10-08T19:01:00Z' }], payments: [] as unknown[], decisions: [] };
     cy.intercept('POST', '**/functions/v1/accounts', req => {
-      if (req.body.action === 'login') req.reply(s);
+      if (req.body.action === 'events_list') req.reply({ events: [], server_now: '2026-10-17T12:00:00Z' });
+      else if (req.body.action === 'login') req.reply(s);
       else if (req.body.action === 'profile') req.reply(profile(s.user_id));
       else if (req.body.action === 'settlements_account') req.reply(account);
       else if (req.body.action === 'settlements_submit_payment') {

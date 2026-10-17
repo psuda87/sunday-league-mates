@@ -1,5 +1,10 @@
 # Sunday League Mates — specyfikacja pierwszej wersji
 
+Aktualizacja UI Beta 17.10.2026: zatwierdzono España Light/Dark, domyślnie
+Automatyczny według systemu. Zastępuje wcześniejszą zielono-miętową paletę ekranów
+opisaną poniżej. Nie zmienia zasad biznesowych ani zakresu kart/ocen/składów.
+Szczegóły: [UI_BETA.md](UI_BETA.md).
+
 Wersja: 1.2 • Data: 13.10.2026 • Język aplikacji: polski
 
 Uzupełnienie 14.10.2026: bieżące zasady rozliczeń mają pierwszeństwo zgodnie

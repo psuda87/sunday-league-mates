@@ -1,6 +1,7 @@
+import MatchHero from '../ui/MatchHero';
 import PhoneInput from '../components/PhoneInput';
 import { normalizePhoneUpdate, nationalPhone } from '../../supabase/functions/_shared/phone';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { IonButton, IonInput, IonSelect, IonSelectOption, IonSpinner } from '@ionic/react';
 import type { SessionManager } from '../auth/sessionManager';
 import type { ManagedAccount, Session } from '../auth/api';
@@ -10,7 +11,9 @@ import './Events.css';
 import MatchSettlement from './MatchSettlement';
 
 export default function Events({ manager, session, initialEventId }: { manager: SessionManager; session: Session; initialEventId?: string | null }) {
+  const [nextMatch, setNextMatch] = useState<Match | null>(null);
   const [matches, setMatches] = useState<Match[]>([]);
+  const [preview, setPreview] = useState<Detail | null>(null);
   const [detail, setDetail] = useState<Detail | null>(null);
   const [form, setForm] = useState<MatchForm | null>(null);
   const [editId, setEditId] = useState<string | null>(null);
@@ -30,9 +33,22 @@ export default function Events({ manager, session, initialEventId }: { manager: 
   const [offset, setOffset] = useState(0);
   const [finance, setFinance] = useState<{ blocked: boolean; unpaid_matches: number } | null>(null);
   const admin = session.role === 'admin';
+  const findNext = useCallback(async (initialRows: Match[], now: string): Promise<Match | null> => {
+    let rows = initialRows;
+    let page = 0;
+    let candidate: Match | null = null;
+    for (;;) {
+      for (const match of rows) if (match.status === 'scheduled' && Date.parse(match.starts_at) > Date.parse(now) && (!candidate || Date.parse(match.starts_at) < Date.parse(candidate.starts_at))) candidate = match;
+      // Existing RPC pages newest first; stop once the page reaches the past.
+      if (rows.length < 50 || rows.some(m => Date.parse(m.starts_at) <= Date.parse(now))) return candidate;
+      page += 50;
+      rows = (await manager.call<{ events: Match[] }>('events_list', { offset: page })).events;
+    }
+  }, [manager]);
   async function list(page = offset) {
     const result = await manager.call<{ events: Match[]; server_now: string }>('events_list', { offset: page });
     setMatches(result.events); setServerNow(result.server_now); setOffset(page);
+    if (page === 0) setNextMatch(await findNext(result.events, result.server_now));
   }
   async function open(id: string) {
     const result = await manager.call<Detail>('events_detail', { event_id: id });
@@ -46,10 +62,10 @@ export default function Events({ manager, session, initialEventId }: { manager: 
   useEffect(() => {
     let alive = true;
     manager.call<{ events: Match[]; server_now: string }>('events_list', { offset: 0 })
-      .then(r => { if (alive) { setMatches(r.events); setServerNow(r.server_now); } })
+      .then(async r => { if (alive) { setMatches(r.events); setServerNow(r.server_now); } const next = await findNext(r.events, r.server_now); if (alive) setNextMatch(next); })
       .catch(e => { if (alive) setError(e instanceof Error ? e.message : 'Nie udało się pobrać meczów.'); });
     return () => { alive = false; };
-  }, [manager]);
+  }, [manager, findNext]);
   useEffect(() => {
     let alive = true;
     manager.call<{ blocked: boolean; unpaid_matches: number }>('settlements_account')
@@ -88,8 +104,29 @@ export default function Events({ manager, session, initialEventId }: { manager: 
       return next;
     });
   }
+  const upcoming = nextMatch;
+  useEffect(() => {
+    let alive = true;
+    setPreview(null);
+    if (upcoming?.id) manager.call<Detail>('events_detail', { event_id: upcoming.id }).then(result => { if (alive) setPreview(result); }).catch(error => { if (alive) setError(error instanceof Error ? error.message : 'Nie udało się pobrać stanu zapisu.'); });
+    return () => { alive = false; };
+  }, [manager, upcoming]);
   const e = detail?.event;
   const mine = detail?.participants.find(p => p.member_id === session.user_id);
+  function matchAction(current: Detail | null) {
+    const event = current?.event;
+    const own = current?.participants.find(p => p.member_id === session.user_id);
+    const closed = !event?.registration_open || event.status === 'cancelled';
+    const full = !!event && event.registered_count >= event.capacity;
+    const withdrawing = own?.status === 'registered';
+    const waiting = own?.status === 'reserve' && full;
+    const label = !event ? 'Sprawdzanie zapisu…' : event.status === 'cancelled' ? 'Mecz odwołany' : closed ? 'Zapisy zamknięte' : withdrawing ? 'Zrezygnuj z meczu' : finance === null ? 'Sprawdzanie możliwości zapisu…' : finance.blocked ? 'Blokada z powodu zaległości' : waiting ? 'Jesteś na rezerwie' : full ? 'Dołącz do rezerwy' : 'ZAPISZ SIĘ NA MECZ';
+    return <IonButton className="slm-match-cta" expand="block" disabled={busy || closed || (!withdrawing && (finance === null || finance.blocked || waiting))} onClick={() => void work(async () => {
+      if (!event) return;
+      await manager.call('events_' + (withdrawing ? 'withdraw' : full ? 'reserve' : 'join'), { event_id: event.id, ...(withdrawing ? { participant_id: own.id } : {}) });
+      await open(event.id); await list(); setNotice('Zmiana zapisana.');
+    })}>{label}</IonButton>;
+  }
   function participant(p: Participant) {
     const manage = admin || p.responsible_user_id === session.user_id;
     return <li key={p.id} className="slm-participant">
@@ -112,6 +149,10 @@ export default function Events({ manager, session, initialEventId }: { manager: 
     {error && <p role="alert" className="slm-error">⚠ {error}</p>}
     {notice && <p role="status" className="slm-notice">✓ {notice}</p>}
     {busy && <IonSpinner aria-label="Trwa operacja wydarzenia" />}
+    {!detail && !form && offset === 0 && upcoming && <MatchHero match={preview?.event ?? upcoming}>
+      {matchAction(preview)}
+      <IonButton fill="clear" expand="block" disabled={busy} onClick={() => void work(() => open(upcoming.id))}>Szczegóły meczu i uczestnicy</IonButton>
+    </MatchHero>}
     <div className="slm-actions">
       <IonButton fill="outline" disabled={busy} onClick={() => void work(async () => { setDetail(null); setForm(null); await list(0); })}>Lista meczów</IonButton>
       {admin && <IonButton disabled={busy} onClick={() => beginForm()}>Utwórz mecz</IonButton>}
@@ -136,6 +177,7 @@ export default function Events({ manager, session, initialEventId }: { manager: 
         <p className="slm-muted">Minimum do gry: 10 osób. Koszt wyliczamy z czasu i stawki; możesz poprawić koszt całkowity.</p>
         <IonButton type="submit" disabled={busy}>Zapisz mecz</IonButton>
       </form></section> : detail && e ? <>
+      <MatchHero match={e}>{matchAction(detail)}</MatchHero>
       <section className="slm-panel"><h1>{matchDate(e.starts_at)}</h1><p>{e.location} · {e.duration_minutes} minut</p>
         <p>{money(e.hourly_rate)}/h · razem {money(e.total_cost)}</p>
         <p>Uczestnicy: {e.registered_count}/{e.capacity} · minimum 10 · rezerwa: {e.reserve_count}</p>

@@ -1,10 +1,13 @@
+import { notificationsOutline } from 'ionicons/icons';
+import AppearanceSettings from '../ui/AppearanceSettings';
+import BottomNav from '../ui/BottomNav';
 import PhoneInput from '../components/PhoneInput';
 import { normalizePolishPhone, normalizePhoneUpdate, nationalPhone } from '../../supabase/functions/_shared/phone';
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { IonButton, IonContent, IonHeader, IonInput, IonItem, IonPage, IonSelect,
-  IonSelectOption, IonSpinner, IonTitle, IonToolbar } from '@ionic/react';
+  IonSelectOption, IonSpinner, IonToolbar, IonFooter, IonIcon } from '@ionic/react';
 import { AccountError, accountRequest } from '../auth/api';
 import type { ManagedAccount, Profile } from '../auth/api';
 import { SessionManager } from '../auth/sessionManager';
@@ -21,7 +24,7 @@ export default function Accounts() {
   const auth = useSyncExternalStore(manager.subscribe, manager.getSnapshot);
   const session = auth.session;
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [screen, setScreen] = useState<'profile' | 'admin' | 'events' | 'notifications' | 'settlements'>('profile');
+  const [screen, setScreen] = useState<'profile' | 'admin' | 'events' | 'notifications' | 'settlements' | 'players' | 'teams'>('events');
   const [eventTarget, setEventTarget] = useState<string | null>(null);
   const [pendingNotification, setPendingNotification] = useState<string | null>(null);
   const [unread, setUnread] = useState<number | null>(null);
@@ -156,9 +159,10 @@ export default function Accounts() {
   </form>;
 
   return <IonPage>
-    <IonHeader><IonToolbar><IonTitle>Sunday League Mates</IonTitle></IonToolbar></IonHeader>
+    <IonHeader><IonToolbar><div className="slm-shell-header"><span className="slm-logo" aria-label="Sunday League Mates">SLM</span>
+      {auth.phase === 'ready' && session && !session.must_change_password && <IonButton fill="clear" aria-label={`Powiadomienia${unread ? `, nieprzeczytane: ${unread}` : ''}`} onClick={() => setScreen('notifications')}><IonIcon icon={notificationsOutline} aria-hidden="true" /> {unread ? `(${unread})` : ''}</IonButton>}</div></IonToolbar></IonHeader>
     <IonContent><main className="slm-accounts">
-      <div className="slm-brand"><span aria-hidden="true">SLM</span><p>Twoja drużyna. Twoje konto.</p></div>
+
       {error && <p role="alert" className="slm-error">⚠ {error}</p>}
       {notice && <p role="status" className="slm-notice">✓ {notice}</p>}
       {auth.message && <p role="alert" className="slm-error">⚠ {auth.message}</p>}
@@ -173,7 +177,7 @@ export default function Accounts() {
         <h1>Zaloguj się</h1><p className="slm-muted">Dane konta otrzymasz od administratora grupy.</p>
         <form className="slm-form" onSubmit={event => {
           event.preventDefault(); void perform(async () => {
-            await manager.signIn(identifier, loginPassword); setScreen('profile');
+            await manager.signIn(identifier, loginPassword); setScreen('events');
           }).finally(() => setLoginPassword(''));
         }}>
           <IonInput label="Login lub numer telefonu" labelPlacement="stacked" autocomplete="username" required
@@ -199,9 +203,10 @@ export default function Accounts() {
               finally { setProfile(null); setAccounts([]); clearSecrets(); } });
           }}>Wyloguj się</IonButton>
         </nav>
+        {!session.must_change_password && screen === 'profile' && <AppearanceSettings />}
         {session.must_change_password ? <section className="slm-panel">
           <h1>Zmień hasło tymczasowe</h1><p>Przed korzystaniem z grupy ustaw własne hasło.</p>{passwordForm}
-        </section> : screen === 'settlements' ? <Settlements manager={manager} session={session} /> : screen === 'notifications' ? <Notifications manager={manager} push={push} pushStatus={pushStatus}
+        </section> : screen === 'players' || screen === 'teams' ? <section className="slm-panel"><h1>{screen === 'players' ? 'Zawodnicy' : 'Składy'}</h1><p>{screen === 'players' ? 'Listę zawodników i kontakt znajdziesz w szczegółach meczu. Katalog zawodników nie jest jeszcze dostępny.' : 'Składy nie są jeszcze dostępne w wersji beta.'}</p><IonButton onClick={() => setScreen('events')}>Przejdź do meczów</IonButton></section> : screen === 'settlements' ? <Settlements manager={manager} session={session} /> : screen === 'notifications' ? <Notifications manager={manager} push={push} pushStatus={pushStatus}
           onOpen={openNotification} onRefresh={() => setNotificationVersion(v => v+1)} /> :
           screen === 'events' ? <Events manager={manager} session={session} initialEventId={eventTarget} /> : screen === 'profile' || session.role !== 'admin' ? <>
           <section className="slm-panel">
@@ -273,5 +278,6 @@ export default function Accounts() {
         </>}
       </>}
     </main></IonContent>
+    {auth.phase === 'ready' && session && !session.must_change_password && <IonFooter><BottomNav active={screen} onSelect={value => { setScreen(value); setTemporary(null); if (value === 'events') setEventTarget(null); }} /></IonFooter>}
   </IonPage>;
 }
