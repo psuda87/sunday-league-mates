@@ -211,3 +211,12 @@ Następny krok: udostępnić oba JPG albo ZIP. Inna rozmowa ChatGPT nie przekazu
 automatycznie wygenerowanych plików do repozytorium ani środowiska Codex.
 SHA commita tej dokumentacji: dostępny w historii Git dla niniejszego wpisu;
 podany również w odpowiedzi końcowej (commit nie może zawierać własnego SHA).
+
+
+=== 2026-10-18 00:54:02 CEST — ponowne sprawdzenie referencji Premium ===
+Obie grafiki są już na origin/feat/ui-beta w commicie 2f2d8a2.
+Pobrano je fast-forward bez nadpisywania zmian i rzeczywiście otwarto oba JPG:
+slm-premium-three-phones.jpg oraz slm-premium-ui-branding-board.jpg.
+Widoczne: stadionowe tła kart, datowniki, listy uczestników, poziome zakładki,
+planowane składy i trzy pozycje nawigacji. Poprzednia blokada materiałów ustąpiła.
+To potwierdzenie dostępności, nie deklaracja wykonania UI Premium ani nowych testów.
