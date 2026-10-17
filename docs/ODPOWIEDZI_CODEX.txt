@@ -1,0 +1,18 @@
+=== 2026-10-17 21:51:44 CEST (Europe/Warsaw) — Zapis dotychczasowego raportu UI Beta ===
+UI Beta España jest zapisane na feat/ui-beta i wypchnięte do origin.
+Commit implementacji: a769c86fed2cf3c8ce5af5a1d32de6938220dd1f.
+Wykonano motywy auto/light/dark, kartę meczu z prawdziwym zajęciem miejsc,
+istniejące operacje zapisów, nawigację oraz odseparowane demo bez API.
+TypeScript/build i ESLint OK; Vitest 80/80; Chromium 320/390/768 px OK.
+Cypress zablokowany brakiem Xvfb. Android/iOS i prawdziwy backend niezweryfikowane.
+Bez zmian backendu, migracji, wdrożeń ani scalania.
+Podgląd Dark: https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/espana-dark.png
+Podgląd Light: https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/espana-light.png
+
+=== 2026-10-17 21:51:44 CEST (Europe/Warsaw) — Zasada zapisywania raportów i podglądów ===
+Zrzuty España Dark i Light są już na GitHubie na gałęzi feat/ui-beta.
+Końcowe raporty będą dopisywane do docs/ODPOWIEDZI_CODEX.txt, z datą i godziną
+Europe/Warsaw, bez usuwania wcześniejszych wpisów. Zasadę zapisano w AGENTS.md.
+W odpowiedziach będę podawać nazwę tego pliku i linki GitHub do podglądów.
+Bieżąca zmiana obejmuje wyłącznie dokumentację; nie wymaga testów aplikacji.
+

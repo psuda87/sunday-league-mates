@@ -1,3 +1,7 @@
+Raportowanie — 2026-10-17 21:51:44 CEST (Europe/Warsaw): raporty chronologicznie w `ODPOWIEDZI_CODEX.txt`,
+podglądy UI w `docs/ui/`, zasada utrwalona w AGENTS.md. Zmiana dokumentacyjna,
+bez nowych testów, migracji i wdrożeń; wyniki UI Beta poniżej bez zmian.
+
 # UI Beta — aktualny etap 17.10.2026
 
 Branch: feat/ui-beta, baza origin/feat/integration 2026754. Przygotowany commit i
