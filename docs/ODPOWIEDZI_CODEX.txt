@@ -341,3 +341,71 @@ Gałąź feat/ui-beta. Bez merge, backendu/finansów/push/Firebase/migracji,
 zmian konfiguracji Vercel i ręcznego wdrożenia. Automatyczny Vercel niezweryfikowany.
 Pełny wykaz zmian w git show --stat; dokumenty STATUS/UI_BETA/DEMO_VERCEL/AGENTS,
 PREMIUM_VISUAL_SPEC i PREMIUM31_VISUAL_REVIEW zaktualizowane; raport w tym pliku.
+
+
+=== 2026-10-18 01:54:56 CEST — UI Beta3.2 / przezroczyste logo i stadionowe karty ===
+Wykonano trzy iteracje rzeczywistego React/Ionic w Chromium po obejrzeniu obu
+Premium JPG oraz premium31-home-dark/light. Zakres tylko logo/nagłówek/karty.
+
+Nowe pliki: slm-logo-primary-transparent.png450x505 i
+slm-logo-header-transparent.png290x280. Oryginałów nie nadpisano; zgodność
+z Git sprawdzona bajtowo. PNG mają rzeczywistą alfę0–255; brak mix-blend-mode.
+Automatyczna edycja zmieniała drobny detal korony, więc odrzucono jej wynik.
+Użyto bezpieczniejszej maski na oryginalnych pikselach: chronione wnętrze tarczy,
+kolorystyczny wybór wyłącznie na zewnątrz, miękkie brzegi i usunięcie czarnego matte.
+Nie przerysowano herbu. Poprawiono maskę po kontroli dolnego konturu i mgły tła;
+wadliwych wersji nie wdrożono. Czerń tarczy, litery SLM, korony i gwiazdy zachowane.
+Kod przygotowania offline: docs/ui/create-logo-alpha.mjs, wymaga ImageMagick7,
+nie jest zależnością aplikacji ani demo. Audyt i SHA: premium32-alpha-audit.json.
+Node app/scripts/verify-logo-alpha.mjs sprawdza rzeczywiste PNG (inflate/filtry),
+RGBA8, przezroczyste narożniki i piksele półprzezroczyste. Header:38113 alfa0,
+3938 miękkich,39149 nieprzezroczystych; primary:69438/2536/155276.
+Maska zachowuje oryginalne RGB w28562 chronionych pikselach header i141056 primary,
+w tym14375/55241 ciemnych pikseli bez utraty czerni wewnętrznej.
+Oba pliki rzeczywiście obejrzano na jasnym i ciemnym tle.
+
+Nagłówek: branding96->84px, transparent-logo82px bez deformacji. Zlikwidowano
+nadmiar paddingu nad Mecze; pierwsza karta227->196px na390x844. Light ma jasny
+header i subtelny cień znaku, bez prostokąta. Safe areas nadal obsługuje Ionic;
+nie zerowano insetów, nie narzucono sztywnej wysokości całego nagłówka.
+Karty nadal121px: jaśniejsze fotografie, boczny gradient zamiast ciężkiego filtra,
+subtelne bordo, refleks światła, złoty rant, głębszy datownik i kontrastowe badge.
+Bez zmian danych/filtrów/uprawnień/logiki zapisów, gości, rezerwy i finansów.
+
+Cykl1: logo76/branding78, pierwsza karta204; po obejrzeniu logo zbyt małe i
+content miał zbędne24px paddingu. Cykl2: logo82/branding84/padding10, karta196;
+subtelniejszy rim i większa cyfra daty. Cykl3: refleks/kadr60%, cień metadanych,
+ciemne pełne tła liczników; ponowny render/ocena320/390/768 i podglądy logo.
+Analiza i porównanie: docs/ui/PREMIUM32_VISUAL_REVIEW.md.
+
+Końcowo: ESLint OK, TypeScript klienta i demo OK, oba buildy OK (duże chunki),
+Vitest87/87 w14 plikach. Trzy pełne przebiegi Chromium: brak poziomego overflow,
+karty Enter/Spacja, filtry4/2/1, zakładki i powrót, Light/Dark/Auto/live system,
+suwak0/10/15, zasoby/CSP/izolacja OK. Demo14 plików i5 jawnych zasobów branding;
+header zastąpiony transparent z kontrolą bajtów i alfy podczas builda. Bez nowych
+modułów aplikacji, App/Auth/API/Supabase/Edge i żądań zewnętrznych. Vercel, env,
+publicDir false i konfiguracja produkcyjna bez zmian. Bez nowych zależności runtime.
+Cypress nie ponawiano (znany brak Xvfb). Android/iOS/prawdziwy Supabase niewykonane;
+testy UI na atrapach nie potwierdzają realnej bazy. Bez cap sync/migracji/deploy.
+
+Zrzuty rzeczywistego UI:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium32-home-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium32-home-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium32-header-detail.png
+Podglądy obu PNG na tłach (render lokalnego HTML w Chromium):
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium32-logo-preview-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium32-logo-preview-light.png
+Dodatkowo premium32-home-320/768, obrazy cykli1/2 i pomiary JSON w docs/ui.
+
+Pozostały font systemowy, źródłowa miękkość JPEG, inne teksty i limit15 oraz inny
+rysunek zatwierdzonego logo niż koncept. Źródłowy header ma ucięty dół na granicy
+rastra; primary/header mają odmienne kompozycje — nie domalowywano brakujących
+części i nie generowano nowego logo. Zachowano kolorową poświatę smug zamiast
+wycinać ją z detalami. Bez deklaracji pełnej zgodności ani gotowości produkcyjnej.
+Odbiór na telefonie: krawędzie obu teł, powiększenie fontu, safe areas, powrót z tła.
+
+Commit implementacji: e223aff475ac64bbda98ed337947dbb9801708a1. Końcowy SHA raportu podany
+w odpowiedzi końcowej i w historii Git. Wyłącznie feat/ui-beta, bez merge.
+Nie uruchamiano ręcznego Vercel; automatyczny podgląd niezweryfikowany.
+Raport: docs/ODPOWIEDZI_CODEX.txt, zachowana cała historia. STATUS/UI_BETA/
+DEMO_VERCEL/AGENTS zaktualizowane. Dokładny wykaz: git show --stat.

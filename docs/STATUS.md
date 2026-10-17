@@ -1,3 +1,40 @@
+# UI Beta3.2 — przezroczyste logo i kompaktowy header — 2026-10-18 01:54:56 CEST
+
+Gałąź feat/ui-beta. Implementacja: e223aff475ac64bbda98ed337947dbb9801708a1.
+Nowe primary-transparent450x505 i header-transparent290x280: prawdziwe RGBA,
+oryginały bajtowo identyczne z Git. Maska oryginalnych pikseli, chroniona czerń
+wewnątrz tarczy, korony/litery/gwiazdy i smugi; brak blend-mode/przerysowania herbu.
+Wariant automatyczny zmieniający detal korony odrzucono przed wdrożeniem.
+Audyt pikseli/SHA/masek: ui/premium32-alpha-audit.json; Node verify-logo-alpha.mjs.
+Herb82px, branding84 zamiast96, pierwsza karta y196 zamiast227 na390x844.
+Jasny header w Light bez kwadratu, safe areas Ionic zachowane; karty121px,
+jaśniejsze zdjęcia, bordo/czerń, złoty rim/refleks i kontrastowe badge.
+Bez zmiany filtrów, prawdziwych danych i operacji biznesowych.
+
+Kontrole: ESLint/TypeScript obu wejść/build aplikacji/build demo OK;
+Vitest87/87 w14 plikach. Trzy przebiegi Chromium320/390/768, brak overflow,
+karty/filtry/zakładki/klawiatura/powrót/Light-Dark-Auto/live system/suwak OK.
+PNG: RGBA8/alfa0..255/miękkie krawędzie/przezroczyste narożniki/chronione RGB OK;
+obejrzano oba pliki na jasnym i ciemnym tle. Demo14 plików, zgodność bajtów
+transparent-header i jego alfa w build verifier, CSP i izolacja bez zmian.
+Brak zewnętrznych żądań. Duże chunki Ionic pozostają. Cypress nie ponawiano
+(znany brak Xvfb). Android/iOS/realny backend niewykonane; testy API są atrapami.
+
+Zrzuty: ui/premium32-home-dark/light.png, premium32-header-detail.png,
+premium32-home-320/768.png, premium32-logo-preview-dark/light.png.
+Analiza porównawcza i trzy cykle: ui/PREMIUM32_VISUAL_REVIEW.md.
+Pozostają systemowy font, źródłowa miękkość zdjęć, inne teksty i logo niż na
+koncepcji oraz oryginalne ucięcie dolnego końca header w źródłowym PNG.
+Nie domalowywano brakujących pikseli ani nie zmieniano kompozycji źródeł.
+
+Bez Supabase/Auth/RPC/RLS/migracji/finansów/push/Firebase, logiki zapisów,
+konfiguracji produkcyjnej/Vercel, merge i ręcznego deploymentu.
+Automatyczny podgląd po push niezweryfikowany. Następnie odbiór na telefonie:
+logo/krawędzie na Light/Dark, czytelność, font scaling, safe areas, wznowienie.
+Historyczne niewykonane SQL/RLS/FIFO/Docker i migracje pozostają poniżej.
+
+---
+
 # UI Beta3.1 — B. Urban Club i Mecze — 2026-10-18 01:37:36 CEST
 
 Gałąź feat/ui-beta. Implementacja: f5658fa7231a00db378545cfa829bba479e66e09.
