@@ -1,3 +1,19 @@
+# UI Beta 3.0 Premium — 2026-10-18 00:28:59 CEST
+
+Gałąź feat/ui-beta. Etap analizy ZABLOKOWANY: brak obu wymaganych grafik
+slm-premium-three-phones.jpg i slm-premium-ui-branding-board.jpg. Sprawdzono
+aktualne drzewa wszystkich siedmiu gałęzi origin, lokalne gałęzie, dostępną historię
+oraz pliki środowiska. Szczegóły i SHA gałęzi: ui/PREMIUM_VISUAL_SPEC.md.
+Nie rozpoczęto przebudowy ani trzech iteracji, nie utworzono zrzutów Premium.
+Wyłącznie dokumentacja; testów, lintowania, TypeScript i buildów w tym podejściu
+nie uruchamiano. Dotychczasowe wyniki Beta 2.3 poniżej nie weryfikują Premium 3.0.
+Nie zmieniono aplikacji, izolacji demo, backendu ani konfiguracji. Bez migracji,
+merge i ręcznego wdrożenia. Status automatycznego Vercel niezweryfikowany.
+Następnie: dostarczyć dwa JPG lub paczkę slm-premium-references.zip.
+Historyczne ograniczenia SQL/RLS/FIFO/Docker i migracji pozostają aktualne poniżej.
+
+---
+
 Uzupełnienie Git: zachowano równoległy commit d1f65b2 z SLM_PREMIUM_DIRECTION.md;
 własne commity przeniesiono bezkonfliktowym rebase, bez force i bez zmiany kodu app.
 Wskazane tam dwa nowe obrazy premium nadal nie są dostarczone; nie były oglądane.
