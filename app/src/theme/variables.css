@@ -163,3 +163,52 @@ ion-header { box-shadow: none !important; }
 
 .slm-hero-card { border-color: var(--slm-match-border); }
 .slm-card-link > span::after { content: ''; width: 6px; height: 6px; border-top: 1.5px solid currentColor; border-right: 1.5px solid currentColor; transform: rotate(45deg); margin-left: -3px; }
+/* Beta 2.3 / first proportion pass against the approved third phone. */
+:root { --slm-home-tint: #B72C3808; }
+:root.ion-palette-dark { --ion-background-color: #0E1016; --ion-background-color-rgb: 14,16,22; --slm-home-tint: #640C2260; --slm-card-top: #24232B; --slm-card-bottom: #161B22; }
+ion-content { --background: linear-gradient(135deg, transparent 28%, var(--slm-home-tint) 95%), radial-gradient(ellipse at 105% 0%, var(--slm-canvas-glow), transparent 60%), var(--ion-background-color); }
+.slm-shell-header { min-height: 76px; padding: 8px 18px; }
+.slm-logo.slm-crest { display: block; object-fit: contain; width: 54px; height: 61px; padding: 0; }
+.slm-next-match > .slm-eyebrow { display: none; }
+.slm-accounts { padding-top: 12px; }
+.slm-next-match { margin: 0 0 20px; }
+.slm-next-match h1 { font-size: 1.7rem; margin: 0 0 18px; line-height: 1.2; }
+.slm-hero-card { padding: 16px; border-radius: 16px; }
+.slm-match-top { grid-template-columns: minmax(0,1fr) 44%; gap: 10px; }
+.slm-match-top p { margin: 3px 0; }
+.slm-weekday { font-size: .84rem !important; margin: 0 !important; color: var(--ion-text-color); }
+.slm-kickoff { font-size: 2.8rem; margin: 4px 0; line-height: 1.04; }
+.slm-match-date { font-size: .68rem !important; }
+.slm-location { font-size: .73rem !important; margin: 4px 0 0 !important; }
+.slm-stadium-frame { min-height: 112px; border-radius: 11px; }
+.slm-stadium { object-position: 60% 72%; }
+.slm-stadium-frame > span { display: none; }
+.slm-capacity p { margin: 12px 0 7px; font-size: .75rem; }
+.slm-capacity strong { font-size: 1rem; }
+.slm-capacity-track { height: 11px; }
+.slm-capacity small { font-size: .58rem; margin-top: 7px; }
+.slm-match-cta { margin-top: 16px; min-height: 54px; --border-radius: 11px; }
+.slm-card-link > span { width: 20px; height: 20px; right: 9px; top: 9px; }
+.slm-bottom-nav { padding-top: 6px; }
+.slm-bottom-nav button { min-height: 52px; }
+.slm-bottom-nav button[aria-current="page"] { background: transparent; }
+.slm-demo .slm-accounts { min-height: 100%; padding-bottom: 18px !important; }
+.slm-demo-badge { order: 8; color: var(--slm-text-secondary); font-size: .65rem; margin: auto 0 6px; }
+.slm-demo-tools { order: 9; color: var(--slm-text-secondary); font-size: .75rem; border-top: 1px solid var(--slm-border); }
+.slm-demo-tools summary { cursor: pointer; padding: 12px 0; min-height: 44px; }
+.slm-demo-tools[open] { margin-top: 20px; }
+.slm-demo-tools .slm-panel { margin-top: 14px; }
+.slm-detail-tabs [role="tablist"] { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin: 12px 0 20px; padding-bottom: 5px; }
+.slm-detail-tabs [role="tab"] { display: flex; flex: 1 0 78px; min-width: 78px; flex-direction: column; align-items: center; justify-content: center; gap: 5px; min-height: 54px; padding: 6px 3px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; font-size: .65rem; }
+.slm-detail-tabs [role="tab"] ion-icon { font-size: 20px; }
+.slm-detail-tabs [role="tab"][aria-selected="true"] { border-color: var(--slm-gold); background: transparent; }
+@media (max-width: 350px) { .slm-stadium-frame { min-height: 112px; } .slm-kickoff { font-size: 2.5rem; } }
+/* Beta 2.3 / second pass after viewing the 390x844 render. */
+ion-content { --background: radial-gradient(ellipse 100% 48% at 105% 0%, var(--slm-home-tint), transparent 74%), var(--ion-background-color); }
+.slm-hero-card { padding: 14px; border-radius: 14px; }
+.slm-weekday { line-height: 1.2; }
+.slm-kickoff { font-size: 2.7rem; }
+.slm-match-date, .slm-location { line-height: 1.3; }
+.slm-stadium-frame { min-height: 104px; }
+.slm-stadium-frame::after { opacity: .45; }
+@media (max-width: 350px) { .slm-stadium-frame { min-height: 104px; } .slm-kickoff { font-size: 2.5rem; } }

@@ -1,3 +1,15 @@
+## UI Beta 2.3 — wybrany B i oryginalny herb
+
+Normalny przepływ: home -> #details-b (alias #details), domyślnie Uczestnicy.
+A/B tylko archiwalnie przez Narzędzia demo. Narzędzia zawierają też motyw i suwak.
+Nagłówek używa oryginalnego assets/branding/slm-crest-espana.svg. Ten dokładny plik
+jest jawnie emitowany do dist-demo; verifier wymaga jego obecności i zgodności bajtów.
+Output12 plików, bez ogólnego kopiowania public/. Dodano tylko MatchTabs do listy
+modułów UI, bez App/Auth/Edge. Root/Build/Output/env/CSP bez zmian.
+Dwie iteracje Chromium i finalne390x844 w docs/ui/beta23-*.png; testy w STATUS.md.
+Automatyczny podgląd po zwykłym push; ręcznego wdrożenia nie uruchamiano.
+Próba weryfikacji deploymentów API GitHub: Forbidden, brak potwierdzonego linku.
+
 ## UI Beta 2.2 — porównanie
 
 Automatyczny podgląd po push jest skonfigurowany zgodnie z informacją użytkownika.

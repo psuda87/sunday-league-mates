@@ -1,94 +1,89 @@
 import fs from 'node:fs/promises';
+import assert from 'node:assert/strict';
+const base = process.env.SLM_UI_URL || 'http://127.0.0.1:5175/';
 const output = process.env.SLM_UI_ARTIFACTS || '/tmp/slm-ui-preview';
 const pages = await (await fetch('http://127.0.0.1:9222/json')).json();
 const ws = new WebSocket(pages[0].webSocketDebuggerUrl);
-await new Promise(r => ws.addEventListener('open', r, {once:true}));
-let resolveLoad;
-let seq=0; const pending=new Map(); const backend=[]; const requests=[]; const securityErrors=[];
-ws.addEventListener('message', e => { const m=JSON.parse(e.data); if(m.method==='Page.loadEventFired')resolveLoad?.(); if(m.id) {const p=pending.get(m.id); pending.delete(m.id); m.error?p.reject(m.error):p.resolve(m.result);} if(m.method==='Network.requestWillBeSent')requests.push(m.params.request.url); if(m.method==='Log.entryAdded' && m.params.entry.source==='security' && m.params.entry.level==='error')securityErrors.push(m.params.entry.text); if(m.method==='Network.requestWillBeSent' && m.params.request.url.includes('/functions/v1/')) backend.push(m.params.request.url); });
-function cmd(method,params={}) { return new Promise((resolve,reject)=>{const id=++seq;pending.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}));}); }
-async function evaluate(expression) { const r=await cmd('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true}); if(r.exceptionDetails) throw new Error(JSON.stringify(r.exceptionDetails)); return r.result.value; }
-await cmd('Log.enable');await cmd('Page.enable');await cmd('Page.bringToFront');await cmd('Network.enable');
-await cmd('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});
-const loaded = new Promise(resolve => { resolveLoad = resolve; });
-await cmd('Page.navigate',{url:process.env.SLM_UI_URL || 'http://localhost:5174/ui-demo'});
-await loaded;
-for(let i=0;i<100;i++){if(await evaluate("!!document.querySelector('[role=progressbar]')"))break;await new Promise(r=>setTimeout(r,100));}
-if(!await evaluate("!!document.querySelector('[role=progressbar]')"))throw Error('Demo did not render');
-await evaluate("Promise.all([...document.images].map(image => image.decode()))");
-if(!await evaluate("document.querySelector('.slm-stadium').naturalWidth > 0"))throw Error('Match image failed to load');
-await fs.mkdir(output,{recursive:true});
+await new Promise(resolve => ws.addEventListener('open', resolve, { once: true }));
+let sequence = 0, onLoad;
+const pending = new Map(), requests = [], errors = [];
+ws.addEventListener('message', event => {
+  const message = JSON.parse(event.data);
+  if (message.method === 'Page.loadEventFired') onLoad?.();
+  if (message.id) { const task = pending.get(message.id); pending.delete(message.id); message.error ? task.reject(message.error) : task.resolve(message.result); }
+  if (message.method === 'Network.requestWillBeSent') requests.push(message.params.request.url);
+  if (message.method === 'Log.entryAdded' && message.params.entry.source === 'security' && message.params.entry.level === 'error') errors.push(message.params.entry.text);
+});
+const cmd = (method, params = {}) => new Promise((resolve, reject) => { const id = ++sequence; pending.set(id, { resolve, reject }); ws.send(JSON.stringify({ id, method, params })); });
+async function evaluate(expression) {
+  const result = await cmd('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
+  if (result.exceptionDetails) throw Error(JSON.stringify(result.exceptionDetails));
+  return result.result.value;
+}
+const pause = () => new Promise(resolve => setTimeout(resolve, 120));
 async function press(key, code, number) {
- const text = key === 'Enter' ? '\r' : key === ' ' ? ' ' : undefined;
- await cmd('Input.dispatchKeyEvent',{type:text ? 'keyDown' : 'rawKeyDown',key,code,windowsVirtualKeyCode:number,nativeVirtualKeyCode:number,text,unmodifiedText:text});
- await cmd('Input.dispatchKeyEvent',{type:'keyUp',key,code,windowsVirtualKeyCode:number});
+  const text = key === 'Enter' ? '\r' : key === ' ' ? ' ' : undefined;
+  await cmd('Input.dispatchKeyEvent', { type: text ? 'keyDown' : 'rawKeyDown', key, code, windowsVirtualKeyCode: number, nativeVirtualKeyCode: number, text, unmodifiedText: text });
+  await cmd('Input.dispatchKeyEvent', { type: 'keyUp', key, code, windowsVirtualKeyCode: number }); await pause();
 }
-async function screenshot(name, height=844, selector) {
- await cmd('Emulation.setDeviceMetricsOverride',{width:390,height,deviceScaleFactor:1,mobile:true});
- if(selector)await evaluate(`document.querySelector('${selector}').scrollIntoView({block:'start'})`);
- await new Promise(r=>setTimeout(r,150));
- const shot=await cmd('Page.captureScreenshot',{format:'png'});
- await fs.writeFile(`${output}/${name}.png`,Buffer.from(shot.data,'base64'));
-}
-async function clickText(text) {
- await evaluate(`[...document.querySelectorAll('ion-button')].find(button => button.textContent === ${JSON.stringify(text)}).click()`);
- await new Promise(r=>setTimeout(r,100));
-}
-async function checkWidths() {
- for(const width of [320,390,768]) {
-  await cmd('Emulation.setDeviceMetricsOverride',{width,height:844,deviceScaleFactor:1,mobile:true});
-  if(await evaluate("document.documentElement.scrollWidth > innerWidth || [...document.querySelectorAll('.slm-detail-tabs,.slm-match-sections')].some(el=>el.scrollWidth>el.clientWidth)"))throw Error('Layout overflow');
- }
-}
-for(const mode of ['dark','light']){
- await evaluate(`document.querySelector('input[value=${mode}]').click()`);
- await checkWidths(); await screenshot(`espana-${mode}`);
- if(await evaluate("document.querySelector('.slm-hero-card').querySelectorAll('button').length")!==1)throw Error('Card must have exactly one native button');
- if(await evaluate("!!document.querySelector('.slm-card-link').querySelector('button,ion-button,a')"))throw Error('Nested card controls');
- await evaluate("document.querySelector('.slm-card-link').focus()");
- await press('Enter','Enter',13); await new Promise(r=>setTimeout(r,100));
- if(await evaluate("document.querySelectorAll('.slm-variant-preview').length")!==2)throw Error('Comparison must display A and B');
- await checkWidths(); await screenshot(`compare-${mode}`,2500);
- for(const variant of ['A','B']) {
-  await clickText(`Otwórz ${variant} w pełnym widoku`);
-  await checkWidths(); await screenshot(`variant-${variant.toLowerCase()}-${mode}`,variant === 'A' ? 2200 : 1600);
-  if(variant==='B') {
-   if(await evaluate("[...document.querySelectorAll('[role=tabpanel]')].filter(panel=>!panel.hidden).length")!==1)throw Error('More than one tab panel');
-   await evaluate("document.querySelector('[role=tab]').focus()");
-   await press('End','End',35); await new Promise(r=>setTimeout(r,50));
-   if(!await evaluate("document.activeElement.textContent==='Rozliczenie' && document.activeElement.getAttribute('aria-selected')==='true'"))throw Error('Tab keyboard navigation failed');
+async function viewport(width = 390) { await cmd('Emulation.setDeviceMetricsOverride', { width, height: 844, deviceScaleFactor: 1, mobile: true }); }
+async function shot(name) { await pause(); const image = await cmd('Page.captureScreenshot', { format: 'png' }); await fs.writeFile(`${output}/${name}.png`, Buffer.from(image.data, 'base64')); }
+async function back() { await evaluate("[...document.querySelectorAll('ion-button')].find(button => button.textContent.includes('Wróć do meczów')).click()"); await pause(); }
+async function tools(open) { await evaluate(`document.querySelector('.slm-demo-tools').open = ${open}`); }
+async function widths() {
+  for (const width of [320, 390, 768]) {
+    await viewport(width);
+    assert.equal(await evaluate('document.documentElement.scrollWidth > innerWidth'), false, `Document overflow at ${width}`);
+    const rows = await evaluate("[...document.querySelectorAll('[role=tab]')].map(tab=>Math.round(tab.getBoundingClientRect().top))");
+    if (rows.length) assert.equal(new Set(rows).size, 1, 'Tabs must be on one horizontal row');
   }
-  await clickText('Porównaj A i B');
- }
- await clickText('← Wróć do meczów');
- // Space also activates the native card; signup is an independent sibling.
- await evaluate("document.querySelector('.slm-card-link').focus()");
- await press(' ','Space',32); await new Promise(r=>setTimeout(r,100));
- if(await evaluate("location.hash")!=='#compare')throw Error('Space did not open details');
- await clickText('← Wróć do meczów');
+  await viewport();
 }
-console.log('Home/comparison/full A/full B at 320/390/768, native Enter/Space, keyboard tabs: OK');
-for (const value of [0,10,15,12]) {
- await evaluate(`(() => { const slider=document.querySelector('#demo-count'); const setter=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set; setter.call(slider,'${value}'); slider.dispatchEvent(new Event('input',{bubbles:true})); slider.dispatchEvent(new Event('change',{bubbles:true})); })()`);
- await new Promise(r=>setTimeout(r,50));
- const actual=await evaluate("document.querySelector('[role=progressbar]').getAttribute('aria-valuenow')");
- if(actual!==String(value))throw Error('Capacity slider did not update');
-}
-console.log('Demo capacity slider 0/10/15: OK');
-if(await evaluate("document.querySelectorAll('nav[aria-label=\"Główna nawigacja\"] button').length")!==3)throw Error('Expected three main tabs');
-const progress=await evaluate("document.querySelector('[role=progressbar]').getAttribute('aria-valuenow')");if(progress!=='12')throw Error('Wrong capacity');
-await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:'dark'}]});
-await evaluate("document.querySelector('input[value=auto]').click()");
-if(!await evaluate("document.documentElement.classList.contains('ion-palette-dark')"))throw Error('System dark not followed');
-await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:'light'}]});
-// Flush a real compositor frame after CDP media emulation (headless may remain idle).
-await evaluate('new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))');
-await cmd('Page.captureScreenshot',{format:'png'});
-for(let i=0;i<30;i++){if(!await evaluate("document.documentElement.classList.contains('ion-palette-dark')"))break;await new Promise(r=>setTimeout(r,100));}
-if(await evaluate("document.documentElement.classList.contains('ion-palette-dark')"))throw Error('System light not followed live');
-if(backend.length)throw Error('Demo called backend');
-const origin=new URL(process.env.SLM_UI_URL || 'http://localhost:5174/ui-demo').origin;
-if(requests.some(url=>url.startsWith('http') && new URL(url).origin!==origin))throw Error('Demo made external requests');
-if(securityErrors.length)throw Error('CSP violation: '+securityErrors.join('; '));
-console.log('Live system theme, manual theme, accessible capacity, zero backend requests: OK');
-console.log(`Screenshots ${output}/espana-{dark,light}.png`);ws.close();
+try {
+  await cmd('Page.enable'); await cmd('Page.bringToFront'); await cmd('Network.enable'); await cmd('Log.enable'); await viewport();
+  const loaded = new Promise(resolve => { onLoad = resolve; });
+  await cmd('Page.navigate', { url: base }); await loaded;
+  for (let i = 0; i < 100; i++) { if (await evaluate("!!document.querySelector('.slm-card-link')")) break; await pause(); }
+  await evaluate('Promise.all([...document.images].map(image=>image.decode()))');
+  assert.equal(await evaluate("document.querySelector('.slm-crest').naturalWidth > 0"), true, 'Crest did not load');
+  await fs.mkdir(output, { recursive: true });
+  const metrics = {};
+  for (const mode of ['dark', 'light']) {
+    await tools(true); await evaluate(`document.querySelector('input[value=${mode}]').click()`); await tools(false);
+    await evaluate("document.querySelector('ion-content').scrollToTop(0)"); await widths();
+    assert.equal(await evaluate("document.querySelector('#demo-count').checkVisibility()"), false, 'Closed demo tools must hide the slider');
+    assert.equal(await evaluate("document.querySelector('.slm-card-link').querySelectorAll('button,ion-button,a').length"), 0);
+    await shot(`home-${mode}`);
+    metrics[mode] = await evaluate("Object.fromEntries(['.slm-crest','.slm-next-match h1','.slm-hero-card','.slm-stadium-frame','.slm-match-cta','.slm-bottom-nav'].map(selector=>{const r=document.querySelector(selector).getBoundingClientRect();return [selector,{x:r.x,y:r.y,width:r.width,height:r.height}]}))");
+    await evaluate("document.querySelector('.slm-card-link').focus()"); await press('Enter', 'Enter', 13);
+    assert.equal(await evaluate("document.querySelectorAll('.slm-variant-preview').length"), 0, 'A/B in normal flow');
+    assert.equal(await evaluate("document.querySelector('[role=tab][aria-selected=true]').textContent"), 'Uczestnicy');
+    assert.equal(await evaluate("[...document.querySelectorAll('[role=tabpanel]')].filter(panel=>!panel.hidden).length"), 1);
+    await widths(); await shot(`details-${mode}`);
+    await evaluate("document.querySelector('[role=tab][aria-selected=true]').focus()"); await press('End', 'End', 35);
+    assert.equal(await evaluate('document.activeElement.textContent'), 'Rozliczenie');
+    assert.equal(await evaluate("document.querySelector('[role=tabpanel]:not([hidden])').textContent.includes('Nie pokazujemy fikcyjnych')"), true);
+    await press('Home', 'Home', 36); assert.equal(await evaluate('document.activeElement.textContent'), 'Informacje');
+    await press('ArrowRight', 'ArrowRight', 39); assert.equal(await evaluate('document.activeElement.textContent'), 'Uczestnicy');
+    await back(); await evaluate("document.querySelector('.slm-card-link').focus()"); await press(' ', 'Space', 32);
+    assert.equal(await evaluate("document.querySelector('[role=tab][aria-selected=true]').textContent"), 'Uczestnicy'); await back();
+  }
+  await tools(false); await evaluate("document.querySelector('.slm-demo-tools summary').focus()"); await press('Enter', 'Enter', 13);
+  assert.equal(await evaluate("document.querySelector('.slm-demo-tools').open"), true, 'Tools must open with native keyboard');
+  for (const value of [0, 10, 15, 12]) {
+    await evaluate(`(() => { const slider=document.querySelector('#demo-count');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(slider,'${value}');slider.dispatchEvent(new Event('input',{bubbles:true}));slider.dispatchEvent(new Event('change',{bubbles:true})); })()`); await pause();
+    assert.equal(await evaluate("document.querySelector('[role=progressbar]').getAttribute('aria-valuenow')"), String(value));
+  }
+  await cmd('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'dark' }] });
+  await evaluate("document.querySelector('input[value=auto]').click()"); assert.equal(await evaluate("document.documentElement.classList.contains('ion-palette-dark')"), true);
+  await cmd('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'light' }] });
+  await evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');
+  for (let i = 0; i < 30; i++) { if (!await evaluate("document.documentElement.classList.contains('ion-palette-dark')")) break; await pause(); }
+  assert.equal(await evaluate("document.documentElement.classList.contains('ion-palette-dark')"), false);
+  assert.equal(requests.some(url => url.includes('/functions/v1/')), false);
+  assert.equal(requests.some(url => url.startsWith('http') && new URL(url).origin !== new URL(base).origin), false);
+  assert.deepEqual(errors, []);
+  await fs.writeFile(`${output}/metrics.json`, JSON.stringify(metrics, null, 2));
+  console.log('PASS: crest, home/details 320/390/768, horizontal tabs/default Participants, Enter/Space/Home/End/arrows, one panel, themes/live system, slider 0/10/15, isolation/CSP.');
+  console.log(JSON.stringify(metrics.dark));
+} finally { ws.close(); }

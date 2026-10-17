@@ -1,3 +1,38 @@
+# UI Beta 2.3 — referencja i wybrany B
+
+Oryginalny slm-crest-espana.svg z assets/branding zastępuje placeholder w obu
+nagłówkach, bez edycji źródła. Dopasowano proporcje karty i fotografii po obejrzeniu
+referencji oraz dwóch renderów390x844; szczegółowa analiza, pomiary i pozostałe
+różnice: [BETA23_VISUAL_REVIEW.md](ui/BETA23_VISUAL_REVIEW.md).
+
+Wspólny MatchTabs (używany przez MatchSections i DemoMatchDetails) implementuje B:
+pojedynczy poziomy pasek z ikonami, domyślnie Uczestnicy. Roving tabindex i ARIA,
+strzałki z zawijaniem/Home/End, tylko jeden widoczny panel. Panele pozostają
+zamontowane, więc nie tracą formularzy i stanu; bez zmian operacji finansowych i RPC.
+Na320px dozwolony lokalny scroll paska; dokument nie przewija się w poziomie.
+Karta nadal natywnie klikalna, zapis jako osobne rodzeństwo.
+
+Demo prowadzi kartą do #details-b, alias #details też działa. Porównanie A/B i stary A
+są wyłącznie archiwalnym narzędziem. Narzędzia demo zwijane, z suwakiem0–15,
+Light/Dark/Auto i opisem izolacji. Na głównym ekranie tylko subtelne Dane przykładowe.
+Dane pozostają fikcyjne, finansów ani nazwisk nie dodano. Nie tworzymy brakujących funkcji.
+
+SVG jawnie dołączony do dist-demo (publicDir nadal false). Weryfikator wymaga obecności
+i dokładnej zgodności bajtów z oryginałem. CSP/env/allowlista modułów zachowane,
+jedyny nowy dozwolony moduł źródłowy to MatchTabs; brak dostępu do backendu.
+
+Finalne rendery390x844: [Home Dark](ui/beta23-home-dark.png),
+[Home Light](ui/beta23-home-light.png), [Details Dark](ui/beta23-details-dark.png),
+[Details Light](ui/beta23-details-light.png). Zachowano też pierwszą iterację Home.
+Testy: lint/TypeScript/oba buildy, Vitest84/84 i Chromium320/390/768 OK;
+Cypress brak Xvfb, Android/iOS niewykonane. Nie testowano prawdziwej bazy.
+Duże chunki i braki weryfikacji backendu pozostają. Vercel bez ręcznego deploy;
+status automatyczny niepotwierdzony (API GitHub Forbidden).
+
+Poniżej historyczne etapy; decyzja B zastępuje wcześniejsze brak wyboru.
+
+---
+
 # UI Beta 2.2 — klikalna karta i porównanie A/B
 
 Karta MatchHero ma opcjonalne onOpen/openDisabled. Natywny button jest na całej

@@ -61,7 +61,7 @@ describe('Rozliczenia — przygotowany interfejs z kontrolowanym API', () => {
         approvals++; approved = true; req.reply({ event_id: eid, version: 2 });
       } else req.reply({ ok: true });
     });
-    login(); cy.contains('ion-button', 'Mecze').click(); cy.contains('ion-button', 'Szczegóły').click();
+    login(); cy.contains('ion-button', 'Mecze').click(); cy.contains('ion-button', 'Szczegóły').click(); cy.contains('[role=tab]', 'Rozliczenie').click();
     cy.contains('Wstępne — nie tworzy zaległości ani blokady').should('be.visible');
     input('Powód decyzji / korekty', 'Odbiór fixture');
     cy.on('window:confirm', () => true); cy.contains('ion-button', 'Zatwierdź rozliczenie').click();

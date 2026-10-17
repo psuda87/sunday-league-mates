@@ -1,3 +1,36 @@
+# UI Beta 2.3 — 2026-10-17 23:45:46 CEST (Europe/Warsaw)
+
+feat/ui-beta zaktualizowano fast-forward do0243660 z oryginalnym herbem.
+Obejrzano referencję, beta22 Dark/Light oraz render SVG przed zmianami.
+Przeprowadzono dwie udokumentowane iteracje390x844: karta290->212->200px,
+zdjęcie pionowe142x164->poziome144x104; tytuł y159->101, CTA y516->368.
+Herb oryginalny54x61, bez zmiany SVG; mniej paddingu, mniejsze promienie, fotografia
+jaśniejsza, niemal czarne tło z poświatą u góry. Light zachowuje ciepły kierunek.
+Analiza: docs/ui/BETA23_VISUAL_REVIEW.md, pomiary beta23-measurements.json.
+
+Wybrano B, zarówno w aplikacji jak demo: jeden poziomy pasek ikon, domyślnie Uczestnicy,
+jeden widoczny panel; na320px przewijać można sam pasek, nie cały dokument.
+Istniejące formularze i panel finansowy pozostają zamontowane w ukrytych panelach,
+bez zmiany operacji/roli/RPC; wyłącznie widoczność i nawigacja. A/B tylko w narzędziach.
+Demo ma zwijane Narzędzia demo z suwakiem i motywami, na main tylko Dane przykładowe.
+
+ESLint/TypeScript/oba buildy OK; Vitest84/84, 14 plików. Duże chunki Ionic pozostają.
+Chromium home/details320/390/768, Enter/Spacja/Home/End/strzałki, jeden panel, wybór
+Uczestników, motywy/live system, rzeczywiste ukrycie narzędzi, suwak0/10/15 i CSP OK.
+Demo12 plików: bez App/Auth/Supabase/Edge, crest jawnie emitowany i bajtowo identyczny
+z oryginałem. Brak zewnętrznych żądań. Cypress próbowano: brak Xvfb, niewykonany.
+Android/iOS i prawdziwy backend niewykonane. Zrzuty docs/ui/beta23-home-dark/light.png,
+beta23-details-dark/light.png to rzeczywisty React/Ionic390x844, bez przeróbek.
+
+Pozostały inne zdjęcie/kadr, pionowy herb,3 zamiast4 zakładek i więcej wolnego tła
+na844px niż na krótszym obrazie referencji. Bez deklaracji zgodności piksel w piksel.
+Bez migracji, zmian backendu/Auth/RLS/RPC/finansów/push/Firebase i merge do innych gałęzi.
+Automatyczny Vercel po push pozostaje skonfigurowany; brak ręcznego wdrożenia.
+Odczyt deploymentów GitHub API zwrócił Forbidden, brak zweryfikowanego URL/statusu.
+Historyczne braki SQL/RLS/FIFO/Docker i niezastosowane migracje pozostają poniżej.
+
+---
+
 # UI Beta 2.2 — 2026-10-17 23:09:22 CEST (Europe/Warsaw)
 
 feat/ui-beta. Cały kafelek najbliższego meczu otwiera szczegóły: natywny button

@@ -1,3 +1,13 @@
+UI BETA 2.3 — feat/ui-beta, wybrany B
+Oryginalny herb SVG pobrano z0243660, renderowany bez zmian. Dwie iteracje390x844,
+karta200px, zdjęcie144x104, techniczne panele w zwijanych Narzędziach demo.
+MatchTabs w app/demo: poziomo z ikonami, domyślnie Uczestnicy, pojedynczy widoczny
+panel; zachowane zamontowane formularze, role, RPC. A/B tylko archiwalnie w demo.
+Lint/TypeScript/buildy/Vitest84/84/Chromium320/390/768/izolacja12 plików OK.
+Cypress brak Xvfb, Android/iOS/DB niewykonane. Szczegółowa analiza i zrzuty beta23
+w docs/ui/. Bez ręcznego Vercel; API GitHub Forbidden, autodeploy niezweryfikowany.
+Backend, RLS/FIFO i migracje nadal mają wcześniejsze braki weryfikacji.
+
 UI BETA 2.2 — feat/ui-beta
 Klikalna cała karta, native Enter/Spacja, zapis osobno. Demo #compare pokazuje A/B
 jeden pod drugim; #details-a i #details-b to osobne pełne widoki. Bez wyboru docelowego

@@ -1,8 +1,9 @@
+import MatchTabs from './MatchTabs';
 import { useId } from 'react';
 import type { ReactNode } from 'react';
 
-export default function MatchSections({ information, participants, settlement }: {
-  information: ReactNode; participants: ReactNode; settlement: ReactNode;
+export default function MatchSections({ information, participants, settlement, layout = 'tabs' }: {
+  information: ReactNode; participants: ReactNode; settlement: ReactNode; layout?: 'stacked' | 'tabs';
 }) {
   const prefix = useId().replace(/[^a-zA-Z0-9_-]/g, '');
   const sections = [
@@ -11,6 +12,7 @@ export default function MatchSections({ information, participants, settlement }:
     ['teams', 'Składy', <section className="slm-panel"><p className="slm-planned">Planowane</p><p>Składy dla tego meczu nie są jeszcze dostępne. Algorytm tworzenia drużyn jest planowany.</p></section>],
     ['settlement', 'Rozliczenie', settlement],
   ] as const;
+  if (layout === 'tabs') return <MatchTabs panels={sections.map(section => section[2])} />;
   return <div className="slm-match-sections">
     <nav aria-label="Sekcje meczu">{sections.map(([key, label]) => <button key={key} aria-controls={`${prefix}-${key}`} onClick={() => {
       const target = document.getElementById(`${prefix}-${key}`);

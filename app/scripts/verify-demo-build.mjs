@@ -11,6 +11,10 @@ async function walk(dir) {
 }
 await walk(root);
 assert(files.some(p => p.endsWith('/index.html')));
+const crest = 'assets/branding/slm-crest-espana.svg';
+const emittedCrest = await readFile(new URL('../dist-demo/' + crest, import.meta.url));
+const originalCrest = await readFile(new URL('../public/' + crest, import.meta.url));
+assert.deepEqual(emittedCrest, originalCrest, 'Demo must ship the exact original crest');
 for (const path of files) {
   if (path === `${root}/images/match-evening.jpg`) {
     const image = await readFile(path);

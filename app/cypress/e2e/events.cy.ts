@@ -37,9 +37,10 @@ describe('Wydarzenia — interfejs z kontrolowanym API', () => {
     });
     cy.visit('/'); input('Login lub numer telefonu', 'Fixture'); input('Hasło', crypto.randomUUID()); cy.contains('ion-button', 'Zaloguj się').click();
     cy.contains('ion-button', 'Mecze').click(); cy.contains('ion-button', 'Szczegóły').click();
-    cy.contains('Podział należności uwzględnia decyzje o opłacie i zastępstwa.').should('be.visible'); cy.contains('Bez automatycznego awansu').should('be.visible');
+    cy.contains('[role=tab]', 'Informacje').click();
+    cy.contains('Podział należności uwzględnia decyzje o opłacie i zastępstwa.').should('be.visible'); cy.contains('[role=tab]', 'Uczestnicy').click(); cy.contains('Bez automatycznego awansu').should('be.visible');
     cy.get('a[href="tel:+12025550150"]').first().should('contain', 'Zadzwoń do zapraszającego');
     cy.contains('ion-button', 'Utwórz mecz').should('not.exist');
-    cy.contains('ion-button', 'Zapisz się').click(); cy.get('[role=alert]').should('contain', 'Brak wolnych miejsc');
+    cy.contains('[role=tab]', 'Informacje').click(); cy.contains('ion-button', 'Zapisz się').click(); cy.get('[role=alert]').should('contain', 'Brak wolnych miejsc');
   });
 });

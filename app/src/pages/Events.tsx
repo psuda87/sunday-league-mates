@@ -178,7 +178,7 @@ export default function Events({ manager, session, initialEventId }: { manager: 
         <IonButton type="submit" disabled={busy}>Zapisz mecz</IonButton>
       </form></section> : detail && e ? <>
       <MatchHero match={e} title="Szczegóły meczu">{matchAction(detail)}</MatchHero>
-      <MatchSections information={<>
+      <MatchSections key={e.id} information={<>
       <section className="slm-panel"><h3>{matchDate(e.starts_at)}</h3><p>{e.location} · {e.duration_minutes} minut</p>
         <p>{money(e.hourly_rate)}/h · razem {money(e.total_cost)}</p>
         <p>Uczestnicy: {e.registered_count}/{e.capacity} · minimum 10 · rezerwa: {e.reserve_count}</p>

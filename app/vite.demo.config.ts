@@ -8,7 +8,7 @@ const app = fileURLToPath(new URL('.', import.meta.url));
 const allowed = new Set([
   'demo/index.html', 'demo/main.tsx', 'src/ui/Demo.tsx', 'src/ui/DemoMatchDetails.tsx', 'src/ui/MatchHero.tsx',
   'src/ui/MatchCapacityProgress.tsx', 'src/ui/capacity.ts', 'src/ui/BottomNav.tsx',
-  'src/ui/AppearanceSettings.tsx', 'src/ui/MatchSections.tsx', 'src/ui/theme.ts', 'src/theme/variables.css',
+  'src/ui/AppearanceSettings.tsx', 'src/ui/MatchSections.tsx', 'src/ui/MatchTabs.tsx', 'src/ui/theme.ts', 'src/theme/variables.css',
   'src/pages/Accounts.css',
 ]);
 export default defineConfig({
@@ -29,6 +29,7 @@ export default defineConfig({
       }
       for (const name of ['stadium.svg', 'match-evening.jpg']) this.emitFile({ type: 'asset', fileName: `images/${name}`,
         source: readFileSync(new URL(`./public/images/${name}`, import.meta.url)) });
+      this.emitFile({ type: 'asset', fileName: 'assets/branding/slm-crest-espana.svg', source: readFileSync(new URL('./public/assets/branding/slm-crest-espana.svg', import.meta.url)) });
     },
   }],
   preview: { host: '127.0.0.1', port: 5175, strictPort: true, headers: Object.fromEntries(JSON.parse(readFileSync(new URL('./vercel.json', import.meta.url), 'utf8')).headers[0].headers.map((h: { key: string; value: string }) => [h.key, h.value])) },

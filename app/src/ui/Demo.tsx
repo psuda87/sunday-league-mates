@@ -11,7 +11,7 @@ import type { Match } from '../events/model';
 type View = 'home' | 'compare' | 'details-a' | 'details-b';
 const readView = (): View => {
   const hash = window.location.hash.slice(1);
-  return hash === 'compare' || hash === 'details-a' || hash === 'details-b' ? hash : 'home';
+  return hash === 'compare' || hash === 'details-a' || hash === 'details-b' ? hash : hash === 'details' ? 'details-b' : 'home';
 };
 // Static fixture: no API, credentials or personal data.
 const demo: Match = { id: 'demo', starts_at: '2026-10-22T16:00:00Z', location: 'Boisko demonstracyjne', duration_minutes: 90, hourly_rate: 180, total_cost: 270, capacity: 15, status: 'scheduled', registered_count: 12, reserve_count: 0, registration_open: true, decision_required: false, cutoff_at: '', estimated_per_person: null, settlements_active: false };
@@ -26,12 +26,12 @@ export default function Demo() {
     return () => window.removeEventListener('hashchange', sync);
   }, []);
   function navigate(next: View) { setView(next); window.location.hash = next; void content.current?.scrollToTop?.(0); }
-  return <IonPage className="slm-demo"><IonHeader><IonToolbar><div className="slm-shell-header"><span className="slm-logo" title="Miejsce na zatwierdzony herb SLM">SLM</span><span className="slm-demo-header"><small>DEMO UI</small><IonIcon icon={notificationsOutline} aria-label="Podgląd ikony powiadomień" /></span></div></IonToolbar></IonHeader>
-    <IonContent ref={content}><main className="slm-accounts"><p className="slm-demo-banner">PODGLĄD UI · Dane demonstracyjne · Bez połączenia z backendem</p>
+  return <IonPage className="slm-demo"><IonHeader><IonToolbar><div className="slm-shell-header"><img className="slm-logo slm-crest" src="/assets/branding/slm-crest-espana.svg" alt="Sunday League Mates" width="54" height="61" /><span className="slm-demo-header"><IonIcon icon={notificationsOutline} aria-label="Podgląd ikony powiadomień" /></span></div></IonToolbar></IonHeader>
+    <IonContent ref={content}><main className="slm-accounts"><p className="slm-demo-badge">Dane przykładowe</p>
       {tab === 'events' ? <>
-        {view !== 'home' && <div className="slm-actions"><IonButton fill="clear" onClick={() => navigate('home')}>← Wróć do meczów</IonButton>{view !== 'compare' && <IonButton fill="clear" onClick={() => navigate('compare')}>Porównaj A i B</IonButton>}</div>}
-        {view === 'home' ? <MatchHero match={{ ...demo, registered_count: count }} onOpen={() => navigate('compare')}>
-          <IonButton expand="block" className="slm-match-cta" disabled>ZAPISZ SIĘ NA MECZ · DEMO</IonButton>
+        {view !== 'home' && <div className="slm-actions"><IonButton fill="clear" onClick={() => navigate('home')}>← Wróć do meczów</IonButton></div>}
+        {view === 'home' ? <MatchHero match={{ ...demo, registered_count: count }} onOpen={() => navigate('details-b')}>
+          <IonButton expand="block" className="slm-match-cta" disabled>ZAPISZ SIĘ NA MECZ</IonButton>
         </MatchHero> : view === 'compare' ? <>
           <h1>Porównaj szczegóły meczu</h1><p className="slm-muted">Dwa układy tego samego wydarzenia. Wariant docelowy nie został wybrany.</p>
           {(['a', 'b'] as const).map(variant => <section key={variant} className="slm-variant-preview" aria-label={`Wariant ${variant.toUpperCase()}`}>
@@ -40,14 +40,17 @@ export default function Demo() {
             <DemoMatchDetails variant={variant} count={count} />
           </section>)}
         </> : <>
-          <MatchHero match={{ ...demo, registered_count: count }} title={`Szczegóły meczu · ${view === 'details-a' ? 'A' : 'B'}`} />
-          <section className="slm-variant-full" aria-label={`Pełny wariant ${view === 'details-a' ? 'A' : 'B'}`}><p className="slm-eyebrow">WARIANT {view === 'details-a' ? 'A · SEKCJE JEDNA POD DRUGĄ' : 'B · PRZEŁĄCZANE ZAKŁADKI'}</p><DemoMatchDetails key={view} variant={view === 'details-a' ? 'a' : 'b'} count={count} /></section>
+          <MatchHero match={{ ...demo, registered_count: count }} title="Szczegóły meczu" />
+          <section className="slm-variant-full" aria-label={`Pełny wariant ${view === 'details-a' ? 'A' : 'B'}`}><DemoMatchDetails key={view} variant={view === 'details-a' ? 'a' : 'b'} count={count} /></section>
         </>}
-        {view === 'home' && <section className="slm-panel slm-demo-capacity"><h2>Przetestuj zajętość</h2>
+      </> : tab === 'players' && <section className="slm-panel"><h1>Zawodnicy</h1><p className="slm-planned">Planowane</p><p>Katalog zawodników nie jest dostępny w demonstracji.</p></section>}
+      <details className="slm-demo-tools"><summary>Narzędzia demo</summary>
+        <p className="slm-muted">Fikcyjne dane, brak API, logowania i połączeń z backendem. Przycisk zapisu jest nieaktywny.</p>
+        <section className="slm-panel slm-demo-capacity"><h2>Przetestuj zajętość</h2>
           <label htmlFor="demo-count">Przykładowi uczestnicy: {count} / 15</label>
           <input id="demo-count" type="range" min="0" max="15" step="1" value={count} onChange={event => setCount(Number(event.target.value))} style={{ width: '100%', minHeight: 44 }} />
           <p className="slm-muted">Symulacja lokalna · bez zapisu na mecz i bez danych zawodników.</p>
-        </section>}
-      </> : tab === 'players' && <section className="slm-panel"><h1>Zawodnicy</h1><p className="slm-planned">Planowane</p><p>Katalog zawodników nie jest dostępny w demonstracji.</p></section>}
-      <AppearanceSettings /></main></IonContent><IonFooter><BottomNav active={tab} onSelect={value => { setTab(value); setView('home'); window.history.replaceState(window.history.state, '', '#home'); void content.current?.scrollToTop?.(0); }} /></IonFooter></IonPage>;
+        </section>
+        <AppearanceSettings /><IonButton fill="clear" onClick={() => { setTab('events'); navigate('compare'); }}>Archiwalne porównanie A/B</IonButton>
+      </details></main></IonContent><IonFooter><BottomNav active={tab} onSelect={value => { setTab(value); setView('home'); window.history.replaceState(window.history.state, '', '#home'); void content.current?.scrollToTop?.(0); }} /></IonFooter></IonPage>;
 }
