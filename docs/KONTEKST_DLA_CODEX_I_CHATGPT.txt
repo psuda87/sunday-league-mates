@@ -1,0 +1,189 @@
+SUNDAY LEAGUE MATES — KONTEKST DLA CODEX CLOUD I CHATGPT
+Aktualizacja: 17.10.2026 (Europe/Warsaw)
+
+START — PRZECZYTAJ PRZED DALSZĄ PRACĄ
+Repozytorium: https://github.com/psuda87/sunday-league-mates
+Gałąź kontynuacji: feat/integration (NIE main ani feat/events).
+Ten plik: docs/KONTEKST_DLA_CODEX_I_CHATGPT.txt
+W chmurze wybierz repozytorium i branch feat/integration, pobierz aktualny stan.
+Przed zmianami sprawdź git branch --show-current, git status i AGENTS.md.
+Nie nadpisuj lokalnych zmian, nie stosuj reset --hard, clean ani force push.
+Użytkownik autoryzował zapis i zwykły push bieżącego postępu 17.10.2026.
+Ta autoryzacja nie oznacza zgody na zdalne migracje, wdrożenia ani merge do main.
+W razie rozbieżności czytaj najnowsze STATUS.md i polecenie użytkownika.
+
+CEL PROJEKTU I NIEZMIENNE ZASADY
+Sunday League Mates: aplikacja amatorskiej grupy piłkarskiej.
+Kod app/, dokumentacja docs/. TypeScript + Ionic React + Capacitor.
+Id aplikacji pl.psuda87.slm, interfejs po polsku.
+Ciemny zielonkawy motyw, miętowy akcent: #0D1613 / #15221D / #80D4C5 / #DFE7E3.
+Usługi bezpłatne: Supabase Free, Firebase Spark wyłącznie FCM, bez płatnych planów.
+Brak publicznej rejestracji, zaproszeń, maili i SMS. Konta tworzy administrator.
+Nie zapisuj sekretów, haseł, tokenów ani danych rzeczywistych kont w kodzie/logach.
+Nie kopiuj produkcyjnych .env, PAT, kluczy Firebase ani konfiguracji SDK do chmury.
+Nie modyfikuj istniejącego administratora lub niezwiązanych zasobów/danych.
+Propozycje specyfikacji nie są zatwierdzonymi wymaganiami.
+Po każdym zadaniu aktualizuj docs/STATUS.md, oddzielając wykonane i niewykonane testy.
+
+GAŁĘZIE I DOTYCHCZASOWE COMMITY
+Auth scalony do main. Wydarzenia zapisane na feat/events: 6638e18.
+Gałęzie źródłowe, obie z feat/events:
+- feat/settlements: 81d71c7fb24dc4b410f178c3fa4101a5fa2ce410
+- feat/push-notifications: 103d08c0dd12e4c0aa59e7d2402d2b02ba0e52b3
+Zintegrowano kolejno rozliczenia, potem powiadomienia w feat/integration.
+5d3048b54b4cfb6016e8d2acf2af255ea10055c6: commit integracji.
+13cfce490e9c5421869a4295e4b68cbe8297f132: normalizacja telefonów, testy i dokumentacja.
+Następny commit dokumentacyjny zawiera niniejszy kontekst i aktualne wyniki.
+Ostateczny SHA odczytaj z git log -1; plik nie może zawierać własnego SHA commita.
+Nie scalano integracji do main lub feat/events. Nie scalać bez nowej decyzji.
+Lokalny worktree: I:/slm/sunday-league-mates-integration.
+Oryginalny I:/slm/sunday-league-mates nadal na feat/events; pics/ nieśledzony,
+nie jest częścią pusha ani backupu Git. Nie usuwać go i nie dodawać bez decyzji.
+
+CO ZAIMPLEMENTOWANO
+1. Auth: jedno konto przez login lub telefon i to samo hasło.
+   Supabase Auth przechowuje hasła; stabilny techniczny email i aliasy serwerowe.
+   Hasło tymczasowe wymaga zmiany; generowane dokładnie 12 znaków.
+   Własne hasło: minimum 8 znaków, maksimum 72 bajty UTF-8.
+   Role i stan bezpieczeństwa po stronie serwera, reset odbiera dostęp starym sesjom.
+   Konta/reset tylko administrator; zmiana identyfikatorów po obecnym haśle.
+   Profil: pseudonim lub opcjonalne imię/nazwisko jako wybrana nazwa wyświetlana.
+2. Sesje: zapis refresh tokena, nigdy hasła. Android/iOS dedykowany Keystore/Keychain,
+   brak fallback do Preferences/localStorage. Sprawdzenie dostępu przy starcie/powrocie,
+   offline ukrywa dane, logout usuwa zapis. Logi mostu Capacitor wyłączone.
+3. Wydarzenia: CRUD administratora, zapisy/rezygnacja, goście z odpowiedzialnym kontem,
+   osobna rezerwa bez autoawansu, obecność, odwołanie, historia czasu serwera.
+   Minimum 10, domyślnie 90 min, 180 zł/h i 270 zł; godzina/limit od administratora.
+   Europe/Warsaw, granica 17:00, zapisy do początku, również po 17:00 przy wolnym miejscu.
+4. Rozliczenia: przygotowany ledger, rewizje, podział groszy, FIFO, goście,
+   zgłoszenia wpłat i decyzje/korekty, saldo i blokada dwóch różnych zaległych meczów.
+   To kod NIEZWERYFIKOWANY na działającej bazie w integracji.
+   Istotna reguła finansowa w aktualnym kodzie: opłata za rezygnację po 17:00 przy
+   spadku zapisanych poniżej 10; historia pozwala odtworzyć zastąpienie FIFO.
+   Nieobecność jest oddzielna od odpowiedzialności finansowej.
+5. Powiadomienia: centrum/inbox, preferencje, outbox, urządzenia, lease/retry,
+   opcjonalny worker FCM HTTP v1. Brak Firebase nie blokuje inbox ani aplikacji.
+   Nie pokazuj fikcyjnego potwierdzenia wysłania push. FCM nie zapewnia exactly-once.
+6. Adapter finansowy: wrappery RPC zapisują powiadomienia po końcowym przeliczeniu,
+   w tej samej transakcji co decyzja finansowa. Klucze źródeł oparte o trwały audyt.
+   Powiadomienia o decyzjach wpłat oraz zmianach blokady; brak HTTP w transakcji SQL.
+   Wspólny advisory lock, service-only rdzenie, zachowana kontrola sesji.
+   Atomowość/idempotencja wymagają rzeczywistego testu — nie uznawać za potwierdzone.
+7. Telefony: domyślnie Polska, 9 cyfr; wejście +48/0048 i separatory, zapis +48XXXXXXXXX.
+   Wspólny app/supabase/functions/_shared/phone.ts dla UI/Edge/bootstrap.
+   Stały prefiks +48, za krótki/długi numer odrzucany bez obcinania.
+   Historyczne zagraniczne aliasy zachowane przy logowaniu i bez zmiany przy edycji
+   innych danych. Nowy numer zagraniczny niedozwolony. Brak migracji danych kont.
+8. Poprawiono atrapę Cypress notifications_open (req.reply({ body: item() })),
+   aby obiekt z polem body nie był traktowany jak konfiguracja odpowiedzi HTTP.
+
+WDROŻENIA — CO JEST TYLKO W REPOZYTORIUM
+Zdalny projekt odniesienia: hjtcyybkxebvdropchac, ale w integracji NIE MODYFIKOWANO go.
+Starsze Auth/events wdrożono wcześniej; stan zdalny nie był teraz ponownie odczytywany.
+Zmiany accounts, nowy push-worker i poniższe 6 migracji nie zostały wdrożone.
+Firebase nie skonfigurowano. Sam git push nie wdraża Supabase.
+13 migracji łącznie: 7 historycznych Auth/events, potem w tej kolejności:
+20261014100000_settlements_ledger.sql
+20261014101000_settlements_rpc.sql
+20261014102000_settlements_events_integration.sql
+20261014120000_notifications_core.sql
+20261014121000_notifications_rpc_and_worker.sql
+20261014122000_notifications_events_eligibility.sql
+Ostatnia łączy dispatch, filtry odbiorców i adapter finansowy. Nie pomijaj wcześniejszych.
+Nie wykonuj migracji zdalnych, deploy Edge, zmian Auth lub Firebase bez osobnej zgody.
+Nie resetuj istniejącej bazy. Użyj świeżego, izolowanego projektu lokalnego.
+
+FAKTYCZNIE POWTÓRZONE TESTY — 17.10.2026
+- npm run lint: OK.
+- npm run build: OK, obejmuje TypeScript klienta; ostrzeżenie chunków >500 kB.
+- npm run test.unit -- --run: 66/66, 11 plików.
+- node --test scripts/bootstrap-admin.node-tests.mjs: 6/6, Admin API mock.
+- Cypress 16.1.1 Electron: 10/10, 4 specyfikacje, kontrolowane API, Vite :5174.
+- Deno 2.9.6 check: accounts/index.ts, local-entrypoint.example.ts, push-worker/index.ts OK.
+- git diff --check: OK. Przegląd ścieżek/sekretów bez rzeczywistych trafień;
+  marker BEGIN PRIVATE KEY w fcm.ts jest wyłącznie wyrażeniem usuwającym nagłówek PEM.
+- Audit z 14.10: 6 moderate, omit=dev 3 moderate, 0 high/critical. Teraz nie ponawiano.
+  Niezmienione zależności/lockfile; nie użyto audit fix --force. Router i CLI wymagają
+  osobnego przeglądu zgodności zamiast automatycznych zmian głównych wersji.
+- Migracje/SQL/RPC/RLS/FIFO/wyścigi/atomowość: NIE WYKONANO w integracji.
+- Android/iOS/realny FCM integracji: NIE WYKONANO.
+Testy UI i jednostkowe nie potwierdzają prawdziwej bazy ani odbioru na urządzeniu.
+Wcześniej użytkownik ręcznie potwierdził Android Auth: pierwsze logowanie i zmiana
+hasła, login/telefon, logout, panel administratora, pamiętanie sesji, tworzenie i reset
+zawodnika. Nie przenosić tych wyników na nową integrację finansów/push.
+
+BLOKADA ŚRODOWISKA — STAN 17.10.2026
+Docker Desktop jest już zainstalowany (wcześniejsze raporty o braku instalacji są historyczne).
+CLI docker 29.8.2 dostępne, lecz silnik Linux NIE ODPOWIADA:
+failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine;
+open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+Nie uruchamiano/nie instalowano Dockera i nie zmieniano Windows w tym zadaniu.
+Supabase CLI 2.121.0 i Deno 2.9.6 działały przez npx (bez instalacji globalnej).
+W chmurze sprawdź osobno dostępność i działanie Docker; brak silnika nie upoważnia
+użycia zdalnej bazy jako zamiennika ani oznaczenia SQL jako zaliczonego.
+
+JAK BEZPIECZNIE KONTYNUOWAĆ
+Najpierw przeczytaj AGENTS.md, docs/STATUS.md, SPECYFIKACJA_SOCCER_APP.md,
+LOCAL_VERIFICATION.md, INTEGRATION_REPORT.md, AUTH_MODULE.md, SETTLEMENTS_MODULE.md,
+PUSH_NOTIFICATIONS.md i PUSH_FINANCE_ADAPTER.md. Niższe sekcje starszych raportów
+opisują stan historyczny; najnowszy STATUS i ten kontekst rozstrzygają wyniki testów.
+Sprawdź aktualną dokumentację Supabase przed zmianami SQL/Auth/CLI.
+
+W app: npm ci (lockfile zachować), npm run lint, npm run build,
+npm run test.unit -- --run i node --test scripts/bootstrap-admin.node-tests.mjs.
+Na świeżym środowisku może być wymagane pobranie Cypress i jego zależności systemowych.
+Lokalny endpoint testowy ustaw tylko w ignorowanym app/.env.local:
+VITE_SLM_FUNCTION_URL=http://127.0.0.1:54321/functions/v1/accounts
+VITE_SLM_PUSH_ENABLED=false
+Nie kopiuj bezmyślnie .env.example: jego przykład wskazuje zdalny backend.
+Cypress mock: npm run dev -- --host 127.0.0.1 --port 5174 --strictPort,
+a w drugim terminalu npm run test.e2e -- --config baseUrl=http://localhost:5174 --browser electron.
+W PowerShell przed Cypress usuń zmienną: $env:ELECTRON_RUN_AS_NODE=$null.
+Deno: npx --yes --package=deno@2.9.6 deno check --no-config --no-lock
+supabase/functions/accounts/index.ts supabase/functions/accounts/local-entrypoint.example.ts
+supabase/functions/push-worker/index.ts (jedno polecenie z katalogu app).
+
+Najbliższy etap: REALNE testy lokalnej bazy (po zgodzie na dalszą pracę):
+- Działający silnik Docker. Nowy izolowany lokalny Supabase; wszystkie 13 migracji.
+- Windows: powershell -NoProfile -File app/scripts/test-integration-local.ps1 -RunSql
+  (z katalogu repo). Runner wymaga feat/integration i tworzy projekt
+  slm-integration-isolated w ignorowanym .cache/supabase-integration.
+  Nie resetuje istniejącej bazy; testy fixtures kończą się ROLLBACK.
+- W Linux/cloud skrypt PowerShell może być niedostępny: przygotuj równoważny lokalny
+  runner z tymi samymi zabezpieczeniami, sprawdzając --help CLI. Nie kopiuj env/sekretów.
+- Przygotowane SQL: settlements.sql, notifications.sql, integration-contracts.sql
+  w app/supabase/tests. Nie są jeszcze wykonane ani kompletnym testem równoczesności.
+- Uzupełnij prawdziwe równoległe połączenia: ostatnie miejsce, duplikaty, limit z gośćmi,
+  wpłata kontra zapis, accept/accept, accept/reject, idempotencja request_id,
+  dwa zaległe mecze, FIFO wpłat i zastąpień, rezerwa bez awansu, 17:00 Europe/Warsaw,
+  obecność/korekty/odwołanie/zamknięcie zapisów oraz brak wycieku cudzych danych RLS.
+- Adapter: decyzja wpłaty i inbox/outbox commitują razem, rollback nie emituje,
+  ponowienie nie dubluje; poprawne blokada->odblokowanie->blokada i filtry odbiorców.
+- Lokalny Auth/Edge przez local-entrypoint.example.ts; produkcyjny index blokuje
+  URL lokalnego Supabase. Nie deployuj przykładu. Skonfiguruj lokalny runtime osobno.
+- Stare test-events/test-accounts nie nadają się do integracji bez adaptacji:
+  usuwają dane nieusuwalnej historii/zakładają zdalny projekt i historyczne branche.
+- Tylko fikcyjne dane; nie pozostawiaj publicznych endpointów testowych/bootstrap.
+- Potem Android: npm run build, npx cap sync android, npx cap open android.
+  Upewnij się, że urządzenie używa wyłącznie właściwego testowego backendu.
+
+NADAL OTWARTE / NIE WDRAŻAĆ PRZYPADKIEM
+CAPTCHA odłożona; nie włączać. Zachować limity logowania.
+iOS niezweryfikowany. Realny FCM, test urządzenia integracji niewykonane.
+Dodatkowe ręczne testy offline i starej sesji po resecie odłożone, niezaliczone.
+Nie ponawiać testów maili/SMS lub zmieniać hooków/limitów bez polecenia.
+Nie implementować teraz ocen, składów, pełnych kart ani odznak.
+Specyfikacja przechowuje ustalenia o odznakach, mieszaniu składów, statusie Już jadę,
+spóźnieniach i narzutkach — nie oznacza to ich realizacji w tym etapie.
+MVP: próg dotyczy liczby głosujących (10 uczestników -> minimum 6 głosujących),
+fallback średnia ocen meczowych, remisy/goście do doprecyzowania.
+
+GOTOWY TEKST DO ROZPOCZĘCIA ROZMOWY W CHMURZE / NA TELEFONIE
+Pracujemy nad psuda87/sunday-league-mates, branch feat/integration.
+Przeczytaj docs/KONTEKST_DLA_CODEX_I_CHATGPT.txt oraz AGENTS.md i docs/STATUS.md.
+Kontrole kodu i UI przeszły 17.10.2026, ale integracja bazy nadal niezweryfikowana.
+Najpierw sprawdź stan repo i działający Docker. Zaproponuj/wykonaj wyłącznie uzgodniony
+następny etap lokalnych testów; bez zdalnego Supabase, produkcyjnego Firebase,
+resetowania istniejących baz i merge do main. Nie traktuj mocków jako testów SQL.
+Jeśli w ChatGPT nie masz dostępu do repo, poproś o ten plik lub jego treść;
+nie zakładaj znajomości kodu ani możliwości wykonania testów.

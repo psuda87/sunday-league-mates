@@ -161,3 +161,15 @@ docker version (Client i Server). Instalacja/systemowe ustawienia wymagają decy
 użytkownika; nie wykonano ich. Nie resetowano żadnej istniejącej bazy.
 Wyniki 66/66, 10/10, 6/6 i kontroli kodu pozostają wynikami poprzedniego etapu,
 bez ponownego wykonania w tym przeglądzie.
+
+## Aktualizacja przekazania do chmury — 17.10.2026
+
+Ponowiono z sukcesem: lint, build/TypeScript klienta, Deno check trzech wejść,
+Vitest 66/66, bootstrap mock 6/6, Cypress API mock 10/10. Audit nieponawiany.
+Docker jest już zainstalowany (CLI 29.8.2), ale silnik Linux nie działa:
+failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine;
+open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.
+Nie uruchamiano testów bazodanowych ani wdrożeń. Starsze informacje o braku instalacji
+pozostają historią. Przekazanie: docs/KONTEKST_DLA_CODEX_I_CHATGPT.txt.
+Sprawdzono śledzone pliki: brak artefaktów; znaleziony marker PEM w fcm.ts jest
+wyłącznie kodem parsera, nie kluczem. Zwykły push na feat/integration autoryzowany.
