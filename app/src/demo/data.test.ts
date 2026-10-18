@@ -76,3 +76,22 @@ describe('isolated demo world',()=>{
   });
 
 });
+
+it('edits only the simulated player number, accepts 0 and 99, keeps duplicates and rejects invalid numbers',()=>{
+ let world=initialWorld();
+ for(const number of [-1,100,1.5,NaN,Infinity]) expect(reduceWorld(world,{type:'jersey',playerId:'p01',number})).toBe(world);
+ expect(reduceWorld(world,{type:'jersey',playerId:'p02',number:12})).toBe(world);
+ for(const number of [0,99,7]){world=reduceWorld(world,{type:'jersey',playerId:'p01',number});expect(world.players[0].jerseyNumber).toBe(number);}
+ const games=world.games,totals=world.players[0].demoTotals;
+ world=reduceWorld(world,{type:'user',id:'p02'});world=reduceWorld(world,{type:'user',id:'p01'});
+ expect(world.players[0].jerseyNumber).toBe(7);expect(world.players[1].jerseyNumber).toBe(7);expect(world.games).toEqual(games);expect(world.players[0].demoTotals).toEqual(totals);
+ expect(reduceWorld(world,{type:'reset'}).players[0].jerseyNumber).toBe(10);
+});
+it('keeps authored fictional goals, assists and MVP independent from attendance and sign-ups',()=>{
+ let world=initialWorld();const totals=world.players.map(p=>p.demoTotals);
+ world=reduceWorld(world,{type:'join',gameId:'demo-1'});
+ world=reduceWorld(world,{type:'attendance',gameId:'demo-5',entryId:world.games[4].entries[0].id});
+ expect(world.players.map(p=>p.demoTotals)).toEqual(totals);
+ expect(totals).toEqual(initialWorld().players.map(p=>p.demoTotals));
+ expect(totals.every(s=>Object.values(s).every(v=>Number.isInteger(v)&&v>=0))).toBe(true);
+});

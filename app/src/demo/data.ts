@@ -1,5 +1,5 @@
 // Deterministic, fictional, memory-only demo. Never imported by production screens.
-export interface DemoPlayer { id: string; name: string; portrait?: { src: string; column: 0 | 1; row: 0 | 1 } }
+export interface DemoPlayer { id: string; name: string; jerseyNumber: number; demoTotals: {goals:number;assists:number;mvp:number}; portrait?: { src: string; column: 0 | 1; row: 0 | 1 } }
 export interface Entry { id: string; playerId: string | null; guestName?: string; inviterId?: string; status: 'registered' | 'reserve' | 'withdrawn'; attendance: boolean | null; paidCents: number }
 export interface Game { id: string; name: string; startsAt: string; status: 'upcoming' | 'completed' | 'cancelled'; capacity: number; costCents: number; entries: Entry[] }
 export interface World { players: DemoPlayer[]; games: Game[]; userId: string; notice: string }
@@ -23,7 +23,9 @@ export function statistics(world: World, playerId: string) {
   return { played, confirmed:rows.length, attendance:rows.length ? Math.round(played/rows.length*100) : null };
 }
 export function initialWorld(): World {
-  const players=names.map((name,i)=>({id:`p${String(i+1).padStart(2,'0')}`,name,portrait:{src:'/assets/demo/fictional-portraits.webp',column:(i%2) as 0|1,row:(Math.floor(i/2)%2) as 0|1}}));
+  // Explicit fictional career totals, not a formula based on attendance or sign-ups.
+  const totals=[[2,1,1],[1,2,0],[3,1,1],[1,1,0],[2,0,0],[0,2,0],[1,1,0],[2,1,1],[0,1,0],[1,0,0],[1,1,0],[0,1,0],[1,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]];
+  const players=names.map((name,i)=>({id:`p${String(i+1).padStart(2,'0')}`,name,jerseyNumber:[10,7,9,4,8,6,11,3,5,14,17,20,21,23,25,27,30,33,40,99][i],demoTotals:{goals:totals[i][0],assists:totals[i][1],mvp:totals[i][2]},portrait:{src:'/assets/demo/fictional-portraits.webp',column:(i%2) as 0|1,row:(Math.floor(i/2)%2) as 0|1}}));
   const counts=[12,15,6,0,12,10,14,11,9,0];
   const games:Game[]=counts.map((count,index)=>({ id:`demo-${index+1}`,name:['El Clásico','La Liga','Rondo Cup','Derby','Jesienny sparing','Mecz przyjaźni','Wieczorne granie','Liga koleżeńska','Spotkanie odwołane','Przerwa techniczna'][index]+' · demo',startsAt:index<4?`2026-${index<2?'10':'11'}-${['22','29','05','12'][index]}T${index===0?'16':'17'}:00:00Z`:`2026-10-${String(18-(index-3)*2).padStart(2,'0')}T16:00:00Z`,status:index<4?'upcoming':index<8?'completed':'cancelled',capacity:15,costCents:27000,entries:Array.from({length:count},(_,i)=>({id:`g${index}-e${i}`,playerId:players[(i+(index<4?1:0))%players.length].id,status:'registered' as const,attendance:index>=4&&index<8?(i+index)%5!==0:null,paidCents:0})) }));
   games[0].entries[10]={...games[0].entries[10],playerId:'p19',inviterId:'p02'};
@@ -35,7 +37,7 @@ export function initialWorld(): World {
 }
 export type Scenario = 'free'|'full'|'joined'|'reserve'|'completed'|'cancelled'|'debt';
 export const scenarioGame:Record<Scenario,string>={free:'demo-1',full:'demo-2',joined:'demo-1',reserve:'demo-2',completed:'demo-5',cancelled:'demo-9',debt:'demo-1'};
-export type Action = {type:'reset';scenario?:Scenario}|{type:'user';id:string}|{type:'join'|'withdraw'|'guest'|'remove_guest'|'resize'|'attendance'|'pay';gameId:string;entryId?:string;count?:number};
+export type Action = {type:'reset';scenario?:Scenario}|{type:'user';id:string}|{type:'jersey';playerId:string;number:number}|{type:'join'|'withdraw'|'guest'|'remove_guest'|'resize'|'attendance'|'pay';gameId:string;entryId?:string;count?:number};
 export function reduceWorld(previous:World,action:Action):World {
   if(action.type==='reset') {
     const world=initialWorld();
@@ -43,6 +45,12 @@ export function reduceWorld(previous:World,action:Action):World {
     if(action.scenario==='reserve') world.games[1].entries.push({id:'demo-user-reserve',playerId:world.userId,status:'reserve',attendance:null,paidCents:0});
     if(action.scenario==='debt') for(const game of world.games.slice(4,6)) for(const e of game.entries) if(e.playerId===world.userId) e.paidCents=0;
     return world;
+  }
+  if(action.type==='jersey') {
+    if(action.playerId!==previous.userId||!Number.isInteger(action.number)||action.number<0||action.number>99)return previous;
+    const player=previous.players.find(p=>p.id===action.playerId);
+    if(!player||player.jerseyNumber===action.number)return previous;
+    return {...previous,players:previous.players.map(p=>p.id===action.playerId?{...p,jerseyNumber:action.number}:p),notice:'Zmieniono numer tylko w pamięci demo.'};
   }
   const world=structuredClone(previous);world.notice='';
   if(action.type==='user'){world.userId=action.id;return world;}

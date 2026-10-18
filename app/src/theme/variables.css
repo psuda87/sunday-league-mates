@@ -493,3 +493,33 @@ ion-toolbar:has(.slm-shell-header) { --background:var(--slm-brand-header-bg); }
 
 /* Reference follow-up pass2: keep ornamental line inside the tapered foot. */
 .slm-ultimate-filigree { bottom:24px; left:43%; right:43%; height:0; border-bottom:0; }
+
+/* Premium3.10 — same shield and portraits, 12% smaller with stadium edge blending. */
+.slm-ultimate-shell { width:min(88%,300px); margin:4px auto 12px; }
+.slm-ultimate-stadium { opacity:.85; background-position:center 45%; }
+.slm-ultimate-inner { background:radial-gradient(ellipse at 50% 22%,var(--slm-ultimate-wine),var(--slm-ultimate-deep) 85%); }
+.slm-ultimate-portrait { mask-image:linear-gradient(transparent,black 8%,black 77%,transparent),linear-gradient(90deg,transparent,black 22%,black 78%,transparent); mask-composite:intersect; }
+.slm-ultimate-inner::before { opacity:.3; background:radial-gradient(ellipse 27% 9% at 6% 28%,var(--slm-ultimate-light),transparent),radial-gradient(ellipse 24% 8% at 96% 30%,var(--slm-ultimate-light),transparent); }
+.slm-ultimate-number { top:85px; left:22px; font-size:2.1rem; line-height:1; text-shadow:0 2px 8px var(--slm-ultimate-deep); }
+.slm-ultimate-number-edit { display:flex; align-items:center; gap:3px; min-width:44px; min-height:44px; margin:-5px 0 0 -5px; padding:5px; border:0; background:transparent; font-family:inherit; cursor:pointer; }
+.slm-ultimate-number-edit small { align-self:flex-end; padding-bottom:3px; font-size:.85rem; }
+.slm-ultimate-number-edit:focus-visible { outline:2px solid var(--slm-ultimate-gold); outline-offset:2px; border-radius:5px; }
+.slm-ultimate-crest { top:85px; right:19px; width:49px; }
+.slm-ultimate-stars { position:absolute; z-index:4; left:20%; right:20%; bottom:25px; text-align:center; color:var(--slm-ultimate-gold); font-size:1rem; letter-spacing:.16em; line-height:1; pointer-events:none; }
+.slm-ultimate-summary { padding:0; margin:0 0 12px; border:0; background:transparent; }
+.slm-ultimate-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; margin:0; }
+.slm-ultimate-stats > div { display:flex; flex-direction:column-reverse; align-items:center; gap:6px; padding:12px 2px; border:1px solid var(--slm-border); border-radius:12px; background:linear-gradient(140deg,var(--slm-card-top),var(--slm-panel)); box-shadow:inset 0 1px 0 var(--slm-card-light); }
+.slm-ultimate-stats dt { color:var(--slm-text-secondary); font-size:.75rem; }
+.slm-ultimate-stats dd { margin:0; color:var(--slm-gold); font-size:1.5rem; line-height:1.1; font-weight:750; font-variant-numeric:tabular-nums; }
+.slm-number-form { padding:14px; margin:0 0 12px; border:1px solid var(--slm-border); border-radius:12px; background:var(--slm-panel); }
+.slm-number-form label { display:block; font-size:.85rem; margin-bottom:8px; }
+.slm-number-form input { width:100%; min-height:44px; box-sizing:border-box; padding:8px 12px; border:1px solid var(--slm-border); border-radius:8px; background:var(--slm-panel); color:var(--slm-text); font:inherit; }
+.slm-number-form > div { display:flex; gap:8px; margin-top:10px; }
+.slm-number-form button { min-height:44px; padding:8px 14px; border:1px solid var(--slm-border); border-radius:8px; background:var(--slm-nav-active); color:var(--slm-text); font:inherit; font-size:.85rem; }
+.slm-number-form [role=alert] { color:var(--ion-color-danger); font-size:.85rem; }
+
+/*3.10 visual pass2: softly darken the pitch behind the name, retain lit stands. */
+.slm-ultimate-stadium { background-image:linear-gradient(transparent 48%,var(--slm-ultimate-ink) 92%),url('/assets/branding/stadium-bg-main.jpg'); background-size:auto 100%; }
+/*3.10 visual pass3: soften the jersey-to-stadium transition, keep identity crisp. */
+.slm-ultimate-portrait { mask-image:linear-gradient(transparent,black 8%,black 68%,transparent),linear-gradient(90deg,transparent,black 22%,black 78%,transparent); }
+.slm-ultimate-number { font-weight:850; }

@@ -1,3 +1,12 @@
+# Premium3.10 — tylko demo, zastępuje zakres profilu3.8/3.9
+
+- Zachować zaakceptowaną tarczę/ramę/portrety3.9. Numer0–99 w DemoPlayer i wspólnym
+  reducerze; edytuje wyłącznie world.userId, brak unikalności, bez persistencji/API.
+  Pięć gwiazdek to dekoracja, nie ocena. Profil: karta i4 pola Mecze/Bramki/Asysty/MVP,
+  bez historii/nowych zakładek/ocen/mediów. Mecze z potwierdzonych fikcyjnych obecności,
+  pozostałe3 jawne stałe demoTotals, nie wyliczać ich z obecności. Dokumentacja
+  docs/ui/PREMIUM310_VISUAL_REVIEW.md. Nie przenosić do produkcji.
+
 # Premium3.9 — karta i goście wyłącznie demo
 
 - UltimatePlayerCard: własna złoto-bordowa tarcza, zdjęcie/herb/nazwisko, brak ocen

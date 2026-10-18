@@ -973,3 +973,54 @@ SHA kodu dopisany po commicie; końcowy SHA raportu w historii Git/odpowiedzi.
 [2026-10-18 17:12:39 CEST] Commit korekty referencji Ultimate: ca8b33cb1629b32281387b5820fa067eacfb7a25.
 Kontrole i przegląd zmian OK; końcowy SHA raportu w historii Git i odpowiedzi.
 Zwykły push wyłącznie feat/ui-beta, bez merge/ręcznego deploy.
+
+[2026-10-18 17:30:34 CEST] Premium España3.10 — finalne dopracowanie karty demo
+Obejrzano rzeczywiste premium39 Dark/Light i referencję Ultimate z repozytorium.
+Zachowano zaakceptowaną krzywą tarczy/podwójną ramkę, portrety/herb i nazwisko.
+Tło: istniejący stadium-bg-main.jpg mocniej widoczny (opacity.85), maska boków
+portretu odsłania trybuny/reflektory; bordowy gradient przyciemnia murawę pod
+nazwiskiem, łagodniejszy pionowy fade koszulki. Bez generowania/edycji obrazów.
+Karta max340x502→300x442,94 (-11,76% wymiarów);320px:300→264 (-12%).
+Numer po lewej u góry,0–99,5 złotych dekoracyjnych gwiazdek w stopie.
+Gwiazdki nie są oceną, są nieinteraktywne i ukryte dla czytnika.
+
+Ołówek44px tylko bieżącego symulowanego zawodnika. Formularz z label i czytelnym
+błędem, walidacja całkowitego0–99 także w reducerze; cudzego numeru nie zmienia.
+Duplikaty dozwolone. Wspólny world odświeża wszystkie karty, numer zostaje przy
+nawigacji/zmianie użytkownika; reset/scenariusz/reload przywraca dane początkowe.
+Pod kartą4 pola Mecze/Bramki/Asysty/MVP w jednym rzędzie; wszystkie widoczne
+nad nawigacją przy320/390/768 w normalnym widoku. Otwarty formularz przewijalny.
+Mecze z potwierdzonych fikcyjnych obecności; pozostałe3 to jawne, deterministyczne
+fixture demoTotals, nie obliczenia z zapisów lub obecności. Dawna rozwijana
+historia profilu3.8 usunięta na polecenie3.10; brak ocen/mediów/nowych zakładek/
+rozbudowanych statystyk. Globalny stos nawigacji/powroty niezmieniony.
+
+Trzy cykle renderowania/oglądu:1 nowe elementy i za zielona murawa,2 gradient
+pod nazwiskiem,3 miększe łączenie koszulki i tła/wyraźniejszy numer. Szczegóły
+docs/ui/PREMIUM310_VISUAL_REVIEW.md. Nadal inne od koncepcji są frontalne portrety
+i detale koszulki; nie deklarujemy zgodności pikselowej ani gotowości produkcyjnej.
+
+## Wyniki końcowe
+
+TypeScript/ESLint/build aplikacji/build demo OK, Vitest108/108 w18 plikach.
+Nowe testy: pełna walidacja UI+reducer, własność/zmiana właściciela/0/99/duplikaty/
+nieprawidłowe wartości, stałość fikcyjnych sum i dekoracyjne gwiazdki.
+Chromium320/390/768: karta/proporcje/portrety/fallback,4 pola w jednym rzędzie
+powyżej footer w normalnym widoku, bez poziomego scrolla; numer7→0→99,
+odrzucenie pustego/-1/100/2.5/abc, powrót z Uczestników i Składów, tylko właściciel
+edytuje; wyszukiwanie/reset/motywy/operacje3.8 i usuwanie obu typów gościa OK.
+Build demo15 statycznych plików, allowlista/CSP/env bez zmian, brak Auth/Supabase/
+Edge/API i obcych żądań. To nie test prawdziwego Supabase. Cypress nie uruchomiono
+(brak Xvfb), Android/iOS i klawiatura natywna niezweryfikowane. Duże chunki Ionic
+nadal. Home Dark/Light, Details Dark i Participants Dark porównane SHA256 ze
+zrzutami poprzedniej wersji — bajtowo identyczne. Bez backendu/finansów/Vercel/
+merge/migracji/ręcznego wdrożenia. Automatyczny Vercel niezweryfikowany.
+
+Zrzuty rzeczywistego React/Ionic Chromium:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium310-player-card-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium310-player-card-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium310-player-card-320.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium310-player-card-768.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium310-player-number-edit.png
+Raport docs/ODPOWIEDZI_CODEX.txt; STATUS/UI_BETA/AGENTS zaktualizowane.
+SHA implementacji dopisany po commicie; końcowy SHA raportu w historii Git/odpowiedzi.

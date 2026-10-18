@@ -1,3 +1,20 @@
+# Premium España3.10 — 2026-10-18 17:29:33 CEST
+
+Wyłącznie demo: zaakceptowana tarcza/herb/portrety3.9 zachowane, stadion wyraźniejszy
+przez maskowane boki zdjęcia i gradient nad murawą. Karta max300×443 zamiast340×502
+(-11,76% obu wymiarów); na320 szerokość264 zamiast300 (-12%). Numer0–99 na tarczy,
+ołówek44px tylko właściciela, walidacja UI+reducer, pamięć wspólna do resetu/reloadu.
+Pięć dekoracyjnych złotych gwiazdek (aria-hidden, bez ocen). Pod kartą4 pola w rzędzie:
+Mecze z potwierdzonej fikcyjnej obecności, Bramki/Asysty/MVP z jawnie przypisanych
+stałych demoTotals, niezależnych od zapisów/obecności. Historia profilu3.8 usunięta
+na polecenie3.10; profil ma tylko kartę,4 pola i chwilowy formularz numeru. Stos
+nawigacji/powroty zachowane, bez nowych zakładek. Szczegóły ui/PREMIUM310_VISUAL_REVIEW.md.
+Backend/Auth/RPC/RLS/migracje/finanse/Firebase/Vercel i produkcyjne UI bez zmian.
+TS/ESLint/oba buildy OK;108/108 Vitest i Chromium320/390/768, Dark/Light/Auto,
+numer/własność/powroty/usuwanie gości/izolacja15plików OK. Cypress brak Xvfb,
+Android/iOS nieweryfikowane, duże chunki Ionic nadal. Starsze ograniczenia
+backendu/Dockera pozostają. Raport ODPOWIEDZI_CODEX.txt.
+
 # Ultimate3.9 — otrzymana referencja, 2026-10-18 17:11:13 CEST
 
 Oryginał użytkownika zapisany i obejrzany: ui/reference/slm-ultimate-player-card-concept.jpg.
