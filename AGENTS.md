@@ -3,7 +3,8 @@
 - UltimatePlayerCard: własna złoto-bordowa tarcza, zdjęcie/herb/nazwisko, brak ocen
   i danych fizycznych. 4 fikcyjne portrety w assets/demo/fictional-portraits.webp
   przypisane stale20 osobom; single-src i fallback inicjałów. Koncepcja Ultimate
-  nie była dostarczona — nie mylić nowych portretów z zaakceptowaną referencją.
+  dostarczona później: docs/ui/reference/slm-ultimate-player-card-concept.jpg.
+  Nie mylić osobnych fikcyjnych portretów z tą referencją.
   Historia3.8 zwinięta, nie budować teraz nowego panelu statystyk. Kosz własnego
   gościa z potwierdzeniem, ownership/idempotencja w reducerze demo; profil/rezerwa/
   wpłaty zachowane, brak obejścia przez withdraw gościa innego zapraszającego.

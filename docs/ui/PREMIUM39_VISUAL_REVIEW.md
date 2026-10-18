@@ -85,3 +85,25 @@ Nie zmieniono produkcyjnych stron, modelu backendu, finansów, RPC/RLS/migracji,
 Firebase ani vercel.json. Cypress niewykonany (brak Xvfb), Android/iOS/realny backend
 nieweryfikowane, duże chunki Ionic nadal. Bez merge/ręcznego deploy; Vercel auto
 niezweryfikowany. Brak referencji to istotna granica oceny zgodności wizualnej.
+
+## Uzupełnienie po otrzymaniu właściwej koncepcji Ultimate
+
+Oryginał [dwóch telefonów](reference/slm-ultimate-player-card-concept.jpg)
+użytkownik dostarczył po implementacji3.9. Obraz rzeczywiście otwarto i porównano
+z premium39-player-card-dark.png. Powyższy opis braku obrazu jest historyczny.
+
+Różnice przed korektą: schodkowe/kanciaste barki tarczy zamiast płynnej korony,
+pojedynczy mocny obrys zamiast dwóch cienkich złotych linii, herb po lewej zamiast
+po prawej, zbyt prosty górny ornament. Zmieniono krzywą SVG w clipPath objectBoundingBox
+(z unikalnym id React useId dla wielu kart) i dodano niezależną linię wewnętrzną
+z non-scaling-stroke. Rama nadal skalowalna340:502, portrety/herb bez edycji.
+Przesunięto herb na prawą stronę, wzmocniono dwa lokalne refleksy. Po pierwszym
+rzeczywistym renderze przeniesiono dolny ornament do wnętrza zwężenia ramki.
+Ponownie wyrenderowano Chromium; zrzuty premium39-* odświeżone.
+
+Nadal inne: portrety frontalne do klatki piersiowej zamiast zdjęcia trzy czwarte
+i koszulki z większą ilością tułowia; ciemne tło samych zdjęć ogranicza widoczność
+stadionu. Nie zmieniano tożsamości zdjęć ani zatwierdzonego herbu, nie kopiowano
+znaków odzieżowych koncepcji. Brak numeru/pozycji w danych — nie wymyślono ich.
+Nie implementowano paneli ocen, mediów, rozszerzonych statystyk ani przycisku koszulki
+z referencji. Nie deklarujemy zgodności pikselowej ani gotowości produkcyjnej.

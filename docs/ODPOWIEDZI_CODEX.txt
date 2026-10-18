@@ -937,3 +937,35 @@ Brak backendu/migracji/merge/ręcznego deploy; Vercel automatyczny niezweryfikow
 Brak właściwej referencji Ultimate, zgodność oceniana według opisu.
 Końcowy SHA uzupełnienia raportu w historii Git/odpowiedzi.
 Raport docs/ODPOWIEDZI_CODEX.txt.
+
+[2026-10-18 17:12:18 CEST] Premium3.9 — właściwa referencja Ultimate dostarczona
+Rzeczywiście obejrzano oryginał użytkownika i zapisano bez edycji w
+docs/ui/reference/slm-ultimate-player-card-concept.jpg. Starsze wpisy o braku
+referencji są historyczne. Porównano z istniejącym zrzutem3.9.
+
+Zmieniono tylko prezentację karty demo: łagodna korona i dolne narożniki zamiast
+kanciastego polygonu, podwójna cienka złota rama, herb po prawej stronie i dwa
+lokalne refleksy. SVG clipPath ma unikalne id, rama skaluje się bez rozciągania
+portretu. Po pierwszym renderze poprawiono dolny ornament przecinający zwężenie,
+ponownie wyrenderowano i obejrzano Dark/Light. Pełne zrzuty premium39-* odświeżone.
+Portrety i oficjalny herb bez edycji. Nadal inne od referencji: zdjęcia frontalne
+zamiast ujęcia trzy czwarte, mniej widoczny stadion przez ciemne tło portretów.
+Nie wymyślono numerów/pozycji, nie dodano panelu ocen, mediów, statystyk ani
+nieczynnego przycisku koszulki. Nie deklaruję pełnej zgodności wizualnej.
+
+ESLint/TypeScript/build aplikacji/build demo OK,104/104 Vitest w17 plikach.
+Chromium320/390/768 Dark/Light/Auto: proporcje, fallback, profile/powroty/Enter,
+query/scroll, scenariusze3.8 i usuwanie własnego gościa/cancel/confirm/zakaz cudzego
+OK. Brak zewnętrznych żądań i naruszeń CSP; izolacja15 plików ponownie potwierdzona.
+To kontrola demo i testy z atrapami API, nie prawdziwy Supabase. Duże chunki Ionic
+nadal; Cypress niewykonany (brak Xvfb), Android/iOS nieweryfikowane.
+Brak zmian backendu/Auth/RPC/RLS/migracji/finansów produkcyjnych/Firebase/Vercel,
+bez merge i ręcznego wdrożenia. Automatyczny podgląd Vercel niezweryfikowany.
+
+Zrzuty React/Ionic Chromium, nie makiety:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium39-player-card-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium39-player-card-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium39-player-card-320.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium39-player-card-768.png
+Raport: docs/ODPOWIEDZI_CODEX.txt; analiza docs/ui/PREMIUM39_VISUAL_REVIEW.md.
+SHA kodu dopisany po commicie; końcowy SHA raportu w historii Git/odpowiedzi.

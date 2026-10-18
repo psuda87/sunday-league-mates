@@ -479,3 +479,17 @@ ion-toolbar:has(.slm-shell-header) { --background:var(--slm-brand-header-bg); }
 /* 3.9 visual pass3: etched crown line; direct portrait replacement needs only src. */
 .slm-ultimate-card::after { content:''; position:absolute; z-index:5; left:16%; right:16%; top:17px; height:1px; opacity:.65; pointer-events:none; background:linear-gradient(90deg,transparent,var(--slm-ultimate-gold),transparent); }
 .slm-ultimate-portrait[data-layout="single"] > img { width:100%; height:100%; object-fit:contain; }
+
+/* Ultimate reference supplied after3.9: curved crown and fine double gold rim. */
+.slm-ultimate-shell > svg { position:absolute; }
+.slm-ultimate-crest { left:auto; right:22px; top:100px; width:55px; }
+.slm-ultimate-number { right:auto; left:26px; top:90px; }
+.slm-ultimate-rim { position:absolute; inset:0; z-index:5; width:100%; height:100%; pointer-events:none; overflow:visible; }
+.slm-ultimate-rim path { fill:none; stroke:var(--slm-ultimate-gold); stroke-width:1px; vector-effect:non-scaling-stroke; opacity:.8; }
+.slm-ultimate-card::after { display:none; }
+.slm-ultimate-inner::after { display:none; }
+.slm-ultimate-inner::before { opacity:.23; background:radial-gradient(ellipse 24% 9% at 9% 26%,var(--slm-ultimate-light),transparent),radial-gradient(ellipse 20% 8% at 93% 29%,var(--slm-ultimate-light),transparent); }
+.slm-ultimate-portrait { mask-image:linear-gradient(transparent,black 8%,black 77%,transparent); }
+
+/* Reference follow-up pass2: keep ornamental line inside the tapered foot. */
+.slm-ultimate-filigree { bottom:24px; left:43%; right:43%; height:0; border-bottom:0; }

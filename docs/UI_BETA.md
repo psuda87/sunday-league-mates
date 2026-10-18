@@ -1,3 +1,12 @@
+# Ultimate3.9 — otrzymana referencja, 2026-10-18 17:11:13 CEST
+
+Oryginał użytkownika zapisany i obejrzany: ui/reference/slm-ultimate-player-card-concept.jpg.
+Zaktualizowano wyłącznie kartę demo: krzywe korony/ramy, podwójny złoty obrys,
+herb po prawej i światło. Bez rozbudowy statystyk/ocen/mediów i bez nowych portretów.
+Portrety frontalne nadal różnią się od ujęcia trzy czwarte w koncepcji.
+Starsze wpisy o braku referencji opisują stan sprzed jej dostarczenia.
+Szczegóły w ui/PREMIUM39_VISUAL_REVIEW.md i ODPOWIEDZI_CODEX.txt.
+
 # Premium España3.4 — szczegóły i Uczestnicy
 
 Home3.3 zachowany: końcowe Dark/Light są bajtowo identyczne. Zmiany tylko szczegółów:
