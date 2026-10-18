@@ -409,3 +409,63 @@ w odpowiedzi końcowej i w historii Git. Wyłącznie feat/ui-beta, bez merge.
 Nie uruchamiano ręcznego Vercel; automatyczny podgląd niezweryfikowany.
 Raport: docs/ODPOWIEDZI_CODEX.txt, zachowana cała historia. STATUS/UI_BETA/
 DEMO_VERCEL/AGENTS zaktualizowane. Dokładny wykaz: git show --stat.
+
+
+=== 2026-10-18 11:13:17 CEST — Premium España3.3 / Floating Crest ===
+Obejrzano oba Premium JPG, premium32-home-dark/light i istniejący primary PNG.
+Użyto dokładnie slm-logo-primary-transparent.png450x505, bez edycji pikseli:
+pełna dolna część tarczy, korona, SLM i3 gwiazdki widoczne. Alfa ma około9px
+marginesu nad/pod znakiem, smugi dochodzą do boków; nie tworzono przyciętej kopii.
+Contain/height:auto i450:505, bez cover/overflow hidden. Nie projektowano nowego logo.
+
+Usunięcie osobnego pasa: branding jest teraz pierwszym elementem main w IonContent,
+nie oddzielnym IonHeader/IonToolbar. Wspólne tło strony, przezroczysty wrapper,
+miękkie radialne bordo/gold. IonPage/IonContent/IonFooter pozostają. Powiadomienia
+w aplikacji zachowane z identyczną autoryzacją i callbackiem, tylko miejsce kontrolki
+przesunięte. Znak relative i przewijalny, brak fixed/sticky, lokalny stacking0/2/3.
+Nie ma linii, prostokąta ani osobnej fotografii/panelu pod logo. Top safe area
+jest jawnie doliczany do paddingu, bez zerowania insetów; footer niezmieniony.
+
+Trzy iteracje:1 pełny primary i wspólne tło (karta y195.4), po ocenie halo za mocne;
+2 mniejsze halo i odstępy (logo76.05x85.33, karta y191.2), nadal4 karty;
+3 lokalniejsza dekoracja i silniejszy selektor pozycji istniejącej kontrolki,
+ponowny render/ocena Dark/Light/320/768. Obrazy pierwszych cykli zachowane.
+W3.2 pierwsza karta była195.84, teraz191.17: zysk około4.7px na390x844,
+bez dodatkowej karty. Główny efekt to pełny herb i brak oddzielonego pasa.
+Przy768 większy pełny znak zajmuje kilka pikseli więcej; nadal4 karty.
+Karty121px, filtry38px, footer777/67 i wszystkie treści pozostają niezmienione.
+Nie modyfikowano MatchHero, MatchFilters, BottomNav, Events ani komponentów
+szczegółów/zakładek; w Accounts/Demo zmieniono wyłącznie markup brandingu i importy.
+
+Kontrole końcowe: ESLint/TypeScript klienta i demo/oba buildy OK (duże chunki Ionic),
+Vitest87/87 w14 plikach. Trzy pełne Chromium320/390/768: brak overflow dokumentu,
+contain i proporcje450:505, relative i scroll zamiast przyklejenia, symulowany
+safe area32px, karty Enter/Spacja, filtry4/2/1, zakładki i jeden panel, powrót,
+dolna nawigacja Mecze/Zawodnicy/Profil, motywy/live system, suwak0/10/15 OK.
+PNG i primary emitowane bajtowo identycznie, prawdziwe alfa zweryfikowane w Node.
+Demo14 plików,5 jawnych zasobów; primary315574B ma indywidualny limit350KB,
+inne160KB. Bez rozszerzania modułów aplikacji, App/Auth/Supabase/API/Edge,
+zewnętrznych żądań i naruszeń CSP. Env/publicDir false/Vercel bez zmian.
+Cypress nie ponawiano (znany brak Xvfb). Android/iOS/realny backend niewykonane.
+Symulacja safe area nie potwierdza statusbara/notcha telefonu; sprawdzić na urządzeniu
+oraz po powrocie z tła i przy powiększeniu tekstu. Testy API są atrapami, nie Supabase.
+
+Rzeczywiste zrzuty React/Ionic:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium33-home-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium33-home-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium33-home-320.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium33-home-768.png
+Porównanie3.2/3.3 i3 cykle: docs/ui/PREMIUM33_VISUAL_REVIEW.md.
+Pomiary: premium33-measurements.json. To screeny renderu, bez makiet i retuszu.
+
+Pozostałe różnice: oficjalny primary ma inny rysunek niż herb z konceptu,
+font jest systemowy, inne teksty i kadr/źródłowa miękkość zdjęcia. Nie deklaruję
+zgodności pikselowej ani gotowości produkcyjnej. Poza kompozycją brandingu
+wygląd zaakceptowanych elementów Premium3.2 zachowany.
+
+Commit implementacji: 4dfe5dc21c9d2b312ed7ffd3731b35bfee05ad36. Końcowy SHA raportu w historii
+Git tego wpisu i w odpowiedzi końcowej. Gałąź wyłącznie feat/ui-beta.
+Bez zmian backendu/Auth/RPC/RLS/migracji/zapisów/gości/rezerwy/finansów/Firebase,
+konfiguracji Vercel i danych. Bez merge i ręcznego wdrożenia. Automatyczny
+podgląd po push niezweryfikowany. Raport: docs/ODPOWIEDZI_CODEX.txt; STATUS,
+UI_BETA, DEMO_VERCEL i AGENTS uaktualnione z zachowaniem informacji historycznych.

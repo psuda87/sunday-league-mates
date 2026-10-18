@@ -1,3 +1,41 @@
+# Premium España3.3 — Floating Crest — 2026-10-18 11:13:17 CEST
+
+Gałąź feat/ui-beta. Implementacja: 4dfe5dc21c9d2b312ed7ffd3731b35bfee05ad36.
+Pełny slm-logo-primary-transparent.png450x505 w UI i demo, bez zmian pikseli.
+Zastąpił przycięty header. Contain/height:auto/450:505, brak clippingu; margines
+alfa około9px góra/dół, nie przycinano smug dochodzących do boków.
+Branding przeniesiono do normalnego flow w IonContent: jedno tło, brak osobnego
+IonHeader/IonToolbar/paska, lokalne halo bordo/gold, stacking0/2/3. Istniejący
+przycisk powiadomień zachowany z tym samym warunkiem i callbackiem.
+Górny safe area jawnie w paddingu; footer i dolne insets zachowane.
+
+Trzy iteracje Chromium390x844: pełny znak bez pasa; stonowanie halo/odstępów;
+lokalizacja dekoracji i priorytetu kontrolki. Finalnie logo76.05x85.33,
+tytuł y89.3, pierwsza karta191.2 zamiast195.8 w3.2: zysk około4.7px, nadal4 karty.
+Przy768 pełny znak skaluje się wyżej; nadal4 karty. Karty121px, filtry38px,
+footer777/67 i ich dane/logika bez zmian. Szczegóły/zakładki bez przebudowy.
+
+ESLint/TypeScript obu wejść/build aplikacji/build demo OK; Vitest87/87 w14 plikach.
+Chromium3 przebiegi320/390/768: pełny contain/ratio, brak fixed/sticky, przewijanie,
+symulowany safe area32px, karty/filtry/zakładki/klawiatura/powrót, dolna nawigacja,
+Light/Dark/Auto/live system, suwak0/10/15 i brak overflow OK. Demo14 plików,
+5 zatwierdzonych zasobów (primary315574B), alfa/bajty/CSP/izolacja OK.
+Brak żądań zewnętrznych/backendu. Większy limit350KB tylko dla wskazanego primary;
+pozostałe limity/allowlista/env/publicDir/Vercel bez zmian. Duże chunki pozostają.
+Cypress nie ponawiano (znany brak Xvfb); Android/iOS i realny Supabase niewykonane.
+Symulacja safe area nie jest testem statusbara/notcha urządzenia. Testy API to atrapy.
+
+Zrzuty: ui/premium33-home-dark/light.png i premium33-home-320/768.png.
+Porównanie3.2/3.3, iteracje i pomiary: ui/PREMIUM33_VISUAL_REVIEW.md.
+Pozostają rysunek oficjalnego primary odmienny od konceptu, font systemowy,
+inny tekst i źródłowe zdjęcie/kadr. Bez deklaracji zgodności pikselowej/produkcji.
+Bez backendu/Auth/RPC/RLS/migracji/zapisów/finansów/Firebase, zmiany danych,
+konfiguracji Vercel, merge i ręcznego wdrożenia. Automatyczny podgląd niezweryfikowany.
+Następnie odbiór pełnego znaku, statusbara/notcha/fontów/wznowienia na Android/iOS.
+Historyczne SQL/RLS/FIFO/Docker i niewykonane migracje bez zmian poniżej.
+
+---
+
 # UI Beta3.2 — przezroczyste logo i kompaktowy header — 2026-10-18 01:54:56 CEST
 
 Gałąź feat/ui-beta. Implementacja: e223aff475ac64bbda98ed337947dbb9801708a1.
