@@ -34,6 +34,10 @@ async function widths() {
   for (const width of [320, 390, 768]) {
     await viewport(width);
     assert.equal(await evaluate('document.documentElement.scrollWidth > innerWidth'), false, `Document overflow at ${width}`);
+    const header = await evaluate("(() => { const a=document.querySelector('.slm-compact-header h1').getBoundingClientRect(),b=document.querySelector('.slm-crest').getBoundingClientRect();return {left:a.left,right:a.right,crestLeft:b.left,crestRight:b.right,overlap:a.top<b.bottom&&a.bottom>b.top};})()");
+    assert(header.overlap && header.right <= header.crestLeft && header.crestRight <= width, `Header must fit one row at ${width}`);
+    const filters = await evaluate("[...document.querySelectorAll('.slm-match-filters button')].map(el=>{const r=el.getBoundingClientRect(),s=el.firstElementChild,v=s.getBoundingClientRect();return {w:r.width,h:r.height,visual:v.height,font:getComputedStyle(el).fontSize,clipped:s.scrollWidth>s.clientWidth};})");
+    for (const filter of filters) { assert(filter.w>=44 && filter.h>=44); assert(filter.visual>=28 && filter.visual<=30); assert.equal(filter.font,'12.48px'); assert.equal(filter.clipped,false); }
     const rows = await evaluate("[...document.querySelectorAll('[role=tab]')].map(tab=>Math.round(tab.getBoundingClientRect().top))");
     if (rows.length) assert.equal(new Set(rows).size, 1, 'Tabs must be on one horizontal row');
   }
@@ -73,7 +77,7 @@ try {
       await evaluate(`[...document.querySelectorAll('.slm-match-filters button')].find(button=>button.textContent==='${filter}').focus()`); await press('Enter', 'Enter', 13);
       assert.equal(await evaluate("document.querySelectorAll('.slm-card-link').length"), number);
     }
-    metrics[mode] = await evaluate("Object.fromEntries(['.slm-crest','.slm-matches-screen h1','.slm-hero-card','.slm-stadium-frame','.slm-match-filters','.slm-bottom-nav'].map(selector=>{const r=document.querySelector(selector).getBoundingClientRect();return [selector,{x:r.x,y:r.y,width:r.width,height:r.height}]}))");
+    metrics[mode] = await evaluate("Object.fromEntries(['.slm-crest','.slm-compact-header h1','.slm-hero-card','.slm-stadium-frame','.slm-match-filters','.slm-bottom-nav'].map(selector=>{const r=document.querySelector(selector).getBoundingClientRect();return [selector,{x:r.x,y:r.y,width:r.width,height:r.height}]}))");
     await evaluate("document.querySelector('.slm-card-link').focus()"); await press('Enter', 'Enter', 13);
     assert.equal(await evaluate("document.querySelectorAll('.slm-variant-preview').length"), 0, 'A/B in normal flow');
     assert.equal(await evaluate("document.querySelector('[role=tab][aria-selected=true]').textContent"), 'Uczestnicy');

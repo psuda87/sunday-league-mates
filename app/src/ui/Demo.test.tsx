@@ -33,7 +33,7 @@ it('opens chosen B directly from the whole card, defaults to Participants and re
   expect(screen.getAllByRole('tabpanel')).toHaveLength(1);
   fireEvent.click(screen.getByRole('tab', { name: 'Rozliczenie' }));
   expect(screen.getByRole('tabpanel')).toHaveTextContent('Nie pokazujemy fikcyjnych należności');
-  fireEvent.click(screen.getByText('← Wróć do meczów'));
+  fireEvent.click(screen.getByLabelText('Wróć do meczów'));
   expect(screen.getByRole('heading', { name: 'Mecze' })).toBeTruthy();
 });
 it('supports tab keyboard navigation and one visible panel', () => {
@@ -79,7 +79,7 @@ it('filters fictional fixtures without inventing membership or changing the chos
   expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '15');
   fireEvent.click(screen.getByRole('tab', { name: 'Informacje' }));
   expect(screen.getByRole('tabpanel')).toHaveTextContent('8 października 2026');
-  fireEvent.click(screen.getByText('← Wróć do meczów'));
+  fireEvent.click(screen.getByLabelText('Wróć do meczów'));
   expect(screen.getByRole('button', { name: 'Historia' })).toHaveAttribute('aria-pressed', 'true');
   fireEvent.click(screen.getByRole('button', { name: 'Nadchodzące' }));
   expect(screen.getAllByRole('button', { name: /Otwórz szczegóły meczu:/ })).toHaveLength(4);

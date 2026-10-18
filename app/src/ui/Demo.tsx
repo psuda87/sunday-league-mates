@@ -1,3 +1,4 @@
+import MatchHeader from './MatchHeader';
 import { useEffect, useRef, useState } from 'react';
 import { IonPage, IonContent, IonFooter, IonButton } from '@ionic/react';
 import DemoMatchDetails from './DemoMatchDetails';
@@ -35,10 +36,10 @@ export default function Demo() {
   }, []);
   function navigate(next: View) { setView(next); window.location.hash = next; void content.current?.scrollToTop?.(0); }
   return <IonPage className="slm-demo">
-    <IonContent ref={content}><main className="slm-accounts"><div className="slm-shell-header slm-floating-brand"><img className="slm-logo slm-crest slm-floating-crest" src="/assets/branding/slm-logo-primary-transparent.png" alt="Sunday League Mates" width="450" height="505" /></div><p className="slm-demo-badge">Dane przykładowe</p>
+    <IonContent ref={content}><main className="slm-accounts">{tab === 'events' ? <MatchHeader onBack={view !== 'home' ? () => navigate('home') : undefined} /> : <div className="slm-shell-header slm-floating-brand"><img className="slm-logo slm-crest slm-floating-crest" src="/assets/branding/slm-logo-primary-transparent.png" alt="Sunday League Mates" width="450" height="505" /></div>}<p className="slm-demo-badge">Dane przykładowe</p>
       {tab === 'events' ? <>
-        {view !== 'home' && <div className="slm-actions slm-detail-back"><IonButton fill="clear" onClick={() => navigate('home')}>← Wróć do meczów</IonButton></div>}
-        {view === 'home' ? <section className="slm-matches-screen" aria-label="Mecze demonstracyjne"><h1>Mecze</h1><MatchFilters value={filter} onChange={setFilter} /><div className="slm-match-list" aria-live="polite">{visible.map(({ match, index }) => <MatchHero key={match.id} match={{ ...match, registered_count: index === 0 ? count : match.registered_count }} compact title="Przykładowy mecz" displayName={names[index]} onOpen={() => { setSelected(index); navigate('details-b'); }} />)}</div></section> : view === 'compare' ? <>
+
+        {view === 'home' ? <section className="slm-matches-screen" aria-label="Mecze demonstracyjne"><MatchFilters value={filter} onChange={setFilter} /><div className="slm-match-list" aria-live="polite">{visible.map(({ match, index }) => <MatchHero key={match.id} match={{ ...match, registered_count: index === 0 ? count : match.registered_count }} compact title="Przykładowy mecz" displayName={names[index]} onOpen={() => { setSelected(index); navigate('details-b'); }} />)}</div></section> : view === 'compare' ? <>
           <h1>Porównaj szczegóły meczu</h1><p className="slm-muted">Dwa układy tego samego wydarzenia. Wariant docelowy nie został wybrany.</p>
           {(['a', 'b'] as const).map(variant => <section key={variant} className="slm-variant-preview" aria-label={`Wariant ${variant.toUpperCase()}`}>
             <p className="slm-eyebrow">WARIANT {variant.toUpperCase()}</p><h2>{variant === 'a' ? 'A · Sekcje jedna pod drugą' : 'B · Przełączane zakładki'}</h2>

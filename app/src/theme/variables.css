@@ -360,3 +360,18 @@ ion-toolbar:has(.slm-shell-header) { --background:var(--slm-brand-header-bg); }
 .slm-roster-expand { min-height:44px; }
 .slm-detail-tabs [role="tab"]:focus-visible { outline-offset:-3px; }
 .slm-detail-tabs [role="tabpanel"]:focus-visible { outline-offset:2px; }
+
+/* Premium 3.5: one flowing header; visual filter pills inside 44px touch targets. */
+.slm-accounts .slm-compact-header { justify-content:flex-start; gap:8px; padding-bottom:4px; }
+.slm-compact-header::before { background:radial-gradient(ellipse 28% 70% at 92% 45%,var(--slm-crest-halo),transparent 80%),radial-gradient(ellipse 50% 90% at 88% 40%,var(--slm-crest-burgundy),transparent 88%); }
+.slm-accounts .slm-compact-header h1 { position:relative; flex:1; margin:0; padding:0 0 7px; font-size:1.7rem; line-height:1.2; font-style:italic; font-weight:750; letter-spacing:-.035em; }
+.slm-compact-header h1::after { content:''; position:absolute; left:0; bottom:0; width:38px; height:2px; border-radius:2px; background:linear-gradient(90deg,var(--slm-gold),transparent); }
+.slm-accounts .slm-compact-header .slm-floating-crest { flex:none; width:64px; margin:0; }
+.slm-accounts .slm-compact-header > ion-button { position:relative; inset:auto; min-width:44px; min-height:44px; margin:0; z-index:3; }
+.slm-compact-header .slm-compact-back { --padding-start:8px; --padding-end:8px; font-size:1.25rem; }
+.slm-sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
+.slm-match-filters { margin-bottom:8px; }
+.slm-match-filters button, .slm-match-filters button[aria-pressed="true"] { display:flex; align-items:center; justify-content:center; min-width:44px; min-height:44px; height:44px; padding:0; border:0; border-radius:12px; background:transparent; box-shadow:none; }
+.slm-match-filters button span { display:flex; align-items:center; justify-content:center; height:28px; padding:0 17px; border:1px solid var(--slm-border); border-radius:12px; background:var(--slm-panel); white-space:nowrap; }
+.slm-match-filters button[aria-pressed="true"] span { background:linear-gradient(130deg,var(--slm-button-top),var(--slm-button-bottom)); border-color:var(--slm-button-top); box-shadow:inset 0 -1px var(--slm-gold); }
+@media(max-width:350px) { .slm-match-filters button span { padding-inline:13px; } }

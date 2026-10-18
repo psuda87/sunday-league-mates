@@ -1,3 +1,5 @@
+import MatchHeader from '../ui/MatchHeader';
+import type { ReactNode } from 'react';
 import ParticipantGroup, { RosterSummary } from '../ui/ParticipantGroup';
 import { IonIcon } from '@ionic/react';
 import { checkmarkCircleOutline, timeOutline, alertCircleOutline } from 'ionicons/icons';
@@ -16,7 +18,7 @@ import type { Detail, Match, MatchForm, Participant } from '../events/model';
 import './Events.css';
 import MatchSettlement from './MatchSettlement';
 
-export default function Events({ manager, session, initialEventId }: { manager: SessionManager; session: Session; initialEventId?: string | null }) {
+export default function Events({ manager, session, initialEventId, headerAction }: { manager: SessionManager; session: Session; initialEventId?: string | null; headerAction?: ReactNode }) {
   const [nextMatch, setNextMatch] = useState<Match | null>(null);
   const [filter, setFilter] = useState<MatchFilter>('upcoming');
   const [matches, setMatches] = useState<Match[]>([]);
@@ -161,11 +163,12 @@ export default function Events({ manager, session, initialEventId }: { manager: 
     </li>;
   }
   return <section aria-label="Wydarzenia" aria-busy={busy}>
+    <MatchHeader action={headerAction} busy={busy} onBack={detail ? () => void work(async () => { setDetail(null); setForm(null); await list(0); }) : undefined} />
     {error && <p role="alert" className="slm-error">⚠ {error}</p>}
     {notice && <p role="status" className="slm-notice">✓ {notice}</p>}
     {busy && <IonSpinner aria-label="Trwa operacja wydarzenia" />}
     <div className={`slm-actions${detail ? ' slm-detail-back' : ''}`}>
-      <IonButton fill="outline" disabled={busy} onClick={() => void work(async () => { setDetail(null); setForm(null); await list(0); })}>{detail ? '← Wróć do meczów' : 'Lista meczów'}</IonButton>
+      {!detail && <IonButton fill="outline" disabled={busy} onClick={() => void work(async () => { setDetail(null); setForm(null); await list(0); })}>Lista meczów</IonButton>}
       {admin && <IonButton disabled={busy} onClick={() => beginForm()}>Utwórz mecz</IonButton>}
       <IonButton fill="clear" disabled={busy} onClick={() => void work(() => e ? open(e.id) : list())}>Odśwież</IonButton>
     </div>
@@ -247,7 +250,7 @@ export default function Events({ manager, session, initialEventId }: { manager: 
           {guestEdit && <IonButton fill="clear" onClick={() => { setGuestEdit(null); setGuestName(''); setGuestPhone(''); }}>Anuluj edycję</IonButton>}
         </form></section>}
       </>} settlement={admin ? <MatchSettlement key={`${e.id}:${e.settlement_version ?? e.status}`} manager={manager} eventId={e.id} onChange={() => open(e.id)} /> : <section className="slm-panel"><p>Zatwierdzone należności za ten mecz sprawdzisz w swoich Rozliczeniach. Podział administracyjny nie jest dostępny w tym widoku.</p></section>} />
-    </> : <section className="slm-matches-screen"><h1>Mecze</h1><MatchFilters value={filter} onChange={setFilter} mineUnavailable />
+    </> : <section className="slm-matches-screen"><MatchFilters value={filter} onChange={setFilter} mineUnavailable />
       <p className="slm-filter-limit">Filtry obejmują pobraną stronę. Starsze mecze: przyciski stronicowania. „Moje” niedostępne — lista nie zawiera informacji o Twoich zapisach.</p>
       {filter === 'upcoming' && offset === 0 && upcoming && <MatchHero compact title="Najbliższy mecz" match={preview?.event ?? upcoming} openDisabled={busy} onOpen={() => void work(() => open(upcoming.id))}>
         {matchAction(preview)}

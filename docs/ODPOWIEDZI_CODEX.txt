@@ -547,3 +547,55 @@ historia Git i odpowiedź końcowa. Wyłącznie feat/ui-beta, normalny push.
 Bez merge, backendu/Auth/RPC/RLS/migracji/finansów/push/Firebase i ręcznego deploy.
 Automatyczny Vercel niezweryfikowany. Raport w docs/ODPOWIEDZI_CODEX.txt;
 STATUS/UI_BETA/DEMO_VERCEL/AGENTS zaktualizowane, wcześniejsze informacje zachowane.
+
+
+[2026-10-18 13:20:34 CEST] PREMIUM ESPAÑA3.5 — kompaktowy nagłówek i smukłe filtry
+Gałąź feat/ui-beta. Start czysty, HEAD i pobrany origin/feat/ui-beta zgodne:
+12e890ef4df6e30d528ef259006cf391299e4250. Bez nadpisywania zmian.
+
+Wspólny MatchHeader w aplikacji i demo: Mecze27.2px, lekka kursywa, złota kreska,
+pełny oryginalny primary-transparent64x71.81px po prawej, contain/450:505,
+bez edycji PNG, bez osobnego paska i tła prostokątnego. W szczegółach powrót
+w tym samym rzędzie z niezmienionym callbackiem i busy. Powiadomienia aplikacji
+przeniesione do nagłówka z zachowaniem callbacku/licznika i dotychczasowego dostępu.
+Pozostałe ekrany zachowują wcześniejszy branding. Safe area i przewijanie zachowane.
+Filtry: span wizualny28px, przycisk44px, szerokości>=44, font12.48px i wagi bez
+zmian, promień12px, red/gold aktywny. Funkcje filtrów i ograniczenie Moje w aplikacji
+bez zmian. Zakładki szczegółów zachowane bez dodatkowego zmniejszania.
+Karty/fotografie/dane/uczestnicy/footer bez przebudowy. Auth/RPC/RLS/migracje,
+finanse/FIFO/push/Firebase, sesje i konfiguracja Vercel nietknięte.
+
+Dwa rzeczywiste cykle Chromium390x844: pierwszy herb60px, ogląd renderów i pomiary;
+drugi korekta do64px dla czytelności, ponowny build/render i ogląd Dark/Light/320.
+Pierwszy cykl docs/ui/premium35-cycle1/. Końcowe metryki premium35-metrics.json.
+Porównano rzeczywiste premium33-home-dark i premium34-participants-dark.
+Home: pierwsza karta y130.81 zamiast191.17 (odzysk60.36px); karta nadal121px,
+footer nadal y777/h67. Szczegóły demo: hero y79 zamiast115 (~36px więcej miejsca).
+Domyślnie Uczestnicy; screenshot details-dark pokazuje osobno Informacje.
+Różnice: nie dostarczono pliku ostatniej wizualizacji3.5, więc dopasowanie do opisu;
+systemowy font z kursywą, nie nowy licencjonowany krój sportowy. Na rzeczywistym
+urządzeniu nadal trzeba potwierdzić notch, skalowanie fontu i komfort dotyku.
+
+TypeScript, ESLint, build aplikacji i demo OK; Vitest90/90 w14 plikach.
+Chromium320/390/768: jeden wiersz tytuł/herb, brak obcinania i overflow dokumentu,
+contain/proporcje, symulowany safe area32px, scroll herbu, wizualne28px i dotyk44px,
+niezmieniony font filtrów, filtry4/2/1, karta Enter/Space, powrót, zakładki i klawiatura,
+jedyny panel, dolna nawigacja, Dark/Light/Auto/live system, suwak0/10/15 OK.
+Kontrola izolacji14 plików, allowlista rozszerzona wyłącznie o MatchHeader UI;
+CSP/connect-src none, brak zewnętrznych żądań i markerów Auth/Supabase/API/Edge.
+Demo nie zawiera rzeczywistych danych ani sekretów. Ostrzeżenia dużych chunków
+Ionic nadal obecne. Cypress niewykonany: brak Xvfb. Android/iOS i prawdziwy backend
+nieweryfikowane; testy API używają atrap, nie rzeczywistego Supabase.
+
+Rzeczywiste zrzuty React/Ionic:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium35-home-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium35-home-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium35-details-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium35-participants-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium35-home-320.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium35-home-768.png
+
+Bez merge, migracji i ręcznego wdrożenia. Automatyczny Vercel niezweryfikowany,
+nie podaję niepotwierdzonego URL. Commit implementacji i status push uzupełnione
+po zapisie poniżej; końcowy SHA w historii Git i odpowiedzi. Raport:
+docs/ODPOWIEDZI_CODEX.txt. Starsze zastrzeżenia backendu/Dockera pozostają aktualne.

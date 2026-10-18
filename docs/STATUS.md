@@ -1,3 +1,17 @@
+# Premium España3.5 — 2026-10-18 13:20:34 CEST
+
+feat/ui-beta: wspólny jednorzędowy nagłówek Mecze/powrót i pełny herb64px,
+filtry wizualne28px przy obszarze44px, font/wagi zachowane. Home odzyskuje60px,
+szczegóły~36px. Karty/fotografie/uczestnicy/footer/dane/logika bez przebudowy.
+Dwa cykle Chromium; premium35-*.png i premium35-metrics.json w docs/ui/.
+TypeScript/ESLint/oba buildy OK; Vitest90/90; Chromium320/390/768, klawiatura,
+filtry/zakładki/motywy, safe area32px/scroll, dotyk44px, brak overflow oraz
+izolacja demo/CSP OK. Cypress niewykonany (brak Xvfb), Android/iOS/realny backend
+nieweryfikowane. Duże chunki Ionic. Bez backendu/migracji/deploy/merge;
+Vercel automatyczny niezweryfikowany. Raport docs/ODPOWIEDZI_CODEX.txt.
+Następny krok: ocena na telefonie, notch/skala tekstu/dotyk. Starsze ograniczenia
+SQL/RLS/FIFO/Dockera i niewdrożone migracje/Edge poniżej pozostają aktualne.
+
 # Premium España3.4 — szczegóły i Uczestnicy — 2026-10-18 13:01:34 CEST
 
 Gałąź feat/ui-beta. Implementacja: fe614069c1c0a6a93f48669bdb396b97986e1891.
