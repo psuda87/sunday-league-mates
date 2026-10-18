@@ -40,6 +40,8 @@ async function widths() {
     for (const filter of filters) { assert(filter.w>=44 && filter.h>=44); assert(filter.visual>=28 && filter.visual<=30); assert.equal(filter.font,'12.48px'); assert.equal(filter.clipped,false); }
     const detail = await evaluate(`(() => {const b=document.querySelector('.slm-match-detail .slm-match-cta');if(!b)return null;const n=b.shadowRoot.querySelector('button'),p=document.querySelector('[role=tabpanel]:not([hidden])'),t=document.querySelector('[role=tablist]');return {hit:b.getBoundingClientRect().height,visible:n.getBoundingClientRect().height,font:getComputedStyle(b).fontSize,weight:getComputedStyle(b).fontWeight,headings:p.querySelectorAll(':scope > .slm-section-heading').length,named:!!document.getElementById(p.getAttribute('aria-labelledby')),gap:p.firstElementChild.getBoundingClientRect().top-t.getBoundingClientRect().bottom,clipped:n.scrollHeight>n.clientHeight};})()`);
     if(detail){assert(detail.hit>=44);assert.equal(detail.visible,34);assert.equal(detail.font,'12.48px');assert.equal(detail.weight,'800');assert.equal(detail.headings,0);assert.equal(detail.named,true);assert.equal(detail.clipped,false);assert(detail.gap>=12&&detail.gap<=16);}
+    const targets=await evaluate("[...document.querySelectorAll('.slm-player-list button,.slm-player-search input')].map(el=>{const r=el.getBoundingClientRect();return {width:r.width,height:r.height};})");
+    for(const target of targets) assert(target.width>=44&&target.height>=44);
     const rows = await evaluate("[...document.querySelectorAll('[role=tab]')].map(tab=>Math.round(tab.getBoundingClientRect().top))");
     if (rows.length) assert.equal(new Set(rows).size, 1, 'Tabs must be on one horizontal row');
   }
@@ -113,6 +115,26 @@ try {
   await evaluate("document.querySelectorAll('.slm-bottom-nav button')[1].click()");
   assert.equal(await evaluate("document.querySelector('.slm-bottom-nav [aria-current=page]').textContent"),'Zawodnicy');
   assert.equal(await evaluate("document.querySelector('h1').textContent"),'Zawodnicy');
+  async function searchPlayers(value) {
+    await evaluate(`(() => {const el=document.querySelector('.slm-player-search input');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,${JSON.stringify(value)});el.dispatchEvent(new Event('input',{bubbles:true}));})()`);await pause();
+  }
+  for(const mode of ['dark','light']) {
+    await tools(true);await evaluate(`document.querySelector('input[value=${mode}]').click()`);await tools(false);await evaluate("document.querySelector('ion-content').scrollToTop(0)");
+    await widths();await shot(`players-${mode}`);
+    assert.equal(await evaluate("document.querySelectorAll('.slm-player-list li').length"),8);
+    await searchPlayers('lukasz');assert.equal(await evaluate("document.querySelectorAll('.slm-player-list li').length"),1);
+    if(mode==='dark') await shot('players-search');
+    await evaluate("document.querySelector('.slm-player-list button').focus()");await press('Enter','Enter',13);await widths();
+    assert.equal(await evaluate("document.querySelector('.slm-bottom-nav [aria-current=page]').textContent"),'Zawodnicy');
+    assert.equal(await evaluate("document.querySelector('.slm-player-card h2').textContent"),'Łukasz Wrona');
+    assert.equal(await evaluate("!!document.querySelector('.slm-players-screen a[href^=tel]')"),false);
+    await shot(`player-profile-${mode}`);
+    await evaluate("document.querySelector('ion-button.slm-compact-back').shadowRoot.querySelector('button').focus()");await press('Enter','Enter',13);await pause();
+    assert.equal(await evaluate("document.querySelector('.slm-player-search input').value"),'lukasz');
+    assert.equal(await evaluate("document.activeElement.textContent.includes('Łukasz')"),true);
+    await searchPlayers('zzzz');assert.equal(await evaluate("document.querySelector('.slm-player-empty h2').textContent"),'Brak wyników');
+    await evaluate("document.querySelector('.slm-player-empty button').click()");assert.equal(await evaluate("document.querySelectorAll('.slm-player-list li').length"),8);
+  }
   await evaluate("document.querySelectorAll('.slm-bottom-nav button')[2].click()");
   assert.equal(await evaluate("document.querySelector('.slm-bottom-nav [aria-current=page]').textContent"),'Profil');
   await evaluate("document.querySelectorAll('.slm-bottom-nav button')[0].click()");

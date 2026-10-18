@@ -1,3 +1,4 @@
+import Players from './Players';
 import MatchHeader from './MatchHeader';
 import { useEffect, useRef, useState } from 'react';
 import { IonPage, IonContent, IonFooter, IonButton } from '@ionic/react';
@@ -15,6 +16,7 @@ const readView = (): View => {
   const hash = window.location.hash.slice(1);
   return hash === 'compare' || hash === 'details-a' || hash === 'details-b' ? hash : hash === 'details' ? 'details-b' : 'home';
 };
+const demoPlayers = ['Alex Nowak', 'Kamil Zieliński', 'Marek Lis', 'Piotr Wójcik', 'Adrian Maj', 'Łukasz Wrona', 'Tomasz Wilk', 'Oskar Król'].map((name, index) => ({ key: `fictional-${index}`, name }));
 // Static fixture: no API, credentials or personal data.
 const demo: Match = { id: 'demo', starts_at: '2026-10-22T16:00:00Z', location: 'Boisko demonstracyjne', duration_minutes: 90, hourly_rate: 180, total_cost: 270, capacity: 15, status: 'scheduled', registered_count: 12, reserve_count: 0, registration_open: true, decision_required: false, cutoff_at: '', estimated_per_person: null, settlements_active: false };
 export default function Demo() {
@@ -36,7 +38,7 @@ export default function Demo() {
   }, []);
   function navigate(next: View) { setView(next); window.location.hash = next; void content.current?.scrollToTop?.(0); }
   return <IonPage className="slm-demo">
-    <IonContent ref={content}><main className="slm-accounts">{tab === 'events' ? <MatchHeader onBack={view !== 'home' ? () => navigate('home') : undefined} /> : <div className="slm-shell-header slm-floating-brand"><img className="slm-logo slm-crest slm-floating-crest" src="/assets/branding/slm-logo-primary-transparent.png" alt="Sunday League Mates" width="450" height="505" /></div>}<p className="slm-demo-badge">Dane przykładowe</p>
+    <IonContent ref={content}><main className="slm-accounts">{tab === 'events' ? <MatchHeader onBack={view !== 'home' ? () => navigate('home') : undefined} /> : tab === 'players' ? null : <div className="slm-shell-header slm-floating-brand"><img className="slm-logo slm-crest slm-floating-crest" src="/assets/branding/slm-logo-primary-transparent.png" alt="Sunday League Mates" width="450" height="505" /></div>}<p className="slm-demo-badge">Dane przykładowe</p>
       {tab === 'events' ? <>
 
         {view === 'home' ? <section className="slm-matches-screen" aria-label="Mecze demonstracyjne"><MatchFilters value={filter} onChange={setFilter} /><div className="slm-match-list" aria-live="polite">{visible.map(({ match, index }) => <MatchHero key={match.id} match={{ ...match, registered_count: index === 0 ? count : match.registered_count }} compact title="Przykładowy mecz" displayName={names[index]} onOpen={() => { setSelected(index); navigate('details-b'); }} />)}</div></section> : view === 'compare' ? <>
@@ -50,7 +52,7 @@ export default function Demo() {
           <MatchHero match={{ ...current, registered_count: currentCount }} title="Szczegóły meczu" displayName={names[selected]}><IonButton expand="block" className="slm-match-cta" disabled>ZAPISZ SIĘ NA MECZ</IonButton></MatchHero>
           <section className="slm-variant-full" aria-label={`Pełny wariant ${view === 'details-a' ? 'A' : 'B'}`}><DemoMatchDetails key={view} variant={view === 'details-a' ? 'a' : 'b'} count={currentCount} startsAt={current.starts_at} /></section>
         </>}
-      </> : tab === 'players' && <section className="slm-panel"><h1>Zawodnicy</h1><p className="slm-planned">Planowane</p><p>Katalog zawodników nie jest dostępny w demonstracji.</p></section>}
+      </> : tab === 'players' && <Players players={demoPlayers} demo onNavigate={() => { void content.current?.scrollToTop?.(0); }} />}
       <details className="slm-demo-tools"><summary>Narzędzia demo</summary>
         <p className="slm-muted">Fikcyjne dane, brak API, logowania i połączeń z backendem. Przycisk zapisu w szczegółach jest nieaktywny.</p>
         <section className="slm-panel slm-demo-capacity"><h2>Przetestuj zajętość</h2>

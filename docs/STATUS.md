@@ -1,3 +1,20 @@
+# Premium España3.7 — 2026-10-18 13:42:23 CEST
+
+feat/ui-beta: Players lista/profil, inicjały, A–Z i wyszukiwanie PL, powrót/fokus,
+stany pusty/brak wyników; statystyki W przygotowaniu bez wartości. Demo pełny flow
+na8 fikcyjnych osobach, Dark/Light/Auto. Prawdziwy katalog NIE PODŁĄCZONY:
+istniejące list_accounts admin-only i prywatne pola; brak bezpiecznego kontraktu
+członka. Aplikacja pokazuje uczciwy stan niedostępności, zachowuje powiadomienia.
+Bez nowych API/SQL/Auth i bez wywołań administracyjnych. Własny Profil bez zmian.
+Trzy render-cykle, premium37-*.png i PREMIUM37_VISUAL_REVIEW.md w ui/;
+regression.json potwierdza bajtowo niezmienione zatwierdzone Mecze/Szczegóły.
+TS/ESLint/oba buildy OK; Vitest92/92, Chromium320/390/768, nawigacja/klawiatura,
+search/clear/brak wyników, cele44px/motywy/overflow i izolacja14plików/CSP OK.
+Pusty dataset: Vitest. Cypress brak Xvfb, Android/iOS/realny backend nieweryfikowane.
+Duże chunki Ionic. Bez migracji/merge/deploy; Vercel automatyczny niezweryfikowany.
+Następny krok: telefon i osobno bezpieczny kontrakt katalogu. Raport ODPOWIEDZI_CODEX.txt.
+Starsze ograniczenia SQL/RLS/FIFO/Dockera i niewdrożone migracje poniżej zachowane.
+
 # Premium España3.6 — 2026-10-18 13:28:53 CEST
 
 Implementacja 4f9dff8616343eee04d4cdefa3d7d1f39f79e726, push zakończony.

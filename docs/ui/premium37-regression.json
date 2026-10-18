@@ -1,0 +1,22 @@
+{
+  "home-dark": {
+    "unchanged": true,
+    "sha256": "1a51392361bfb34f617008a3621f9b4f93f7e5036fe4da082e5c5a0208ae0e37"
+  },
+  "home-light": {
+    "unchanged": true,
+    "sha256": "5c01f68913aced00fe791a0a4c4e8b9398a581ddcf533588efb40ef19400a8d5"
+  },
+  "details-dark": {
+    "unchanged": true,
+    "sha256": "f455300c8b41910c37d8c4173727d39daf4d56793db377d434715a6e12efb7d1"
+  },
+  "participants-dark": {
+    "unchanged": true,
+    "sha256": "a291e341ce4f432b6b9830bddd8eb5c675fd3c6b1691d59cd0111a62418bb324"
+  },
+  "teams-dark": {
+    "unchanged": true,
+    "sha256": "fc64929241243007ad36792d5bc656427dc2093aa5591119bde6b60b704ac248"
+  }
+}

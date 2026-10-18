@@ -1,3 +1,4 @@
+import Players from '../ui/Players';
 import { notificationsOutline } from 'ionicons/icons';
 import AppearanceSettings from '../ui/AppearanceSettings';
 import BottomNav from '../ui/BottomNav';
@@ -160,7 +161,7 @@ export default function Accounts() {
 
   return <IonPage>
     <IonContent><main className="slm-accounts">
-    {!(auth.phase === 'ready' && session && !session.must_change_password && screen === 'events') && <div className="slm-shell-header slm-floating-brand"><img className="slm-logo slm-crest slm-floating-crest" src="/assets/branding/slm-logo-primary-transparent.png" alt="Sunday League Mates" width="450" height="505" />
+    {!(auth.phase === 'ready' && session && !session.must_change_password && (screen === 'events' || screen === 'players')) && <div className="slm-shell-header slm-floating-brand"><img className="slm-logo slm-crest slm-floating-crest" src="/assets/branding/slm-logo-primary-transparent.png" alt="Sunday League Mates" width="450" height="505" />
       {auth.phase === 'ready' && session && !session.must_change_password && <IonButton fill="clear" aria-label={`Powiadomienia${unread ? `, nieprzeczytane: ${unread}` : ''}`} onClick={() => setScreen('notifications')}><IonIcon icon={notificationsOutline} aria-hidden="true" /> {unread ? `(${unread})` : ''}</IonButton>}</div>}
 
       {error && <p role="alert" className="slm-error">⚠ {error}</p>}
@@ -206,7 +207,7 @@ export default function Accounts() {
         {!session.must_change_password && screen === 'profile' && <AppearanceSettings />}
         {session.must_change_password ? <section className="slm-panel">
           <h1>Zmień hasło tymczasowe</h1><p>Przed korzystaniem z grupy ustaw własne hasło.</p>{passwordForm}
-        </section> : screen === 'players' ? <section className="slm-panel"><h1>Zawodnicy</h1><p>Listę zawodników i kontakt znajdziesz w szczegółach meczu. Katalog zawodników jest planowany.</p><IonButton onClick={() => setScreen('events')}>Przejdź do meczów</IonButton></section> : screen === 'settlements' ? <Settlements manager={manager} session={session} /> : screen === 'notifications' ? <Notifications manager={manager} push={push} pushStatus={pushStatus}
+        </section> : screen === 'players' ? <Players players={[]} unavailable action={<IonButton fill="clear" aria-label={`Powiadomienia${unread ? `, nieprzeczytane: ${unread}` : ''}`} onClick={() => setScreen('notifications')}><IonIcon icon={notificationsOutline} aria-hidden="true" />{unread ? `(${unread})` : ''}</IonButton>} /> : screen === 'settlements' ? <Settlements manager={manager} session={session} /> : screen === 'notifications' ? <Notifications manager={manager} push={push} pushStatus={pushStatus}
           onOpen={openNotification} onRefresh={() => setNotificationVersion(v => v+1)} /> :
           screen === 'events' ? <Events manager={manager} session={session} initialEventId={eventTarget} headerAction={<IonButton fill="clear" aria-label={`Powiadomienia${unread ? `, nieprzeczytane: ${unread}` : ''}`} onClick={() => setScreen('notifications')}><IonIcon icon={notificationsOutline} aria-hidden="true" />{unread ? `(${unread})` : ''}</IonButton>} /> : screen === 'profile' || session.role !== 'admin' ? <>
           <section className="slm-panel">

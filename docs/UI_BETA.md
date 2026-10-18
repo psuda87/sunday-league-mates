@@ -348,3 +348,19 @@ port debug na loopback; bez publikacji. Zrzuty domyślnie w /tmp/slm-ui-preview.
 buduje odrębne `demo/main.tsx` do `dist-demo`, bez App/Auth/Edge/Supabase.
 Demo ma teraz suwak zajętości 0–15. Konfiguracja i wyniki: [DEMO_VERCEL.md](DEMO_VERCEL.md).
 Brak wdrożenia. Nie publikować pełnego `dist`.
+
+## Premium3.7 — katalog i profil zawodnika
+
+Players jest wspólnym UI bez fetch/Auth: przyjmuje minimalne key/name, nie renderuje
+key ani prywatnych pól. Inicjały zamiast niedostępnych portretów, brak jersey/ocen.
+A–Z PL, wyszukiwanie z diakrytykami, empty/no-results/unavailable, profil i fokus
+po powrocie. MatchHeader ma opcjonalny tytuł i etykietę powrotu, domyślne Mecze
+pozostały identyczne. CSS wyłącznie .slm-player*; istniejące Mecze i Szczegóły
+bajtowo niezmienione w porównawczych zrzutach. Dark/Light/Auto bez nowego systemu.
+Demo ma8 jawnie fikcyjnych osób. Produkcyjny katalog wymaga osobnego minimalnego
+kontraktu dla członka grupy; list_accounts admin-only nie jest takim kontraktem.
+Aplikacja pokazuje niedostępność, nie używa admin API i nie symuluje listy.
+Statystyki wymagają zweryfikowanych obecności zakończonych meczów, nie zapisów.
+Nie ma nowych migracji/RPC, numerów koszulek/statystyk ani publikowanych kontaktów.
+Analiza3 cykli i screenshoty: ui/PREMIUM37_VISUAL_REVIEW.md. Testy:92/92 Vitest,
+Chromium320/390/768; nie są to realne testy Supabase/Androida.

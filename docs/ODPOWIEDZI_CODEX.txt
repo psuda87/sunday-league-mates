@@ -658,3 +658,77 @@ Commit implementacji: 4f9dff8616343eee04d4cdefa3d7d1f39f79e726.
 Zwykły push na feat/ui-beta zakończony. Przegląd zakresu i diff --check OK;
 brak nowych sekretów/.env/niepotrzebnych artefaktów. Końcowy SHA uzupełnienia
 w historii Git i odpowiedzi. Raport docs/ODPOWIEDZI_CODEX.txt.
+
+
+[2026-10-18 13:42:23 CEST] PREMIUM ESPAÑA3.7 — Zawodnicy i indywidualny profil
+Gałąź feat/ui-beta. Start czysty; fetch potwierdził zgodność z origin:
+4f0287483aab75d3f49949d4083304a5f1c3ad8c. Bez nadpisywania cudzych zmian.
+
+Dane i ograniczenie rzeczywistej aplikacji:
+Profile ma display_name, login, full_name, display_as, phone, user_id. ManagedAccount
+rozszerza o role i stany bezpieczeństwa. Brak awatara, numeru koszulki i wiarygodnego
+agregatu statystyk. accounts/handler.ts list_accounts jest po sprawdzeniu roli admin
+(linie361+), zawiera też prywatne pola. Nie wykorzystano tego endpointu jako katalogu
+członków, nie pobierano danych administracyjnych i nie dodano endpointu/RPC.
+Sama tabela slm_profiles zawiera full_name/display_as, bez pełnego kontraktu nazw
+preferowanych/nicków i katalogu grupy. Nie obchodzono obecnego zarządzania sesją.
+
+W prawdziwej aplikacji Zawodnicy ma nowy wspólny nagłówek i uczciwy stan Katalog
+grupy w przygotowaniu. Nie pokazuje pustej tablicy jako rzeczywiście pustej grupy.
+Istniejący przycisk powiadomień/licznik i jego callback zachowane jako headerAction.
+Własny Profil/edycja konta bez zmian. Pełny katalog i profile innych członków
+wymagają osobno autoryzowanego, serwerowo bezpiecznego kontraktu minimalnych danych.
+To świadomie niedokończona integracja danych, nie gotowa rzeczywista lista grupy.
+
+Wspólny Players: kompaktowe kafelki62px, inicjały40px, nazwa i strzałka,
+sortowanie Intl.Collator pl, wyszukiwanie live z obsługą ł/diakrytyków, licznik,
+pusta lista, brak wyników i czyszczenie. Profil: inicjały100px, nazwa, stadionowa
+poświata z istniejącego zasobu, sekcja Statystyki/W przygotowaniu. Brak ocen,
+pozycji, wymyślonych numerów, telefonów/e-maili/identyfikatorów w treści, finansów
+czy danych admina. Powrót zachowuje query i fokus na wybranym wierszu, scroll
+na górę przy wejściu; Zawodnicy aktywni na liście i profilu. MatchHeader ma tylko
+opcjonalny tytuł/backLabel, domyślne wartości Mecze i DOM pozostały bez zmian.
+
+Demo: osiem jawnie fikcyjnych osób, pełny flow lista/wyszukaj/profil/powrót,
+Light/Dark/Auto w dotychczasowych Narzędziach demo. Profil w dolnej nawigacji nadal
+obsługuje istniejący ekran ustawień wyglądu. Bez backendu/Auth/Supabase/API,
+portretów z internetu, prawdziwych danych ani nowych sekretów. Allowlista builda
+rozszerzona tylko o Players UI. Konfiguracja Vercel i CSP bez zmian.
+
+Statystyki przyszłe: rozegrane mecze/obecności/ostatnie występy wymagają danych
+zakończonych, nieanulowanych meczów i jawnie zweryfikowanej obecności fizycznej.
+Frekwencja wymaga dodatkowo zdefiniowania mianownika i kontraktu potwierdzeń.
+Zapis lub domyślna obecność nie wystarczają. Nie liczono niczego z rejestracji
+ani obowiązku zapłaty; brak nowego modelu statystyk i tabel/migracji.
+
+Weryfikacja: TypeScript/ESLint/oba buildy OK; Vitest92/92 w15 plikach.
+Nowe2 testy: sortowanie PL/diakrytyki/query, powrót/fokus, prywatne dane nie trafiają
+do treści, brak danych/brak wyników/clear i uczciwa niedostępność. Istniejące testy
+zapisów/finansów/Auth używają atrap API, nie rzeczywistego Supabase.
+Chromium320x844/390x844/768px i obrót: lista/profil/back klawiaturą, wyszukiwanie,
+brak wyników/clear, aktywny tab, cele>=44px, brak overflow, cały herb, motywy,
+reszta smoke meczów/zakładek/suwaka/safe areas i CSP OK. Pustą listę sprawdzono
+Vitest; demo nie zawiera dodatkowego przełącznika fikcyjnej pustej bazy.
+Izolacja14 statycznych plików, brak Auth/Supabase/Edge i żądań poza origin.
+Duże chunki Ionic nadal; Cypress niewykonany (brak Xvfb), Android/iOS/backend realny
+nieweryfikowane. Nie deklaruję pełnego audytu WCAG ani gotowości produkcyjnej.
+
+Trzy cykle renderowania i oglądu: cycle1/2 zachowane w docs/ui/premium37-cycle*/,
+trzeci końcowy, analiza docs/ui/PREMIUM37_VISUAL_REVIEW.md. Pierwszy smoke wymagał
+korekty selektora Shadow DOM powrotu, kolejne pełne przebiegi zaliczone.
+Home Dark/Light i details/participants/teams Dark bajtowo identyczne z3.5/3.6,
+SHA256 w docs/ui/premium37-regression.json. Brak przebudowy zaakceptowanych ekranów.
+
+Zrzuty rzeczywistego React/Ionic:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium37-players-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium37-players-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium37-player-profile-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium37-player-profile-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium37-players-search.png
+
+Bez merge, migracji, zmian backendu/Auth/RPC/RLS/finansów/push/Firebase,
+konfiguracji Vercel i ręcznego wdrożenia. Automatyczny Vercel niezweryfikowany.
+Raport docs/ODPOWIEDZI_CODEX.txt; STATUS/UI_BETA zaktualizowane. Po commicie dopiszę
+SHA implementacji; końcowy SHA uzupełnienia w historii Git i odpowiedzi.
+Następny krok: ocena na telefonie, klawiatura/safe areas/fonty oraz osobna decyzja
+o minimalnym kontrakcie katalogu członków bez prywatnych danych.
