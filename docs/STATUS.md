@@ -1,5 +1,6 @@
 # Premium España3.5 — 2026-10-18 13:20:34 CEST
 
+Commit implementacji 8d7543bff521bf0c2248124bc975accf77a09ac3; push origin potwierdzony.
 feat/ui-beta: wspólny jednorzędowy nagłówek Mecze/powrót i pełny herb64px,
 filtry wizualne28px przy obszarze44px, font/wagi zachowane. Home odzyskuje60px,
 szczegóły~36px. Karty/fotografie/uczestnicy/footer/dane/logika bez przebudowy.

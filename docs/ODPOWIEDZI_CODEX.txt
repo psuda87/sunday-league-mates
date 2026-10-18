@@ -599,3 +599,10 @@ Bez merge, migracji i ręcznego wdrożenia. Automatyczny Vercel niezweryfikowany
 nie podaję niepotwierdzonego URL. Commit implementacji i status push uzupełnione
 po zapisie poniżej; końcowy SHA w historii Git i odpowiedzi. Raport:
 docs/ODPOWIEDZI_CODEX.txt. Starsze zastrzeżenia backendu/Dockera pozostają aktualne.
+
+[2026-10-18 13:21:06 CEST] Zapis i push Premium3.5
+Commit implementacji: 8d7543bff521bf0c2248124bc975accf77a09ac3.
+Zwykły push na origin/feat/ui-beta zakończony; ls-remote potwierdził identyczny SHA.
+Przegląd diff/staged, nowych plików i diff --check OK; brak .env, sekretów i artefaktów
+poza zamówionymi zrzutami/metriami. Końcowy commit tego uzupełnienia w historii Git.
+Bez merge/ręcznego deploy. Raport: docs/ODPOWIEDZI_CODEX.txt.
