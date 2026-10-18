@@ -1,3 +1,12 @@
+## Premium3.12 — Premium Finance UI
+
+Do jawnej allowlisty modułów dodano tylko src/demo/Finance.tsx. Bez nowych
+zasobów/dependencies; output15 plików/6 dotychczasowych assetów. CSP/env/publicDir
+i app/vercel.json bez zmian. Dane i role wyłącznie fikcyjne w pamięci, bez Auth/
+API/Supabase/Edge. Przełącznik ról nie jest zabezpieczeniem; nie stosować go
+do prawdziwych danych. Root app / npm run build:demo / dist-demo / bez env.
+Bez ręcznego wdrożenia.
+
 ## Premium3.11 — boisko tylko demo
 
 Jawna allowlista modułów rozszerzona o src/demo/Teams.tsx; kontrola nadal odrzuca

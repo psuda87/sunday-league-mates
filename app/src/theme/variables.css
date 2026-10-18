@@ -569,3 +569,63 @@ ion-toolbar:has(.slm-shell-header) { --background:var(--slm-brand-header-bg); }
 .slm-pitch-player[aria-pressed=true] .slm-pitch-token::after { content:'✓'; position:absolute; right:-5px; top:-5px; display:grid; place-items:center; width:17px; height:17px; border-radius:50%; background:var(--slm-pitch-gold); color:var(--slm-pitch-navy); font-size:.7rem; line-height:1; }
 /*3.11 tablet review: keep the pitch vertical instead of stretching across 768px. */
 .slm-football-pitch { max-width:420px; margin-inline:auto; }
+
+/* Premium3.12 — compact demo finance, scoped away from production finance. */
+.slm-finance { --slm-finance-positive:#7CCCA0; --slm-finance-warning:#F2C56D; --slm-finance-pending:#EAA0A5; }
+.ion-palette-dark .slm-finance { --slm-finance-positive:#7CCCA0; --slm-finance-warning:#F2C56D; --slm-finance-pending:#EAA0A5; }
+:root:not(.ion-palette-dark) .slm-finance { --slm-finance-positive:#226343; --slm-finance-warning:#795312; --slm-finance-pending:#9E2935; }
+.slm-finance-disclaimer { margin:0 0 8px; color:var(--slm-gold); font-size:.7rem; font-weight:650; }
+.slm-finance-role { display:flex; gap:7px; }
+.slm-finance button { cursor:pointer; }
+.slm-finance-role button,.slm-finance-row-tools button,.slm-finance-form button { min-height:44px; padding:8px 12px; border:1px solid var(--slm-border); border-radius:10px; background:var(--slm-panel); color:var(--slm-text); font:inherit; font-size:.74rem; }
+.slm-finance-role [aria-pressed=true] { border-color:var(--slm-gold); background:var(--slm-nav-active); box-shadow:inset 0 -1px var(--slm-gold); }
+.slm-finance-scope { min-height:34px; margin:8px 0 12px; color:var(--slm-text-secondary); font-size:.72rem; line-height:1.5; }
+.slm-finance-tiles { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin:0 0 12px; }
+.slm-finance-tiles > div { min-width:0; padding:13px 12px; border:1px solid var(--slm-border); border-radius:13px; background:linear-gradient(140deg,var(--slm-card-top),var(--slm-panel)); box-shadow:0 4px 12px var(--slm-shadow),inset 0 1px 0 var(--slm-card-light); }
+.slm-finance-tiles dt { display:flex; align-items:center; gap:6px; color:var(--slm-text-secondary); font-size:.72rem; }
+.slm-finance-tiles dt ion-icon { flex:none; color:var(--slm-gold); font-size:16px; }
+.slm-finance-tiles dd { margin:8px 0 0; color:var(--slm-gold); font-size:clamp(1rem,4.5vw,1.35rem); font-weight:750; font-variant-numeric:tabular-nums; line-height:1.25; overflow-wrap:anywhere; }
+.slm-finance-progress { margin-bottom:16px; padding:0 2px; }
+.slm-finance-progress > div:first-child { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:.78rem; }
+.slm-finance-progress strong { color:var(--slm-gold); }
+.slm-finance-track { height:8px; margin:9px 0 6px; border-radius:8px; background:var(--slm-panel); border:1px solid var(--slm-border); overflow:hidden; }
+.slm-finance-track > span { display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,var(--slm-gold),var(--slm-finance-positive)); }
+.slm-finance-progress small { color:var(--slm-text-secondary); font-size:.67rem; }
+.slm-finance-surplus { padding:10px 12px; border:1px solid var(--slm-border); border-radius:10px; color:var(--slm-finance-positive); background:var(--slm-panel); font-size:.78rem; }
+.slm-finance-list-heading { display:flex; align-items:center; justify-content:space-between; margin:0 0 8px; }
+.slm-finance-list-heading h3 { margin:0; font-size:.9rem; }
+.slm-finance-list-heading > span { color:var(--slm-gold); font-size:.8rem; }
+.slm-finance-rows { display:grid; gap:9px; }
+.slm-finance .slm-finance-rows > li { display:block; padding:9px 12px; border:1px solid var(--slm-border); border-radius:12px; background:linear-gradient(135deg,var(--slm-card-top),var(--slm-panel)); }
+.slm-finance-person { display:flex; align-items:center; gap:9px; }
+.slm-finance-avatar { display:grid; place-items:center; flex:none; width:32px; height:32px; border-radius:50%; border:1px solid var(--slm-border); background:var(--slm-nav-active); color:var(--slm-gold); font-size:.7rem; }
+.slm-finance-person > div { min-width:0; flex:1; overflow-wrap:anywhere; font-size:.85rem; }
+.slm-finance-person .slm-demo-person { width:100%; text-align:left; white-space:normal; line-height:1.35; font-size:.85rem; }
+.slm-finance-person small { display:block; line-height:1.4; font-size:.65rem; }
+.slm-finance-status { flex:none; max-width:85px; color:var(--slm-finance-pending); font-size:.65rem; font-weight:650; }
+.slm-finance-status[data-state="Opłacono"],.slm-finance-status[data-state="Nadpłata"] { color:var(--slm-finance-positive); }
+.slm-finance-status[data-state="Częściowo"] { color:var(--slm-finance-warning); }
+.slm-finance-row-amounts { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:4px 0 2px; padding-left:41px; }
+.slm-finance-row-amounts dt { color:var(--slm-text-secondary); font-size:.64rem; }
+.slm-finance-row-amounts dd { margin:4px 0; font-size:.83rem; font-weight:650; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.slm-finance-row-tools { margin-top:6px; border-top:1px solid var(--slm-border); }
+.slm-finance-row-tools summary { display:flex; align-items:center; min-height:44px; cursor:pointer; color:var(--slm-gold); font-size:.7rem; }
+.slm-finance-row-tools summary::after { content:'⌄'; margin-left:auto; }
+.slm-finance-row-tools > div { display:flex; flex-wrap:wrap; gap:6px; }
+.slm-finance-form { margin-top:10px; padding-top:12px; border-top:1px solid var(--slm-border); }
+.slm-finance-form h3 { font-size:.85rem; margin:0 0 10px; }
+.slm-finance-form label { display:block; margin-bottom:7px; font-size:.75rem; }
+.slm-finance-form input { display:block; width:100%; min-height:44px; box-sizing:border-box; padding:8px 12px; border:1px solid var(--slm-border); border-radius:8px; background:var(--slm-panel); color:var(--slm-text); font:inherit; }
+.slm-finance-form > p { font-size:.7rem; color:var(--slm-text-secondary); line-height:1.5; }
+.slm-finance-form [role=alert] { color:var(--ion-color-danger); }
+.slm-finance-form > div { display:flex; gap:6px; flex-wrap:wrap; }
+.slm-finance-empty,.slm-finance-retained { padding:14px; border:1px solid var(--slm-border); border-radius:12px; background:var(--slm-panel); font-size:.8rem; line-height:1.5; }
+.slm-finance-empty h3,.slm-finance-retained h3 { margin:0 0 8px; font-size:.9rem; }
+.slm-finance-note,.slm-finance-retained > p { font-size:.7rem; color:var(--slm-text-secondary); line-height:1.5; }
+/*3.12 pass2: quiet status chips and a restrained burgundy light on summary tiles. */
+.slm-finance-status { padding:4px 6px; border:1px solid var(--slm-border); border-radius:7px; background:var(--slm-panel); line-height:1.35; }
+.slm-finance-tiles > div { background:radial-gradient(ellipse at 100% 0,var(--slm-crest-burgundy),transparent 72%),linear-gradient(140deg,var(--slm-card-top),var(--slm-panel)); }
+/*3.12 pass3: visible keyboard focus and an inline, clearly bounded amount editor. */
+.slm-finance button:focus-visible,.slm-finance summary:focus-visible,.slm-finance input:focus-visible { outline:2px solid var(--slm-gold); outline-offset:2px; }
+.slm-finance-form { padding:12px; border:1px solid var(--slm-border); border-radius:10px; background:var(--slm-panel); }
+.slm-finance-progress > div:first-child { font-weight:650; }

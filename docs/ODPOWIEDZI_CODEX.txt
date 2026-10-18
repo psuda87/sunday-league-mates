@@ -1093,3 +1093,69 @@ Przegląd zmian/sekretów/artefaktów i diff --check OK. Końcowy Chromium z pio
 boiskiem także na768,112/112 Vitest, lint/TS/oba buildy i izolacja OK.
 Zwykły push tylko feat/ui-beta, bez merge/ręcznego deploy.
 Końcowy SHA raportu w historii Git i odpowiedzi.
+
+[2026-10-18 18:13:07 CEST] Premium España3.12 — Premium Finance UI wyłącznie demo
+Przeczytano AGENTS/STATUS/UI_BETA/DEMO_VERCEL/ostatni raport i zasady widoczności
+z SETTLEMENTS_MODULE.md. Obejrzano rzeczywiste zrzuty3.8/3.11/3.10/3.6.
+Nowy Finance.tsx zastępuje tylko demonstracyjną zakładkę Rozliczenie.4 kafelki
+2×2, złote kwoty/subtelne ikony i bordo, postęp z procentem/max100%, nadpłata
+osobno, lista z inicjałami/nazwą/należne/wpłacone/etykietą statusu. Kontrolki44px,
+pełne nazwiska zawijane, osoby z profilem otwierają tę samą kartę3.10 i wracają
+do Rozliczenia; goście bez konta bez linków. Nie dodano grafik/dependencies.
+
+Dane: te same20 osób/10 meczów/Entry.paidCents. W pierwszym meczu jawne fikcyjne
+wpłaty6400gr na27000gr kosztu; admin64/270zł i24%. Kamil z2 gośćmi ma6750gr
+udziałów/3150gr wpłat/3600gr pozostało/47%. Grosze całkowite i stary podział
+charges bez zmian; gdy udziały różnią się groszem, kafelek pokazuje przedział.
+Nie ma kwot wpisanych na stałe w JSX.
+
+DemoFinance filtruje własność po inviterId??playerId; zawodnik widzi własne
+zobowiązania i zaproszonych gości, nie cudze szczegóły/wpłaty. Koszt/udział
+to informacja o wydarzeniu, Wpłacono/Pozostało/postęp są wyraźnie własne.
+Administrator demo widzi pełny mecz i zmienia wpłaty przez zwijane menu: pełna
+kwota/zero/własna kwota. Formularz inline przyjmuje0–1000000zł i2 miejsca
+po przecinku, parser bez mnożenia floatowej kwoty; reducer ponownie sprawdza
+rolę/aktywną pozycję/zakres/anulowanie. To ustawienie łącznej fikcyjnej wpłaty,
+nie dodanie przelewu: ponowne kliknięcie nie dubluje pieniędzy. Przelicza sumy,
+pozostało>=0, statusy i procent. Domyślnie player; zmiana osoby/reset wyłącza admina.
+Przełącznik roli nie jest rzeczywistym zabezpieczeniem — fixture jest lokalne
+i fikcyjne, nie wolno użyć tego zamiast Auth/RLS. Żadnych realnych płatności.
+
+Usunięty wpis nie usuwa wpłaty: retained sumowane i pokazane oddzielnie tylko
+właścicielowi/adminowi. Bez FIFO/automatycznej alokacji kredytu do innych pozycji;
+status wiersza dotyczy jego własnej przypisanej wpłaty. Zachowanie podczas
+nawigacji i reset wspólnego world; brak produkcyjnego ledgera/nowych naliczeń.
+
+Trzy renderowania/oglądy:1 układ2×2 i własne udziały Dark/320,2 statusy w
+dyskretnych ramkach i bordowy refleks/ogląd Light,3 fokus i edytor inline,
+ponowny Chromium i kontrola retained/roli. Detale docs/ui/PREMIUM312_VISUAL_REVIEW.md.
+
+## Wyniki końcowe
+
+ESLint/TypeScript/build aplikacji/build demo OK; Vitest116/116 w20 plikach.
+Testy modelu/UI: widoczność własnych3 pozycji i2 gości, brak cudzych danych,
+role/guard reducera, reset/zmiana osoby, kwoty gr i parser, sumy, częściowe/0/
+pełne/nadpłaty, clamp100%, retained i jego prywatność, powtarzalne ustawienia.
+Chromium320x844/390x844/768: siatka2×2, kwoty bez overflow,44px kontrole,
+widoczność profili/role/0→100%/nadpłata, nieprawidłowe kwoty, częściowa11,25,
+powrót do Rozliczenia i zachowanie danych, reset fixture, goście/składy/numery/
+zapisy/rezerwa/blokada oraz Light/Dark/Auto/CSP OK. Brak regresji tych scenariuszy.
+Nowy moduł tylko w jawnej allowliście, output15 plików/6 istniejących zasobów;
+kontrola izolacji bez Auth/Supabase/Edge/API i obcych żądań. Bez nowych zależności.
+To testy demo i istniejące atrapy API aplikacji, nie prawdziwy Supabase.
+SHA256 home Dark/Light, details Dark, participants Dark, karta Dark/Light oraz
+Składy Dark/Light — bajtowo identyczne z poprzednim etapem3.11.
+Cypress nie uruchomiono (brak Xvfb); Android/iOS i prawdziwy backend nieweryfikowane.
+Duże chunki Ionic nadal. Bez backendu/produkcji/Auth/RPC/RLS/migracji/Firebase/
+vercel.json/merge/ręcznego deploy. Automatyczny podgląd Vercel niezweryfikowany.
+
+Rzeczywiste zrzuty React/Ionic Chromium:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium312-settlement-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium312-settlement-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium312-settlement-admin.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium312-settlement-partial.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium312-settlement-320.png
+Pliki: demo/Finance.tsx+test, data.ts+test, Panels.tsx, theme/variables.css,
+allowlista vite.demo.config.ts, skrypt Chromium, dokumentacja i5 zrzutów.
+STATUS/UI_BETA/AGENTS/DEMO_VERCEL zaktualizowane. Raport docs/ODPOWIEDZI_CODEX.txt.
+SHA implementacji dopisany po commicie; końcowy SHA raportu w historii/odpowiedzi.

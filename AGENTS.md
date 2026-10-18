@@ -1,3 +1,13 @@
+# Premium3.12 — finanse tylko w izolowanym demo
+
+- Finance.tsx/demoFinance korzystają z Entry.paidCents/charges. Domyślna rola
+  player: tylko własne zobowiązania (w tym goście); admin demo widzi/edytuje całość.
+  Przełącznik to symulacja, nie Auth/zabezpieczenie. Nie przenosić do produkcji.
+  Wpłaty ustawiają łączną kwotę w groszach, nie dodają przelewów. Retained po
+  wycofaniu zachować w sumie/własnym widoku, bez FIFO/automatycznej alokacji.
+  Koszt/udział publiczny wydarzenia, wpłacono/pozostało/postęp w zakresie roli.
+  docs/ui/PREMIUM312_VISUAL_REVIEW.md. Nie zmieniać zaakceptowanych innych ekranów.
+
 # Premium3.11 — boisko wyłącznie demo
 
 - Game.lineup używa id wpisów uczestników, nie nowej listy profili. teamEntries

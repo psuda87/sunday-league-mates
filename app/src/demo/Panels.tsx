@@ -1,22 +1,20 @@
+import DemoFinance from './Finance';
 import DemoTeams from './Teams';
 import { useState } from 'react';
 import type { Dispatch, ReactNode } from 'react';
 import { trashOutline } from 'ionicons/icons';
-import { IonAlert, IonIcon, IonButton } from '@ionic/react';
+import { IonAlert, IonIcon } from '@ionic/react';
 import MatchTabs from '../ui/MatchTabs';
 import ParticipantGroup, { RosterSummary } from '../ui/ParticipantGroup';
 import type { Action, Entry, Game, World } from './data';
-import { charges, personName, registered, reserves } from './data';
-const currency=(cents:number)=>new Intl.NumberFormat('pl-PL',{style:'currency',currency:'PLN'}).format(cents/100);
+import { personName, registered, reserves } from './data';
 export function PlayerLink({world,id,onPlayer}:{world:World;id:string;onPlayer:(id:string)=>void}) {
   return <button type="button" className="slm-demo-person" onClick={()=>onPlayer(id)}>{world.players.find(p=>p.id===id)?.name??'Nieznany profil demo'}</button>;
 }
 export function DemoPanels({world,game,dispatch,onPlayer,actions}:{world:World;game:Game;dispatch:Dispatch<Action>;onPlayer:(id:string)=>void;actions?:ReactNode}) {
   const [removeId,setRemoveId]=useState<string|null>(null);
   const removing=game.entries.find(e=>e.id===removeId);
-  const rows=registered(game), waiting=reserves(game), amounts=charges(game);
-  const collected=game.status==='cancelled'?0:game.entries.reduce((sum,entry)=>sum+entry.paidCents,0);
-  const retained=game.entries.filter(entry=>entry.status==='withdrawn'&&entry.paidCents>0);
+  const rows=registered(game), waiting=reserves(game);
   const person=(entry:Entry)=>entry.playerId?<PlayerLink world={world} id={entry.playerId} onPlayer={onPlayer}/>:<span>{personName(world,entry)}<small>Gość bez własnego profilu</small></span>;
   return <><IonAlert isOpen={!!removing} header="Usunąć gościa?" subHeader={removing?personName(world,removing):undefined} message={`Usuniesz wyłącznie wpis z tego meczu demonstracyjnego. ${removing?.playerId?'Profil zawodnika pozostanie dostępny.':'Gość nie ma własnego profilu.'} Rezerwa nie zostanie automatycznie awansowana.`} buttons={[{text:'Anuluj',role:'cancel'},{text:'Usuń gościa',role:'destructive',handler:()=>{if(removeId)dispatch({type:'remove_guest',gameId:game.id,entryId:removeId});}}]} onDidDismiss={()=>setRemoveId(null)}/><MatchTabs panels={[
     <section className="slm-panel slm-match-info"><dl className="slm-match-facts"><div><dt>Termin · Europe/Warsaw</dt><dd>{new Intl.DateTimeFormat('pl-PL',{timeZone:'Europe/Warsaw',dateStyle:'long',timeStyle:'short'}).format(new Date(game.startsAt))}</dd></div><div><dt>Lokalizacja</dt><dd>Boisko demonstracyjne</dd></div><div><dt>Czas gry</dt><dd>90 minut</dd></div><div><dt>Status</dt><dd>{game.status==='completed'?'Zakończony':game.status==='cancelled'?'Anulowany':'Nadchodzący'}</dd></div></dl><p>Wyłącznie fikcyjny scenariusz. Żadna akcja nie zmienia prawdziwego systemu.</p></section>,
@@ -26,6 +24,6 @@ export function DemoPanels({world,game,dispatch,onPlayer,actions}:{world:World;g
       {title:'Rezerwa',entries:waiting},
     ].map(group=><ParticipantGroup key={group.title} title={group.title} emptyText="Brak osób w tej grupie." previewLimit={group.title==='Zapisani'?5:undefined}>{group.entries.map(entry=><li key={entry.id}><span className="slm-roster-avatar" aria-hidden="true">{personName(world,entry).split(' ').slice(0,2).map(s=>s[0]).join('')}</span><div className="slm-demo-person-meta">{person(entry)}<small>{entry.status==='reserve'?'Na rezerwie':entry.inviterId?'Gość':'Zapisany'} · demo</small>{entry.inviterId&&<small>Zaprasza: <PlayerLink world={world} id={entry.inviterId} onPlayer={onPlayer}/></small>}</div>{game.status==='upcoming'&&entry.inviterId===world.userId&&<button type="button" className="slm-demo-remove-guest" aria-label={`Usuń gościa: ${personName(world,entry)}`} disabled={removeId!==null} onClick={()=>setRemoveId(entry.id)}><IonIcon icon={trashOutline} aria-hidden="true"/></button>}{game.status==='completed'&&<button className="slm-demo-attendance" type="button" aria-label={`Zmień obecność: ${personName(world,entry)}`} onClick={()=>dispatch({type:'attendance',gameId:game.id,entryId:entry.id})}>{entry.attendance?'✓ Obecny':'— Nieobecny'}</button>}</li>)}</ParticipantGroup>)}<p className="slm-muted">Kliknij nazwę, aby otworzyć profil. Gość bez profilu nie ma konta.</p></section>,
     <DemoTeams world={world} game={game} dispatch={dispatch} onPlayer={onPlayer}/>,
-    <section className="slm-panel slm-demo-settlement"><p className="slm-planned">Symulacja finansowa · nie jest wpłatą</p>{game.status==='cancelled'?<p>Mecz anulowany — brak należności.</p>:<><dl className="slm-match-facts"><div><dt>Koszt fikcyjnego wynajmu</dt><dd>{currency(game.costCents)}</dd></div><div><dt>Płacący uczestnicy (w tym goście)</dt><dd>{amounts.length}</dd></div><div><dt>Na uczestnika</dt><dd>{amounts.length?`${currency(Math.min(...amounts.map(a=>a.due)))}–${currency(Math.max(...amounts.map(a=>a.due)))}`:'Brak osób do podziału'}</dd></div><div><dt>Zebrano · demo</dt><dd>{currency(collected)}</dd></div><div><dt>Pozostało · demo</dt><dd>{currency(Math.max(0,game.costCents-collected))}</dd></div>{collected>game.costCents&&<div><dt>Nadwyżka · demo</dt><dd>{currency(collected-game.costCents)}</dd></div>}</dl><p className="slm-muted">{game.status==='completed'?'Zakończony mecz demonstracyjny.':'Wstępny podział, nie tworzy zaległości.'} Za gościa odpowiada zapraszający. Reszty groszy dzielone według stałego porządku wpisów.</p>{retained.length>0&&<section className="slm-demo-retained-payments"><h3>Zachowane wpłaty wycofanych wpisów · demo</h3>{retained.map(entry=><p key={entry.id}>{currency(entry.paidCents)} · {entry.inviterId?<PlayerLink world={world} id={entry.inviterId} onPlayer={onPlayer}/>:person(entry)}</p>)}<p>Usunięcie gościa nie usuwa wcześniejszej symulowanej wpłaty. To nie jest księgowanie produkcyjne.</p></section>}<ul className="slm-demo-finance-list">{amounts.map(({entry,due})=><li key={entry.id}><div>{person(entry)}<small>{currency(due)} · {entry.paidCents>=due?'Opłacone':entry.paidCents>0?'Częściowa wpłata':'Do zapłaty'}</small>{entry.inviterId&&<small>Płaci: <PlayerLink world={world} id={entry.inviterId} onPlayer={onPlayer}/></small>}</div><IonButton size="small" fill="outline" disabled={entry.paidCents>=due} onClick={()=>dispatch({type:'pay',gameId:game.id,entryId:entry.id})}>Symuluj wpłatę</IonButton></li>)}</ul></>}</section>,
+    <DemoFinance world={world} game={game} dispatch={dispatch} onPlayer={onPlayer}/>,
   ]}/></>;
 }

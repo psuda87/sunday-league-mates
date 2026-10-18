@@ -1,3 +1,24 @@
+# Premium España3.12 — 2026-10-18 18:11:49 CEST
+
+Wyłącznie demo: nowy Finance.tsx w Rozliczeniu.4 kafelki2×2, postęp0–100%,
+lista udziałów z inicjałami/klikalnymi profilami/statusami i kwotami, nadpłata
+osobno. Model Entry.paidCents wspólny; demoFinance projektuje własne pozycje
+(z gośćmi obciążającymi zapraszającego) lub pełny widok administratora demo.
+Zwykły zawodnik nie widzi cudzych pozycji/wpłat. Koszt/udział wspólny wydarzenia,
+ale Wpłacono/Pozostało/postęp wyraźnie własne; administrator widzi cały mecz.
+Tylko admin demo edytuje0/pełna/własna kwota, grosze/liczby całkowite; nie są to
+przelewy ani wpłaty produkcyjne. Przełącznik ról nie jest zabezpieczeniem.
+Domyślnie player; zmiana użytkownika/reset też przywraca player. Wspólne fixture
+20osób/10meczów, w pierwszym meczu6400gr fikcyjnych wpłat mieszanych.
+Retained wpłaty po wycofaniu pozostają w sumie/widoku właściciela, bez FIFO
+i automatycznej alokacji. Brak backendu/Auth/RPC/RLS/migracji/Firebase/vercel.json.
+Pozostałe zaakceptowane UI bez przebudowy. Szczegóły ui/PREMIUM312_VISUAL_REVIEW.md,
+raport ODPOWIEDZI_CODEX.txt. TS/ESLint/oba buildy OK;116/116 Vitest i Chromium
+320/390/768: własne/admin/partial/0/full/over/retained/reset/profile oraz
+regresja gości/składów/zapisów OK. Izolacja15 plików/CSP OK. Pozostałe UI
+porównane SHA256 bez zmian. Cypress brak Xvfb, native/backend nieweryfikowane.
+Duże chunki Ionic nadal. Starsze ograniczenia backendu/Dockera pozostają.
+
 # Premium España3.11 — 2026-10-18 17:43:30 CEST
 
 Wyłącznie demo: nowe boisko SVG/CSS w zakładce Składy, naturalne ciemne pasy,

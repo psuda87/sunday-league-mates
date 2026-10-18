@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { charges, history, initialWorld, reduceWorld, registered, reserves, statistics, unpaidGames, teamEntries } from './data';
+import { charges, history, initialWorld, reduceWorld, registered, reserves, statistics, unpaidGames, teamEntries, demoFinance, parseDemoMoney, paymentStatus } from './data';
 import type { World } from './data';
 function coherent(world:World) {
   expect(world.players).toHaveLength(20);expect(world.games).toHaveLength(10);
@@ -33,8 +33,8 @@ describe('isolated demo world',()=>{
     let world=reduceWorld(initialWorld(),{type:'reset',scenario:'debt'});expect(unpaidGames(world,'p01')).toBe(2);
     world=reduceWorld(world,{type:'join',gameId:'demo-1'});expect(registered(world.games[0])).toHaveLength(12);
     const game=world.games[4],entry=game.entries.find(e=>e.playerId==='p01')!;
-    world=reduceWorld(world,{type:'pay',gameId:game.id,entryId:entry.id});expect(unpaidGames(world,'p01')).toBe(1);
-    const paid=world.games[4].entries[0].paidCents;world=reduceWorld(world,{type:'pay',gameId:game.id,entryId:entry.id});expect(world.games[4].entries[0].paidCents).toBe(paid);
+    world=reduceWorld(world,{type:'finance_role',role:'admin'});world=reduceWorld(world,{type:'pay',gameId:game.id,entryId:entry.id});expect(unpaidGames(world,'p01')).toBe(1);
+    const paid=world.games[4].entries[0].paidCents;world=reduceWorld(world,{type:'finance_role',role:'admin'});world=reduceWorld(world,{type:'pay',gameId:game.id,entryId:entry.id});expect(world.games[4].entries[0].paidCents).toBe(paid);
     world=reduceWorld(world,{type:'join',gameId:'demo-1'});expect(registered(world.games[0])).toHaveLength(13);coherent(world);
   });
   it('updates attendance statistics and resets every mutation',()=>{
@@ -49,7 +49,7 @@ describe('isolated demo world',()=>{
     let world=initialWorld();const id=world.games[0].entries.find(e=>e.inviterId&&e.playerId)!.id;
     expect(reduceWorld(world,{type:'remove_guest',gameId:'demo-1',entryId:id})).toBe(world);
     world=reduceWorld(world,{type:'user',id:'p02'});
-    world=reduceWorld(world,{type:'pay',gameId:'demo-1',entryId:id});
+    world=reduceWorld(world,{type:'finance_role',role:'admin'});world=reduceWorld(world,{type:'pay',gameId:'demo-1',entryId:id});
     const paid=world.games[0].entries.reduce((sum,e)=>sum+e.paidCents,0),waiting=reserves(world.games[0]),players=world.players;
     world=reduceWorld(world,{type:'remove_guest',gameId:'demo-1',entryId:id});
     expect(registered(world.games[0])).toHaveLength(11);expect(reserves(world.games[0])).toEqual(waiting);expect(world.players).toEqual(players);
@@ -121,4 +121,30 @@ it('has honest empty teams, never auto-adds a new participant and resets from cu
  world=reduceWorld(world,{type:'lineup_reset',gameId:'demo-1'});expect(teamEntries(world.games[0]).unassigned).toHaveLength(0);
  expect([...teamEntries(world.games[0]).a,...teamEntries(world.games[0]).b]).toHaveLength(13);
  expect(reduceWorld(world,{type:'reset'})).toEqual(initialWorld());
+});
+
+it('limits finance to own obligations including guests, with full details only in demo admin',()=>{
+ let world=reduceWorld(initialWorld(),{type:'user',id:'p02'});const game=world.games[0];
+ const own=demoFinance(world,game);expect(own.rows).toHaveLength(3);expect(own.due).toBe(6750);expect(own.rows.every(r=>(r.entry.inviterId??r.entry.playerId)==='p02')).toBe(true);
+ expect(reduceWorld(world,{type:'pay',gameId:game.id,entryId:own.rows[0].entry.id})).toBe(world);
+ expect(reduceWorld(world,{type:'payment_set',gameId:game.id,entryId:own.rows[0].entry.id,cents:100})).toBe(world);
+ world=reduceWorld(world,{type:'finance_role',role:'admin'});expect(demoFinance(world,game).rows).toHaveLength(12);
+ expect(reduceWorld(world,{type:'user',id:'p03'}).financeRole).toBe('player');
+ expect(reduceWorld(world,{type:'reset'}).financeRole).toBe('player');
+});
+it('sums cents, validates amounts, clamps progress and keeps withdrawn payments visible to their owner only',()=>{
+ let world=reduceWorld(initialWorld(),{type:'finance_role',role:'admin'});const id=world.games[0].id,entry=world.games[0].entries[0].id;
+ for(const cents of [-1,NaN,Infinity,1.1,100000001])expect(reduceWorld(world,{type:'payment_set',gameId:id,entryId:entry,cents})).toBe(world);
+ expect(reduceWorld(world,{type:'payment_set',gameId:id,entryId:'reserve-p16',cents:500})).toBe(world);
+ for(const {entry} of charges(world.games[0]))world=reduceWorld(world,{type:'pay',gameId:id,entryId:entry.id});
+ expect(demoFinance(world,world.games[0])).toMatchObject({paid:27000,remaining:0,percent:100,overpaid:0});
+ world=reduceWorld(world,{type:'payment_set',gameId:id,entryId:entry,cents:3000});
+ expect(demoFinance(world,world.games[0])).toMatchObject({paid:27750,remaining:0,percent:100,overpaid:750});
+ expect(paymentStatus(2250,3000)).toBe('Nadpłata');expect(paymentStatus(2250,2250)).toBe('Opłacono');expect(paymentStatus(2250,1000)).toBe('Częściowo');expect(paymentStatus(2250,0)).toBe('Do zapłaty');
+ world=reduceWorld(world,{type:'payment_set',gameId:id,entryId:entry,cents:1000});expect(demoFinance(world,world.games[0]).paid).toBe(25750);
+ world=reduceWorld(world,{type:'user',id:'p02'});const guest=world.games[0].entries.find(e=>e.inviterId&&!e.playerId)!;
+ world=reduceWorld(world,{type:'remove_guest',gameId:id,entryId:guest.id});expect(demoFinance(world,world.games[0]).retained.map(e=>e.id)).toEqual([guest.id]);
+ world=reduceWorld(world,{type:'user',id:'p03'});expect(demoFinance(world,world.games[0]).retained).toHaveLength(0);
+ for(const [text,cents] of [['0',0],['12,34',1234],['12.3',1230],['1000000',100000000]] as const)expect(parseDemoMoney(text)).toBe(cents);
+ for(const text of ['','-1','1,234','1e2','abc','1000000,01'])expect(parseDemoMoney(text)).toBeNull();
 });
