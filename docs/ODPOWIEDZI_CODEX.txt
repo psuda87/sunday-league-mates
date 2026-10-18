@@ -732,3 +732,11 @@ Raport docs/ODPOWIEDZI_CODEX.txt; STATUS/UI_BETA zaktualizowane. Po commicie dop
 SHA implementacji; końcowy SHA uzupełnienia w historii Git i odpowiedzi.
 Następny krok: ocena na telefonie, klawiatura/safe areas/fonty oraz osobna decyzja
 o minimalnym kontrakcie katalogu członków bez prywatnych danych.
+
+[2026-10-18 13:42:56 CEST] Zapis Premium3.7
+Commit implementacji: 58cf1fd289d57e808711510bde7d49424977ab16.
+Zwykły push feat/ui-beta zakończony. Końcowy smoke Chromium po ostatnim buildzie
+zaliczony; przegląd diff/staged/nowych plików i diff --check OK, brak sekretów/.env
+i zbędnych artefaktów. Końcowy SHA raportu w historii Git i odpowiedzi.
+Pełna lista/profil na fikcyjnych danych tylko w demo; realny katalog wymaga API.
+Raport docs/ODPOWIEDZI_CODEX.txt, bez merge i ręcznego wdrożenia.

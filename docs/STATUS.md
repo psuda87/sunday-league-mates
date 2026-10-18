@@ -1,5 +1,6 @@
 # Premium España3.7 — 2026-10-18 13:42:23 CEST
 
+Implementacja 58cf1fd289d57e808711510bde7d49424977ab16, push zakończony.
 feat/ui-beta: Players lista/profil, inicjały, A–Z i wyszukiwanie PL, powrót/fokus,
 stany pusty/brak wyników; statystyki W przygotowaniu bez wartości. Demo pełny flow
 na8 fikcyjnych osobach, Dark/Light/Auto. Prawdziwy katalog NIE PODŁĄCZONY:
