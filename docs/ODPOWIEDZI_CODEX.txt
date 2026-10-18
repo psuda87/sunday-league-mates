@@ -1159,3 +1159,10 @@ Pliki: demo/Finance.tsx+test, data.ts+test, Panels.tsx, theme/variables.css,
 allowlista vite.demo.config.ts, skrypt Chromium, dokumentacja i5 zrzutów.
 STATUS/UI_BETA/AGENTS/DEMO_VERCEL zaktualizowane. Raport docs/ODPOWIEDZI_CODEX.txt.
 SHA implementacji dopisany po commicie; końcowy SHA raportu w historii/odpowiedzi.
+
+[2026-10-18 18:13:40 CEST] Zapis Premium3.12
+Commit implementacji: c69f1dc2ecff95e66bdeb8a6659e0efffc826b88.
+Końcowe lint/TS/oba buildy,116/116 Vitest i Chromium z zakresami ról/kwotami/
+retained/izolacją zaliczone. Przegląd sekretów/artefaktów i diff --check OK.
+Zwykły push tylko feat/ui-beta, bez merge/ręcznego deploy.
+Końcowy SHA raportu w historii Git i odpowiedzi.
