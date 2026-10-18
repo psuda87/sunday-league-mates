@@ -844,3 +844,13 @@ Status automatycznego Vercel niezweryfikowany. SHA implementacji dopiszę po
 commicie; końcowy SHA dokumentacji w historii Git i odpowiedzi. Następny krok:
 ocena scenariuszy na telefonie, osobno weryfikacja na Android/iOS; bez używania
 reducera demo jako serwerowej logiki biznesowej.
+
+[2026-10-18 15:37:39 CEST] Zapis i push Premium3.8
+Commit implementacji: e87c01b587250480143088c0b2d78fbd7d015619.
+Zwykły push origin/feat/ui-beta zakończony. Ostatni pełny Chromium zaliczony
+z otwieraniem profili i powrotem przez Enter; podświetlenie Mecze w historycznym
+meczu i Zawodnicy w profilu dopasowane do aktualnej warstwy. Wszystkie98 testów
+Vitest zaliczone; TS/lint/oba buildy/izolacja14 plików OK. Przegląd staged/diff
+i diff --check OK: brak sekretów/.env/zbędnych artefaktów; poza kodem raporty
+i zamówione rzeczywiste PNG. Bez produkcyjnego backendu, migracji, merge i deploy.
+Końcowy SHA uzupełnienia w historii Git i odpowiedzi. Raport docs/ODPOWIEDZI_CODEX.txt.

@@ -1,5 +1,6 @@
 # Premium España3.8 — 2026-10-18 15:31:22 CEST
 
+Implementacja e87c01b587250480143088c0b2d78fbd7d015619, push zakończony.
 feat/ui-beta: wyłącznie demo. Centralne src/demo/data.ts:20 osób/10 meczów,
 jedna pamięć/reducer; profile globalnie z powrotem do źródła/zakładki/query/scroll.
 Interaktywne zapisy/wypisy/goście/rezerwa/claim/suwak/obecności, drużyny z list,
