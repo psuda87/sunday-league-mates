@@ -854,3 +854,75 @@ Vitest zaliczone; TS/lint/oba buildy/izolacja14 plików OK. Przegląd staged/dif
 i diff --check OK: brak sekretów/.env/zbędnych artefaktów; poza kodem raporty
 i zamówione rzeczywiste PNG. Bez produkcyjnego backendu, migracji, merge i deploy.
 Końcowy SHA uzupełnienia w historii Git i odpowiedzi. Raport docs/ODPOWIEDZI_CODEX.txt.
+
+
+[2026-10-18 17:04:43 CEST] PREMIUM ESPAÑA3.9 — Ultimate Player Card i usuwanie gości
+Gałąź feat/ui-beta, start czysty; fetch potwierdził zgodność z origin:
+026eeadaed29224fc993f3ab76c8ca14a38133f4. Tylko demo/UI, bez backendu.
+
+Referencja dwóch ekranów Ultimate NIE BYŁA DOSTĘPNA w repozytorium ani załącznikach
+tego zadania. Nie deklaruję jej obejrzenia/odtworzenia. Użyto specyfikacji tekstowej;
+po dostarczeniu pliku należy zachować oryginał w docs/ui/reference/. Nie zastąpiono
+brakującej referencji wygenerowaną makietą. Nowe portrety są osobnym zasobem demo.
+
+UltimatePlayerCard: własna duża złota tarcza CSS, bordowo-czarne wnętrze, stadionowe
+światło, duży portret, oficjalny herb, imię i duże złote nazwisko. CardPortrait
+obsługuje stałą komórkę zdjęcia demo albo pojedynczy src z contain do późniejszej
+podmiany. Brak uploadu. Inicjały po braku/błędzie zdjęcia zachowują pełną kartę.
+Numer jest opcjonalnym prop, ale nie dodano go do danych, bo go wcześniej nie było.
+Nie ma pozycji, wieku/wzrostu/wagi/daty urodzenia/kontaktów/ocen. Pod kartą tylko
+istniejący licznik meczów; historia3.8 jest zwinięta, nie zbudowano nowego panelu
+statystyk/rankingów. StarRating i mechanizmu ocen nie wdrażano.
+
+Zasoby: niezmienione slm-logo-primary-transparent.png/stadium-bg-main.jpg oraz
+nowe fictional-portraits.webp (117036 B,1086×1448), cztery fikcyjne dorosłe
+osoby w bordowych koszulkach, wygenerowane image_gen bez zdjęć z internetu.
+Każda z20 osób ma stałe przypisanie jednej z4 fotografii. Warianty są powtarzane,
+nie są to20 unikalnych osób na zdjęciach. Oryginał generacji zachowany w środowisku,
+WebP zoptymalizowany bez kadrowania; dobór komórki w CSS zachowuje proporcje3:4.
+Opis pochodzenia/SHA i ogląd3 cykli w docs/ui/PREMIUM39_VISUAL_REVIEW.md.
+To nie są zdjęcia realnych zawodników grupy ani zatwierdzona grafika koncepcyjna.
+
+Usuwanie gości: kosz44px tylko przy wpisie zaproszonym przez bieżącego użytkownika,
+IonAlert z nazwą osoby i Anuluj/Usuń gościa. Potwierdzenie wycofuje konkretne id,
+nie konto/profil. Reducer ponownie weryfikuje właściciela/status; ponowne usunięcie
+nie zmienia danych. Oba rodzaje gościa (z profilem/bez) obsłużone, rezerwa pozostaje
+bez automatycznej promocji, licznik/wolne miejsca/udziały odświeżone. Symulowane
+wpłaty wycofanych wpisów nie znikają z danych/zebranej kwoty; jawna informacja
+w rozliczeniu. Nie implementowano księgowania, rozdzielania kredytu ani FIFO.
+Zamknięto też obejście przez główny withdraw dla gościa, którego dodała inna osoba;
+w takim przypadku CTA informuje, że wpisem zarządza zapraszający. Dotyczy tylko demo.
+Akcja kosza jest oddzielnym przyciskiem i nie otwiera profilu. Globalny stos kart
+z3.8 i powrót do źródła/meczu/zakładki/query/scroll zachowane.
+
+Wyniki: ESLint/TypeScript/build aplikacji/build demo OK; Vitest104/104 w17 plikach.
+Nowe testy zdjęcia/fallback/src, stałych4 wariantów, własności/no-op usunięcia,
+pozostawienia profilu/rezerwy/wpłat i blokady obejścia przez withdraw. To testy
+modelu demo oraz istniejące atrapy API aplikacji, nie rzeczywisty Supabase.
+Chromium320x844/390x844/768: pełna tarcza/proporcje, nieucięte nazwisko, portrety,
+rzeczywisty błąd zasobu -> inicjały, globalne karty/powrót/Enter, Light/Dark/Auto,
+obaj właściciele/obydwa typy gości, cancel/confirm/12->11->10 i rezerwa2, wcześniejsze
+scenariusze3.8 oraz izolacja/CSP OK. Trzy iteracje renderowania i oglądu zapisane
+w przeglądzie; pierwszą korektą testową był selektor light DOM IonicAlert.
+Demo15 plików:6 jawnych assetów (5 dawnych+WebP), memcmp/sygnatura/limit rozmiaru,
+allowlista tylko nowego komponentu UI, CSP/env/publicDir bez poluzowania.
+Brak prawdziwych danych, API/Auth/Supabase/Edge i zewnętrznych żądań. Brak nowych
+zależności. Duże chunki Ionic nadal. Cypress niewykonany (brak Xvfb), Android/iOS
+i prawdziwy backend nieweryfikowane. Nie deklaruję gotowości produkcyjnej.
+
+Zrzuty rzeczywistego React/Ionic Chromium, nie wygenerowane makiety:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium39-player-card-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium39-player-card-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium39-player-card-320.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium39-player-card-768.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium39-guest-remove.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium39-player-card-alternate.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium39-player-card-fallback.png
+
+Bez zmian Supabase/Auth/RPC/RLS/migracji/finansów produkcyjnych/Firebase/vercel.json.
+Nie przebudowano Mecze/Szczegóły; tylko niezbędne akcje gościa/odmowa nieuprawnionego
+wypisu oraz zachowanie wpłaty w modelu demo. Brak merge i ręcznego deploy.
+Status automatycznego Vercel niezweryfikowany. STATUS/UI_BETA i opis izolacji
+zaktualizowane; raport docs/ODPOWIEDZI_CODEX.txt. SHA implementacji dopiszę po
+commicie; końcowy SHA raportu w historii Git/odpowiedzi. Następnie ocena na telefonie,
+weryfikacja Android/iOS i porównanie po otrzymaniu właściwej referencji Ultimate.

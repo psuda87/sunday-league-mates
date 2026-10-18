@@ -23,7 +23,11 @@ for (const name of branding) {
   else assert(emitted[0] === 0xff && emitted[1] === 0xd8, 'Expected JPEG');
 }
 assert(!files.some(p => p.endsWith('slm-crest-espana.svg')), 'Old crest stays archival, outside the demo');
+const portraits = await readFile(new URL('../dist-demo/assets/demo/fictional-portraits.webp',import.meta.url));
+assert.deepEqual(portraits,await readFile(new URL('../public/assets/demo/fictional-portraits.webp',import.meta.url)));
+assert(portraits.length<500_000 && portraits.subarray(0,4).toString()==='RIFF' && portraits.subarray(8,12).toString()==='WEBP','Expected bounded, verified fictional portrait WebP');
 for (const path of files) {
+  if(path===`${root}/assets/demo/fictional-portraits.webp`)continue;
   if (branding.some(name => path === `${root}/assets/branding/${name}`)) continue;
   assert(/\.(html|js|css|svg)$/.test(path), `Unexpected output: ${path}`);
   const text = await readFile(path, 'utf8');

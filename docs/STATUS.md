@@ -1,3 +1,21 @@
+# Premium España3.9 — 2026-10-18 17:04:43 CEST
+
+feat/ui-beta: UltimatePlayerCard demo, złota tarcza/duży portret/herb/nazwisko,
+4 stałe fikcyjne zdjęcia dla20 osób, fallback inicjały i src pojedynczego zdjęcia.
+Brak referencji Ultimate — realizacja opisu, bez deklaracji zgodności z grafiką.
+Pod kartą krótki licznik, historia3.8 zwinięta, bez nowych statystyk/ocen/uploadu.
+Usuwanie własnego gościa z IonAlert, ownership w reducerze, no-op powtórzenia,
+liczniki/udziały aktualne, rezerwa/profil/wpłaty zachowane. Cudzy gość z profilem
+nie może obejść reguły przez withdraw. Wyłącznie model demonstracyjny, bez FIFO.
+TS/ESLint/oba buildy OK;104/104 Vitest, Chromium320/390/768: karta/zdjęcia/błąd
+zasobu/fallback/nawigacja i usuwanie/cancel/confirm oraz scenariusze3.8 OK.
+Izolacja15plików/CSP OK, nowy WebP~115KB jawnie emitowany/sprawdzany. Zrzuty
+premium39-* i PREMIUM39_VISUAL_REVIEW.md w ui/. Cypress brak Xvfb; native/backend
+nieweryfikowane, duże chunki Ionic nadal. Bez backendu/RPC/RLS/migracji/Firebase/
+finansów produkcyjnych/vercel.json/merge/ręcznego deploy. Vercel auto nieweryfikowany.
+Raport docs/ODPOWIEDZI_CODEX.txt. Następnie telefon i właściwa referencja Ultimate.
+Poprzednie ograniczenia SQL/Dockera/API katalogu pozostają aktualne poniżej.
+
 # Premium España3.8 — 2026-10-18 15:31:22 CEST
 
 Implementacja e87c01b587250480143088c0b2d78fbd7d015619, push zakończony.

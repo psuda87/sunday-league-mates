@@ -45,4 +45,34 @@ describe('isolated demo world',()=>{
     for(const player of world.players){world=reduceWorld(world,{type:'user',id:player.id});world=reduceWorld(world,{type:'join',gameId:'demo-1'});coherent(world);}
   });
 
+  it('removes only an own guest once, preserves the profile, reserve and earlier payment',()=>{
+    let world=initialWorld();const id=world.games[0].entries.find(e=>e.inviterId&&e.playerId)!.id;
+    expect(reduceWorld(world,{type:'remove_guest',gameId:'demo-1',entryId:id})).toBe(world);
+    world=reduceWorld(world,{type:'user',id:'p02'});
+    world=reduceWorld(world,{type:'pay',gameId:'demo-1',entryId:id});
+    const paid=world.games[0].entries.reduce((sum,e)=>sum+e.paidCents,0),waiting=reserves(world.games[0]),players=world.players;
+    world=reduceWorld(world,{type:'remove_guest',gameId:'demo-1',entryId:id});
+    expect(registered(world.games[0])).toHaveLength(11);expect(reserves(world.games[0])).toEqual(waiting);expect(world.players).toEqual(players);
+    expect(world.games[0].entries.reduce((sum,e)=>sum+e.paidCents,0)).toBe(paid);
+    expect(reduceWorld(world,{type:'remove_guest',gameId:'demo-1',entryId:id})).toBe(world);coherent(world);
+  });
+  it('removes an own guest without a profile and a reserve guest, never an ordinary member',()=>{
+    let world=reduceWorld(initialWorld(),{type:'user',id:'p02'});
+    const guest=world.games[0].entries.find(e=>e.inviterId&&!e.playerId)!;
+    guest.status='reserve';const count=registered(world.games[0]).length;
+    world=reduceWorld(world,{type:'remove_guest',gameId:'demo-1',entryId:guest.id});
+    expect(registered(world.games[0])).toHaveLength(count);expect(reserves(world.games[0])).toHaveLength(2);
+    const member=world.games[0].entries.find(e=>!e.inviterId&&e.playerId==='p02')!;
+    expect(reduceWorld(world,{type:'remove_guest',gameId:'demo-1',entryId:member.id})).toBe(world);coherent(world);
+  });
+  it('does not let a profiled guest remove an invitation owned by someone else via withdraw',()=>{
+    const world=reduceWorld(initialWorld(),{type:'user',id:'p19'});
+    expect(reduceWorld(world,{type:'withdraw',gameId:'demo-1'})).toBe(world);
+    expect(registered(world.games[0])).toHaveLength(12);
+  });
+  it('assigns four fixed portrait variants across all twenty fictional players',()=>{
+    const a=initialWorld(),b=initialWorld();expect(a.players.map(p=>p.portrait)).toEqual(b.players.map(p=>p.portrait));
+    expect(new Set(a.players.map(p=>`${p.portrait!.column}-${p.portrait!.row}`)).size).toBe(4);
+  });
+
 });

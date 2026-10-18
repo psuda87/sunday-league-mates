@@ -1,3 +1,14 @@
+# Premium3.9 — karta i goście wyłącznie demo
+
+- UltimatePlayerCard: własna złoto-bordowa tarcza, zdjęcie/herb/nazwisko, brak ocen
+  i danych fizycznych. 4 fikcyjne portrety w assets/demo/fictional-portraits.webp
+  przypisane stale20 osobom; single-src i fallback inicjałów. Koncepcja Ultimate
+  nie była dostarczona — nie mylić nowych portretów z zaakceptowaną referencją.
+  Historia3.8 zwinięta, nie budować teraz nowego panelu statystyk. Kosz własnego
+  gościa z potwierdzeniem, ownership/idempotencja w reducerze demo; profil/rezerwa/
+  wpłaty zachowane, brak obejścia przez withdraw gościa innego zapraszającego.
+  Nie przenosić tego do produkcji. Opis docs/ui/PREMIUM39_VISUAL_REVIEW.md.
+
 # Premium3.8 — wyjątek wyłącznie dla izolowanego demo
 
 - Na wyraźne polecenie użytkownika demo ma teraz interaktywne fikcyjne zapisy,

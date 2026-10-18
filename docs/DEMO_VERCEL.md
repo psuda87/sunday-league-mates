@@ -1,3 +1,12 @@
+## Premium3.9 — fikcyjne portrety
+
+Output15 plików,6 jawnych zasobów: dawnych5 branding + assets/demo/fictional-portraits.webp.
+WebP~115KB jest generatywną macierzą4 fikcyjnych portretów, mapowaną deterministycznie.
+Verifier porównuje bajty, RIFF/WEBP i limit500KB; pozostałe kontrole niepoluzowane.
+Allowlista obejmuje nowy UltimatePlayerCard UI. Usuwanie gości i kredyt wpłat są
+wyłącznie w pamięci demo. Nie dodano API/uploadu/sekretów ani nowych zależności.
+Root/Build/Output/env/CSP/vercel.json bez zmian; brak ręcznego deploy.
+
 ## Premium3.8 — aktualny zakres demonstracji
 
 Interaktywne fixture tylko src/demo/:20 fikcyjnych osób/10 meczów, reducer w pamięci,

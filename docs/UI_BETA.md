@@ -388,3 +388,27 @@ zostały zastąpione tym etapem na wyraźne polecenie użytkownika; produkcja ni
 
 TS/ESLint/oba buildy,98/98 Vitest i Chromium320/390/768, izolacja/CSP OK.
 Zrzuty i opis: ui/PREMIUM38_DEMO_REVIEW.md. Nie są to testy Supabase/Androida.
+
+## Premium3.9 — Ultimate Player Card i własny gość
+
+Karta demo jest osobnym prezentacyjnym UltimatePlayerCard: własna tarcza CSS,
+złota rama, stadion/bordo, duży portret, herb i nazwisko. Cztery fikcyjne portrety
+w jednym WebP są stałe dla20 osób; bez danych/zdjęć realnych użytkowników.
+Photo prop obsługuje także pojedynczy src z contain i fallback inicjałów. Nie ma
+uploadu, oceny ani numeru koszulki zmyślonego dla danych. Krótki licznik meczów
+pochodzi z istniejących obecności, historia poprzedniego etapu jest zwinięta.
+Nie tworzono nowego panelu statystyk/rankingów. Przyszłe gwiazdki8->5,5->2.5
+pozostają planem, bez kodu systemu ocen w tej iteracji.
+
+Nowa referencja Ultimate niedostępna: projekt według opisu, bez deklaracji
+obejrzenia/odtworzenia brakującej grafiki. Po otrzymaniu zachować oryginał
+w ui/reference/. Portrety wygenerowane nie są tą referencją. Źródła/3 cykle:
+ui/PREMIUM39_VISUAL_REVIEW.md. Screenshoty premium39-* to prawdziwy Chromium.
+
+Kosz przy własnym gościu -> IonAlert -> konkretny wpis withdrawn. Właściciel
+sprawdzany w reducerze, powtórzenie no-op, profil i rezerwa zachowane, brak promocji.
+Także profilowany gość nie może wycofać zaproszenia innej osoby głównym CTA.
+Wcześniejsze symulowane wpłaty zostają w sumie zebranej i są jawnie pokazane;
+nie jest to produkcyjna alokacja kredytu/FIFO. Zmiany wyłącznie demo.
+104/104 Vitest, TS/lint/oba buildy i Chromium320/390/768/CSP OK. Izolacja15 plików;
+nowy WebP jawnie dołączony i porównywany bajtowo, brak poluzowania sieci/backendu.

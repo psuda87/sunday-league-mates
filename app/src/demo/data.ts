@@ -1,5 +1,5 @@
 // Deterministic, fictional, memory-only demo. Never imported by production screens.
-export interface DemoPlayer { id: string; name: string }
+export interface DemoPlayer { id: string; name: string; portrait?: { src: string; column: 0 | 1; row: 0 | 1 } }
 export interface Entry { id: string; playerId: string | null; guestName?: string; inviterId?: string; status: 'registered' | 'reserve' | 'withdrawn'; attendance: boolean | null; paidCents: number }
 export interface Game { id: string; name: string; startsAt: string; status: 'upcoming' | 'completed' | 'cancelled'; capacity: number; costCents: number; entries: Entry[] }
 export interface World { players: DemoPlayer[]; games: Game[]; userId: string; notice: string }
@@ -23,7 +23,7 @@ export function statistics(world: World, playerId: string) {
   return { played, confirmed:rows.length, attendance:rows.length ? Math.round(played/rows.length*100) : null };
 }
 export function initialWorld(): World {
-  const players=names.map((name,i)=>({id:`p${String(i+1).padStart(2,'0')}`,name}));
+  const players=names.map((name,i)=>({id:`p${String(i+1).padStart(2,'0')}`,name,portrait:{src:'/assets/demo/fictional-portraits.webp',column:(i%2) as 0|1,row:(Math.floor(i/2)%2) as 0|1}}));
   const counts=[12,15,6,0,12,10,14,11,9,0];
   const games:Game[]=counts.map((count,index)=>({ id:`demo-${index+1}`,name:['El Clásico','La Liga','Rondo Cup','Derby','Jesienny sparing','Mecz przyjaźni','Wieczorne granie','Liga koleżeńska','Spotkanie odwołane','Przerwa techniczna'][index]+' · demo',startsAt:index<4?`2026-${index<2?'10':'11'}-${['22','29','05','12'][index]}T${index===0?'16':'17'}:00:00Z`:`2026-10-${String(18-(index-3)*2).padStart(2,'0')}T16:00:00Z`,status:index<4?'upcoming':index<8?'completed':'cancelled',capacity:15,costCents:27000,entries:Array.from({length:count},(_,i)=>({id:`g${index}-e${i}`,playerId:players[(i+(index<4?1:0))%players.length].id,status:'registered' as const,attendance:index>=4&&index<8?(i+index)%5!==0:null,paidCents:0})) }));
   games[0].entries[10]={...games[0].entries[10],playerId:'p19',inviterId:'p02'};
@@ -35,7 +35,7 @@ export function initialWorld(): World {
 }
 export type Scenario = 'free'|'full'|'joined'|'reserve'|'completed'|'cancelled'|'debt';
 export const scenarioGame:Record<Scenario,string>={free:'demo-1',full:'demo-2',joined:'demo-1',reserve:'demo-2',completed:'demo-5',cancelled:'demo-9',debt:'demo-1'};
-export type Action = {type:'reset';scenario?:Scenario}|{type:'user';id:string}|{type:'join'|'withdraw'|'guest'|'resize'|'attendance'|'pay';gameId:string;entryId?:string;count?:number};
+export type Action = {type:'reset';scenario?:Scenario}|{type:'user';id:string}|{type:'join'|'withdraw'|'guest'|'remove_guest'|'resize'|'attendance'|'pay';gameId:string;entryId?:string;count?:number};
 export function reduceWorld(previous:World,action:Action):World {
   if(action.type==='reset') {
     const world=initialWorld();
@@ -51,7 +51,14 @@ export function reduceWorld(previous:World,action:Action):World {
   if(action.type==='attendance') {const entry=game.entries.find(e=>e.id===action.entryId);if(game.status==='completed'&&entry?.status==='registered')entry.attendance=!entry.attendance;return world;}
   if(action.type==='pay') {for(const {entry,due} of charges(game)) if(entry.id===action.entryId)entry.paidCents=due;world.notice='Symulacja wpłaty zapisana tylko w pamięci demo.';return world;}
   if(game.status!=='upcoming'){world.notice='Demo: zapisy zamknięte dla tego meczu.';return world;}
-  if(action.type==='withdraw'){if(current)current.status='withdrawn';world.notice='Wycofano zapis w demo. Nikt nie jest automatycznie dopisywany z rezerwy.';return world;}
+  if(action.type==='remove_guest') {
+    const guest=game.entries.find(e=>e.id===action.entryId);
+    if(!guest||guest.inviterId!==world.userId||guest.status==='withdrawn')return previous;
+    guest.status='withdrawn';
+    world.notice='Usunięto własnego gościa w demo. Rezerwa nie jest automatycznie awansowana.';
+    return world;
+  }
+  if(action.type==='withdraw'){if(current?.inviterId&&current.inviterId!==world.userId)return previous;if(current)current.status='withdrawn';world.notice='Wycofano zapis w demo. Nikt nie jest automatycznie dopisywany z rezerwy.';return world;}
   if(action.type==='resize') {
     const count=Math.max(0,Math.min(game.capacity,Math.trunc(Number.isFinite(action.count)?action.count!:0)));
     const rows=registered(game);for(const e of rows.slice(count))e.status='withdrawn';

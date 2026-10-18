@@ -443,3 +443,39 @@ ion-toolbar:has(.slm-shell-header) { --background:var(--slm-brand-header-bg); }
 .slm-demo-tools input[type="range"] { width:100%; min-height:44px; }
 
 .slm-demo-pitch small { display:block; font-size:.62rem; color:var(--slm-text-secondary); margin-top:4px; }
+
+/* Premium3.9 — original SLM shield silhouette, theme-independent burgundy/gold. */
+.slm-ultimate-profile { --slm-ultimate-ink:#21070D; --slm-ultimate-deep:#0B090D; --slm-ultimate-wine:#650D25; --slm-ultimate-gold:#E8CB77; --slm-ultimate-light:#FFF1B7; --slm-ultimate-shadow:#704C16; }
+.slm-ultimate-shell { width:min(100%,340px); margin:8px auto 18px; filter:drop-shadow(0 12px 22px var(--slm-shadow)); }
+.slm-ultimate-card { --slm-shield:polygon(50% 0,66% 3%,83% 2%,90% 5%,96% 5%,96% 15%,100% 20%,98% 82%,93% 91%,74% 96%,50% 100%,26% 96%,7% 91%,2% 82%,0 20%,4% 15%,4% 5%,10% 5%,17% 2%,34% 3%); position:relative; width:100%; aspect-ratio:340/502; clip-path:var(--slm-shield); background:linear-gradient(135deg,var(--slm-ultimate-shadow),var(--slm-ultimate-light) 22%,var(--slm-ultimate-gold) 35%,var(--slm-ultimate-shadow) 55%,var(--slm-ultimate-light) 77%,var(--slm-ultimate-shadow)); }
+.slm-ultimate-inner { position:absolute; inset:3px; overflow:hidden; clip-path:var(--slm-shield); background:radial-gradient(ellipse at 50% 30%,var(--slm-ultimate-wine),var(--slm-ultimate-deep) 80%); }
+.slm-ultimate-inner::after { content:''; position:absolute; pointer-events:none; inset:9px; clip-path:var(--slm-shield); background:linear-gradient(100deg,transparent 1%,var(--slm-ultimate-gold) 2%,transparent 2.5%,transparent 97%,var(--slm-ultimate-gold) 98%,transparent 99%); opacity:.55; }
+.slm-ultimate-stadium { position:absolute; inset:0; opacity:.4; background:url('/assets/branding/stadium-bg-main.jpg') center 22%/auto 100%; }
+.slm-ultimate-crest { position:absolute; z-index:3; top:40px; left:24px; width:53px; height:auto; object-fit:contain; filter:drop-shadow(0 2px 5px var(--slm-ultimate-deep)); }
+.slm-ultimate-number { position:absolute; top:48px; right:24px; z-index:3; color:var(--slm-ultimate-gold); font-size:2rem; font-weight:800; }
+.slm-ultimate-portrait { position:absolute; inset:38px 11px auto; aspect-ratio:3/4; overflow:hidden; mask-image:linear-gradient(transparent,black 6%,black 77%,transparent); }
+.slm-ultimate-portrait[data-layout="sheet"] > img { position:absolute; width:200%; height:200%; max-width:none; left:calc(var(--portrait-column) * -100%); top:calc(var(--portrait-row) * -100%); object-fit:fill; }
+.slm-ultimate-initials { display:grid; place-items:center; height:100%; color:var(--slm-ultimate-gold); font-size:5rem; font-weight:750; background:radial-gradient(var(--slm-ultimate-wine),transparent 70%); }
+.slm-ultimate-nameplate { position:absolute; left:22px; right:22px; bottom:47px; z-index:4; padding-top:28px; text-align:center; color:var(--slm-ultimate-gold); background:linear-gradient(transparent,var(--slm-ultimate-ink) 65%); }
+.slm-ultimate-nameplate h2 { margin:0; line-height:1.12; overflow-wrap:anywhere; }
+.slm-ultimate-nameplate h2:focus { outline:none; }
+.slm-ultimate-nameplate h2 span { display:block; font-size:.88rem; font-weight:500; margin-bottom:7px; letter-spacing:.14em; }
+.slm-ultimate-nameplate h2 strong { display:block; font-size:clamp(24px,8vw,36px); font-weight:850; letter-spacing:.035em; text-transform:uppercase; }
+.slm-ultimate-filigree { position:absolute; bottom:26px; left:30%; right:30%; height:8px; border-top:1px solid var(--slm-ultimate-gold); border-bottom:1px solid var(--slm-ultimate-gold); opacity:.7; }
+.slm-ultimate-summary { text-align:center; padding:12px 16px; }
+.slm-ultimate-summary > p { margin:0; font-size:.8rem; color:var(--slm-text-secondary); }
+.slm-ultimate-summary > p strong { color:var(--slm-gold); font-size:1.15rem; }
+.slm-demo-profile-history { text-align:left; margin-top:12px; padding-top:12px; border-top:1px solid var(--slm-border); font-size:.75rem; }
+.slm-demo-profile-history summary { min-height:44px; cursor:pointer; }
+.slm-demo-remove-guest { display:grid; place-items:center; flex:none; width:44px; height:44px; padding:10px; border:1px solid var(--slm-border); border-radius:12px; background:var(--slm-nav-active); color:var(--slm-gold); cursor:pointer; }
+.slm-demo-remove-guest ion-icon { font-size:18px; }
+.slm-demo-remove-guest:focus-visible { outline:2px solid var(--slm-gold); outline-offset:2px; }
+
+/* 3.9 visual pass2: restrained stadium glints and an etched inner rim. */
+.ion-palette-dark .slm-ultimate-shell { filter:drop-shadow(0 12px 22px var(--slm-shadow)) drop-shadow(0 0 12px var(--slm-crest-burgundy)); }
+.slm-ultimate-inner::before { content:''; pointer-events:none; position:absolute; z-index:2; inset:0; opacity:.13; background:radial-gradient(ellipse 17% 6% at 9% 19%,var(--slm-ultimate-light),transparent),radial-gradient(ellipse 12% 5% at 91% 24%,var(--slm-ultimate-light),transparent); }
+
+
+/* 3.9 visual pass3: etched crown line; direct portrait replacement needs only src. */
+.slm-ultimate-card::after { content:''; position:absolute; z-index:5; left:16%; right:16%; top:17px; height:1px; opacity:.65; pointer-events:none; background:linear-gradient(90deg,transparent,var(--slm-ultimate-gold),transparent); }
+.slm-ultimate-portrait[data-layout="single"] > img { width:100%; height:100%; object-fit:contain; }

@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 const app = fileURLToPath(new URL('.', import.meta.url));
 // Explicit allowlist: accidentally importing App/Auth/Edge fails the build.
 const allowed = new Set([
-  'src/demo/App.tsx', 'src/demo/data.ts', 'src/demo/Panels.tsx', 'src/demo/Profile.tsx', 'demo/index.html', 'demo/main.tsx', 'src/ui/Demo.tsx', 'src/ui/MatchHero.tsx',
+  'src/demo/UltimatePlayerCard.tsx', 'src/demo/App.tsx', 'src/demo/data.ts', 'src/demo/Panels.tsx', 'src/demo/Profile.tsx', 'demo/index.html', 'demo/main.tsx', 'src/ui/Demo.tsx', 'src/ui/MatchHero.tsx',
   'src/ui/Players.tsx', 'src/ui/MatchHeader.tsx', 'src/ui/ParticipantGroup.tsx', 'src/ui/MatchFilters.tsx', 'src/ui/MatchCapacityProgress.tsx', 'src/ui/capacity.ts', 'src/ui/BottomNav.tsx',
   'src/ui/AppearanceSettings.tsx', 'src/ui/MatchSections.tsx', 'src/ui/MatchTabs.tsx', 'src/ui/theme.ts', 'src/theme/variables.css',
   'src/pages/Accounts.css',
@@ -27,6 +27,7 @@ export default defineConfig({
             this.error(`Non-demo module in demo bundle: ${id.slice(app.length)}`);
         }
       }
+      this.emitFile({type:'asset',fileName:'assets/demo/fictional-portraits.webp',source:readFileSync(new URL('./public/assets/demo/fictional-portraits.webp',import.meta.url))});
       for (const name of ['slm-logo-primary-transparent.png', 'slm-favicon-64.png', 'stadium-bg-card.jpg', 'stadium-bg-main.jpg', 'espana-dark-texture.jpg']) {
         this.emitFile({ type: 'asset', fileName: `assets/branding/${name}`, source: readFileSync(new URL(`./public/assets/branding/${name}`, import.meta.url)) });
       }
