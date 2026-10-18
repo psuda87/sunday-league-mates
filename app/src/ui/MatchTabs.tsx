@@ -9,7 +9,7 @@ export default function MatchTabs({ panels }: { panels: readonly ReactNode[] }) 
   const labels = ['Informacje', 'Uczestnicy', 'Składy', 'Rozliczenie'];
   const icons = [informationCircleOutline, peopleOutline, shirtOutline, walletOutline];
   return <div className="slm-detail-tabs">
-    <div role="tablist" aria-label="Sekcje meczu">{labels.map((label, index) => <button key={label} id={`${prefix}-tab-${index}`} role="tab" aria-selected={active === index} tabIndex={active === index ? 0 : -1} aria-controls={`${prefix}-panel-${index}`} onClick={() => setActive(index)} onKeyDown={event => {
+    <div role="tablist" aria-orientation="horizontal" aria-label="Sekcje meczu">{labels.map((label, index) => <button key={label} id={`${prefix}-tab-${index}`} role="tab" aria-selected={active === index} tabIndex={active === index ? 0 : -1} aria-controls={`${prefix}-panel-${index}`} onClick={() => setActive(index)} onKeyDown={event => {
       const next = event.key === 'ArrowRight' ? (index + 1) % 4 : event.key === 'ArrowLeft' ? (index + 3) % 4 : event.key === 'Home' ? 0 : event.key === 'End' ? 3 : null;
       if (next === null) return;
       event.preventDefault(); setActive(next); document.getElementById(`${prefix}-tab-${next}`)?.focus();

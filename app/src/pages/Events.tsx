@@ -1,10 +1,13 @@
+import ParticipantGroup, { RosterSummary } from '../ui/ParticipantGroup';
+import { IonIcon } from '@ionic/react';
+import { checkmarkCircleOutline, timeOutline, alertCircleOutline } from 'ionicons/icons';
 import MatchSections from '../ui/MatchSections';
 import MatchHero from '../ui/MatchHero';
 import MatchFilters from '../ui/MatchFilters';
 import type { MatchFilter } from '../ui/MatchFilters';
 import PhoneInput from '../components/PhoneInput';
 import { normalizePhoneUpdate, nationalPhone } from '../../supabase/functions/_shared/phone';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { IonButton, IonInput, IonSelect, IonSelectOption, IonSpinner } from '@ionic/react';
 import type { SessionManager } from '../auth/sessionManager';
 import type { ManagedAccount, Session } from '../auth/api';
@@ -23,6 +26,7 @@ export default function Events({ manager, session, initialEventId }: { manager: 
   const [editId, setEditId] = useState<string | null>(null);
   const [serverNow, setServerNow] = useState('');
   const [busy, setBusy] = useState(false);
+  const actionPending = useRef(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [guestName, setGuestName] = useState('');
@@ -59,9 +63,11 @@ export default function Events({ manager, session, initialEventId }: { manager: 
     setDetail(result); setServerNow(result.server_now); setForm(null); setGuestEdit(null);
   }
   async function work(task: () => Promise<void>) {
+    if (actionPending.current) return;
+    actionPending.current = true;
     setBusy(true); setError(''); setNotice('');
     try { await task(); } catch (e) { setError(e instanceof Error ? e.message : 'Nie udało się wykonać operacji.'); }
-    finally { setBusy(false); }
+    finally { actionPending.current = false; setBusy(false); }
   }
   useEffect(() => {
     let alive = true;
@@ -130,20 +136,20 @@ export default function Events({ manager, session, initialEventId }: { manager: 
     const withdrawing = own?.status === 'registered';
     const waiting = own?.status === 'reserve' && full;
     const label = !event ? 'Sprawdzanie zapisu…' : event.status === 'cancelled' ? 'Mecz odwołany' : closed ? 'Zapisy zamknięte' : withdrawing ? 'Zrezygnuj z meczu' : finance === null ? 'Sprawdzanie możliwości zapisu…' : finance.blocked ? 'Blokada z powodu zaległości' : waiting ? 'Jesteś na rezerwie' : full ? 'Dołącz do rezerwy' : 'ZAPISZ SIĘ NA MECZ';
-    return <IonButton className="slm-match-cta" expand="block" disabled={busy || closed || (!withdrawing && (finance === null || finance.blocked || waiting))} onClick={() => void work(async () => {
+    return <IonButton aria-busy={busy} className="slm-match-cta" expand="block" disabled={busy || closed || (!withdrawing && (finance === null || finance.blocked || waiting))} onClick={() => void work(async () => {
       if (!event) return;
       await manager.call('events_' + (withdrawing ? 'withdraw' : full ? 'reserve' : 'join'), { event_id: event.id, ...(withdrawing ? { participant_id: own.id } : {}) });
       await open(event.id); await list(); setNotice('Zmiana zapisana.');
-    })}>{label}</IonButton>;
+    })}>{busy ? 'Trwa operacja…' : label}</IonButton>;
   }
   function participant(p: Participant) {
     const manage = admin || p.responsible_user_id === session.user_id;
     return <li key={p.id} className="slm-participant">
       <span className="slm-avatar" aria-hidden="true">{p.display_name.slice(0, 2).toUpperCase()}</span>
-      <div><strong>{p.display_name}</strong>
+      <div><div className="slm-participant-heading"><strong>{p.display_name}</strong><span className="slm-participant-status"><IonIcon icon={p.status === 'reserve' ? timeOutline : p.absent ? alertCircleOutline : checkmarkCircleOutline} aria-hidden="true" />{p.status === 'reserve' ? 'Na rezerwie' : p.absent ? 'Nieobecny' : 'Zapisany'}</span></div>
         <p>{p.member_id ? 'Zawodnik' : `Gość · odpowiedzialny: ${p.responsible_name}`}
           {p.status === 'registered' && (p.absent ? ' · ⚠ Nieobecny' : ' · Obecny')}</p>
-        <a className="slm-call" href={`tel:${p.contact_phone}`}>Zadzwoń{!p.member_id && !p.guest_phone ? ' do zapraszającego' : ''}</a>
+        {p.contact_phone && <a className="slm-call" href={`tel:${p.contact_phone}`}>Zadzwoń{!p.member_id && !p.guest_phone ? ' do zapraszającego' : ''}</a>}
         {manage && e?.registration_open && <div className="slm-actions">
           <IonButton size="small" fill="outline" disabled={busy} onClick={() => void work(() => operation('withdraw', { participant_id: p.id }))}>Zrezygnuj{p.member_id ? '' : ' z gościa'}</IonButton>
           <IonButton size="small" fill="outline" disabled={busy} onClick={() => void work(() => operation(p.member_id ? (p.status === 'reserve' ? 'join' : 'reserve') : 'move_guest',
@@ -154,12 +160,12 @@ export default function Events({ manager, session, initialEventId }: { manager: 
       </div>
     </li>;
   }
-  return <section aria-label="Wydarzenia">
+  return <section aria-label="Wydarzenia" aria-busy={busy}>
     {error && <p role="alert" className="slm-error">⚠ {error}</p>}
     {notice && <p role="status" className="slm-notice">✓ {notice}</p>}
     {busy && <IonSpinner aria-label="Trwa operacja wydarzenia" />}
-    <div className="slm-actions">
-      <IonButton fill="outline" disabled={busy} onClick={() => void work(async () => { setDetail(null); setForm(null); await list(0); })}>Lista meczów</IonButton>
+    <div className={`slm-actions${detail ? ' slm-detail-back' : ''}`}>
+      <IonButton fill="outline" disabled={busy} onClick={() => void work(async () => { setDetail(null); setForm(null); await list(0); })}>{detail ? '← Wróć do meczów' : 'Lista meczów'}</IonButton>
       {admin && <IonButton disabled={busy} onClick={() => beginForm()}>Utwórz mecz</IonButton>}
       <IonButton fill="clear" disabled={busy} onClick={() => void work(() => e ? open(e.id) : list())}>Odśwież</IonButton>
     </div>
@@ -184,7 +190,7 @@ export default function Events({ manager, session, initialEventId }: { manager: 
       </form></section> : detail && e ? <>
       <MatchHero match={e} title="Szczegóły meczu">{matchAction(detail)}</MatchHero>
       <MatchSections key={e.id} information={<>
-      <section className="slm-panel"><h3>{matchDate(e.starts_at)}</h3><p>{e.location} · {e.duration_minutes} minut</p>
+      <section className="slm-panel slm-match-info"><h3>{matchDate(e.starts_at)}</h3><p>{e.location} · {e.duration_minutes} minut</p>
         <p>{money(e.hourly_rate)}/h · razem {money(e.total_cost)}</p>
         <p>Uczestnicy: {e.registered_count}/{e.capacity} · minimum 10 · rezerwa: {e.reserve_count}</p>
         <p className="slm-muted">Podział należności uwzględnia decyzje o opłacie i zastępstwa. Administrator widzi go w rozliczeniu meczu; zatwierdzone należności są w zakładce Rozliczenia.</p>
@@ -208,10 +214,10 @@ export default function Events({ manager, session, initialEventId }: { manager: 
         </div>}
       </section>
       </>} participants={<>
-      <section className="slm-panel"><h3>Zapisani na mecz</h3><ul className="slm-participants">{detail.participants.filter(p => p.status === 'registered' && p.member_id).map(participant)}</ul>{!detail.participants.some(p => p.status === 'registered' && p.member_id) && <p>Brak zapisanych zawodników.</p>}</section>
-      <section className="slm-panel"><h3>Goście</h3><ul className="slm-participants">{detail.participants.filter(p => p.status === 'registered' && !p.member_id).map(participant)}</ul>{!detail.participants.some(p => p.status === 'registered' && !p.member_id) && <p>Brak gości.</p>}</section>
-      <section className="slm-panel"><h2>Rezerwa</h2><p className="slm-muted">Nie zajmuje miejsc. Bez automatycznego awansu: pierwszy skuteczny zapis zajmuje wolne miejsce. Powiadomienie o miejscu nie jest potwierdzeniem zapisu.</p>
-        <ul className="slm-participants">{detail.participants.filter(p => p.status === 'reserve').map(participant)}</ul>{!e.reserve_count && <p>Rezerwa jest pusta.</p>}</section>
+      <RosterSummary occupied={e.registered_count} capacity={e.capacity} reserve={e.reserve_count} />
+      <ParticipantGroup title="Zapisani" emptyText="Brak zapisanych zawodników." previewLimit={5}>{detail.participants.filter(p => p.status === 'registered' && p.member_id).map(participant)}</ParticipantGroup>
+      <ParticipantGroup title="Goście" emptyText="Brak gości.">{detail.participants.filter(p => p.status === 'registered' && !p.member_id).map(participant)}</ParticipantGroup>
+      <ParticipantGroup title="Rezerwa" emptyText="Rezerwa jest pusta." description="Nie zajmuje miejsc. Bez automatycznego awansu — miejsce daje dopiero skuteczny zapis.">{detail.participants.filter(p => p.status === 'reserve').map(participant)}</ParticipantGroup>
       {admin && e.registration_open && <section className="slm-panel"><h2>Zarządzaj uczestnikami</h2>
         <IonButton fill="outline" disabled={busy} onClick={() => void work(() => loadPeople())}>Wczytaj zawodników</IonButton>
         <IonSelect label="Zawodnik" labelPlacement="stacked" value={selectedMember} onIonChange={ev => setSelectedMember(ev.detail.value)}>

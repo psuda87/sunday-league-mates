@@ -26,7 +26,7 @@ async function press(key, code, number) {
   await cmd('Input.dispatchKeyEvent', { type: text ? 'keyDown' : 'rawKeyDown', key, code, windowsVirtualKeyCode: number, nativeVirtualKeyCode: number, text, unmodifiedText: text });
   await cmd('Input.dispatchKeyEvent', { type: 'keyUp', key, code, windowsVirtualKeyCode: number }); await pause();
 }
-async function viewport(width = 390) { await cmd('Emulation.setDeviceMetricsOverride', { width, height: 844, deviceScaleFactor: 1, mobile: true }); }
+async function viewport(width = 390, height = 844) { await cmd('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: true }); }
 async function shot(name) { await pause(); const image = await cmd('Page.captureScreenshot', { format: 'png' }); await fs.writeFile(`${output}/${name}.png`, Buffer.from(image.data, 'base64')); }
 async function back() { await evaluate("[...document.querySelectorAll('ion-button')].find(button => button.textContent.includes('Wróć do meczów')).click()"); await pause(); }
 async function tools(open) { await evaluate(`document.querySelector('.slm-demo-tools').open = ${open}`); }
@@ -79,9 +79,21 @@ try {
     assert.equal(await evaluate("document.querySelector('[role=tab][aria-selected=true]').textContent"), 'Uczestnicy');
     assert.equal(await evaluate("[...document.querySelectorAll('[role=tabpanel]')].filter(panel=>!panel.hidden).length"), 1);
     await widths(); await shot(`participants-${mode}`);
+    await viewport(844,390);
+    assert.equal(await evaluate('document.documentElement.scrollWidth > innerWidth'),false,'Landscape overflow');
+    assert.equal(await evaluate("document.querySelector('[role=tab][aria-selected=true]').textContent"),'Uczestnicy');
+    await viewport();
     await evaluate("document.querySelectorAll('[role=tab]')[0].click()"); await widths(); await shot(`details-${mode}`);
     await evaluate("document.querySelectorAll('[role=tab]')[2].click()"); await widths(); await shot(`teams-${mode}`);
     await evaluate("document.querySelectorAll('[role=tab]')[1].click()");
+    assert.equal(await evaluate("document.querySelector('.slm-roster-group').querySelectorAll('li').length"),5);
+    await evaluate("document.querySelector('.slm-roster-expand').click()");
+    assert.equal(await evaluate("document.querySelector('.slm-roster-group').querySelectorAll('li').length"),10);
+    await evaluate("document.querySelector('.slm-roster-expand').click()");
+    assert.equal(await evaluate("document.querySelector('.slm-roster-group').querySelectorAll('li').length"),5);
+    await evaluate("document.querySelectorAll('.slm-roster-group')[1].scrollIntoView({block:'center'})");
+    await shot(`participants-groups-${mode}`);
+    await evaluate("document.querySelector('ion-content').scrollToTop(0)");
     await evaluate("document.querySelector('[role=tab][aria-selected=true]').focus()"); await press('End', 'End', 35);
     assert.equal(await evaluate('document.activeElement.textContent'), 'Rozliczenie');
     assert.equal(await evaluate("document.querySelector('[role=tabpanel]:not([hidden])').textContent.includes('Nie pokazujemy fikcyjnych')"), true);

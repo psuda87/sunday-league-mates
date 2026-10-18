@@ -57,6 +57,8 @@ it('opens the selected fictional match with matching date, capacity and roster t
   fireEvent.click(screen.getAllByRole('button', { name: /Otwórz szczegóły meczu:/ })[1]);
   expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '8');
   const panel = screen.getByRole('tabpanel');
+  expect(panel.querySelectorAll('.slm-roster-group')[0].querySelectorAll('li')).toHaveLength(5);
+  fireEvent.click(screen.getByRole('button', { name: /Pokaż wszystkich/ }));
   expect(panel.querySelectorAll('.slm-roster-group')[0].querySelectorAll('li')).toHaveLength(6);
   expect(panel.querySelectorAll('.slm-roster-group')[1].querySelectorAll('li')).toHaveLength(2);
   expect(panel.querySelectorAll('.slm-roster-group')[2].querySelectorAll('li')).toHaveLength(2);
@@ -82,4 +84,16 @@ it('filters fictional fixtures without inventing membership or changing the chos
   fireEvent.click(screen.getByRole('button', { name: 'Nadchodzące' }));
   expect(screen.getAllByRole('button', { name: /Otwórz szczegóły meczu:/ })).toHaveLength(4);
   expect(screen.queryByRole('heading', { name: 'Następny mecz' })).toBeNull();
+});
+it('shows five initial rows, expands the group and preserves state when switching tabs', () => {
+  render(<DemoMatchDetails variant="b" count={12} />);
+  expect(screen.getByRole('tabpanel').querySelectorAll('.slm-roster-group')[0].querySelectorAll('li')).toHaveLength(5);
+  fireEvent.click(screen.getByRole('button', { name: /Pokaż wszystkich/ }));
+  expect(screen.getByRole('tabpanel').querySelectorAll('.slm-roster-group')[0].querySelectorAll('li')).toHaveLength(10);
+  fireEvent.click(screen.getByRole('tab', { name: 'Składy' }));
+  fireEvent.click(screen.getByRole('tab', { name: 'Uczestnicy' }));
+  expect(screen.getByRole('button', { name: /Zwiń listę/ })).toHaveAttribute('aria-expanded', 'true');
+  fireEvent.click(screen.getByRole('button', { name: /Zwiń listę/ }));
+  expect(screen.getByRole('tabpanel').querySelectorAll('.slm-roster-group')[0].querySelectorAll('li')).toHaveLength(5);
+  expect(screen.getByRole('tabpanel')).toHaveTextContent('Wolne miejsca3');
 });

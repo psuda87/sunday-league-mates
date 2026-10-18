@@ -6,6 +6,7 @@ import { capacityState } from './capacity';
 import MatchCapacityProgress from './MatchCapacityProgress';
 export default function MatchHero({ match, children, imageSrc = '/assets/branding/stadium-bg-card.jpg', title = 'Następny mecz', onOpen, openDisabled = false, compact = false, displayName }: { match: Match; children?: ReactNode; imageSrc?: string; title?: string; onOpen?: () => void; openDisabled?: boolean; compact?: boolean; displayName?: string }) {
   const date = new Date(match.starts_at);
+  const isDetail = title === 'Szczegóły meczu';
   const capacity = capacityState(match.registered_count, match.capacity);
   const format = (options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('pl-PL', { timeZone: 'Europe/Warsaw', ...options }).format(date);
   return <section className={`slm-next-match${compact ? ' slm-match-compact' : ''}${title === 'Szczegóły meczu' ? ' slm-match-detail' : ''}`} aria-label={title}>
@@ -17,7 +18,7 @@ export default function MatchHero({ match, children, imageSrc = '/assets/brandin
         <time className="slm-date-tile" dateTime={match.starts_at} aria-label={format({ weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}>
           <span>{format({ weekday: 'short' })}</span><strong>{format({ day: 'numeric' })}</strong><span>{format({ month: 'short' })}</span>
         </time>
-        <div className="slm-match-meta">{compact ? <h2 className="slm-card-name">{displayName ?? `Mecz · ${format({ weekday: 'long' })}`}</h2> : <><p className="slm-weekday">{format({ weekday: 'long' })}</p><strong className="slm-kickoff">{format({ hour: '2-digit', minute: '2-digit' })}</strong></>}
+        <div className="slm-match-meta">{compact ? <h2 className="slm-card-name">{displayName ?? `Mecz · ${format({ weekday: 'long' })}`}</h2> : isDetail ? <><h2 className="slm-detail-name">{displayName ?? `Mecz · ${format({ weekday: 'long' })}`}</h2><strong className="slm-kickoff">{format({ hour: '2-digit', minute: '2-digit' })}</strong></> : <><p className="slm-weekday">{format({ weekday: 'long' })}</p><strong className="slm-kickoff">{format({ hour: '2-digit', minute: '2-digit' })}</strong></>}
           <p className="slm-location"><IonIcon icon={locationOutline} aria-hidden="true" /> {match.location}</p>
           <p className="slm-match-date"><IonIcon icon={timeOutline} aria-hidden="true" /> {compact ? `${format({ hour: '2-digit', minute: '2-digit' })} · ${match.duration_minutes} min` : `${match.duration_minutes} minut · ${format({ year: 'numeric' })}`}</p>
         </div>

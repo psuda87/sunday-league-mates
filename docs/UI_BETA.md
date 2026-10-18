@@ -1,3 +1,24 @@
+# Premium España3.4 — szczegóły i Uczestnicy
+
+Home3.3 zachowany: końcowe Dark/Light są bajtowo identyczne. Zmiany tylko szczegółów:
+niższy fotograficzny nagłówek, nazwa z dostępnych danych, powrót, pasek/minimum10,
+44px CTA i pojedynczy poziomy pasek4 zakładek (domyślnie Uczestnicy).
+Wspólny ParticipantGroup/RosterSummary pokazuje Zapisani/Goście/Rezerwa, wolne
+miejsca, inicjały i statusy. Po5 zapisanych: Pokaż wszystkich/Zwiń z zachowaniem
+stanu panelu. Numery i działania wyłącznie według istniejących danych/uprawnień.
+UI single-flight w work() chroni przed przypadkowym podwójnym wywołaniem;
+backend/RPC/finanse/UUID i zasady zapisów niezmienione.
+
+Demo to nadal fikcyjne osoby i nieaktywne zapisy; Składy Planowane bez algorytmu,
+Rozliczenie Funkcja w przygotowaniu, bez fałszywych należności. Prawdziwy panel
+finansowy aplikacji zachowany. [Analiza3 cykli](ui/PREMIUM34_VISUAL_REVIEW.md),
+[Uczestnicy Dark](ui/premium34-participants-dark.png),
+[Light](ui/premium34-participants-light.png), [grupy](ui/premium34-participants-groups-dark.png).
+90/90 Vitest, lint/TS/oba buildy, Chromium320/390/768/obrót844x390/izolacja OK.
+To nie test rzeczywistego Supabase ani urządzenia. Poniżej historia.
+
+---
+
 # UI Beta3.3 — Floating Crest
 
 Pełny primary-transparent450x505 bez zmian pikseli, contain/height:auto, zamiast

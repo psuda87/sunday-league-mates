@@ -1,3 +1,7 @@
+# UI Premium3.4 — szczegóły
+
+- Home3.3 jest wzorcem, nie przebudowywać go. Szczegóły: zwarty stadionowy hero, powrót,4 poziome zakładki domyślnie Uczestnicy. ParticipantGroup/RosterSummary wspólne dla aplikacji i demo, rozdzielają zapisanych/gości/rezerwę bez tworzenia kont gości. Podgląd5 zapisanych rozwijany, stan panelu zachowany. UI work() ma lokalną blokadę pending, bez zmiany RPC/argumentów. Prawdziwe finanse/uprawnienia zachować; demo żadnych należności ani aktywnych zapisów. Analiza i3 cykle w docs/ui/PREMIUM34_VISUAL_REVIEW.md. Wariant brandingu3.3 nadal obowiązuje; tylko w szczegółach znak mniejszy, aby oddać miejsce liście.
+
 # UI Beta3.3 — Floating Crest
 
 - Pełny slm-logo-primary-transparent.png450x505 zastępuje wersję header w UI i demo. Plik bez edycji; contain, proporcje450:505 i brak clippingu. Branding jest częścią przewijanej treści IonContent, nie oddzielnym/sticky toolbar. Jedno tło, lokalne bordo/gold, stacking0/2/3, jawny górny safe area w paddingu brandingu. Karty/filtry/footer/szczegóły bez przebudowy. Dokumentacja: docs/ui/PREMIUM33_VISUAL_REVIEW.md. Ta decyzja zastępuje używanie header-transparent z3.2. Nie zmieniać źródłowego herbu ani backendu.

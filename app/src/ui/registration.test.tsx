@@ -55,3 +55,49 @@ it('filters the loaded page using server time and explicitly disables unavailabl
   expect(await screen.findByText('Archiwum')).toBeTruthy();
   expect(call.mock.calls.every(([name]) => ['events_list', 'events_detail', 'settlements_account'].includes(name))).toBe(true);
 });
+it('suppresses repeated submission while a registration is pending, then releases the UI lock', async () => {
+  let finish!: () => void;
+  const call = vi.fn(async (action: string) => {
+    if (action === 'events_list') return { events: [match], server_now: '2026-10-22T16:00:00Z' };
+    if (action === 'events_detail') return { event: match, participants: [], server_now: '2026-10-22T16:00:00Z' };
+    if (action === 'settlements_account') return { blocked: false, unpaid_matches: 0 };
+    if (action === 'events_join') return new Promise(resolve => { finish = () => resolve({ ok: true }); });
+    return {};
+  });
+  render(<Events manager={{ call } as unknown as SessionManager} session={session} />);
+  const button = await screen.findByText('ZAPISZ SIĘ NA MECZ');
+  fireEvent.click(button); fireEvent.click(button);
+  expect(call.mock.calls.filter(([name]) => name === 'events_join')).toHaveLength(1);
+  expect(screen.getByRole('region', { name: 'Wydarzenia' })).toHaveAttribute('aria-busy', 'true');
+  await waitFor(() => expect((screen.getByText('Trwa operacja…').closest('ion-button') as HTMLIonButtonElement).disabled).toBe(true));
+  finish();
+  await screen.findByText(/Zmiana zapisana\./);
+  expect(await screen.findByText('ZAPISZ SIĘ NA MECZ')).toBeTruthy();
+  expect(screen.getByRole('region', { name: 'Wydarzenia' })).toHaveAttribute('aria-busy', 'false');
+});
+it('groups server-provided guests once and keeps reserve out of occupied places', async () => {
+  const rows = [
+    { id: 'member', member_id: 'other-member', responsible_user_id: 'other-member', display_name: 'Zawodnik A', status: 'registered', absent: false, contact_phone: '', guest_phone: null, responsible_name: 'Zawodnik A' },
+    { id: 'guest', member_id: null, responsible_user_id: 'other-member', display_name: 'Gość B', status: 'registered', absent: false, contact_phone: '', guest_phone: null, responsible_name: 'Zawodnik A' },
+    { id: 'reserve', member_id: 'reserve-member', responsible_user_id: 'reserve-member', display_name: 'Rezerwowy C', status: 'reserve', absent: false, contact_phone: '', guest_phone: null, responsible_name: 'Rezerwowy C' },
+  ];
+  const event = { ...match, registered_count: 2, reserve_count: 1 };
+  const call = vi.fn(async (action: string) => {
+    if (action === 'events_list') return { events: [event], server_now: '2026-10-22T16:00:00Z' };
+    if (action === 'events_detail') return { event, participants: rows, server_now: '2026-10-22T16:00:00Z' };
+    if (action === 'settlements_account') return { blocked: false, unpaid_matches: 0 };
+    return {};
+  });
+  render(<Events manager={{ call } as unknown as SessionManager} session={session} initialEventId="fixture" />);
+  await screen.findByText('Gość B');
+  const panel = screen.getByRole('tabpanel');
+  const groups = panel.querySelectorAll('.slm-roster-group');
+  expect(groups).toHaveLength(3);
+  expect(groups[0]).toHaveTextContent('Zawodnik A');
+  expect(groups[1]).toHaveTextContent('Gość B');
+  expect(groups[2]).toHaveTextContent('Rezerwowy C');
+  expect(panel.querySelectorAll('.slm-participant')).toHaveLength(3);
+  expect(panel.querySelector('.slm-roster-overview')).toHaveTextContent('Na mecz2 / 15Wolne miejsca13Rezerwa1');
+  expect(panel.querySelectorAll('a[href^="tel:"]')).toHaveLength(0);
+  expect(screen.queryByText('Przenieś na rezerwę')).toBeNull();
+});

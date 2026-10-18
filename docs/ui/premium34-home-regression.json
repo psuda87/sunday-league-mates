@@ -1,0 +1,10 @@
+{
+  "dark": {
+    "sha256": "b64c3eaabe491c76345b8f12671663893ea46d659aef5a7d3053795f373f5c04",
+    "identical": true
+  },
+  "light": {
+    "sha256": "93965e953445bfcb13f9fb0acf6a620862cc7adb866e90eca742f5757b5a4a2b",
+    "identical": true
+  }
+}

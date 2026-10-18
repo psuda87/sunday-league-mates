@@ -1,3 +1,13 @@
+## Premium3.4 — szczegóły i współdzielone grupy
+
+Allowlista rozszerzona tylko o UI ParticipantGroup/RosterSummary. Output nadal14
+statycznych plików, logo/zasoby/CSP/env/publicDir false bez zmian. Nie ma API,
+Auth/Supabase/Edge ani operacji zapisujących. Zmiany fixture dotyczą wyłącznie
+prezentacji osób, bez nowych rzeczywistych danych. Wszystkie4 zakładki i wejście/
+powrót działają bez logowania. Składy/finanse jawnie planowane lub niedostępne.
+Root app / npm run build:demo / dist-demo / brak env i app/vercel.json bez zmian.
+Nie wykonywano ręcznego wdrożenia; status automatyczny niezweryfikowany.
+
 ## Premium3.3 — pełny herb w jednym tle
 
 Demo nadal14 plików i5 jawnych zasobów. Emitowany slm-logo-primary-transparent.png

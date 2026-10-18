@@ -305,3 +305,58 @@ ion-toolbar:has(.slm-shell-header) { --background:var(--slm-brand-header-bg); }
 .slm-floating-brand { z-index:0; }
 .slm-floating-brand::before { inset:0 0 -4px; background:radial-gradient(ellipse 30% 55% at 50% 45%,var(--slm-crest-halo),transparent 76%),radial-gradient(ellipse 44% 70% at 50% 40%,var(--slm-crest-burgundy),transparent 86%); }
 .slm-shell-header.slm-floating-brand > ion-button:last-child { top:calc(16px + var(--ion-safe-area-top, env(safe-area-inset-top, 0px))); right:0; z-index:3; }
+/* Premium 3.4 — detail-only composition; home card rules remain untouched. */
+:root { --slm-detail-rim:#C59A3947; --slm-detail-row:#20242A05; }
+:root.ion-palette-dark { --slm-detail-rim:#D4AF3730; --slm-detail-row:#FFFFFF03; }
+.slm-detail-back { gap:6px; margin:4px 0 10px; align-items:center; }
+.slm-detail-back ion-button { --border-radius:20px; --border-color:var(--slm-border); --background:var(--slm-panel); font-size:.7rem; min-height:36px; margin:0; }
+.slm-match-detail .slm-hero-card { padding-top:38px; border-radius:15px; border-color:var(--slm-detail-rim); }
+.slm-match-detail .slm-stadium { object-position:center 62%; }
+.slm-match-detail .slm-stadium-frame::after { background:linear-gradient(90deg,var(--slm-card-side),transparent 130%),linear-gradient(0deg,var(--slm-photo-bottom),transparent 115%); }
+.slm-match-detail .slm-match-top { grid-template-columns:52px minmax(0,1fr); gap:13px; align-items:center; }
+.slm-match-detail .slm-date-tile { min-height:84px; }
+.slm-detail-name { margin:0 0 5px; color:var(--slm-photo-text); font-size:1.12rem; font-weight:800; letter-spacing:-.025em; line-height:1.25; overflow-wrap:anywhere; }
+.slm-match-detail .slm-kickoff { font-size:1.65rem; margin:0 0 6px; }
+.slm-match-detail .slm-location,.slm-match-detail .slm-match-date { margin:4px 0 0; }
+.slm-match-detail .slm-match-cta { margin-top:10px; min-height:44px; font-size:.78rem; }
+.slm-match-detail .slm-capacity { margin-top:12px; }
+.slm-detail-tabs [role="tablist"] { margin:0 0 14px; background:linear-gradient(150deg,var(--slm-card-top),var(--slm-panel)); border-color:var(--slm-detail-rim); }
+.slm-detail-tabs [role="tab"] { min-height:58px; }
+.slm-detail-tabs [role="tab"][aria-selected="true"] { border-bottom-color:var(--slm-gold); box-shadow:inset 0 1px 0 var(--slm-card-light); }
+.slm-roster-overview { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:0 0 14px; padding:12px; border:1px solid var(--slm-border); border-radius:12px; background:var(--slm-panel); }
+.slm-roster-overview dt { font-size:.65rem; color:var(--slm-text-secondary); }
+.slm-roster-overview dd { margin:5px 0 0; font-size:1rem; font-weight:800; font-variant-numeric:tabular-nums; color:var(--slm-gold); }
+.slm-detail-tabs .slm-section-heading { margin-bottom:12px; }
+.slm-roster-group { border-color:var(--slm-border); background:linear-gradient(145deg,var(--slm-card-top),var(--slm-panel)); }
+.slm-roster-group h3 { font-size:.86rem; margin-bottom:10px; display:flex; justify-content:space-between; }
+.slm-roster-group .slm-roster-list { margin:0; list-style:none; padding:0; }
+.slm-roster-group .slm-roster-list > li { min-height:48px; background:var(--slm-detail-row); }
+.slm-roster-group .slm-roster-list > .slm-participant { align-items:flex-start; padding:12px 0; }
+.slm-participant-heading { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; }
+.slm-participant-status { display:inline-flex; align-items:center; gap:4px; font-size:.65rem; color:var(--slm-gold); }
+.slm-participant-status ion-icon { font-size:16px; }
+.slm-roster-note { margin:6px 0 10px; color:var(--slm-text-secondary); font-size:.73rem; line-height:1.5; }
+.slm-roster-expand { min-height:40px; display:block; width:100%; color:var(--slm-gold); border:0; border-top:1px solid var(--slm-border); background:transparent; cursor:pointer; font-size:.73rem; }
+.slm-roster-group .slm-call { display:inline-block; margin:0 0 8px; padding:4px 0; font-size:.75rem; }
+.slm-roster-group .slm-actions { margin:0; gap:6px; }
+.slm-roster-group .slm-actions ion-button { font-size:.65rem; min-height:36px; }
+.slm-demo-roster > .slm-muted { font-size:.7rem; }
+/* 3.4 iteration 2 — more room for people without touching the home screen. */
+.slm-accounts:has(.slm-match-detail) .slm-floating-crest { width:60px; }
+.slm-match-detail .slm-hero-card { padding-top:24px; }
+.slm-match-detail { margin-bottom:12px; }
+.slm-match-facts { margin:0; }
+.slm-match-facts > div { padding:11px 0; border-bottom:1px solid var(--slm-border); }
+.slm-match-facts > div:first-child { padding-top:0; }
+.slm-match-facts dt { color:var(--slm-text-secondary); font-size:.7rem; margin-bottom:5px; }
+.slm-match-facts dd { margin:0; font-size:.87rem; line-height:1.5; font-weight:650; overflow-wrap:anywhere; }
+.slm-match-info { line-height:1.55; }
+.slm-match-info > .slm-muted { font-size:.75rem; }
+/* 3.4 iteration 3 — stronger row hierarchy and touch targets within detail panels. */
+.slm-roster-group .slm-roster-list > li { border-top-color:var(--slm-border); }
+.slm-roster-group .slm-roster-list > li > span:nth-child(2) { min-width:0; overflow-wrap:anywhere; }
+.slm-roster-group .slm-roster-list > li > span:nth-child(2) > small { font-size:.66rem; line-height:1.45; }
+.slm-roster-group .slm-participant strong { line-height:1.4; }
+.slm-roster-expand { min-height:44px; }
+.slm-detail-tabs [role="tab"]:focus-visible { outline-offset:-3px; }
+.slm-detail-tabs [role="tabpanel"]:focus-visible { outline-offset:2px; }
