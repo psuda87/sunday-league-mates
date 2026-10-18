@@ -1,3 +1,14 @@
+# Premium3.13 — własna tożsamość tylko demo
+
+- Profil główny używa DemoProfile personal + tej samej UltimatePlayerCard. Jedno
+  name i portrait w world.players, edycja tylko world.userId. Nie duplikować numeru
+  (istniejące jersey/formularz). Identity/portraits:4 fikcyjne warianty i lokalny
+  raster≤2MiB/4096px, podgląd/cancel/commit, tylko pamięć/data URL. Bez uploadu,
+  localStorage obrazów, repo prywatnych zdjęć lub zmiany CSP. Konto jawnie
+  Niedostępne w demo; bez Auth/pozornych operacji. AppearanceSettings współdzielone
+  z unikalnymi nazwami radio. docs/ui/PREMIUM313_VISUAL_REVIEW.md. Zachować
+  zaakceptowany wygląd karty i pozostałe panele/produkcję.
+
 # Premium3.12 — finanse tylko w izolowanym demo
 
 - Finance.tsx/demoFinance korzystają z Entry.paidCents/charges. Domyślna rola

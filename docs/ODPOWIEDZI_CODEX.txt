@@ -1166,3 +1166,76 @@ Końcowe lint/TS/oba buildy,116/116 Vitest i Chromium z zakresami ról/kwotami/
 retained/izolacją zaliczone. Przegląd sekretów/artefaktów i diff --check OK.
 Zwykły push tylko feat/ui-beta, bez merge/ręcznego deploy.
 Końcowy SHA raportu w historii Git i odpowiedzi.
+
+[2026-10-18 18:40:38 CEST] Premium España3.13 — Mój profil i Premium Player Identity
+Przeczytano instrukcje/status/dokumentację/ostatni raport, obejrzano rzeczywiste
+karty3.10 Dark/Light, finanse3.12 Dark/Light i Premium branding board.
+Dolny Profil otwiera Mój profil: kompaktowy nagłówek z oficjalnym herbem,
+jedna istniejąca UltimatePlayerCard3.10 i4 pola, niżej Edytuj profil/Zmień
+zdjęcie/Ustawienia. Nie powielono zdjęcia/nazwy/statystyk ani implementacji karty.
+Wygląd karty niezmieniony; tylko alternatywny tekst rozróżnia lokalne zdjęcie
+od fikcyjnego portretu. Nie dodano ocen/filmów/danych fizycznych/statystyk.
+
+Edycja modelu DemoPlayer.name: dwa pola Imię i druga część nazwy składane
+w jeden istniejący string, normalizacja spacji/limit48/walidacja, zapis/anuluj.
+Numer nadal jeden formularz i akcja jersey0–99/duplikaty dozwolone. Tylko
+world.userId edytuje własne dane; inne karty bez cudzych edytorów, także
+w demonstracyjnym trybie finansowego admina. Wspólny world aktualizuje katalog/
+uczestników/boisko/rozliczenie/karty. Po zmianie zdjęcia awatary i znacznik
+boiska korzystają z tego samego src; przed edycją zaakceptowane inicjały bez zmian.
+
+Wybór zdjęcia:4 istniejące fikcyjne fotografie oraz lokalny PNG/JPEG/WebP do2MiB
+i4096px na bok. MIME/sygnatura/dekodowanie/wymiary, podgląd przed zatwierdzeniem,
+Anuluj nic nie zapisuje. DataURL tylkoRAM, bez wysyłania/Storage/localStorage/
+repo/objectURL/canvas/zewnętrznych usług. Obecna CSP self/data wystarcza, bez
+zmian Vercel. Licznik generacji ignoruje spóźnione odczyty po zmianie wyboru/
+odmontowaniu. Karta contain nie deformuje lokalnego zdjęcia. W testach użyto
+oficjalnej ikony PNG, nie prywatnej osoby; zrzuty wyłącznie fikcyjnych portretów.
+Reset usuwa własne dane/zdjęcie i odtwarza fixture, reload też; wybór motywu
+pozostaje zapamiętywany zgodnie z dotychczasową funkcją.
+
+Ustawienia: istniejące AppearanceSettings, Auto/Jasny/Ciemny reagują natychmiast
+na system i wybór ręczny. Naprawiono unikalność grup radio przy równoczesnym
+montowaniu w profilu/narzędziach, bez nowego systemu motywów. Konto: Dane konta/
+Zmiana hasła/Powiadomienia/Wylogowanie to tekstowe pozycje Niedostępne w demo.
+Nie ma pozornego wykonania, Auth, sesji, Firebase ani backendu.
+
+Trzy renderowania/oglądy:1 własna karta/form/picker/settings,2 kontrolki motywu,
+polski wybór pliku, czyszczenie poprawionych błędów i cichy feedback,3 widoczny
+stan edytora/fokus wracający do karty, dodatkowy reset/anulowanie pliku/SVG.
+Końcowe sprawdzenie także bezpośrednich przełączeń motywu w nowych ustawieniach.
+Detale docs/ui/PREMIUM313_VISUAL_REVIEW.md.
+
+## Wyniki końcowe
+
+ESLint/TypeScript/build aplikacji/build demo OK; Vitest122/122 w21 plikach.
+Nowe testy: własność/nazwa/normalizacja/limit/portret/zakaz zewnętrznegoURL/SVG,
+cancel/commit, brak edycji cudzych, jedna karta/4 statystyki, własny numer nadal
+ten sam formularz, reset i niezależne grupy radio.
+Chromium320x844/390x844/768: profil/nazwa/numer0/avatar/cancel, aktualizacja
+katalogu/uczestników/składów/rozliczenia/innych kart, readonly cudzych/powroty,
+reset przywracający Alex/10/portret0-0, lokalnyPNG preview/cancel/commit i
+odrzucenieSVG, brak obrazów w localStorage/CSP naruszeń/obcych żądań.
+Dark/Light/Auto i pierwszeństwo trybu ręcznego także bezpośrednio z nowych
+ustawień; dotychczasowe zapisy/rezerwa/goście/składy/finanse/role/kwoty nadal OK.
+Izolacja15 plików/6 istniejących zasobów, allowlista tylko Identity/portraits,
+bez Auth/API/Supabase/Edge/sekretów i bez zmian CSP/env/vercel.json.
+SHA256 home Dark/Light, details Dark, participants Dark, karta zwykłego zawodnika
+Dark/Light, Składy Dark/Light i Rozliczenie Dark/Light identyczne z3.12.
+To testy fikcyjnego demo i istniejących atrap API, nie prawdziwy Supabase.
+Cypress niewykonany (brak Xvfb); Android/iOS, natywna klawiatura/galeria i
+prawdziwy backend nieweryfikowane. Duże chunki Ionic nadal. Bez migracji/merge/
+ręcznego deploy. Automatyczny Vercel niezweryfikowany.
+
+Rzeczywiste zrzuty React/Ionic Chromium:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium313-my-profile-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium313-my-profile-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium313-profile-edit.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium313-avatar-picker.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium313-settings.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium313-my-profile-320.png
+Zmienione moduły: Identity+test/portraits, Profile/App/data+test, dekoracyjne
+awatary Panels/Teams/Finance, alt Ultimate, CSS, grupa radio AppearanceSettings,
+allowlista demo i Chromium; dokumentacja i6 zrzutów. Bez nowych dependencies.
+Raport docs/ODPOWIEDZI_CODEX.txt, STATUS/UI_BETA/AGENTS/DEMO_VERCEL aktualne.
+SHA implementacji dopisany po commicie, końcowy SHA raportu w historii/odpowiedzi.

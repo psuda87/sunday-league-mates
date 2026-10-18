@@ -1,5 +1,7 @@
+import { validDemoPortrait } from './portraits';
+import type { DemoPortrait } from './portraits';
 // Deterministic, fictional, memory-only demo. Never imported by production screens.
-export interface DemoPlayer { id: string; name: string; jerseyNumber: number; demoTotals: {goals:number;assists:number;mvp:number}; portrait?: { src: string; column: 0 | 1; row: 0 | 1 } }
+export interface DemoPlayer { id: string; name: string; jerseyNumber: number; demoTotals: {goals:number;assists:number;mvp:number}; portrait?: DemoPortrait; portraitEdited?:boolean }
 export interface Entry { id: string; playerId: string | null; guestName?: string; inviterId?: string; status: 'registered' | 'reserve' | 'withdrawn'; attendance: boolean | null; paidCents: number }
 export interface Game { id: string; name: string; startsAt: string; status: 'upcoming' | 'completed' | 'cancelled'; capacity: number; costCents: number; entries: Entry[]; lineup?: {a:string[];b:string[]} }
 export interface World { players: DemoPlayer[]; games: Game[]; userId: string; financeRole: 'player'|'admin'; notice: string }
@@ -51,7 +53,7 @@ export function initialWorld(): World {
 }
 export type Scenario = 'free'|'full'|'joined'|'reserve'|'completed'|'cancelled'|'debt';
 export const scenarioGame:Record<Scenario,string>={free:'demo-1',full:'demo-2',joined:'demo-1',reserve:'demo-2',completed:'demo-5',cancelled:'demo-9',debt:'demo-1'};
-export type Action = {type:'reset';scenario?:Scenario}|{type:'user';id:string}|{type:'finance_role';role:'player'|'admin'}|{type:'payment_set';gameId:string;entryId:string;cents:number}|{type:'lineup_reset';gameId:string}|{type:'lineup_swap';gameId:string;a:string;b:string}|{type:'jersey';playerId:string;number:number}|{type:'join'|'withdraw'|'guest'|'remove_guest'|'resize'|'attendance'|'pay';gameId:string;entryId?:string;count?:number};
+export type Action = {type:'reset';scenario?:Scenario}|{type:'user';id:string}|{type:'finance_role';role:'player'|'admin'}|{type:'payment_set';gameId:string;entryId:string;cents:number}|{type:'lineup_reset';gameId:string}|{type:'lineup_swap';gameId:string;a:string;b:string}|{type:'identity';playerId:string;name:string}|{type:'portrait';playerId:string;portrait:DemoPortrait}|{type:'jersey';playerId:string;number:number}|{type:'join'|'withdraw'|'guest'|'remove_guest'|'resize'|'attendance'|'pay';gameId:string;entryId?:string;count?:number};
 export function reduceWorld(previous:World,action:Action):World {
   if(action.type==='reset') {
     const world=initialWorld();
@@ -59,6 +61,12 @@ export function reduceWorld(previous:World,action:Action):World {
     if(action.scenario==='reserve') world.games[1].entries.push({id:'demo-user-reserve',playerId:world.userId,status:'reserve',attendance:null,paidCents:0});
     if(action.scenario==='debt') for(const game of world.games.slice(4,6)) for(const e of game.entries) if(e.playerId===world.userId) e.paidCents=0;
     return world;
+  }
+  if(action.type==='identity'||action.type==='portrait') {
+    if(action.playerId!==previous.userId||!previous.players.some(p=>p.id===action.playerId))return previous;
+    if(action.type==='identity'&&!validDemoName(action.name))return previous;
+    if(action.type==='portrait'&&!validDemoPortrait(action.portrait))return previous;
+    return {...previous,players:previous.players.map(p=>p.id!==action.playerId?p:action.type==='identity'?{...p,name:normalizeDemoName(action.name)}:{...p,portrait:{...action.portrait},portraitEdited:true}),notice:''};
   }
   if(action.type==='jersey') {
     if(action.playerId!==previous.userId||!Number.isInteger(action.number)||action.number<0||action.number>99)return previous;
@@ -135,3 +143,6 @@ export function parseDemoMoney(value:string):number|null {
  const cents=Number(whole)*100+Number(fraction.padEnd(2,'0'));
  return cents<=100000000?cents:null;
 }
+
+export const normalizeDemoName=(value:string)=>value.trim().replace(/\s+/gu,' ');
+export const validDemoName=(value:string)=>normalizeDemoName(value).length>0&&Array.from(normalizeDemoName(value)).length<=48&&!Array.from(value).some(char=>char.codePointAt(0)!<32||char.codePointAt(0)===127||char==='<'||char==='>');

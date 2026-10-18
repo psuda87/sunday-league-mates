@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { charges, history, initialWorld, reduceWorld, registered, reserves, statistics, unpaidGames, teamEntries, demoFinance, parseDemoMoney, paymentStatus } from './data';
+import { charges, history, initialWorld, reduceWorld, registered, reserves, statistics, unpaidGames, teamEntries, demoFinance, parseDemoMoney, paymentStatus, validDemoName, personName } from './data';
 import type { World } from './data';
 function coherent(world:World) {
   expect(world.players).toHaveLength(20);expect(world.games).toHaveLength(10);
@@ -147,4 +147,19 @@ it('sums cents, validates amounts, clamps progress and keeps withdrawn payments 
  world=reduceWorld(world,{type:'user',id:'p03'});expect(demoFinance(world,world.games[0]).retained).toHaveLength(0);
  for(const [text,cents] of [['0',0],['12,34',1234],['12.3',1230],['1000000',100000000]] as const)expect(parseDemoMoney(text)).toBe(cents);
  for(const text of ['','-1','1,234','1e2','abc','1000000,01'])expect(parseDemoMoney(text)).toBeNull();
+});
+
+it('edits one shared own identity/portrait only, preserves matches and resets without persistence',()=>{
+ let world=reduceWorld(initialWorld(),{type:'user',id:'p02'});const before=world;
+ expect(reduceWorld(world,{type:'identity',playerId:'p03',name:'Mateusz Próbny'})).toBe(world);
+ for(const name of ['', '  ', '<img>', 'x'.repeat(49)])expect(reduceWorld(world,{type:'identity',playerId:'p02',name})).toBe(world);
+ expect(validDemoName('Łukasz O’Bór')).toBe(true);
+ world=reduceWorld(world,{type:'identity',playerId:'p02',name:' Mateusz   Próbny '});
+ expect(world.players[1].name).toBe('Mateusz Próbny');expect(personName(world,world.games[0].entries[0])).toBe('Mateusz Próbny');expect(world.games).toEqual(before.games);
+ const portrait={src:'/assets/demo/fictional-portraits.webp',column:1 as const,row:1 as const};
+ expect(reduceWorld(world,{type:'portrait',playerId:'p03',portrait})).toBe(world);
+ for(const src of ['https://example.invalid/image.jpg','data:image/svg+xml;base64,AAAA','/anything.png'])expect(reduceWorld(world,{type:'portrait',playerId:'p02',portrait:{src}})).toBe(world);
+ world=reduceWorld(world,{type:'portrait',playerId:'p02',portrait});expect(world.players[1].portrait).toEqual(portrait);expect(world.players[1].portraitEdited).toBe(true);
+ world=reduceWorld(world,{type:'jersey',playerId:'p02',number:0});expect(world.players[1].jerseyNumber).toBe(0);expect(world.players[1].demoTotals).toEqual(before.players[1].demoTotals);
+ expect(reduceWorld(world,{type:'reset'})).toEqual(initialWorld());
 });

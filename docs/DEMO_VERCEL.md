@@ -1,3 +1,13 @@
+## Premium3.13 — pamięciowa edycja profilu
+
+Jawnie dopuszczono src/demo/Identity.tsx i portraits.ts. Bez nowych zasobów/
+zależności, nadal15 plików/6 istniejących assetów. Lokalne PNG/JPEG/WebP są
+FileReader data URL w RAM; obecne img-src self data: wystarcza, nie dodano blob: ani
+nowych wyjątków CSP. connect-src none nadal, zero uploadu/Storage/sekretów/Auth.
+Nie utrwalamy obrazów/nazw w localStorage ani repo; jedynie stary motyw zapisuje
+preferencję jak wcześniej. Root app / npm run build:demo / dist-demo / bez env,
+app/vercel.json nietknięty. Żadnego ręcznego deploy.
+
 ## Premium3.12 — Premium Finance UI
 
 Do jawnej allowlisty modułów dodano tylko src/demo/Finance.tsx. Bez nowych

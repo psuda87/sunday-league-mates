@@ -81,7 +81,7 @@ try {
     await profile('Alex Nowak');assert.equal(await evaluate("$demo('.slm-demo-profile-history')!==undefined"),false);await back();
     await scenario('debt');assert.equal(await evaluate("$demo('.slm-match-cta').disabled"),true);
     await tools(true);await evaluate("document.querySelector('.slm-demo-tools').scrollIntoView({block:'start'})");await shot(`demo-tools-${mode}`);await tools(false);await evaluate("document.querySelector('ion-content').scrollToTop(0)");
-    await evaluate("document.querySelectorAll('.slm-bottom-nav button')[2].click()");await pause();await profile('Alex Nowak');await back();
+    await evaluate("document.querySelectorAll('.slm-bottom-nav button')[2].click()");await pause();assert.equal(await evaluate("$demo('h1').textContent"),'Mój profil');
     await evaluate("document.querySelectorAll('.slm-bottom-nav button')[0].click()");await pause();await click('Historia');
     await evaluate("[...document.querySelectorAll('.slm-next-match')].find(el=>el.textContent.includes('Jesienny sparing')).querySelector('.slm-card-link').click()");await pause();await tab('Rozliczenie');await click('Administrator demo');
     await evaluate("(() => {const row=[...document.querySelectorAll('.slm-demo-finance-list li')].find(el=>el.checkVisibility()&&el.querySelector('.slm-demo-person')?.textContent==='Alex Nowak');row.querySelector('details').open=true;row.querySelector('details button').click();})()");await pause();await back();
@@ -93,6 +93,54 @@ try {
     await profile('Łukasz Wrona');await back();assert.equal(await evaluate("document.getElementById('demo-player-search').value"),'lukasz');
     await evaluate("document.querySelectorAll('.slm-bottom-nav button')[0].click()");await pause();
   }
+  const textField=async(selector,value)=>{await evaluate(`(() => {const el=$demo(${JSON.stringify(selector)});Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,${JSON.stringify(value)});el.dispatchEvent(new Event('input',{bubbles:true}));})()`);await pause();};
+  for(const mode of ['dark','light']) {
+    await scenario('joined');await tools(true);await evaluate(`document.querySelector('.slm-demo-tools input[value=${mode}]').click()`);await tools(false);
+    await evaluate("document.querySelectorAll('.slm-bottom-nav button')[2].click()");await pause();await widths();
+    assert.equal(await evaluate("$demo('h1').textContent"),'Mój profil');await shot(`my-profile-${mode}`);if(mode==='dark'){await viewport(320);await shot('my-profile-320');await viewport();}
+    await click('Edytuj profil');await textField('.slm-identity-editor input','');await click('Zapisz dane demo');assert.equal(await evaluate("!!$demo('.slm-identity-editor [role=alert]')"),true);
+    await textField('.slm-identity-editor input','Mateusz');await textField('.slm-identity-editor input:last-of-type','Próbny');
+    await evaluate("$demo('.slm-identity-editor').scrollIntoView({block:'start'})");await shot('profile-edit');await widths();await click('Anuluj');assert.equal(await evaluate("$demo('.slm-ultimate-nameplate h2').textContent"),'Kamil Zieliński');
+    await click('Edytuj profil');await textField('.slm-identity-editor input','Mateusz');await textField('.slm-identity-editor input:last-of-type','Próbny');await click('Zapisz dane demo');
+    assert.equal(await evaluate("$demo('.slm-ultimate-nameplate h2').textContent"),'Mateusz Próbny');
+    await click('Zmień zdjęcie');await evaluate("$demo('[aria-label=\"Portret demonstracyjny 4\"]').click()");await pause();await click('Anuluj');assert.equal(await evaluate("$demo('.slm-ultimate-portrait').dataset.portrait"),'1-0');
+    await click('Zmień zdjęcie');await evaluate("$demo('[aria-label=\"Portret demonstracyjny 4\"]').click()");await pause();await evaluate("$demo('.slm-avatar-picker').scrollIntoView({block:'start'})");await shot('avatar-picker');await widths();await click('Zatwierdź zdjęcie');assert.equal(await evaluate("$demo('.slm-ultimate-portrait').dataset.portrait"),'1-1');
+    await evaluate("document.querySelector('ion-content').scrollToTop(0)");await click('7');await textField('.slm-number-form input','0');await click('Zapisz numer');assert.equal(await evaluate("$demo('.slm-ultimate-number span').textContent"),'0');
+    await click('Ustawienia');await pause();assert.equal(await evaluate("$demo('.slm-identity-account').textContent.includes('Niedostępne w demo')"),true);await shot('settings');await widths();
+    await evaluate("$demo('.slm-identity-settings input[value=dark]').click()");assert.equal(await evaluate("document.documentElement.classList.contains('ion-palette-dark')"),true);
+    await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:'light'}]});await pause();assert.equal(await evaluate("document.documentElement.classList.contains('ion-palette-dark')"),true,'Manual mode overrides the system');
+    await evaluate("$demo('.slm-identity-settings input[value=auto]').click()");await pause();assert.equal(await evaluate("document.documentElement.classList.contains('ion-palette-dark')"),false);
+    await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:'dark'}]});await pause();assert.equal(await evaluate("document.documentElement.classList.contains('ion-palette-dark')"),true);
+    await evaluate("$demo('.slm-identity-settings input[value=light]').click()");assert.equal(await evaluate("document.documentElement.classList.contains('ion-palette-dark')"),false);
+    await evaluate(`$demo('.slm-identity-settings input[value=${mode}]').click()`);
+
+    await evaluate("document.querySelectorAll('.slm-bottom-nav button')[1].click()");await pause();
+    assert.equal(await evaluate("[...$demo('.slm-player-list').querySelectorAll('li')].some(el=>el.textContent.includes('Mateusz Próbny')&&el.querySelector('.slm-custom-avatar'))"),true);
+    await profile('Mateusz Próbny');assert.equal(await evaluate("$demo('.slm-ultimate-portrait').dataset.portrait"),'1-1');await back();
+    await profile('Marek Lis');assert.equal(await evaluate("!!$demo('.slm-ultimate-number-edit')||!!$demo('.slm-my-identity')"),false);await back();
+    await evaluate("document.querySelectorAll('.slm-bottom-nav button')[0].click()");await pause();await evaluate("$demo('.slm-card-link').click()");await pause();
+    assert.equal(await evaluate("$demo('.slm-demo-roster').textContent.includes('Mateusz Próbny')"),true);assert.equal(await evaluate("!!$demo('.slm-demo-roster .slm-custom-avatar')"),true);
+    await tab('Składy');assert.equal(await evaluate("$demo('.slm-team-a [data-player=p02]').textContent.includes('Próbny')"),true);assert.equal(await evaluate("$demo('.slm-team-a [data-player=p02] .slm-pitch-custom-number').textContent"),'0');
+    await profile('Mateusz Próbny');await back();assert.equal(await evaluate("$demo('[role=tab][aria-selected=true]').textContent"),'Składy');
+    await tab('Rozliczenie');assert.equal(await evaluate("$demo('.slm-finance-rows').textContent.includes('Mateusz Próbny')"),true);assert.equal(await evaluate("!!$demo('.slm-finance-avatar .slm-custom-avatar')"),true);
+  }
+  // Local file stays in memory and passes CSP without a network request or new asset.
+  await evaluate("document.querySelectorAll('.slm-bottom-nav button')[2].click()");await pause();await click('Zmień zdjęcie');
+  async function localFile(path){const root=await cmd('DOM.getDocument');const input=await cmd('DOM.querySelector',{nodeId:root.root.nodeId,selector:'.slm-avatar-picker input[type=file]'});await cmd('DOM.setFileInputFiles',{nodeId:input.nodeId,files:[path]});await pause();}
+  await localFile('/workspace/sunday-league-mates/app/public/assets/branding/slm-crest-espana.svg');
+  for(let i=0;i<50;i++){if(await evaluate("!!$demo('.slm-avatar-picker [role=alert]')"))break;await pause();}
+  assert.equal(await evaluate("$demo('.slm-avatar-picker [role=alert]').textContent.includes('PNG, JPEG lub WebP')"),true);
+  await localFile('/workspace/sunday-league-mates/app/public/assets/branding/slm-app-icon-192.png');
+  for(let i=0;i<50;i++){if(await evaluate("$demo('.slm-avatar-preview-wrap img').src.startsWith('data:image/png;')"))break;await pause();}
+  assert.equal(await evaluate("$demo('.slm-avatar-preview-wrap img').src.startsWith('data:image/png;')"),true);assert.equal(await evaluate("$demo('.slm-ultimate-portrait').dataset.layout"),'sheet');
+  await click('Anuluj');assert.equal(await evaluate("$demo('.slm-ultimate-portrait').dataset.layout"),'sheet');
+  await click('Zmień zdjęcie');await localFile('/workspace/sunday-league-mates/app/public/assets/branding/slm-app-icon-192.png');
+  for(let i=0;i<50;i++){if(await evaluate("$demo('.slm-avatar-preview-wrap img').src.startsWith('data:image/png;')"))break;await pause();}
+  await click('Zatwierdź zdjęcie');assert.equal(await evaluate("$demo('.slm-ultimate-portrait').dataset.layout"),'single');
+  assert.equal(await evaluate("Object.values(localStorage).some(value=>value.startsWith('data:image/'))"),false);
+  await tools(true);await click('Reset danych demo');await tools(false);await evaluate("document.querySelectorAll('.slm-bottom-nav button')[2].click()");await pause();
+  assert.equal(await evaluate("$demo('.slm-ultimate-nameplate h2').textContent"),'Alex Nowak');assert.equal(await evaluate("$demo('.slm-ultimate-portrait').dataset.portrait"),'0-0');assert.equal(await evaluate("$demo('.slm-ultimate-number span').textContent"),'10');
+  await scenario('free');
   await scenario('free');await tab('Rozliczenie');await click('Administrator demo');await widths();
   assert.equal(await evaluate("$demo('.slm-finance-rows').children.length"),12);
   await evaluate("$demo('.slm-finance').scrollIntoView({block:'start'})");await shot('settlement-admin');
@@ -166,5 +214,5 @@ try {
   await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:'dark'}]});await evaluate("document.querySelector('input[value=auto]').click()");await pause();assert.equal(await evaluate("document.documentElement.classList.contains('ion-palette-dark')"),true);
   await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:'light'}]});await pause();assert.equal(await evaluate("document.documentElement.classList.contains('ion-palette-dark')"),false);
   assert.equal(requests.some(url=>url.startsWith('http')&&new URL(url).origin!==new URL(base).origin),false);assert.deepEqual(errors,[]);
-  console.log('PASS: demo world 320/390/768, global profiles with Enter/tab and scroll return, teams, private/admin finance/partial/full/zero/overpayment, join/guest/withdraw/reserve/cancel/debt/reset, search, Ultimate portraits/ratios/fallback/four stats/own number validation and persistence, pitch counts/swap/reset/empty/guest sync, own guest confirmation/cancel/removal and isolation/CSP.');
+  console.log('PASS: demo world 320/390/768, global profiles with Enter/tab and scroll return, identity/name/number/avatar/local-file/cancel/settings, teams, private/admin finance/partial/full/zero/overpayment, join/guest/withdraw/reserve/cancel/debt/reset, search, Ultimate portraits/ratios/fallback/four stats/own number validation and persistence, pitch counts/swap/reset/empty/guest sync, own guest confirmation/cancel/removal and isolation/CSP.');
 } finally {ws.close();}

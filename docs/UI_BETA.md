@@ -1,3 +1,26 @@
+# Premium España3.13 — 2026-10-18 18:36:29 CEST
+
+Wyłącznie demo: dolny Profil otwiera Mój profil, istniejący DemoProfile i jedną
+kartę Ultimate3.10 +4 pola, bez kopiowania karty. Edytuj profil/Zmień zdjęcie/
+Ustawienia, bez zbędnych powtórzeń nazwy i zdjęcia. Jedno DemoPlayer.name (imię
++druga część nazwy), własna edycja/walidacja48 znaków; numer nadal ta sama akcja
+jersey i istniejący formularz0–99. Inne profile tylko odczyt dla innych osób.
+Fikcyjne4 portrety i lokalny PNG/JPEG/WebP≤2MiB/4096px, podgląd/Anuluj/Zatwierdź;
+FileReader/data URL tylko RAM, bez uploadu/Storage/localStorage/repo. Nie zmieniono
+CSP, obrazów źródłowych ani konfiguracji Vercel. AvatarPicker ignoruje opóźnione
+wyniki po anulowaniu/zmianie wyboru. Wspólny world aktualizuje wszystkie widoki
+przez id; dopiero po wyborze zdjęcia awatary list/boiska pokazują zmianę.
+AppearanceSettings nadal wspólne: Auto/Light/Dark, unikalne grupy radio przy
+jednoczesnym montowaniu w profilu i narzędziach. Konto:4 jawne niedostępne pozycje,
+bez pozornego hasła/push/wylogowania/sesji. Reset odtwarza fixture.
+Backend/Auth/RPC/RLS/migracje/finanse/Firebase bez zmian. Szczegóły
+ui/PREMIUM313_VISUAL_REVIEW.md, raport ODPOWIEDZI_CODEX.txt. Starsze ograniczenia
+backendu/Dockera pozostają poniżej. TS/ESLint/oba buildy OK;122/122 Vitest
+i Chromium320/390/768: nazwa/numer/avatar/lokalnyPNG/SVG/cancel/reset/readonly/
+spójność danych i nowe ustawienia Auto/Light/Dark OK. Izolacja15 plików/CSP OK.
+Pozostałe zaakceptowane widoki SHA256 identyczne. Cypress brak Xvfb; native
+klawiatura/galeria/backend nieweryfikowane, duże chunki Ionic nadal.
+
 # Premium España3.12 — 2026-10-18 18:11:49 CEST
 
 Wyłącznie demo: nowy Finance.tsx w Rozliczeniu.4 kafelki2×2, postęp0–100%,
