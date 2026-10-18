@@ -1,3 +1,7 @@
+# UI Beta3.3 — Floating Crest
+
+- Pełny slm-logo-primary-transparent.png450x505 zastępuje wersję header w UI i demo. Plik bez edycji; contain, proporcje450:505 i brak clippingu. Branding jest częścią przewijanej treści IonContent, nie oddzielnym/sticky toolbar. Jedno tło, lokalne bordo/gold, stacking0/2/3, jawny górny safe area w paddingu brandingu. Karty/filtry/footer/szczegóły bez przebudowy. Dokumentacja: docs/ui/PREMIUM33_VISUAL_REVIEW.md. Ta decyzja zastępuje używanie header-transparent z3.2. Nie zmieniać źródłowego herbu ani backendu.
+
 # UI Beta3.2 — przezroczystość i kompaktowy header
 
 - Nowy UI używa slm-logo-header-transparent.png (RGBA) zamiast nieprzezroczystego PNG. Oryginały zachowane. slm-logo-primary-transparent.png jest osobnym wycięciem oryginalnego primary, nie nowym rysunkiem. Nie usuwać czerni wewnątrz tarczy ani nie używać blend-mode jako zamiennika alfy. Kontrola Node: app/scripts/verify-logo-alpha.mjs; maski/proweniencja i trzy iteracje: docs/ui/PREMIUM32_VISUAL_REVIEW.md. Branding84px, logo82px, safe areas Ionic bez zerowania. Karty nadal121px, jaśniejsze stadionowe zdjęcie i subtelne bordo/gold. Ten wpis zastępuje instrukcję3.1 o pozostawianiu tła PNG w nowym UI. Bez zmiany backendu, danych ani logiki.

@@ -288,3 +288,20 @@ ion-toolbar:has(.slm-shell-header) { --background:var(--slm-brand-header-bg); }
 .slm-match-compact .slm-stadium { object-position:center 60%; }
 .slm-match-compact .slm-stadium-frame::after { background:radial-gradient(ellipse 50% 65% at 85% 0%,var(--slm-card-light),transparent 70%),linear-gradient(90deg,var(--slm-card-side),transparent 94%),linear-gradient(0deg,var(--slm-card-floor),transparent 75%),radial-gradient(ellipse at 4% 105%,var(--slm-card-burgundy),transparent 65%); }
 .slm-match-compact .slm-location,.slm-match-compact .slm-match-date { text-shadow:0 1px 3px var(--slm-card-side); }
+/* Premium 3.3: branding scrolls naturally inside the single page background. */
+:root { --slm-crest-halo:#C59A3926; --slm-crest-burgundy:#B72C3810; }
+:root.ion-palette-dark { --slm-crest-halo:#D4AF3726; --slm-crest-burgundy:#88000054; }
+.slm-accounts:has(.slm-floating-brand) { padding-top:0; }
+.slm-floating-brand { position:relative; isolation:isolate; z-index:1; display:flex; align-items:center; justify-content:center; flex-shrink:0; width:100%; max-width:none; min-height:0; margin:0; padding:calc(4px + var(--ion-safe-area-top, env(safe-area-inset-top, 0px))) 0 2px; overflow:visible; background:transparent; border:0; }
+.slm-floating-brand::before { content:''; position:absolute; z-index:0; inset:-8px 0 -12px; pointer-events:none; opacity:1; background:radial-gradient(ellipse 28% 52% at 50% 43%,var(--slm-crest-halo),transparent 75%),radial-gradient(ellipse 55% 75% at 50% 35%,var(--slm-crest-burgundy),transparent 85%); }
+.slm-floating-brand .slm-floating-crest { position:relative; z-index:2; display:block; width:clamp(76px,20vw,88px); height:auto; aspect-ratio:450/505; object-fit:contain; margin:0 auto; padding:0; overflow:visible; filter:drop-shadow(0 2px 4px var(--slm-shadow)); }
+.slm-floating-brand > ion-button { position:absolute; z-index:3; right:0; top:calc(16px + var(--ion-safe-area-top, env(safe-area-inset-top, 0px))); }
+/* 3.3 iteration 2: reduce halo intensity and recover a few pixels without shrinking the mark below 76px. */
+:root { --slm-crest-halo:#C59A391C; }
+:root.ion-palette-dark { --slm-crest-halo:#D4AF3720; --slm-crest-burgundy:#88000044; }
+.slm-floating-brand { padding-top:calc(3px + var(--ion-safe-area-top, env(safe-area-inset-top, 0px))); padding-bottom:1px; }
+.slm-floating-brand .slm-floating-crest { width:clamp(76px,19.5vw,84px); }
+/* 3.3 iteration 3: keep the halo local and controls above decoration. */
+.slm-floating-brand { z-index:0; }
+.slm-floating-brand::before { inset:0 0 -4px; background:radial-gradient(ellipse 30% 55% at 50% 45%,var(--slm-crest-halo),transparent 76%),radial-gradient(ellipse 44% 70% at 50% 40%,var(--slm-crest-burgundy),transparent 86%); }
+.slm-shell-header.slm-floating-brand > ion-button:last-child { top:calc(16px + var(--ion-safe-area-top, env(safe-area-inset-top, 0px))); right:0; z-index:3; }

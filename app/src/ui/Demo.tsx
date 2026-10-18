@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { IonPage, IonHeader, IonToolbar, IonContent, IonFooter, IonButton } from '@ionic/react';
+import { IonPage, IonContent, IonFooter, IonButton } from '@ionic/react';
 import DemoMatchDetails from './DemoMatchDetails';
 import MatchHero from './MatchHero';
 import MatchFilters from './MatchFilters';
@@ -34,8 +34,8 @@ export default function Demo() {
     return () => window.removeEventListener('hashchange', sync);
   }, []);
   function navigate(next: View) { setView(next); window.location.hash = next; void content.current?.scrollToTop?.(0); }
-  return <IonPage className="slm-demo"><IonHeader><IonToolbar><div className="slm-shell-header"><img className="slm-logo slm-crest" src="/assets/branding/slm-logo-header-transparent.png" alt="Sunday League Mates" width="290" height="280" /></div></IonToolbar></IonHeader>
-    <IonContent ref={content}><main className="slm-accounts"><p className="slm-demo-badge">Dane przykładowe</p>
+  return <IonPage className="slm-demo">
+    <IonContent ref={content}><main className="slm-accounts"><div className="slm-shell-header slm-floating-brand"><img className="slm-logo slm-crest slm-floating-crest" src="/assets/branding/slm-logo-primary-transparent.png" alt="Sunday League Mates" width="450" height="505" /></div><p className="slm-demo-badge">Dane przykładowe</p>
       {tab === 'events' ? <>
         {view !== 'home' && <div className="slm-actions"><IonButton fill="clear" onClick={() => navigate('home')}>← Wróć do meczów</IonButton></div>}
         {view === 'home' ? <section className="slm-matches-screen" aria-label="Mecze demonstracyjne"><h1>Mecze</h1><MatchFilters value={filter} onChange={setFilter} /><div className="slm-match-list" aria-live="polite">{visible.map(({ match, index }) => <MatchHero key={match.id} match={{ ...match, registered_count: index === 0 ? count : match.registered_count }} compact title="Przykładowy mecz" displayName={names[index]} onOpen={() => { setSelected(index); navigate('details-b'); }} />)}</div></section> : view === 'compare' ? <>

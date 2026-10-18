@@ -1,3 +1,13 @@
+## Premium3.3 — pełny herb w jednym tle
+
+Demo nadal14 plików i5 jawnych zasobów. Emitowany slm-logo-primary-transparent.png
+zamiast header-transparent, zgodność bajtów i rzeczywista alfa nadal obowiązkowe.
+Konkretny zatwierdzony primary ma315574B, limit dla niego350KB; inne zasoby160KB.
+Nie kopiować całego public/. Allowlista modułów/CSP/env/Root/Build/Output bez zmian.
+Wrapper brandingu jest częścią IonContent, bez osobnego toolbaru i warstwy fixed.
+Brak połączeń z backendem/sekretów/danych rzeczywistych. app/vercel.json bez zmian.
+Bez ręcznego deploy; automatycznego podglądu nie zweryfikowano.
+
 ## UI Beta3.2 — rzeczywiste alfa logo
 
 Demo nadal14 statycznych plików i5 jawnych zasobów branding. Zmieniono jedynie

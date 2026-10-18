@@ -12,13 +12,13 @@ async function walk(dir) {
 }
 await walk(root);
 assert(files.some(p => p.endsWith('/index.html')));
-const branding = ['slm-logo-header-transparent.png', 'slm-favicon-64.png', 'stadium-bg-card.jpg', 'stadium-bg-main.jpg', 'espana-dark-texture.jpg'];
+const branding = ['slm-logo-primary-transparent.png', 'slm-favicon-64.png', 'stadium-bg-card.jpg', 'stadium-bg-main.jpg', 'espana-dark-texture.jpg'];
 for (const name of branding) {
   const emitted = await readFile(new URL('../dist-demo/assets/branding/' + name, import.meta.url));
   const original = await readFile(new URL('../public/assets/branding/' + name, import.meta.url));
   assert.deepEqual(emitted, original, `Demo must ship the exact approved asset: ${name}`);
-  if (name === 'slm-logo-header-transparent.png') verifyLogoAlpha(emitted);
-  assert(emitted.length < 160_000, `Unexpected asset size: ${name}`);
+  if (name === 'slm-logo-primary-transparent.png') verifyLogoAlpha(emitted);
+  assert(emitted.length < (name === 'slm-logo-primary-transparent.png' ? 350_000 : 160_000), `Unexpected asset size: ${name}`);
   if (name.endsWith('.png')) assert.equal(emitted.subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
   else assert(emitted[0] === 0xff && emitted[1] === 0xd8, 'Expected JPEG');
 }

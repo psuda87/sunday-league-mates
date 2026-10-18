@@ -6,8 +6,8 @@ import { normalizePolishPhone, normalizePhoneUpdate, nationalPhone } from '../..
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
-import { IonButton, IonContent, IonHeader, IonInput, IonItem, IonPage, IonSelect,
-  IonSelectOption, IonSpinner, IonToolbar, IonFooter, IonIcon } from '@ionic/react';
+import { IonButton, IonContent, IonInput, IonItem, IonPage, IonSelect,
+  IonSelectOption, IonSpinner, IonFooter, IonIcon } from '@ionic/react';
 import { AccountError, accountRequest } from '../auth/api';
 import type { ManagedAccount, Profile } from '../auth/api';
 import { SessionManager } from '../auth/sessionManager';
@@ -159,9 +159,9 @@ export default function Accounts() {
   </form>;
 
   return <IonPage>
-    <IonHeader><IonToolbar><div className="slm-shell-header"><img className="slm-logo slm-crest" src="/assets/branding/slm-logo-header-transparent.png" alt="Sunday League Mates" width="290" height="280" />
-      {auth.phase === 'ready' && session && !session.must_change_password && <IonButton fill="clear" aria-label={`Powiadomienia${unread ? `, nieprzeczytane: ${unread}` : ''}`} onClick={() => setScreen('notifications')}><IonIcon icon={notificationsOutline} aria-hidden="true" /> {unread ? `(${unread})` : ''}</IonButton>}</div></IonToolbar></IonHeader>
     <IonContent><main className="slm-accounts">
+    <div className="slm-shell-header slm-floating-brand"><img className="slm-logo slm-crest slm-floating-crest" src="/assets/branding/slm-logo-primary-transparent.png" alt="Sunday League Mates" width="450" height="505" />
+      {auth.phase === 'ready' && session && !session.must_change_password && <IonButton fill="clear" aria-label={`Powiadomienia${unread ? `, nieprzeczytane: ${unread}` : ''}`} onClick={() => setScreen('notifications')}><IonIcon icon={notificationsOutline} aria-hidden="true" /> {unread ? `(${unread})` : ''}</IonButton>}</div>
 
       {error && <p role="alert" className="slm-error">⚠ {error}</p>}
       {notice && <p role="status" className="slm-notice">✓ {notice}</p>}

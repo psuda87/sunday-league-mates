@@ -45,8 +45,8 @@ try {
   await cmd('Page.navigate', { url: base }); await loaded;
   for (let i = 0; i < 100; i++) { if (await evaluate("!!document.querySelector('.slm-card-link')")) break; await pause(); }
   await evaluate('Promise.all([...document.images].map(image=>image.decode()))');
-  assert.equal(await evaluate("document.querySelector('.slm-crest').getAttribute('src')"), '/assets/branding/slm-logo-header-transparent.png');
-  assert.equal(await evaluate("document.querySelector('.slm-crest').naturalWidth"), 290, 'Official logo did not load');
+  assert.equal(await evaluate("document.querySelector('.slm-crest').getAttribute('src')"), '/assets/branding/slm-logo-primary-transparent.png');
+  assert.equal(await evaluate("document.querySelector('.slm-crest').naturalWidth"), 450, 'Official logo did not load');
   assert.equal(await evaluate("document.querySelector('.slm-stadium').naturalWidth"), 1400, 'Official stadium did not load');
   await fs.mkdir(output, { recursive: true });
   const metrics = {};
@@ -55,6 +55,14 @@ try {
     await evaluate("document.querySelector('ion-content').scrollToTop(0)"); await widths();
     assert.equal(await evaluate("document.querySelector('#demo-count').checkVisibility()"), false, 'Closed demo tools must hide the slider');
     assert.equal(await evaluate("document.querySelector('.slm-card-link').querySelectorAll('button,ion-button,a').length"), 0);
+    const crestStyle=await evaluate("(() => { const el=document.querySelector('.slm-floating-crest'),s=getComputedStyle(el),r=el.getBoundingClientRect();return {fit:s.objectFit,position:s.position,ratio:r.height/r.width}; })()");
+    assert.equal(crestStyle.fit,'contain'); assert.equal(crestStyle.position,'relative'); assert(Math.abs(crestStyle.ratio-505/450)<.002);
+    await evaluate("document.documentElement.style.setProperty('--ion-safe-area-top','32px')"); await pause();
+    assert.equal(await evaluate("document.querySelector('.slm-floating-crest').getBoundingClientRect().top >= 32"),true,'Crest overlaps simulated top safe area');
+    await evaluate("document.documentElement.style.removeProperty('--ion-safe-area-top')");
+    await tools(true); await evaluate("document.querySelector('ion-content').scrollToPoint(0,100,0)"); await pause();
+    assert.equal(await evaluate("document.querySelector('.slm-floating-crest').getBoundingClientRect().top < -20"),true,'Crest must scroll, not stay fixed');
+    await tools(false); await evaluate("document.querySelector('ion-content').scrollToTop(0)"); await pause();
     await shot(`home-${mode}`);
     if (mode === 'dark') {
       const detail=await cmd('Page.captureScreenshot', { format:'png', clip:{x:0,y:0,width:390,height:194,scale:2} });
@@ -82,6 +90,13 @@ try {
     await back(); await evaluate("document.querySelector('.slm-card-link').focus()"); await press(' ', 'Space', 32);
     assert.equal(await evaluate("document.querySelector('[role=tab][aria-selected=true]').textContent"), 'Uczestnicy'); await back();
   }
+  await evaluate("document.querySelectorAll('.slm-bottom-nav button')[1].click()");
+  assert.equal(await evaluate("document.querySelector('.slm-bottom-nav [aria-current=page]').textContent"),'Zawodnicy');
+  assert.equal(await evaluate("document.querySelector('h1').textContent"),'Zawodnicy');
+  await evaluate("document.querySelectorAll('.slm-bottom-nav button')[2].click()");
+  assert.equal(await evaluate("document.querySelector('.slm-bottom-nav [aria-current=page]').textContent"),'Profil');
+  await evaluate("document.querySelectorAll('.slm-bottom-nav button')[0].click()");
+  assert.equal(await evaluate("document.querySelectorAll('.slm-card-link').length"),4);
   await tools(false); await evaluate("document.querySelector('.slm-demo-tools summary').focus()"); await press('Enter', 'Enter', 13);
   assert.equal(await evaluate("document.querySelector('.slm-demo-tools').open"), true, 'Tools must open with native keyboard');
   for (const value of [0, 10, 15, 12]) {
@@ -98,6 +113,6 @@ try {
   assert.equal(requests.some(url => url.startsWith('http') && new URL(url).origin !== new URL(base).origin), false);
   assert.deepEqual(errors, []);
   await fs.writeFile(`${output}/metrics.json`, JSON.stringify(metrics, null, 2));
-  console.log('PASS: official logo/assets, filters (4/2/1), home/details 320/390/768, horizontal tabs/default Participants, Enter/Space/Home/End/arrows, one panel, themes/live system, slider 0/10/15, isolation/CSP.');
+  console.log('PASS: full crest/contain/scroll/simulated safe area, official assets, filters (4/2/1), home/details 320/390/768, horizontal tabs/default Participants, Enter/Space/Home/End/arrows, one panel, themes/live system, slider 0/10/15, isolation/CSP.');
   console.log(JSON.stringify(metrics.dark));
 } finally { ws.close(); }

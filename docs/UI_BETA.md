@@ -1,3 +1,20 @@
+# UI Beta3.3 — Floating Crest
+
+Pełny primary-transparent450x505 bez zmian pikseli, contain/height:auto, zamiast
+przyciętego header-transparent. Znak z poświatą w normalnym flow IonContent,
+bez osobnego paska IonToolbar i fixed/sticky. Tło strony ciągłe w Dark/Light.
+Górny safe area jawnie doliczany; powiadomienia i footer zachowane.
+Karty/filtry/szczegóły i dane bez przebudowy. Na390x844 cztery karty, około5px
+więcej miejsca niż3.2; główny zysk jest wizualny. Na768 pełny herb nieco wyższy.
+
+[Analiza3 cykli](ui/PREMIUM33_VISUAL_REVIEW.md), [Dark](ui/premium33-home-dark.png),
+[Light](ui/premium33-home-light.png), [320](ui/premium33-home-320.png),
+[768](ui/premium33-home-768.png). Lint/TS/buildy/Vitest87/87/Chromium OK.
+Symulacja top safe area32px i scroll są sprawdzone; Android/iOS pozostają do odbioru.
+Historia niżej. Nowy primary zastępuje używanie header z poprzedniego etapu.
+
+---
+
 # UI Beta3.2 — naturalne logo i stadionowe karty
 
 Nowe prawdziwe RGBA: header-transparent290x280 oraz primary-transparent450x505.
