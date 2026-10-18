@@ -1326,3 +1326,15 @@ https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium
 https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium314-bottom-nav-320.png
 Raport: docs/ODPOWIEDZI_CODEX.txt. SHA implementacji dopisany po commicie;
 końcowy SHA raportu w historii Git i odpowiedzi.
+
+[2026-10-18 20:02:34 CEST] Zapis Premium3.14
+Commit implementacji: 3723bc85c8d41e9a45f18f39a7466c632882d873.
+Końcowe TS/ESLint/build aplikacji/build demo i131/131 Vitest zaliczone.
+Końcowy Chromium również tworzy z filtra Historia i potwierdza powrót do
+Nadchodzących; walidacja/podgląd/edycja/goście/reset/role/notch320/390/768 OK.
+Wcześniejszy pełny scenariusz regresji profili/składów/finansów/Auto zaliczony.
+Kontrola29 ścieżek, diff --check i wzorców sekretów OK. Nie dodano .env,
+credentiali, prywatnych danych ani artefaktów builda;7 zrzutów fikcyjnego UI.
+Push tylko feat/ui-beta. Bez merge/migracji/ręcznego deploy. Android/iOS/
+klawiatura natywna/Cypress oraz automatyczny Vercel nadal nieweryfikowane.
+Końcowy SHA raportu jest w historii Git i odpowiedzi.
