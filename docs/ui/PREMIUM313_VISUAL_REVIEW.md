@@ -107,8 +107,10 @@ Dark/Light/Auto i pierwszeństwo trybu ręcznego także bezpośrednio z nowych
 ustawień; dotychczasowe zapisy/rezerwa/goście/składy/finanse/role/kwoty nadal OK.
 Izolacja15 plików/6 istniejących zasobów, allowlista tylko Identity/portraits,
 bez Auth/API/Supabase/Edge/sekretów i bez zmian CSP/env/vercel.json.
-SHA256 home Dark/Light, details Dark, participants Dark, karta zwykłego zawodnika
-Dark/Light, Składy Dark/Light i Rozliczenie Dark/Light identyczne z3.12.
+Porównanie trzeciego cyklu:10/10 poprzednich zrzutów SHA256 identycznych.
+Dodatkowy końcowy przebieg:9/10 identycznych; Rozliczenie Light różni się17
+pikselami na lewym obrysie wierszy (bbox16,408–18,526, max1/255 na kanał), bez różnicy geometrii
+lub treści. Zrzut obejrzano; nie retuszowano obrazów, aby wymuszać zgodność.
 To testy fikcyjnego demo i istniejących atrap API, nie prawdziwy Supabase.
 Cypress niewykonany (brak Xvfb); Android/iOS, natywna klawiatura/galeria i
 prawdziwy backend nieweryfikowane. Duże chunki Ionic nadal. Bez migracji/merge/

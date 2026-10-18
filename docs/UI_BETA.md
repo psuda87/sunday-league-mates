@@ -18,7 +18,8 @@ ui/PREMIUM313_VISUAL_REVIEW.md, raport ODPOWIEDZI_CODEX.txt. Starsze ograniczeni
 backendu/Dockera pozostają poniżej. TS/ESLint/oba buildy OK;122/122 Vitest
 i Chromium320/390/768: nazwa/numer/avatar/lokalnyPNG/SVG/cancel/reset/readonly/
 spójność danych i nowe ustawienia Auto/Light/Dark OK. Izolacja15 plików/CSP OK.
-Pozostałe zaakceptowane widoki SHA256 identyczne. Cypress brak Xvfb; native
+Pozostałe zaakceptowane widoki bez przebudowy;3.cykl10/10 SHA256 identycznych,
+końcowo9/10 i17 różniących pikseli obrysu Rozliczenia Light (opis w review). Cypress brak Xvfb; native
 klawiatura/galeria/backend nieweryfikowane, duże chunki Ionic nadal.
 
 # Premium España3.12 — 2026-10-18 18:11:49 CEST
