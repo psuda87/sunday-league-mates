@@ -375,3 +375,8 @@ ion-toolbar:has(.slm-shell-header) { --background:var(--slm-brand-header-bg); }
 .slm-match-filters button span { display:flex; align-items:center; justify-content:center; height:28px; padding:0 17px; border:1px solid var(--slm-border); border-radius:12px; background:var(--slm-panel); white-space:nowrap; }
 .slm-match-filters button[aria-pressed="true"] span { background:linear-gradient(130deg,var(--slm-button-top),var(--slm-button-bottom)); border-color:var(--slm-button-top); box-shadow:inset 0 -1px var(--slm-gold); }
 @media(max-width:350px) { .slm-match-filters button span { padding-inline:13px; } }
+
+/* Premium3.6: 34px visible CTA, 44px interactive host; tab labels name panels. */
+.slm-match-detail .slm-match-cta { height:44px; min-height:44px; padding-block:5px; box-sizing:border-box; --border-radius:10px; --padding-top:0; --padding-bottom:0; }
+.slm-match-detail .slm-match-cta::part(native) { height:34px; min-height:34px; padding-block:0; }
+.slm-detail-tabs [role="tabpanel"] > :first-child { margin-top:0; }

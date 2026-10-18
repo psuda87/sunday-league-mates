@@ -38,6 +38,8 @@ async function widths() {
     assert(header.overlap && header.right <= header.crestLeft && header.crestRight <= width, `Header must fit one row at ${width}`);
     const filters = await evaluate("[...document.querySelectorAll('.slm-match-filters button')].map(el=>{const r=el.getBoundingClientRect(),s=el.firstElementChild,v=s.getBoundingClientRect();return {w:r.width,h:r.height,visual:v.height,font:getComputedStyle(el).fontSize,clipped:s.scrollWidth>s.clientWidth};})");
     for (const filter of filters) { assert(filter.w>=44 && filter.h>=44); assert(filter.visual>=28 && filter.visual<=30); assert.equal(filter.font,'12.48px'); assert.equal(filter.clipped,false); }
+    const detail = await evaluate(`(() => {const b=document.querySelector('.slm-match-detail .slm-match-cta');if(!b)return null;const n=b.shadowRoot.querySelector('button'),p=document.querySelector('[role=tabpanel]:not([hidden])'),t=document.querySelector('[role=tablist]');return {hit:b.getBoundingClientRect().height,visible:n.getBoundingClientRect().height,font:getComputedStyle(b).fontSize,weight:getComputedStyle(b).fontWeight,headings:p.querySelectorAll(':scope > .slm-section-heading').length,named:!!document.getElementById(p.getAttribute('aria-labelledby')),gap:p.firstElementChild.getBoundingClientRect().top-t.getBoundingClientRect().bottom,clipped:n.scrollHeight>n.clientHeight};})()`);
+    if(detail){assert(detail.hit>=44);assert.equal(detail.visible,34);assert.equal(detail.font,'12.48px');assert.equal(detail.weight,'800');assert.equal(detail.headings,0);assert.equal(detail.named,true);assert.equal(detail.clipped,false);assert(detail.gap>=12&&detail.gap<=16);}
     const rows = await evaluate("[...document.querySelectorAll('[role=tab]')].map(tab=>Math.round(tab.getBoundingClientRect().top))");
     if (rows.length) assert.equal(new Set(rows).size, 1, 'Tabs must be on one horizontal row');
   }
@@ -82,7 +84,9 @@ try {
     assert.equal(await evaluate("document.querySelectorAll('.slm-variant-preview').length"), 0, 'A/B in normal flow');
     assert.equal(await evaluate("document.querySelector('[role=tab][aria-selected=true]').textContent"), 'Uczestnicy');
     assert.equal(await evaluate("[...document.querySelectorAll('[role=tabpanel]')].filter(panel=>!panel.hidden).length"), 1);
-    await widths(); await shot(`participants-${mode}`);
+    await widths();
+    metrics[`${mode}-details`] = await evaluate(`(() => {const b=document.querySelector('.slm-match-cta'),n=b.shadowRoot.querySelector('button'),t=document.querySelector('[role=tablist]'),p=document.querySelector('[role=tabpanel]:not([hidden])'),first=p.querySelector('.slm-roster-overview')||p.firstElementChild;return {button:b.getBoundingClientRect().height,visible:n.getBoundingClientRect().height,font:getComputedStyle(b).fontSize,weight:getComputedStyle(b).fontWeight,firstTop:first.getBoundingClientRect().top,tabsBottom:t.getBoundingClientRect().bottom};})()`);
+    await shot(`participants-${mode}`);
     await viewport(844,390);
     assert.equal(await evaluate('document.documentElement.scrollWidth > innerWidth'),false,'Landscape overflow');
     assert.equal(await evaluate("document.querySelector('[role=tab][aria-selected=true]').textContent"),'Uczestnicy');

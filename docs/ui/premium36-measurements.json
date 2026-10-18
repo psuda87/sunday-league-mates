@@ -1,0 +1,194 @@
+{
+  "before": {
+    "dark": {
+      ".slm-crest": {
+        "x": 310,
+        "y": 3,
+        "width": 64,
+        "height": 71.8125
+      },
+      ".slm-compact-header h1": {
+        "x": 16,
+        "y": 19.078125,
+        "width": 286,
+        "height": 39.640625
+      },
+      ".slm-hero-card": {
+        "x": 16,
+        "y": 130.8125,
+        "width": 358,
+        "height": 121
+      },
+      ".slm-stadium-frame": {
+        "x": 17,
+        "y": 131.8125,
+        "width": 356,
+        "height": 119
+      },
+      ".slm-match-filters": {
+        "x": 16,
+        "y": 78.8125,
+        "width": 358,
+        "height": 44
+      },
+      ".slm-bottom-nav": {
+        "x": 0,
+        "y": 777,
+        "width": 390,
+        "height": 67
+      }
+    },
+    "dark-details": {
+      "button": 44,
+      "visible": 44,
+      "font": "12.48px",
+      "weight": "800",
+      "firstTop": 464.96875,
+      "tabsBottom": 414.96875
+    },
+    "light": {
+      ".slm-crest": {
+        "x": 310,
+        "y": 3,
+        "width": 64,
+        "height": 71.8125
+      },
+      ".slm-compact-header h1": {
+        "x": 16,
+        "y": 19.078125,
+        "width": 286,
+        "height": 39.640625
+      },
+      ".slm-hero-card": {
+        "x": 16,
+        "y": 130.8125,
+        "width": 358,
+        "height": 121
+      },
+      ".slm-stadium-frame": {
+        "x": 17,
+        "y": 131.8125,
+        "width": 356,
+        "height": 119
+      },
+      ".slm-match-filters": {
+        "x": 16,
+        "y": 78.8125,
+        "width": 358,
+        "height": 44
+      },
+      ".slm-bottom-nav": {
+        "x": 0,
+        "y": 777,
+        "width": 390,
+        "height": 67
+      }
+    },
+    "light-details": {
+      "button": 44,
+      "visible": 44,
+      "font": "12.48px",
+      "weight": "800",
+      "firstTop": 464.96875,
+      "tabsBottom": 414.96875
+    }
+  },
+  "after": {
+    "dark": {
+      ".slm-crest": {
+        "x": 310,
+        "y": 3,
+        "width": 64,
+        "height": 71.8125
+      },
+      ".slm-compact-header h1": {
+        "x": 16,
+        "y": 19.078125,
+        "width": 286,
+        "height": 39.640625
+      },
+      ".slm-hero-card": {
+        "x": 16,
+        "y": 130.8125,
+        "width": 358,
+        "height": 121
+      },
+      ".slm-stadium-frame": {
+        "x": 17,
+        "y": 131.8125,
+        "width": 356,
+        "height": 119
+      },
+      ".slm-match-filters": {
+        "x": 16,
+        "y": 78.8125,
+        "width": 358,
+        "height": 44
+      },
+      ".slm-bottom-nav": {
+        "x": 0,
+        "y": 777,
+        "width": 390,
+        "height": 67
+      }
+    },
+    "dark-details": {
+      "button": 44,
+      "visible": 34,
+      "font": "12.48px",
+      "weight": "800",
+      "firstTop": 428.96875,
+      "tabsBottom": 414.96875
+    },
+    "light": {
+      ".slm-crest": {
+        "x": 310,
+        "y": 3,
+        "width": 64,
+        "height": 71.8125
+      },
+      ".slm-compact-header h1": {
+        "x": 16,
+        "y": 19.078125,
+        "width": 286,
+        "height": 39.640625
+      },
+      ".slm-hero-card": {
+        "x": 16,
+        "y": 130.8125,
+        "width": 358,
+        "height": 121
+      },
+      ".slm-stadium-frame": {
+        "x": 17,
+        "y": 131.8125,
+        "width": 356,
+        "height": 119
+      },
+      ".slm-match-filters": {
+        "x": 16,
+        "y": 78.8125,
+        "width": 358,
+        "height": 44
+      },
+      ".slm-bottom-nav": {
+        "x": 0,
+        "y": 777,
+        "width": 390,
+        "height": 67
+      }
+    },
+    "light-details": {
+      "button": 44,
+      "visible": 34,
+      "font": "12.48px",
+      "weight": "800",
+      "firstTop": 428.96875,
+      "tabsBottom": 414.96875
+    }
+  },
+  "homeScreenshotUnchanged": {
+    "home-dark": true,
+    "home-light": true
+  }
+}

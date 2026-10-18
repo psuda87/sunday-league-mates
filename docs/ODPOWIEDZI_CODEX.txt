@@ -606,3 +606,49 @@ Zwykły push na origin/feat/ui-beta zakończony; ls-remote potwierdził identycz
 Przegląd diff/staged, nowych plików i diff --check OK; brak .env, sekretów i artefaktów
 poza zamówionymi zrzutami/metriami. Końcowy commit tego uzupełnienia w historii Git.
 Bez merge/ręcznego deploy. Raport: docs/ODPOWIEDZI_CODEX.txt.
+
+
+[2026-10-18 13:28:53 CEST] PREMIUM ESPAÑA3.6 — smukła akcja i brak powtórzeń
+feat/ui-beta, start czysty. Precyzyjny zakres: CSS głównej akcji tylko wewnątrz
+slm-match-detail oraz usunięcie h2 powtarzającego etykietę aktywnej zakładki w MatchTabs.
+CTA: widoczny button part(native)44 ->34px; host/obszar interakcji nadal44px,
+po5px niewidocznej przestrzeni pionowo, radius10px. Font12.48px/800 i treść,
+szerokość, red gradient i obsługa stanów/operacji bez zmian. Dotyczy wspólnego
+CTA szczegółów także przy wycofaniu/rezerwie, bez zmniejszania formularzy i innych
+przycisków. Nie zmieniono callbacków, warunków disabled/loading ani danych.
+
+Cztery panele mają nadal role=tabpanel, aria-labelledby wskazuje ich zakładkę,
+jeden panel widoczny, klawiatura i focus bez zmian. Usunięto tylko powtórzone h2;
+Zapisani/Goście/Rezerwa i zawartość pozostają. Historyczny układ stacked nadal ma
+swoje nagłówki, ponieważ nie powtarzają aktywnej zakładki.
+
+Pomiar rzeczywistego React/Ionic390x844, oba motywy: przed przycisk44px/host44,
+po34px/host44. Pierwsza karta Uczestników y464.96875 ->428.96875, czyli36px wyżej.
+Dolna krawędź zakładek414.96875 bez zmian, nowy odstęp14px zamiast50px wraz z h2.
+Szczegóły pomiarów przed/po w docs/ui/premium36-measurements.json. Baseline zmierzony
+na buildzie kodu3.5, następnie przywrócono poprawki3.6 i ponowiono build/kontrole.
+Oglądnięto rzeczywiste renderowanie Informacji Dark/Light, Uczestników i Składów.
+Home Dark i Light SHA256 identyczne z premium35: brak zmian nagłówka, herbu,
+filtrów28px, kart/fotografii, dolnej nawigacji i tła głównego.
+
+Wyniki: TypeScript, ESLint, build aplikacji i build:demo OK. Vitest90/90 w14 plikach
+(atrapy API, nie testy rzeczywistego Supabase). Chromium320x844/390x844/768x844,
+obrót844x390, CTA34/44/font/waga/brak obcięcia, brak powtórzonych h2/nazwy dostępne,
+odstęp12–16px wszystkich paneli, cztery zakładki/klawiatura, karta/powrót,
+filtry, dolna nawigacja, Dark/Light/Auto/live system, safe area i overflow OK.
+Demo14 plików, brak Auth/Supabase/API/Edge/sekretów/rzeczywistych danych,
+brak żądań poza origin, CSP/connect-src none zachowane. Duże chunki Ionic nadal.
+Android/iOS i realny backend nieweryfikowane. Cypress nie uruchamiano (brak Xvfb).
+
+Zrzuty prawdziwego Chromium, bez makiet:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium36-details-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium36-details-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium36-participants-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium36-teams-dark.png
+
+Bez zmian backendu/Supabase/Auth/RPC/RLS/migracji/finansów/push/Firebase
+ani konfiguracji Vercel. Bez merge i ręcznego deploy. Automatyczny Vercel
+niezweryfikowany. Następny krok: ocena na telefonie, dotyk i skalowanie fontów.
+Raport docs/ODPOWIEDZI_CODEX.txt; STATUS zaktualizowany, poprzednie informacje
+SQL/Docker/niewdrożone migracje zachowane. SHA implementacji zostanie dopisany
+po commicie; końcowy commit dokumentacji w historii Git i odpowiedzi.

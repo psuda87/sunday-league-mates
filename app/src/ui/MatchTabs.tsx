@@ -15,7 +15,7 @@ export default function MatchTabs({ panels }: { panels: readonly ReactNode[] }) 
       event.preventDefault(); setActive(next); document.getElementById(`${prefix}-tab-${next}`)?.focus();
     }}><IonIcon icon={icons[index]} aria-hidden="true" /><span>{label}</span></button>)}</div>
     {labels.map((label, index) => <section key={label} id={`${prefix}-panel-${index}`} role="tabpanel" aria-labelledby={`${prefix}-tab-${index}`} hidden={active !== index} tabIndex={0}>
-      <h2 className="slm-section-heading">{label}</h2>{panels[index]}
+      {panels[index]}
     </section>)}
   </div>;
 }

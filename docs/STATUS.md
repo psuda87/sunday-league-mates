@@ -1,3 +1,17 @@
+# Premium España3.6 — 2026-10-18 13:28:53 CEST
+
+feat/ui-beta: CTA szczegółów widoczne34px (wcześniej44), obszar interakcji44px,
+font12.48px/800 bez zmian; brak powtórzonych h2 pod aktywnymi zakładkami,
+aria-labelledby zachowane. Pierwsza karta uczestników36px wyżej, odstęp14px.
+Home Dark/Light bajtowo identyczne z3.5. Pomiary: ui/premium36-measurements.json;
+zrzuty premium36-details-dark/light, participants-dark, teams-dark w ui/.
+TypeScript/ESLint/oba buildy OK; Vitest90/90, Chromium320/390/768 i kontrola
+CTA34/44/tekstu, czterech paneli/nazw/klawiatury/odstępów/motywów/overflow OK.
+Izolacja14 plików/CSP OK. Duże chunki Ionic. Cypress niewykonany (brak Xvfb),
+Android/iOS/realny backend nieweryfikowane. Bez backendu/migracji/merge/deploy;
+Vercel automatyczny niezweryfikowany. Raport docs/ODPOWIEDZI_CODEX.txt.
+Następny krok: ocena dotyku i skalowania na telefonie. Starsze zastrzeżenia poniżej.
+
 # Premium España3.5 — 2026-10-18 13:20:34 CEST
 
 Commit implementacji 8d7543bff521bf0c2248124bc975accf77a09ac3; push origin potwierdzony.
