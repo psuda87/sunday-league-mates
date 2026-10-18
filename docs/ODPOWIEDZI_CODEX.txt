@@ -969,3 +969,7 @@ https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium
 https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium39-player-card-768.png
 Raport: docs/ODPOWIEDZI_CODEX.txt; analiza docs/ui/PREMIUM39_VISUAL_REVIEW.md.
 SHA kodu dopisany po commicie; końcowy SHA raportu w historii Git/odpowiedzi.
+
+[2026-10-18 17:12:39 CEST] Commit korekty referencji Ultimate: ca8b33cb1629b32281387b5820fa067eacfb7a25.
+Kontrole i przegląd zmian OK; końcowy SHA raportu w historii Git i odpowiedzi.
+Zwykły push wyłącznie feat/ui-beta, bez merge/ręcznego deploy.
