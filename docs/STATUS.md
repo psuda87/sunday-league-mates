@@ -1,5 +1,6 @@
 # Premium España3.9 — 2026-10-18 17:04:43 CEST
 
+Implementacja fc60370068e0c01e452b144122df540d6405ef57, push zakończony.
 feat/ui-beta: UltimatePlayerCard demo, złota tarcza/duży portret/herb/nazwisko,
 4 stałe fikcyjne zdjęcia dla20 osób, fallback inicjały i src pojedynczego zdjęcia.
 Brak referencji Ultimate — realizacja opisu, bez deklaracji zgodności z grafiką.
