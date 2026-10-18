@@ -1,3 +1,16 @@
+# Premium3.14 — wydarzenia wyłącznie demo
+
+- Użytkownik doprecyzował: nadal3 zakładki Mecze/Zawodnicy/Profil, Składy tylko
+  wewnątrz meczu. DemoBottomNav dla admina dodaje osobny plus56px/20px i notch,
+  dla gracza deleguje istniejący BottomNav. canManageDemoEvents/eventRole to
+  symulacja osobna od finansowej, reset/zmiana użytkownika przywraca player.
+- EventForm/eventDraft: wspólne tworzenie/edycja przyszłych meczów, Warsaw/DST,
+  walidacja/podgląd bez zapisu/Anuluj, grosze z parseDemoMoney. Game ma opcjonalne
+  metadane i minimum; prezentacja domyślnie10, produkcja bez nowych reguł.
+  Nowy id/creationKey tylko RAM, bez uczestników; edycja zachowuje wszystkie
+  wpisy/składy/wpłaty. Nie przenosić reducera do produkcji. docs/ui/
+  PREMIUM314_VISUAL_REVIEW.md. Zachować backend/konfigurację Vercel/UI zaakceptowane.
+
 # Premium3.13 — własna tożsamość tylko demo
 
 - Profil główny używa DemoProfile personal + tej samej UltimatePlayerCard. Jedno

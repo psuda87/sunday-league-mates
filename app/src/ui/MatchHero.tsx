@@ -4,10 +4,10 @@ import { locationOutline, timeOutline } from 'ionicons/icons';
 import type { Match } from '../events/model';
 import { capacityState } from './capacity';
 import MatchCapacityProgress from './MatchCapacityProgress';
-export default function MatchHero({ match, children, imageSrc = '/assets/branding/stadium-bg-card.jpg', title = 'Następny mecz', onOpen, openDisabled = false, compact = false, displayName }: { match: Match; children?: ReactNode; imageSrc?: string; title?: string; onOpen?: () => void; openDisabled?: boolean; compact?: boolean; displayName?: string }) {
+export default function MatchHero({ match, children, imageSrc = '/assets/branding/stadium-bg-card.jpg', title = 'Następny mecz', onOpen, openDisabled = false, compact = false, displayName, minimum = 10 }: { match: Match; children?: ReactNode; imageSrc?: string; title?: string; onOpen?: () => void; openDisabled?: boolean; compact?: boolean; displayName?: string; minimum?:number }) {
   const date = new Date(match.starts_at);
   const isDetail = title === 'Szczegóły meczu';
-  const capacity = capacityState(match.registered_count, match.capacity);
+  const capacity = capacityState(match.registered_count, match.capacity, minimum);
   const format = (options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('pl-PL', { timeZone: 'Europe/Warsaw', ...options }).format(date);
   return <section className={`slm-next-match${compact ? ' slm-match-compact' : ''}${title === 'Szczegóły meczu' ? ' slm-match-detail' : ''}`} aria-label={title}>
     {!compact && <h1>{title}</h1>}
@@ -23,7 +23,7 @@ export default function MatchHero({ match, children, imageSrc = '/assets/brandin
           <p className="slm-match-date"><IonIcon icon={timeOutline} aria-hidden="true" /> {compact ? `${format({ hour: '2-digit', minute: '2-digit' })} · ${match.duration_minutes} min` : `${match.duration_minutes} minut · ${format({ year: 'numeric' })}`}</p>
         </div>
       </div>
-      {compact ? <p className="slm-compact-count" data-state={capacity.occupied === 0 ? 'empty' : capacity.occupied >= 10 ? 'ready' : 'low'}><strong>{capacity.occupied}/{capacity.total}</strong><span className="slm-sr-only"> zawodników · {capacity.label}</span></p> : <MatchCapacityProgress count={match.registered_count} capacity={match.capacity} />}
+      {compact ? <p className="slm-compact-count" data-state={capacity.occupied === 0 ? 'empty' : capacity.occupied >= minimum ? 'ready' : 'low'}><strong>{capacity.occupied}/{capacity.total}</strong><span className="slm-sr-only"> zawodników · {capacity.label}</span></p> : <MatchCapacityProgress minimum={minimum} count={match.registered_count} capacity={match.capacity} />}
     {(match.status === 'cancelled' || !match.registration_open) && <p className="slm-match-status">{match.status === 'cancelled' ? '⛔ Mecz odwołany' : '🔒 Zapisy zamknięte'}</p>}{match.decision_required && <p className="slm-match-status">⚠ Brak minimum po 17:00 — decyzja administratora</p>}</article>{children}
   </section>;
 }

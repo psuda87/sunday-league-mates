@@ -1,3 +1,13 @@
+## Premium3.14 — wydarzenia w pamięci demo
+
+Allowlista rozszerzona tylko o src/demo/DemoBottomNav.tsx, EventForm.tsx,
+eventDraft.ts. Root app / npm run build:demo / dist-demo / bez env nadal.
+Bez nowych zależności/zasobów i zmian app/vercel.json/CSP.15 statycznych plików,
+6 dotychczasowych assetów; brak produkcji/Auth/API/Supabase/Edge w bundle demo.
+Rola wydarzeń tylko symulowana w Narzędziach demo, domyślnie zawodnik; nie jest
+zabezpieczeniem prawdziwych danych. Mecze wyłącznie RAM, reset/odświeżenie usuwa
+utworzone rekordy.3 zakładki zgodnie z odpowiedzią użytkownika. Bez ręcznego deploy.
+
 ## Premium3.13 — pamięciowa edycja profilu
 
 Jawnie dopuszczono src/demo/Identity.tsx i portraits.ts. Bez nowych zasobów/

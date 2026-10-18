@@ -1,10 +1,12 @@
+import { validateEvent } from './eventDraft';
+import type { EventInput } from './eventDraft';
 import { validDemoPortrait } from './portraits';
 import type { DemoPortrait } from './portraits';
 // Deterministic, fictional, memory-only demo. Never imported by production screens.
 export interface DemoPlayer { id: string; name: string; jerseyNumber: number; demoTotals: {goals:number;assists:number;mvp:number}; portrait?: DemoPortrait; portraitEdited?:boolean }
 export interface Entry { id: string; playerId: string | null; guestName?: string; inviterId?: string; status: 'registered' | 'reserve' | 'withdrawn'; attendance: boolean | null; paidCents: number }
-export interface Game { id: string; name: string; startsAt: string; status: 'upcoming' | 'completed' | 'cancelled'; capacity: number; costCents: number; entries: Entry[]; lineup?: {a:string[];b:string[]} }
-export interface World { players: DemoPlayer[]; games: Game[]; userId: string; financeRole: 'player'|'admin'; notice: string }
+export interface Game { id: string; name: string; startsAt: string; status: 'upcoming' | 'completed' | 'cancelled'; capacity: number; costCents: number; entries: Entry[]; location?:string; address?:string; durationMinutes?:number; minimum?:number; creationKey?:string; lineup?: {a:string[];b:string[]} }
+export interface World { players: DemoPlayer[]; games: Game[]; userId: string; financeRole: 'player'|'admin'; eventRole:'player'|'admin'; nextGameId:number; notice: string }
 export const names = ['Alex Nowak','Kamil Zieliński','Marek Lis','Piotr Wójcik','Adrian Maj','Łukasz Wrona','Tomasz Wilk','Oskar Król','Jan Sokół','Filip Góral','Igor Biały','Leon Zając','Dawid Polny','Adam Brzoza','Patryk Las','Rafał Dąb','Michał Sowa','Artur Bór','Daniel Rzeka','Szymon Wiatr'];
 export const registered = (game: Game) => game.entries.filter(e => e.status === 'registered');
 export const reserves = (game: Game) => game.entries.filter(e => e.status === 'reserve');
@@ -49,11 +51,12 @@ export function initialWorld(): World {
   for(const game of games.filter(g=>g.status==='completed')) for(const {entry,due} of charges(game)) entry.paidCents=due;
   games[7].entries[3].paidCents=Math.floor(games[7].entries[3].paidCents/2);
   for(const game of [games[0],games[1],...games.slice(4,8)])game.lineup=exampleLineup(game);
-  return {players,games,userId:'p01',financeRole:'player',notice:''};
+  return {players,games,userId:'p01',financeRole:'player',eventRole:'player',nextGameId:11,notice:''};
 }
 export type Scenario = 'free'|'full'|'joined'|'reserve'|'completed'|'cancelled'|'debt';
 export const scenarioGame:Record<Scenario,string>={free:'demo-1',full:'demo-2',joined:'demo-1',reserve:'demo-2',completed:'demo-5',cancelled:'demo-9',debt:'demo-1'};
-export type Action = {type:'reset';scenario?:Scenario}|{type:'user';id:string}|{type:'finance_role';role:'player'|'admin'}|{type:'payment_set';gameId:string;entryId:string;cents:number}|{type:'lineup_reset';gameId:string}|{type:'lineup_swap';gameId:string;a:string;b:string}|{type:'identity';playerId:string;name:string}|{type:'portrait';playerId:string;portrait:DemoPortrait}|{type:'jersey';playerId:string;number:number}|{type:'join'|'withdraw'|'guest'|'remove_guest'|'resize'|'attendance'|'pay';gameId:string;entryId?:string;count?:number};
+export const canManageDemoEvents=(world:World)=>world.eventRole==='admin';
+export type Action = {type:'event_role';role:'player'|'admin'}|{type:'event_create';input:EventInput;key:string}|{type:'event_update';gameId:string;input:EventInput}|{type:'reset';scenario?:Scenario}|{type:'user';id:string}|{type:'finance_role';role:'player'|'admin'}|{type:'payment_set';gameId:string;entryId:string;cents:number}|{type:'lineup_reset';gameId:string}|{type:'lineup_swap';gameId:string;a:string;b:string}|{type:'identity';playerId:string;name:string}|{type:'portrait';playerId:string;portrait:DemoPortrait}|{type:'jersey';playerId:string;number:number}|{type:'join'|'withdraw'|'guest'|'remove_guest'|'resize'|'attendance'|'pay';gameId:string;entryId?:string;count?:number};
 export function reduceWorld(previous:World,action:Action):World {
   if(action.type==='reset') {
     const world=initialWorld();
@@ -61,6 +64,20 @@ export function reduceWorld(previous:World,action:Action):World {
     if(action.scenario==='reserve') world.games[1].entries.push({id:'demo-user-reserve',playerId:world.userId,status:'reserve',attendance:null,paidCents:0});
     if(action.scenario==='debt') for(const game of world.games.slice(4,6)) for(const e of game.entries) if(e.playerId===world.userId) e.paidCents=0;
     return world;
+  }
+  if(action.type==='event_role')return {...previous,eventRole:action.role,notice:''};
+  if(action.type==='event_create'||action.type==='event_update') {
+    if(!canManageDemoEvents(previous))return previous;
+    const original=action.type==='event_update'?previous.games.find(g=>g.id===action.gameId):undefined;
+    if(action.type==='event_update'&&(!original||original.status!=='upcoming'))return previous;
+    if(validateEvent(action.input,original?registered(original).length:0).length)return previous;
+    const input={...action.input,name:action.input.name.trim()||'Mecz · demo',location:action.input.location.trim(),address:action.input.address.trim()};
+    if(action.type==='event_create') {
+      if(!action.key||previous.games.some(g=>g.creationKey===action.key))return previous;
+      const game:Game={...input,id:`demo-${previous.nextGameId}`,creationKey:action.key,status:'upcoming',entries:[]};
+      return {...previous,games:[game,...previous.games],nextGameId:previous.nextGameId+1,notice:'Utworzono mecz wyłącznie w pamięci demo.'};
+    }
+    return {...previous,games:previous.games.map(g=>g===original?{...g,...input}:g),notice:'Zapisano zmiany meczu wyłącznie w pamięci demo.'};
   }
   if(action.type==='identity'||action.type==='portrait') {
     if(action.playerId!==previous.userId||!previous.players.some(p=>p.id===action.playerId))return previous;
@@ -76,7 +93,7 @@ export function reduceWorld(previous:World,action:Action):World {
   }
   if(action.type==='finance_role')return {...previous,financeRole:action.role,notice:''};
   const world=structuredClone(previous);world.notice='';
-  if(action.type==='user'){world.userId=action.id;world.financeRole='player';return world;}
+  if(action.type==='user'){world.userId=action.id;world.financeRole='player';world.eventRole='player';return world;}
   const game=world.games.find(g=>g.id===action.gameId);if(!game)return previous;
   if(action.type==='lineup_reset') {
     if(game.status==='cancelled'||registered(game).length<2)return previous;

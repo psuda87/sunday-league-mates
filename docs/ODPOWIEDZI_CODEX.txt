@@ -1249,3 +1249,80 @@ SVG/PNG/cancel/reset/powroty/pozostałe moduły) zaliczone. Przegląd plików/
 sekretów/artefaktów i diff --check OK; bez prywatnych fotografii w repo.
 Zwykły push tylko feat/ui-beta, bez merge/ręcznego deploy.
 Końcowy SHA raportu w historii Git i odpowiedzi.
+
+[2026-10-18 19:57:42 CEST] PREMIUM ESPAÑA3.14 — centralny plus i wydarzenia demo
+
+Decyzja użytkownika po pytaniu: pozostawić3 zakładki Mecze/Zawodnicy/Profil;
+Składy wyłącznie w szczegółach wydarzenia. Wersja końcowa to respektuje.
+Plus56×56px,20px ponad paskiem, bordo/gold, prawdziwe wycięcie radialną maską
+powierzchni i SVG krzywizna krawędzi. Footer rezerwuje miejsce; trzy zakładki
+symetryczne, ich ikony i funkcje zachowane. Zwykły użytkownik używa dokładnie
+poprzedniego BottomNav. Admin ma większą wysokość paska, aby plus nie kolidował
+z ikoną Zawodnicy. Min8px odstępu między nimi potwierdzony w Chromium.
+
+Jak przetestować: Narzędzia demo → Rola wydarzeń → Administrator demo.
+To odrębna symulacja od roli finansowej, nie Auth/serwerowe zabezpieczenie.
+canManageDemoEvents sprawdza pasek, formularz i reducer; rola player/reset/zmiana
+użytkownika blokuje edycję i tworzenie, także przy bezpośrednim #match-create.
+Nie przyznaje automatycznie dostępu do cudzych finansów.
+
+Nowe EventForm/EventInput/eventDraft: jedna implementacja tworzenia i edycji
+nadchodzących meczów. Nazwa opcjonalna, data/godzina, czas gry, miejsce/adres,
+minimum/limit i koszt. Domyślnie jutro18:00 Europe/Warsaw,90min,10/15,270zł,
+Harcerska1 Chorzów; dowolny dzień tygodnia. Przyszły termin walidowany w lokalnej
+strefie; odrzucenie niejednoznacznej/nieistniejącej godziny DST zamiast zmiany
+terminu po cichu. Dodatnie całkowite min/czas, max≥min i zapisani wraz z gośćmi,
+kwota≥0 i poprawny format do2 miejsc, wymagane miejsce, ograniczenia tekstowe.
+Jawne limity demonstracji: czas≤1440min, limit≤100, koszt≤1mln zł. Grosze z
+istniejącego parseDemoMoney. Podgląd używa MatchHero; nie dodaje rekordu.
+Wróć do edycji/Anuluj nie mutują danych. Fokus i scroll podglądu poprawione.
+
+Po potwierdzeniu stabilny id demo-11 i następne / creationKey deduplikuje zapis,
+blokada wielokrotnego kliknięcia. Bez automatycznych uczestników, licznik0/limit.
+Wspólny world obsługuje zapisy/gości/rezerwę/składy/rozliczenia nowego meczu.
+Lista sortowana chronologicznie, Moje korzysta z wpisu w demo. Utworzenie
+z filtra Historia przełącza powrót na Nadchodzące, aby nowy mecz był widoczny.
+Edytuj mecz tylko adminowi w nadchodzących; te same pola i podgląd, limit≥liczba
+aktywnych. Wpisy/goście/rezerwa/składy/wpłaty nie są usuwane. Koszt i minimum
+aktualizują wspólne widoki. Parametr prezentacji minimum domyślnie10 w istniejącym
+UI — bez zmiany produkcyjnych reguł. Nie dodano edycji zakończonych/anulowanych,
+usuwania ani nowej akcji anulowania. Reset usuwa dodane mecze i zmiany.
+
+Kontrola:3 pełne cykle renderów docelowego układu i korekt,320×844/390×844/768.
+1: odstęp plus/środkowa ikona zbyt bliski;2: padding40px i bez kolizji;
+3: zwarty opis formularza, fokus/przewinięcie podglądu. Przy320 długi tytuł
+podglądu zawija się do2 wierszy, bez clippingu; formularz przewijany.
+TypeScript i ESLint zaliczone. Build aplikacji i build:demo zaliczone, dotychczasowe
+ostrzeżenia dużych chunków Ionic pozostają. Vitest131/131 w23 plikach zaliczony.
+Nowy test Chromium: role i utrata roli/directURL, geometria56/20, dotyk≥44,
+walidacja miejsca/kwoty/przeszłości/limitów, podgląd bez utworzenia, powrót do pól,
+utworzenie, zapis/gość, edycja/cancel/limit<zapisani, nowe minimum/koszt,
+lista/reset,3 zakładki i brak overflow. Testy modelu obejmują DST/idempotencję/
+puste wpisy/zachowanie rezerwy/składów/wpłat/reset. Pełna regresja Chromium
+profili/numerów/awatarów/nawigacji/gości/składów/finansów/Auto-Light-Dark OK.
+Porównanie zaakceptowanych ekranów z3.13:9/10 identycznych SHA256; Rozliczenie
+Light różni się17 pikselami obrysu w bbox(16,408)–(18,526), maks1/255 na kanał.
+Obejrzano, brak zmiany układu lub treści, zrzutów nie retuszowano.
+
+Izolacja demo: allowlista tylko3 nowych modułów demo,15 statycznych plików/6
+istniejących zasobów; brak Auth/API/Supabase/Edge/sekretów, zero żądań zewnętrznych
+w Chromium, CSP bez błędów. Nie zmieniono vercel.json/env/dependencies ani
+backendu/finansów produkcyjnych/Firebase. To testy fikcyjnego demo i istniejących
+atrap API, nie prawdziwego Supabase. Cypress nie uruchomiono (brak Xvfb).
+Android/iOS, natywna klawiatura i safe areas wymagają weryfikacji na telefonie.
+Bez migracji/merge/ręcznego wdrożenia; automatyczny Vercel niezweryfikowany.
+
+Zmienione moduły: demo App/Panels/data, nowe DemoBottomNav/EventForm/eventDraft
++2 pliki testów,parametr minimum w3 plikach UI (capacity/progress/hero),
+CSS, allowlista vite.demo, test Demo i skrypty Chromium. Dokumentacja
+STATUS/UI_BETA/DEMO_VERCEL/AGENTS oraz ui/PREMIUM314_VISUAL_REVIEW.md.
+Rzeczywiste finalne zrzuty React/Ionic:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium314-bottom-nav-admin-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium314-bottom-nav-admin-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium314-bottom-nav-user.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium314-create-match.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium314-create-preview.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium314-edit-match.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium314-bottom-nav-320.png
+Raport: docs/ODPOWIEDZI_CODEX.txt. SHA implementacji dopisany po commicie;
+końcowy SHA raportu w historii Git i odpowiedzi.

@@ -1,3 +1,25 @@
+# Premium España3.14 — 2026-10-18 19:57:42 CEST
+
+Wyłącznie demo: centralny plus56px / wystaje20px, rzeczywista maska i złota
+krzywizna notch, safe area i miejsce zarezerwowane przez footer. Zgodnie z
+późniejszą odpowiedzią użytkownika nadal3 zakładki Mecze/Zawodnicy/Profil;
+Składy tylko w meczu. Zwykły gracz zachowuje istniejący BottomNav. Administrator
+wydarzeń w Narzędziach demo ma plus i Edytuj mecz dla nadchodzących wydarzeń.
+Wspólny EventForm: podstawowe pola/min/max/koszt, walidacja, Europe/Warsaw/DST,
+podgląd bez mutacji, utworzenie z pustą listą i stabilnym id/kluczem deduplikacji,
+edycja bez utraty zapisów/gości/rezerwy/składów/wpłat, Anuluj bez zapisu. Limit
+nie może spaść poniżej aktywnych osób. Minimum prezentacji jest parametrem,
+domyślne10 dla istniejącej aplikacji bez zmiany reguł. Nowe mecze działają ze
+wspólnymi operacjami demo; reset je usuwa. Rola wydarzeń jest osobną symulacją,
+nie udostępnia automatycznie cudzych finansów. Bez API/persistencji/backendu.
+TS/ESLint/oba buildy OK,131/131 Vitest w23 plikach,3 cykle Chromium320/390/768
+oraz pełna regresja starych scenariuszy OK. Izolacja15 plików/CSP OK.9/10
+zaakceptowanych zrzutów identycznych SHA256; Rozliczenie Light tylko17 pikseli
+obrysu o1/255 (bez zmiany geometrii/treści). Zrzuty premium314-*.png i analiza
+ui/PREMIUM314_VISUAL_REVIEW.md. Cypress brak Xvfb, Android/iOS/klawiatura natywna
+nieweryfikowane. Duże chunki Ionic nadal. Backend/Docker ograniczenia poniżej
+pozostają aktualne; bez migracji, merge i ręcznego deploy. Vercel niezweryfikowany.
+
 # Premium España3.13 — 2026-10-18 18:36:29 CEST
 
 Wyłącznie demo: dolny Profil otwiera Mój profil, istniejący DemoProfile i jedną

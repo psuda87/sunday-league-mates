@@ -81,7 +81,7 @@ try {
     await profile('Alex Nowak');assert.equal(await evaluate("$demo('.slm-demo-profile-history')!==undefined"),false);await back();
     await scenario('debt');assert.equal(await evaluate("$demo('.slm-match-cta').disabled"),true);
     await tools(true);await evaluate("document.querySelector('.slm-demo-tools').scrollIntoView({block:'start'})");await shot(`demo-tools-${mode}`);await tools(false);await evaluate("document.querySelector('ion-content').scrollToTop(0)");
-    await evaluate("document.querySelectorAll('.slm-bottom-nav button')[2].click()");await pause();assert.equal(await evaluate("$demo('h1').textContent"),'Mój profil');
+    await evaluate("[...document.querySelectorAll('.slm-bottom-nav button')].find(el=>el.textContent.trim()==='Profil').click()");await pause();assert.equal(await evaluate("$demo('h1').textContent"),'Mój profil');
     await evaluate("document.querySelectorAll('.slm-bottom-nav button')[0].click()");await pause();await click('Historia');
     await evaluate("[...document.querySelectorAll('.slm-next-match')].find(el=>el.textContent.includes('Jesienny sparing')).querySelector('.slm-card-link').click()");await pause();await tab('Rozliczenie');await click('Administrator demo');
     await evaluate("(() => {const row=[...document.querySelectorAll('.slm-demo-finance-list li')].find(el=>el.checkVisibility()&&el.querySelector('.slm-demo-person')?.textContent==='Alex Nowak');row.querySelector('details').open=true;row.querySelector('details button').click();})()");await pause();await back();
@@ -96,7 +96,7 @@ try {
   const textField=async(selector,value)=>{await evaluate(`(() => {const el=$demo(${JSON.stringify(selector)});Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,${JSON.stringify(value)});el.dispatchEvent(new Event('input',{bubbles:true}));})()`);await pause();};
   for(const mode of ['dark','light']) {
     await scenario('joined');await tools(true);await evaluate(`document.querySelector('.slm-demo-tools input[value=${mode}]').click()`);await tools(false);
-    await evaluate("document.querySelectorAll('.slm-bottom-nav button')[2].click()");await pause();await widths();
+    await evaluate("[...document.querySelectorAll('.slm-bottom-nav button')].find(el=>el.textContent.trim()==='Profil').click()");await pause();await widths();
     assert.equal(await evaluate("$demo('h1').textContent"),'Mój profil');await shot(`my-profile-${mode}`);if(mode==='dark'){await viewport(320);await shot('my-profile-320');await viewport();}
     await click('Edytuj profil');await textField('.slm-identity-editor input','');await click('Zapisz dane demo');assert.equal(await evaluate("!!$demo('.slm-identity-editor [role=alert]')"),true);
     await textField('.slm-identity-editor input','Mateusz');await textField('.slm-identity-editor input:last-of-type','Próbny');
@@ -125,7 +125,7 @@ try {
     await tab('Rozliczenie');assert.equal(await evaluate("$demo('.slm-finance-rows').textContent.includes('Mateusz Próbny')"),true);assert.equal(await evaluate("!!$demo('.slm-finance-avatar .slm-custom-avatar')"),true);
   }
   // Local file stays in memory and passes CSP without a network request or new asset.
-  await evaluate("document.querySelectorAll('.slm-bottom-nav button')[2].click()");await pause();await click('Zmień zdjęcie');
+  await evaluate("[...document.querySelectorAll('.slm-bottom-nav button')].find(el=>el.textContent.trim()==='Profil').click()");await pause();await click('Zmień zdjęcie');
   async function localFile(path){const root=await cmd('DOM.getDocument');const input=await cmd('DOM.querySelector',{nodeId:root.root.nodeId,selector:'.slm-avatar-picker input[type=file]'});await cmd('DOM.setFileInputFiles',{nodeId:input.nodeId,files:[path]});await pause();}
   await localFile('/workspace/sunday-league-mates/app/public/assets/branding/slm-crest-espana.svg');
   for(let i=0;i<50;i++){if(await evaluate("!!$demo('.slm-avatar-picker [role=alert]')"))break;await pause();}
@@ -138,7 +138,7 @@ try {
   for(let i=0;i<50;i++){if(await evaluate("$demo('.slm-avatar-preview-wrap img').src.startsWith('data:image/png;')"))break;await pause();}
   await click('Zatwierdź zdjęcie');assert.equal(await evaluate("$demo('.slm-ultimate-portrait').dataset.layout"),'single');
   assert.equal(await evaluate("Object.values(localStorage).some(value=>value.startsWith('data:image/'))"),false);
-  await tools(true);await click('Reset danych demo');await tools(false);await evaluate("document.querySelectorAll('.slm-bottom-nav button')[2].click()");await pause();
+  await tools(true);await click('Reset danych demo');await tools(false);await evaluate("[...document.querySelectorAll('.slm-bottom-nav button')].find(el=>el.textContent.trim()==='Profil').click()");await pause();
   assert.equal(await evaluate("$demo('.slm-ultimate-nameplate h2').textContent"),'Alex Nowak');assert.equal(await evaluate("$demo('.slm-ultimate-portrait').dataset.portrait"),'0-0');assert.equal(await evaluate("$demo('.slm-ultimate-number span').textContent"),'10');
   await scenario('free');
   await scenario('free');await tab('Rozliczenie');await click('Administrator demo');await widths();
