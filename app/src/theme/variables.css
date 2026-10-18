@@ -412,3 +412,34 @@ ion-toolbar:has(.slm-shell-header) { --background:var(--slm-brand-header-bg); }
 /* 3.7 visual pass3: tighten the demo caption and establish the profile name hierarchy. */
 .slm-players-demo { margin-bottom:12px; }
 .slm-player-card h2 { font-weight:750; letter-spacing:-.02em; }
+
+/* 3.8: demo-only links, teams and tools. Existing Premium surfaces retained. */
+.slm-demo .slm-demo-scene[hidden] { display:none; }
+.slm-demo-scene { min-width:0; width:100%; }
+.slm-demo-person { border:0; padding:4px 0; min-height:44px; color:inherit; font:inherit; font-weight:650; text-align:left; background:transparent; cursor:pointer; text-decoration:underline; text-decoration-color:var(--slm-border); text-underline-offset:4px; overflow-wrap:anywhere; }
+.slm-demo-person:focus-visible,.slm-demo-history button:focus-visible { outline:2px solid var(--slm-gold); outline-offset:2px; }
+.slm-demo-person-meta { flex:1; min-width:0; }
+.slm-demo-person-meta small { display:block; color:var(--slm-text-secondary); font-size:.68rem; }
+.slm-demo-person-meta small .slm-demo-person { font-size:inherit; font-weight:400; }
+.slm-demo-secondary-actions { display:flex; flex-wrap:wrap; gap:6px; margin:4px 0 8px; }
+.slm-demo-secondary-actions ion-button { min-height:44px; font-size:.7rem; }
+.slm-demo-attendance { min-height:44px; border:1px solid var(--slm-border); border-radius:10px; color:var(--slm-gold); background:var(--slm-nav-active); font-size:.65rem; padding:4px 6px; }
+.slm-demo-pitch { display:grid; grid-template-columns:1fr 1fr; gap:12px; border:1px solid var(--slm-gold); border-radius:12px; padding:12px; background:linear-gradient(100deg,var(--slm-nav-active),var(--slm-panel)); }
+.slm-demo-pitch section { min-width:0; }
+.slm-demo-pitch section+section { border-left:1px solid var(--slm-border); padding-left:12px; }
+.slm-demo-pitch h2 { margin:0 0 8px; font-size:.9rem; color:var(--slm-gold); }
+.slm-demo-pitch ul,.slm-demo-finance-list,.slm-demo-history { list-style:none; margin:0; padding:0; }
+.slm-demo-pitch li { display:flex; gap:6px; align-items:center; padding:4px 0; font-size:.76rem; }
+.slm-demo-pitch li > span { color:var(--slm-gold); }
+.slm-demo-finance-list li { display:flex; flex-wrap:wrap; justify-content:space-between; gap:6px; align-items:center; border-top:1px solid var(--slm-border); padding:10px 0; }
+.slm-demo-finance-list li > div { min-width:0; flex:1 1 140px; }
+.slm-demo-finance-list small { display:block; color:var(--slm-text-secondary); }
+.slm-demo-finance-list ion-button { min-height:44px; font-size:.64rem; }
+.slm-demo-history li { border-top:1px solid var(--slm-border); }
+.slm-demo-history button { display:block; width:100%; min-height:44px; padding:12px 0; text-align:left; background:transparent; border:0; color:var(--slm-text); font:inherit; font-size:.85rem; }
+.slm-demo-history small { display:block; color:var(--slm-text-secondary); margin-top:6px; }
+.slm-demo-tools label { display:block; font-size:.8rem; margin:12px 0; }
+.slm-demo-tools select { display:block; width:100%; min-height:44px; margin-top:6px; color:var(--slm-text); background:var(--slm-panel); border:1px solid var(--slm-border); border-radius:8px; padding:8px; }
+.slm-demo-tools input[type="range"] { width:100%; min-height:44px; }
+
+.slm-demo-pitch small { display:block; font-size:.62rem; color:var(--slm-text-secondary); margin-top:4px; }

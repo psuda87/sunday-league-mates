@@ -1,7 +1,9 @@
 import { afterEach, expect, it } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import Demo from './Demo';
-import DemoMatchDetails from './DemoMatchDetails';
+import { DemoPanels } from '../demo/Panels';
+import { initialWorld } from '../demo/data';
+function DemoMatchDetails() {const world=initialWorld();return <DemoPanels world={world} game={world.games[0]} dispatch={()=>{}} onPlayer={()=>{}}/>;}
 afterEach(() => { cleanup(); window.history.replaceState(null, '', '/'); });
 const openTools = () => { fireEvent.click(screen.getByText('Narzędzia demo')); screen.getByText('Narzędzia demo').closest('details')!.open = true; };
 it('keeps tools collapsed and allows local capacity testing without login', () => {
@@ -32,12 +34,12 @@ it('opens chosen B directly from the whole card, defaults to Participants and re
   expect(screen.getByRole('tab', { name: 'Uczestnicy' })).toHaveAttribute('aria-selected', 'true');
   expect(screen.getAllByRole('tabpanel')).toHaveLength(1);
   fireEvent.click(screen.getByRole('tab', { name: 'Rozliczenie' }));
-  expect(screen.getByRole('tabpanel')).toHaveTextContent('Nie pokazujemy fikcyjnych należności');
+  expect(screen.getByRole('tabpanel')).toHaveTextContent('Symulacja finansowa');
   fireEvent.click(screen.getByLabelText('Wróć do meczów'));
   expect(screen.getByRole('heading', { name: 'Mecze' })).toBeTruthy();
 });
 it('supports tab keyboard navigation and one visible panel', () => {
-  render(<DemoMatchDetails variant="b" count={12} />);
+  render(<DemoMatchDetails />);
   const people = screen.getByRole('tab', { name: 'Uczestnicy' });
   expect(people).toHaveAttribute('aria-selected', 'true');
   expect(screen.getByRole('tabpanel')).toHaveTextContent('12 / 15');
@@ -55,30 +57,31 @@ it('supports a direct details URL with Participants selected', () => {
 it('opens the selected fictional match with matching date, capacity and roster totals', () => {
   render(<Demo />);
   fireEvent.click(screen.getAllByRole('button', { name: /Otwórz szczegóły meczu:/ })[1]);
-  expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '8');
+  expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '15');
   const panel = screen.getByRole('tabpanel');
   expect(panel.querySelectorAll('.slm-roster-group')[0].querySelectorAll('li')).toHaveLength(5);
   fireEvent.click(screen.getByRole('button', { name: /Pokaż wszystkich/ }));
-  expect(panel.querySelectorAll('.slm-roster-group')[0].querySelectorAll('li')).toHaveLength(6);
-  expect(panel.querySelectorAll('.slm-roster-group')[1].querySelectorAll('li')).toHaveLength(2);
-  expect(panel.querySelectorAll('.slm-roster-group')[2].querySelectorAll('li')).toHaveLength(2);
+  expect(panel.querySelectorAll('.slm-roster-group')[0].querySelectorAll('li')).toHaveLength(15);
+  expect(panel.querySelectorAll('.slm-roster-group')[1].querySelectorAll('li')).toHaveLength(0);
+  expect(panel.querySelectorAll('.slm-roster-group')[2].querySelectorAll('li')).toHaveLength(0);
   fireEvent.click(screen.getByRole('tab', { name: 'Informacje' }));
   expect(screen.getByRole('tabpanel')).toHaveTextContent('29 października 2026');
   fireEvent.click(screen.getByRole('tab', { name: 'Składy' }));
-  expect(screen.getByRole('tabpanel')).toHaveTextContent('Planowane');
-  expect(screen.getByRole('tabpanel').querySelectorAll('.slm-team-side ion-icon')).toHaveLength(10);
+  expect(screen.getByRole('tabpanel')).toHaveTextContent('Podgląd demonstracyjny');
+  expect(screen.getByRole('tabpanel').querySelectorAll('.slm-demo-pitch li')).toHaveLength(15);
 });
 it('filters fictional fixtures without inventing membership or changing the chosen card', () => {
   render(<Demo />);
   expect(screen.getAllByRole('button', { name: /Otwórz szczegóły meczu:/ })).toHaveLength(4);
   fireEvent.click(screen.getByRole('button', { name: 'Moje' }));
-  expect(screen.getAllByRole('button', { name: /Otwórz szczegóły meczu:/ })).toHaveLength(2);
+  expect(screen.queryAllByRole('button', { name: /Otwórz szczegóły meczu:/ })).toHaveLength(0);
+  expect(screen.getByText(/Brak meczów w tym filtrze/)).toBeTruthy();
   fireEvent.click(screen.getByRole('button', { name: 'Historia' }));
-  expect(screen.getAllByRole('button', { name: /Otwórz szczegóły meczu:/ })).toHaveLength(1);
-  fireEvent.click(screen.getByRole('button', { name: /Otwórz szczegóły meczu:/ }));
-  expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '15');
+  expect(screen.getAllByRole('button', { name: /Otwórz szczegóły meczu:/ })).toHaveLength(6);
+  fireEvent.click(screen.getAllByRole('button', { name: /Otwórz szczegóły meczu:/ })[0]);
+  expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '12');
   fireEvent.click(screen.getByRole('tab', { name: 'Informacje' }));
-  expect(screen.getByRole('tabpanel')).toHaveTextContent('8 października 2026');
+  expect(screen.getByRole('tabpanel')).toHaveTextContent('16 października 2026');
   fireEvent.click(screen.getByLabelText('Wróć do meczów'));
   expect(screen.getByRole('button', { name: 'Historia' })).toHaveAttribute('aria-pressed', 'true');
   fireEvent.click(screen.getByRole('button', { name: 'Nadchodzące' }));
@@ -86,7 +89,7 @@ it('filters fictional fixtures without inventing membership or changing the chos
   expect(screen.queryByRole('heading', { name: 'Następny mecz' })).toBeNull();
 });
 it('shows five initial rows, expands the group and preserves state when switching tabs', () => {
-  render(<DemoMatchDetails variant="b" count={12} />);
+  render(<DemoMatchDetails />);
   expect(screen.getByRole('tabpanel').querySelectorAll('.slm-roster-group')[0].querySelectorAll('li')).toHaveLength(5);
   fireEvent.click(screen.getByRole('button', { name: /Pokaż wszystkich/ }));
   expect(screen.getByRole('tabpanel').querySelectorAll('.slm-roster-group')[0].querySelectorAll('li')).toHaveLength(10);

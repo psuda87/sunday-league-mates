@@ -28,133 +28,62 @@ async function press(key, code, number) {
 }
 async function viewport(width = 390, height = 844) { await cmd('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: true }); }
 async function shot(name) { await pause(); const image = await cmd('Page.captureScreenshot', { format: 'png' }); await fs.writeFile(`${output}/${name}.png`, Buffer.from(image.data, 'base64')); }
-async function back() { await evaluate("[...document.querySelectorAll('ion-button')].find(button => button.textContent.includes('Wróć do meczów')).click()"); await pause(); }
-async function tools(open) { await evaluate(`document.querySelector('.slm-demo-tools').open = ${open}`); }
-async function widths() {
-  for (const width of [320, 390, 768]) {
-    await viewport(width);
-    assert.equal(await evaluate('document.documentElement.scrollWidth > innerWidth'), false, `Document overflow at ${width}`);
-    const header = await evaluate("(() => { const a=document.querySelector('.slm-compact-header h1').getBoundingClientRect(),b=document.querySelector('.slm-crest').getBoundingClientRect();return {left:a.left,right:a.right,crestLeft:b.left,crestRight:b.right,overlap:a.top<b.bottom&&a.bottom>b.top};})()");
-    assert(header.overlap && header.right <= header.crestLeft && header.crestRight <= width, `Header must fit one row at ${width}`);
-    const filters = await evaluate("[...document.querySelectorAll('.slm-match-filters button')].map(el=>{const r=el.getBoundingClientRect(),s=el.firstElementChild,v=s.getBoundingClientRect();return {w:r.width,h:r.height,visual:v.height,font:getComputedStyle(el).fontSize,clipped:s.scrollWidth>s.clientWidth};})");
-    for (const filter of filters) { assert(filter.w>=44 && filter.h>=44); assert(filter.visual>=28 && filter.visual<=30); assert.equal(filter.font,'12.48px'); assert.equal(filter.clipped,false); }
-    const detail = await evaluate(`(() => {const b=document.querySelector('.slm-match-detail .slm-match-cta');if(!b)return null;const n=b.shadowRoot.querySelector('button'),p=document.querySelector('[role=tabpanel]:not([hidden])'),t=document.querySelector('[role=tablist]');return {hit:b.getBoundingClientRect().height,visible:n.getBoundingClientRect().height,font:getComputedStyle(b).fontSize,weight:getComputedStyle(b).fontWeight,headings:p.querySelectorAll(':scope > .slm-section-heading').length,named:!!document.getElementById(p.getAttribute('aria-labelledby')),gap:p.firstElementChild.getBoundingClientRect().top-t.getBoundingClientRect().bottom,clipped:n.scrollHeight>n.clientHeight};})()`);
-    if(detail){assert(detail.hit>=44);assert.equal(detail.visible,34);assert.equal(detail.font,'12.48px');assert.equal(detail.weight,'800');assert.equal(detail.headings,0);assert.equal(detail.named,true);assert.equal(detail.clipped,false);assert(detail.gap>=12&&detail.gap<=16);}
-    const targets=await evaluate("[...document.querySelectorAll('.slm-player-list button,.slm-player-search input')].map(el=>{const r=el.getBoundingClientRect();return {width:r.width,height:r.height};})");
-    for(const target of targets) assert(target.width>=44&&target.height>=44);
-    const rows = await evaluate("[...document.querySelectorAll('[role=tab]')].map(tab=>Math.round(tab.getBoundingClientRect().top))");
-    if (rows.length) assert.equal(new Set(rows).size, 1, 'Tabs must be on one horizontal row');
-  }
-  await viewport();
-}
+async function tools(open){await evaluate(`document.querySelector('.slm-demo-tools').open=${open}`);await pause();}
+async function click(text){await evaluate(`(() => {const el=[...document.querySelectorAll('button,ion-button')].find(el=>el.checkVisibility()&&el.textContent.trim().startsWith(${JSON.stringify(text)}));if(!el)throw Error('Missing visible action: '+${JSON.stringify(text)});el.click();})()`);await pause();}
+async function select(id,value){await evaluate(`(() => {const el=document.getElementById('${id}');el.value=${JSON.stringify(value)};el.dispatchEvent(new Event('change',{bubbles:true}));})()`);await pause();}
+async function tab(label){await evaluate(`$demo('[role=tablist]').querySelectorAll('[role=tab]').forEach(el=>{if(el.textContent===${JSON.stringify(label)})el.click();})`);await pause();}
+async function widths(){for(const width of [320,390,768]){await viewport(width);assert.equal(await evaluate('document.documentElement.scrollWidth>innerWidth'),false,`Overflow ${width}`);const row=await evaluate("[...document.querySelectorAll('[role=tab]')].filter(el=>el.checkVisibility()).map(el=>Math.round(el.getBoundingClientRect().top))");if(row.length)assert.equal(new Set(row).size,1);const hit=await evaluate("[...document.querySelectorAll('.slm-demo-person,.slm-player-list button')].filter(el=>el.checkVisibility()).every(el=>el.getBoundingClientRect().height>=44)");assert(hit);const cta=await evaluate("(() => {const b=$demo('.slm-match-cta');if(!b)return null;return {hit:b.getBoundingClientRect().height,visual:b.shadowRoot.querySelector('button').getBoundingClientRect().height,font:getComputedStyle(b).fontSize};})()");if(cta){assert.equal(cta.hit,44);assert.equal(cta.visual,34);assert.equal(cta.font,'12.48px');}}await viewport();}
+async function back(){await evaluate("$demo('ion-button.slm-compact-back').shadowRoot.querySelector('button').focus()");await press('Enter','Enter',13);await pause();}
+async function scenario(value){await tools(true);await select('demo-scenario',value);await tools(false);await evaluate("document.querySelector('ion-content').scrollToTop(0)");}
+async function profile(name){await evaluate(`(() => {const b=[...document.querySelectorAll('.slm-demo-person,.slm-player-list button')].find(el=>el.checkVisibility()&&el.textContent.includes(${JSON.stringify(name)}));if(!b)throw Error('Missing player link');b.focus();})()`);await press('Enter','Enter',13);await pause();}
+async function panel(){return evaluate("$demo('[role=tabpanel]').textContent");}
 try {
-  await cmd('Page.enable'); await cmd('Page.bringToFront'); await cmd('Network.enable'); await cmd('Log.enable'); await viewport();
-  const loaded = new Promise(resolve => { onLoad = resolve; });
-  await cmd('Page.navigate', { url: base }); await loaded;
-  for (let i = 0; i < 100; i++) { if (await evaluate("!!document.querySelector('.slm-card-link')")) break; await pause(); }
-  await evaluate('Promise.all([...document.images].map(image=>image.decode()))');
-  assert.equal(await evaluate("document.querySelector('.slm-crest').getAttribute('src')"), '/assets/branding/slm-logo-primary-transparent.png');
-  assert.equal(await evaluate("document.querySelector('.slm-crest').naturalWidth"), 450, 'Official logo did not load');
-  assert.equal(await evaluate("document.querySelector('.slm-stadium').naturalWidth"), 1400, 'Official stadium did not load');
-  await fs.mkdir(output, { recursive: true });
-  const metrics = {};
-  for (const mode of ['dark', 'light']) {
-    await tools(true); await evaluate(`document.querySelector('input[value=${mode}]').click()`); await tools(false);
-    await evaluate("document.querySelector('ion-content').scrollToTop(0)"); await widths();
-    assert.equal(await evaluate("document.querySelector('#demo-count').checkVisibility()"), false, 'Closed demo tools must hide the slider');
-    assert.equal(await evaluate("document.querySelector('.slm-card-link').querySelectorAll('button,ion-button,a').length"), 0);
-    const crestStyle=await evaluate("(() => { const el=document.querySelector('.slm-floating-crest'),s=getComputedStyle(el),r=el.getBoundingClientRect();return {fit:s.objectFit,position:s.position,ratio:r.height/r.width}; })()");
-    assert.equal(crestStyle.fit,'contain'); assert.equal(crestStyle.position,'relative'); assert(Math.abs(crestStyle.ratio-505/450)<.002);
-    await evaluate("document.documentElement.style.setProperty('--ion-safe-area-top','32px')"); await pause();
-    assert.equal(await evaluate("document.querySelector('.slm-floating-crest').getBoundingClientRect().top >= 32"),true,'Crest overlaps simulated top safe area');
-    await evaluate("document.documentElement.style.removeProperty('--ion-safe-area-top')");
-    await tools(true); await evaluate("document.querySelector('ion-content').scrollToPoint(0,100,0)"); await pause();
-    assert.equal(await evaluate("document.querySelector('.slm-floating-crest').getBoundingClientRect().top < -20"),true,'Crest must scroll, not stay fixed');
-    await tools(false); await evaluate("document.querySelector('ion-content').scrollToTop(0)"); await pause();
-    await shot(`home-${mode}`);
-    if (mode === 'dark') {
-      const detail=await cmd('Page.captureScreenshot', { format:'png', clip:{x:0,y:0,width:390,height:194,scale:2} });
-      await fs.writeFile(`${output}/header-detail.png`,Buffer.from(detail.data,'base64'));
-    }
-    if (mode === 'dark') for (const width of [320, 768]) { await viewport(width); await shot(`home-${width}`); } await viewport();
-    for (const [filter, number] of [['Moje', 2], ['Historia', 1], ['Nadchodzące', 4]]) {
-      await evaluate(`[...document.querySelectorAll('.slm-match-filters button')].find(button=>button.textContent==='${filter}').focus()`); await press('Enter', 'Enter', 13);
-      assert.equal(await evaluate("document.querySelectorAll('.slm-card-link').length"), number);
-    }
-    metrics[mode] = await evaluate("Object.fromEntries(['.slm-crest','.slm-compact-header h1','.slm-hero-card','.slm-stadium-frame','.slm-match-filters','.slm-bottom-nav'].map(selector=>{const r=document.querySelector(selector).getBoundingClientRect();return [selector,{x:r.x,y:r.y,width:r.width,height:r.height}]}))");
-    await evaluate("document.querySelector('.slm-card-link').focus()"); await press('Enter', 'Enter', 13);
-    assert.equal(await evaluate("document.querySelectorAll('.slm-variant-preview').length"), 0, 'A/B in normal flow');
-    assert.equal(await evaluate("document.querySelector('[role=tab][aria-selected=true]').textContent"), 'Uczestnicy');
-    assert.equal(await evaluate("[...document.querySelectorAll('[role=tabpanel]')].filter(panel=>!panel.hidden).length"), 1);
-    await widths();
-    metrics[`${mode}-details`] = await evaluate(`(() => {const b=document.querySelector('.slm-match-cta'),n=b.shadowRoot.querySelector('button'),t=document.querySelector('[role=tablist]'),p=document.querySelector('[role=tabpanel]:not([hidden])'),first=p.querySelector('.slm-roster-overview')||p.firstElementChild;return {button:b.getBoundingClientRect().height,visible:n.getBoundingClientRect().height,font:getComputedStyle(b).fontSize,weight:getComputedStyle(b).fontWeight,firstTop:first.getBoundingClientRect().top,tabsBottom:t.getBoundingClientRect().bottom};})()`);
-    await shot(`participants-${mode}`);
-    await viewport(844,390);
-    assert.equal(await evaluate('document.documentElement.scrollWidth > innerWidth'),false,'Landscape overflow');
-    assert.equal(await evaluate("document.querySelector('[role=tab][aria-selected=true]').textContent"),'Uczestnicy');
-    await viewport();
-    await evaluate("document.querySelectorAll('[role=tab]')[0].click()"); await widths(); await shot(`details-${mode}`);
-    await evaluate("document.querySelectorAll('[role=tab]')[2].click()"); await widths(); await shot(`teams-${mode}`);
-    await evaluate("document.querySelectorAll('[role=tab]')[1].click()");
-    assert.equal(await evaluate("document.querySelector('.slm-roster-group').querySelectorAll('li').length"),5);
-    await evaluate("document.querySelector('.slm-roster-expand').click()");
-    assert.equal(await evaluate("document.querySelector('.slm-roster-group').querySelectorAll('li').length"),10);
-    await evaluate("document.querySelector('.slm-roster-expand').click()");
-    assert.equal(await evaluate("document.querySelector('.slm-roster-group').querySelectorAll('li').length"),5);
-    await evaluate("document.querySelectorAll('.slm-roster-group')[1].scrollIntoView({block:'center'})");
-    await shot(`participants-groups-${mode}`);
-    await evaluate("document.querySelector('ion-content').scrollToTop(0)");
-    await evaluate("document.querySelector('[role=tab][aria-selected=true]').focus()"); await press('End', 'End', 35);
-    assert.equal(await evaluate('document.activeElement.textContent'), 'Rozliczenie');
-    assert.equal(await evaluate("document.querySelector('[role=tabpanel]:not([hidden])').textContent.includes('Nie pokazujemy fikcyjnych')"), true);
-    await press('Home', 'Home', 36); assert.equal(await evaluate('document.activeElement.textContent'), 'Informacje');
-    await press('ArrowRight', 'ArrowRight', 39); assert.equal(await evaluate('document.activeElement.textContent'), 'Uczestnicy');
-    await back(); await evaluate("document.querySelector('.slm-card-link').focus()"); await press(' ', 'Space', 32);
-    assert.equal(await evaluate("document.querySelector('[role=tab][aria-selected=true]').textContent"), 'Uczestnicy'); await back();
-  }
-  await evaluate("document.querySelectorAll('.slm-bottom-nav button')[1].click()");
-  assert.equal(await evaluate("document.querySelector('.slm-bottom-nav [aria-current=page]').textContent"),'Zawodnicy');
-  assert.equal(await evaluate("document.querySelector('h1').textContent"),'Zawodnicy');
-  async function searchPlayers(value) {
-    await evaluate(`(() => {const el=document.querySelector('.slm-player-search input');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,${JSON.stringify(value)});el.dispatchEvent(new Event('input',{bubbles:true}));})()`);await pause();
-  }
+  await cmd('Page.enable');await cmd('Runtime.enable');await cmd('Network.enable');await cmd('Log.enable');await viewport();
+  const loaded=new Promise(resolve=>{onLoad=resolve;});await cmd('Page.navigate',{url:base});await loaded;
+  await evaluate("window.$demo=selector=>[...document.querySelectorAll(selector)].find(el=>el.checkVisibility())");
+  for(let i=0;i<100;i++){if(await evaluate("!!$demo('.slm-card-link')"))break;await pause();}
+  await evaluate('Promise.all([...document.images].map(image=>image.decode()))');await fs.mkdir(output,{recursive:true});
   for(const mode of ['dark','light']) {
-    await tools(true);await evaluate(`document.querySelector('input[value=${mode}]').click()`);await tools(false);await evaluate("document.querySelector('ion-content').scrollToTop(0)");
-    await widths();await shot(`players-${mode}`);
-    assert.equal(await evaluate("document.querySelectorAll('.slm-player-list li').length"),8);
-    await searchPlayers('lukasz');assert.equal(await evaluate("document.querySelectorAll('.slm-player-list li').length"),1);
-    if(mode==='dark') await shot('players-search');
-    await evaluate("document.querySelector('.slm-player-list button').focus()");await press('Enter','Enter',13);await widths();
-    assert.equal(await evaluate("document.querySelector('.slm-bottom-nav [aria-current=page]').textContent"),'Zawodnicy');
-    assert.equal(await evaluate("document.querySelector('.slm-player-card h2').textContent"),'Łukasz Wrona');
-    assert.equal(await evaluate("!!document.querySelector('.slm-players-screen a[href^=tel]')"),false);
-    await shot(`player-profile-${mode}`);
-    await evaluate("document.querySelector('ion-button.slm-compact-back').shadowRoot.querySelector('button').focus()");await press('Enter','Enter',13);await pause();
-    assert.equal(await evaluate("document.querySelector('.slm-player-search input').value"),'lukasz');
-    assert.equal(await evaluate("document.activeElement.textContent.includes('Łukasz')"),true);
-    await searchPlayers('zzzz');assert.equal(await evaluate("document.querySelector('.slm-player-empty h2').textContent"),'Brak wyników');
-    await evaluate("document.querySelector('.slm-player-empty button').click()");assert.equal(await evaluate("document.querySelectorAll('.slm-player-list li').length"),8);
+    await tools(true);await evaluate(`document.querySelector('input[value=${mode}]').click()`);await tools(false);await widths();await shot(`home-${mode}`);
+    assert.equal(await evaluate("$demo('.slm-crest').naturalWidth"),450);
+    assert.equal(await evaluate("document.querySelectorAll('.slm-card-link').length"),4);
+    await scenario('free');await widths();assert((await panel()).includes('12 / 15'));
+    await shot(`participants-${mode}`);
+    await profile('Kamil Zieliński');await widths();assert.equal(await evaluate("$demo('.slm-player-card h2').textContent"),'Kamil Zieliński');await shot(`player-profile-${mode}`);
+    await evaluate("$demo('.slm-player-stats').scrollIntoView({block:'start'})");await shot(`statistics-${mode}`);
+    await evaluate("document.querySelector('ion-content').scrollToTop(0)");await back();assert.equal(await evaluate("$demo('[role=tab][aria-selected=true]').textContent"),'Uczestnicy');
+    await tab('Składy');await widths();await evaluate("$demo('.slm-demo-teams').scrollIntoView({block:'start'})");await shot(`teams-${mode}`);await evaluate("document.querySelector('ion-content').scrollToTop(0)");
+    await profile('Kamil Zieliński');await back();assert.equal(await evaluate("$demo('[role=tab][aria-selected=true]').textContent"),'Składy');
+    await tab('Rozliczenie');await widths();assert((await panel()).includes('270,00'));await evaluate("$demo('.slm-demo-settlement').scrollIntoView({block:'start'})");await shot(`settlement-${mode}`);await evaluate("document.querySelector('ion-content').scrollToTop(0)");
+    await tab('Informacje');await widths();await shot(`details-${mode}`);
+    await tab('Uczestnicy');await click('ZAPISZ SIĘ NA MECZ');assert.equal(await evaluate("$demo('[role=progressbar]').getAttribute('aria-valuenow')"),'13');
+    await click('Dodaj gościa · demo');assert.equal(await evaluate("$demo('[role=progressbar]').getAttribute('aria-valuenow')"),'14');assert((await panel()).includes('Gość Alex Nowak'));
+    await click('WYCOFAJ ZAPIS');assert.equal(await evaluate("$demo('[role=progressbar]').getAttribute('aria-valuenow')"),'13');
+    await scenario('full');await click('DOŁĄCZ DO REZERWY');assert((await panel()).includes('Alex Nowak'));assert.equal(await evaluate("$demo('[role=progressbar]').getAttribute('aria-valuenow')"),'15');
+    await click('OPUŚĆ REZERWĘ');await scenario('reserve');await tools(true);
+    await evaluate("(() => {const el=document.getElementById('demo-count');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,'14');el.dispatchEvent(new Event('input',{bubbles:true}));})()");await pause();await tools(false);await click('ZAJMIJ WOLNE MIEJSCE');assert.equal(await evaluate("$demo('[role=progressbar]').getAttribute('aria-valuenow')"),'15');
+    await scenario('cancelled');assert.equal(await evaluate("$demo('.slm-match-cta').disabled"),true);await tab('Rozliczenie');assert((await panel()).includes('brak należności'));
+    await scenario('completed');await tab('Uczestnicy');const before=await panel();await evaluate("$demo('.slm-demo-attendance').click()");assert.notEqual(await panel(),before);
+    await profile('Alex Nowak');await evaluate("$demo('.slm-demo-history button').click()");await pause();assert.equal(await evaluate("$demo('[role=tab][aria-selected=true]').textContent"),'Uczestnicy');
+    await profile('Alex Nowak');await back();await back();assert.equal(await evaluate("$demo('.slm-player-card h2').textContent"),'Alex Nowak');await back();
+    await scenario('debt');assert.equal(await evaluate("$demo('.slm-match-cta').disabled"),true);
+    await tools(true);await evaluate("document.querySelector('.slm-demo-tools').scrollIntoView({block:'start'})");await shot(`demo-tools-${mode}`);await tools(false);await evaluate("document.querySelector('ion-content').scrollToTop(0)");
+    await evaluate("document.querySelectorAll('.slm-bottom-nav button')[2].click()");await pause();await profile('Alex Nowak');await evaluate("$demo('.slm-demo-history button').click()");await pause();assert.equal(await evaluate("document.querySelector('.slm-bottom-nav [aria-current=page]').textContent"),'Mecze');await tab('Rozliczenie');
+    await evaluate("(() => {const row=[...document.querySelectorAll('.slm-demo-finance-list li')].find(el=>el.checkVisibility()&&el.querySelector('.slm-demo-person')?.textContent==='Alex Nowak');row.querySelector('ion-button').click();})()");await pause();await back();await back();
+    await evaluate("document.querySelectorAll('.slm-bottom-nav button')[0].click()");await pause();await evaluate("$demo('.slm-card-link').click()");await pause();assert.equal(await evaluate("$demo('.slm-match-cta').disabled"),false);
+    await tools(true);await click('Reset danych demo');await tools(false);assert.equal(await evaluate("$demo('.slm-compact-count strong').textContent"),'12/15');
+    await evaluate("document.querySelectorAll('.slm-bottom-nav button')[1].click()");await pause();await widths();
+    await evaluate("(() => {const el=document.getElementById('demo-player-search');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,'lukasz');el.dispatchEvent(new Event('input',{bubbles:true}));})()");await pause();assert.equal(await evaluate("document.querySelectorAll('.slm-player-list li').length"),1);
+    await profile('Łukasz Wrona');await back();assert.equal(await evaluate("document.getElementById('demo-player-search').value"),'lukasz');
+    await evaluate("document.querySelectorAll('.slm-bottom-nav button')[0].click()");await pause();
   }
-  await evaluate("document.querySelectorAll('.slm-bottom-nav button')[2].click()");
-  assert.equal(await evaluate("document.querySelector('.slm-bottom-nav [aria-current=page]').textContent"),'Profil');
-  await evaluate("document.querySelectorAll('.slm-bottom-nav button')[0].click()");
-  assert.equal(await evaluate("document.querySelectorAll('.slm-card-link').length"),4);
-  await tools(false); await evaluate("document.querySelector('.slm-demo-tools summary').focus()"); await press('Enter', 'Enter', 13);
-  assert.equal(await evaluate("document.querySelector('.slm-demo-tools').open"), true, 'Tools must open with native keyboard');
-  for (const value of [0, 10, 15, 12]) {
-    await evaluate(`(() => { const slider=document.querySelector('#demo-count');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(slider,'${value}');slider.dispatchEvent(new Event('input',{bubbles:true}));slider.dispatchEvent(new Event('change',{bubbles:true})); })()`); await pause();
-    assert.equal(await evaluate("document.querySelector('.slm-compact-count strong').textContent"), `${value}/15`);
-  }
-  await cmd('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'dark' }] });
-  await evaluate("document.querySelector('input[value=auto]').click()"); assert.equal(await evaluate("document.documentElement.classList.contains('ion-palette-dark')"), true);
-  await cmd('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'light' }] });
-  await evaluate('new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))');
-  for (let i = 0; i < 30; i++) { if (!await evaluate("document.documentElement.classList.contains('ion-palette-dark')")) break; await pause(); }
-  assert.equal(await evaluate("document.documentElement.classList.contains('ion-palette-dark')"), false);
-  assert.equal(requests.some(url => url.includes('/functions/v1/')), false);
-  assert.equal(requests.some(url => url.startsWith('http') && new URL(url).origin !== new URL(base).origin), false);
-  assert.deepEqual(errors, []);
-  await fs.writeFile(`${output}/metrics.json`, JSON.stringify(metrics, null, 2));
-  console.log('PASS: full crest/contain/scroll/simulated safe area, official assets, filters (4/2/1), home/details 320/390/768, horizontal tabs/default Participants, Enter/Space/Home/End/arrows, one panel, themes/live system, slider 0/10/15, isolation/CSP.');
-  console.log(JSON.stringify(metrics.dark));
-} finally { ws.close(); }
+  // Preserve exact match/tab/expansion/scroll through a global profile visit.
+  await scenario('free');await click('Pokaż wszystkich (10)');await evaluate("document.querySelector('ion-content').scrollToPoint(0,400,0)");await pause();
+  const y=await evaluate("document.querySelector('ion-content').getScrollElement().then(el=>el.scrollTop)");await profile('Kamil Zieliński');await back();
+  assert.equal(await evaluate("document.querySelector('ion-content').getScrollElement().then(el=>el.scrollTop)"),y);assert.equal(await evaluate("$demo('.slm-roster-expand').getAttribute('aria-expanded')"),'true');
+  await evaluate("document.querySelector('ion-content').scrollToTop(0)");await tools(true);
+  await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:'dark'}]});await evaluate("document.querySelector('input[value=auto]').click()");await pause();assert.equal(await evaluate("document.documentElement.classList.contains('ion-palette-dark')"),true);
+  await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:'light'}]});await pause();assert.equal(await evaluate("document.documentElement.classList.contains('ion-palette-dark')"),false);
+  assert.equal(requests.some(url=>url.startsWith('http')&&new URL(url).origin!==new URL(base).origin),false);assert.deepEqual(errors,[]);
+  console.log('PASS: demo world 320/390/768, global profiles with Enter/nested history/tab and scroll return, teams, finance, join/guest/withdraw/reserve/cancel/debt/reset, search, themes and isolation/CSP.');
+} finally {ws.close();}

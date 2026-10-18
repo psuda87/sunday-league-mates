@@ -1,3 +1,12 @@
+# Premium3.8 — wyjątek wyłącznie dla izolowanego demo
+
+- Na wyraźne polecenie użytkownika demo ma teraz interaktywne fikcyjne zapisy,
+  wpłaty/rozliczenia/blokady/statystyki i podgląd składów. To zastępuje starsze
+  zakazy fikcyjnych kwot/aktywnych akcji tylko w demonstracji. Centralne fixture
+  src/demo/data.ts, wspólny stan i profile, brak API/persistencji; nie przenosić
+  reducera do produkcji. Produkcyjne Auth/RPC/RLS/FIFO/backend pozostają nietknięte.
+  Patrz docs/UI_BETA.md i docs/ui/PREMIUM38_DEMO_REVIEW.md.
+
 # UI Premium3.4 — szczegóły
 
 - Home3.3 jest wzorcem, nie przebudowywać go. Szczegóły: zwarty stadionowy hero, powrót,4 poziome zakładki domyślnie Uczestnicy. ParticipantGroup/RosterSummary wspólne dla aplikacji i demo, rozdzielają zapisanych/gości/rezerwę bez tworzenia kont gości. Podgląd5 zapisanych rozwijany, stan panelu zachowany. UI work() ma lokalną blokadę pending, bez zmiany RPC/argumentów. Prawdziwe finanse/uprawnienia zachować; demo żadnych należności ani aktywnych zapisów. Analiza i3 cykle w docs/ui/PREMIUM34_VISUAL_REVIEW.md. Wariant brandingu3.3 nadal obowiązuje; tylko w szczegółach znak mniejszy, aby oddać miejsce liście.

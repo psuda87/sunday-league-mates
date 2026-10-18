@@ -1,3 +1,22 @@
+# Premium España3.8 — 2026-10-18 15:31:22 CEST
+
+feat/ui-beta: wyłącznie demo. Centralne src/demo/data.ts:20 osób/10 meczów,
+jedna pamięć/reducer; profile globalnie z powrotem do źródła/zakładki/query/scroll.
+Interaktywne zapisy/wypisy/goście/rezerwa/claim/suwak/obecności, drużyny z list,
+podział27000gr/statusy/wpłaty i symulowane zaległości; statystyki z potwierdzonych
+fikcyjnych obecności. Reset/7 scenariuszy/użytkownik/motywy w zwijanych narzędziach.
+Składy/płatności/blokady to demonstracja, nie funkcje produkcyjne ani FIFO.
+Produkcja katalogu nadal wymaga bezpiecznego API; stare ograniczenia pozostają.
+ESLint/TS/oba buildy OK; Vitest98/98, Chromium320/390/768: profile/zagnieżdżona
+historia/powrót ze scrollem, search, zapis/guest/wypis/rezerwa/claim/anulowanie,
+blokada/wpłata/unlock/reset, motywy i izolacja14 plików/CSP OK. Duże chunki Ionic.
+Cypress brak Xvfb; realny backend, Android/iOS nieweryfikowane. Zrzuty premium38-*
+i PREMIUM38_DEMO_REVIEW.md w ui/. Brak zmian produkcyjnego backendu/Auth/UI,
+RPC/RLS/migracji/finansów/push/Firebase/vercel.json, bez merge/ręcznego deploy.
+Automatyczny Vercel niezweryfikowany. Raport docs/ODPOWIEDZI_CODEX.txt.
+Następny krok: telefon/scenariusze; profile nawigują pamięciowym stosem strzałkami,
+nie deklarowano systemowego Back ani trwałych deep linków. Starszy stan poniżej.
+
 # Premium España3.7 — 2026-10-18 13:42:23 CEST
 
 Implementacja 58cf1fd289d57e808711510bde7d49424977ab16, push zakończony.

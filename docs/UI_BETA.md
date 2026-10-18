@@ -364,3 +364,27 @@ Statystyki wymagają zweryfikowanych obecności zakończonych meczów, nie zapis
 Nie ma nowych migracji/RPC, numerów koszulek/statystyk ani publikowanych kontaktów.
 Analiza3 cykli i screenshoty: ui/PREMIUM37_VISUAL_REVIEW.md. Testy:92/92 Vitest,
 Chromium320/390/768; nie są to realne testy Supabase/Androida.
+
+## Premium3.8 — interaktywny świat demo
+
+Nowe src/demo/data.ts jest jedynym źródłem fixture:20 osób/10 meczów, deterministyczny
+snapshot18.10.2026. App.tsx ma wspólny reducer i stos widoków (źródła pozostają
+zamontowane), Panels.tsx renderuje listy/składy/finanse, Profile.tsx jest jedynym
+profilem demo ze statystykami i historią. Profile otwierane z nazw, nie całych wierszy
+z niezależnymi akcjami. Powrót aplikacyjny zachowuje zakładkę/query/scroll/fokus,
+także profil -> mecz z historii -> profil. Odświeżenie resetuje dane; brak trwałego
+zapisu/deep linków profili i deklaracji obsługi systemowego Back.
+
+Zapis/wypis/guest/rezerwa/claim i suwak zmieniają wspólne listy i liczniki.
+Obecności w zakończonych meczach tworzą statystyki; koszt27000gr dzielony dokładnie
+z deterministyczną resztą, płaci zapraszający gościa. Wpłata symulowana lokalnie,
+blokada tylko przy2 zakończonych nieopłaconych meczach. Żadna z tych funkcji nie
+jest implementacją produkcyjnego ledgera/FIFO ani uprawnień. Składy to podgląd
+oparty na aktualnych uczestnikach, bez sportowego algorytmu i zapisów serwerowych.
+Narzędzia:reset/scenariusz/user/0–15/motyw, zwinięte domyślnie. Poprzednie fixture
+DemoMatchDetails i archiwalny przepływ porównania A/B zastąpione aktualnym demo.
+Historyczne opisy braku symulowanych kwot/statystyk/aktywnych zapisów poniżej
+zostały zastąpione tym etapem na wyraźne polecenie użytkownika; produkcja nietknięta.
+
+TS/ESLint/oba buildy,98/98 Vitest i Chromium320/390/768, izolacja/CSP OK.
+Zrzuty i opis: ui/PREMIUM38_DEMO_REVIEW.md. Nie są to testy Supabase/Androida.

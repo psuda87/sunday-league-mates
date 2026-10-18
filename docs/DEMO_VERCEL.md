@@ -1,3 +1,15 @@
+## Premium3.8 — aktualny zakres demonstracji
+
+Interaktywne fixture tylko src/demo/:20 fikcyjnych osób/10 meczów, reducer w pamięci,
+globalne profile i historia, składy/statystyki/kwoty oraz operacje symulowane.
+Starsze opisy braku aktywnych zapisów lub fikcyjnych kwot są historyczne: użytkownik
+w3.8 autoryzował jawnie oznaczoną symulację, bez zmiany backendu i granicy builda.
+Allowlista4 jawnych nowych modułów; env/publicDir false, emitowane5 zasobów,
+14 plików wyjściowych i CSP connect-src none nadal sprawdzane. Brak Auth/Supabase/
+API/Edge, sieci zewnętrznej, sekretów i rzeczywistych danych. Danych nie utrwalamy.
+Root app / npm run build:demo / dist-demo / bez env i bez zmian vercel.json.
+Brak ręcznego deploy; automatyczny Vercel niezweryfikowany.
+
 ## Premium3.4 — szczegóły i współdzielone grupy
 
 Allowlista rozszerzona tylko o UI ParticipantGroup/RosterSummary. Output nadal14

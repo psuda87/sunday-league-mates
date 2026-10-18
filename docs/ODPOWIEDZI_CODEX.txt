@@ -740,3 +740,107 @@ zaliczony; przegląd diff/staged/nowych plików i diff --check OK, brak sekretó
 i zbędnych artefaktów. Końcowy SHA raportu w historii Git i odpowiedzi.
 Pełna lista/profil na fikcyjnych danych tylko w demo; realny katalog wymaga API.
 Raport docs/ODPOWIEDZI_CODEX.txt, bez merge i ręcznego wdrożenia.
+
+
+[2026-10-18 15:31:22 CEST] PREMIUM ESPAÑA3.8 — interaktywny, spójny świat demo
+Gałąź feat/ui-beta, start czysty i zgodny z pobranym origin:
+07b1ef55425b691925e4449d420167953bdd3405. Zakres wyłącznie demo i dokumentacja.
+
+Centralne src/demo/data.ts:20 fikcyjnych zawodników,10 meczów (4 nadchodzące,
+4 zakończone,2 anulowane), członkowie, goście z profilem i bez niego, rezerwa,
+potwierdzone obecności i wpłaty. Snapshot czasu18.10.2026, daty/stany deterministyczne,
+bez losowania, fetch i utrwalania danych. Reload/reset odtwarza świat; motyw nadal
+przez istniejący mechanizm lokalny. Usunięto stare niezależne DemoMatchDetails
+ze sprzecznymi fixture; także testy paneli używają teraz jednego modułu danych.
+Demo.tsx jest tylko wejściem do src/demo/App.tsx. Ekrany produkcyjne nietknięte.
+
+Interaktywne:
+- Jedna warstwa DemoProfile i wspólny push/pop z wszystkich przycisków nazw:
+  katalog, zapisani, rezerwa, goście z profilem, zapraszający, składy, rozliczenia,
+  własny użytkownik demo. Gość bez profilu nie ma linku/konta; nie dodaje się
+  nowego zawodnika do katalogu po kliknięciu Dodaj gościa.
+- Źródło pozostaje zamontowane: powrót strzałką aplikacji zachowuje mecz, zakładkę,
+  rozwinięcie listy, wyszukiwanie i scroll/fokus. Obsługiwane zagnieżdżenie
+  profil -> historyczny mecz -> inny profil -> powrót przez te same widoki.
+  To pamięciowy stos widoków; nie deklaruję obsługi systemowego Back ani trwałych
+  deep linków profili po odświeżeniu. Dotychczasowy hash #details/#details-b działa.
+- Zapis, wypis, dodanie gościa, rezerwa i zajęcie zwolnionego miejsca przez osobę
+  z rezerwy. Brak automatycznej promocji. Limity i unikalność osoby pilnowane
+  lokalnym reducerem demo, także po przełączeniu na profilowanego gościa.
+- Suwak0–15 aktualizuje realną listę świata, nie sam licznik. Filtry Nadchodzące/
+  Moje/Historia wynikają z tych danych. Zmiana użytkownika zmienia jego akcje.
+- Statystyki/liczba występów/frekwencja/historia wynikają z jawnych fikcyjnych
+  obecności zakończonych meczów. Frekwencja obecni/potwierdzone udziały; brak
+  danych oznacza kreskę. W zakończonym meczu można przełączyć symulowaną obecność
+  i zobaczyć aktualizację profilu, bez zmiany odpowiedzialności finansowej.
+- Dwie drużyny to deterministyczny podgląd uczestników aktualnego meczu, nazwy
+  klikalne, goście bez kont tylko jako oznaczone osoby. Bez rankingu/ocen.
+- Rozliczenie:27000 groszy kosztu, podział z resztami po stabilnym id wpisu,
+  suma należności dokładnie równa kosztowi, różnica udziałów<=1 grosz. Gość
+  obciąża zapraszającego. Zebrane/pozostałe/ewentualna nadwyżka i statusy wpłat
+  wynikają z jednego stanu. Jest przykład częściowej wpłaty w meczu historycznym.
+  Symuluj wpłatę uzupełnia udział bez podwójnego zwiększania wpłaty.
+- Zaległości demonstracyjne liczą różne zakończone mecze; dwa blokują zapis/gości,
+  symulowana wpłata w historii obniża liczbę i odblokowuje zapis. Nie powstają
+  zaległości z nadchodzących/anulowanych spotkań. Nie jest to produkcyjny FIFO.
+- Narzędzia zwijane:reset,7 scenariuszy (wolne/full/zapisany/rezerwa/zakończony/
+  anulowany/zaległości), wybór użytkownika, liczba uczestników, Dark/Light/Auto.
+
+Podglądy/makiety i zależności:
+Boisko/składy to ilustracyjny układ, nie profesjonalny algorytm ani zapis składów.
+Portrety to inicjały, nie zdjęcia. Wpłaty, blokady, obecności i statystyki to
+wyłącznie symulacje; brak banku, autoryzacji, zatwierdzania realnej wpłaty,
+księgowania/audytu/FIFO i wysyłek push w świecie demo. Nie sugeruję, że backendowe
+moduły produkcyjne są gotowe. Rzeczywisty katalog nadal wymaga minimalnego
+bezpiecznego API dla członków, statystyki wiarygodnych potwierdzeń obecności,
+a operacje finansowe/zapisy serwerowych uprawnień i odbioru istniejących migracji.
+Brak jakichkolwiek nowych endpointów/RPC/RLS/SQL/zmian Auth/Firebase/finansów.
+
+Styl/izolacja:
+MatchHeader/MatchHero/MatchTabs/ParticipantGroup/AppearanceSettings i zasoby Premium
+użyte bez przebudowy. Główny CTA nadal34px/obszar44, filtry28px, typografia/herb,
+zdjęcia i stopka zachowane. Nowe linki nazw mają44px; oddzielne akcje obecności
+czy wpłaty nie są przechwytywane przez kliknięcie wiersza. Akcja gościa w panelu
+Uczestnicy dopiero po zapisie, więc nie przesuwa zatwierdzonego paska zakładek.
+Prawdziwe strony/operacje chronione poza zmianami; CSS nowe klasy demo, bez
+przepisywania motywu. Nie deklaruję identyczności pełnych screenshotów, bo dane
+i zawartość paneli zostały świadomie rozbudowane.
+Allowlista rozszerzona o4 jawne moduły demo (App/data/Panels/Profile); nadal14
+statycznych plików,5 zweryfikowanych zasobów, env/publicDir/CSP bez poluzowania.
+CSP connect-src none i kontrola żądań Chromium potwierdzają brak backendu/sieci
+zewnętrznej. Brak prywatnych danych, sekretów i nowych zależności. vercel.json
+bez zmian, nie wykonywano ręcznego wdrożenia.
+
+Weryfikacja:
+ESLint/TypeScript/build aplikacji/build demo OK; Vitest98/98 w16 plikach.
+6 nowych testów modelu: deterministyczność, spójność tożsamości/limitów/groszy,
+historia/statystyki, brak podwójnego zapisu, goście, rezerwa/claim/resize/anulowanie,
+dwie zaległości i idempotentna wpłata/odblokowanie, obecność/reset, symulacja
+każdego z20 użytkowników bez zdublowania profilowanego gościa.
+Istniejące testy paneli zaktualizowane do danych świata (pełny mecz15, historia6,
+Moje faktycznie puste przed zapisem, prawdziwe składy demo). Nie pomijano testów.
+Testy API aplikacji nadal na atrapach, nie na rzeczywistym Supabase.
+Chromium320x844/390x844/768px: globalne profile i powrót, zagnieżdżona historia,
+zachowanie zakładki/rozwinięcia/scroll, wyszukiwanie, skład/rozliczenie,
+zapis/guest/wypis/rezerwa/claim, zamknięcie anulowanego, obecność, blokada ->
+wpłata -> odblokowanie, reset, motywy Auto/live system, cele44px/CTA34 i brak
+poziomego overflow, izolacja/CSP OK. Kolejne rzeczywiste rendery oglądnięte;
+w trakcie usunięto lukę przekazania przycisku gościa po przeniesieniu go do panelu
+oraz poprawiono selektor tekstu rozwijania z ikoną. Końcowy pełny smoke zaliczony.
+Cypress niewykonany (brak Xvfb), Android/iOS i prawdziwy backend nieweryfikowane.
+Pozostają ostrzeżenia dużych chunków Ionic. Brak migracji/merge/deploy.
+
+Zrzuty rzeczywistego React/Ionic w Chromium (nie makiety graficzne):
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium38-participants-clickable.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium38-player-profile.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium38-teams.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium38-settlement.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium38-statistics.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium38-demo-tools.png
+
+Dodatkowe Light i opis w docs/ui/PREMIUM38_DEMO_REVIEW.md.
+Raport docs/ODPOWIEDZI_CODEX.txt, STATUS/UI_BETA i opis izolacji zaktualizowane.
+Status automatycznego Vercel niezweryfikowany. SHA implementacji dopiszę po
+commicie; końcowy SHA dokumentacji w historii Git i odpowiedzi. Następny krok:
+ocena scenariuszy na telefonie, osobno weryfikacja na Android/iOS; bez używania
+reducera demo jako serwerowej logiki biznesowej.
