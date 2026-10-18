@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { charges, history, initialWorld, reduceWorld, registered, reserves, statistics, unpaidGames } from './data';
+import { charges, history, initialWorld, reduceWorld, registered, reserves, statistics, unpaidGames, teamEntries } from './data';
 import type { World } from './data';
 function coherent(world:World) {
   expect(world.players).toHaveLength(20);expect(world.games).toHaveLength(10);
@@ -94,4 +94,31 @@ it('keeps authored fictional goals, assists and MVP independent from attendance 
  expect(world.players.map(p=>p.demoTotals)).toEqual(totals);
  expect(totals).toEqual(initialWorld().players.map(p=>p.demoTotals));
  expect(totals.every(s=>Object.values(s).every(v=>Number.isInteger(v)&&v>=0))).toBe(true);
+});
+
+it('swaps opposite sides only and keeps entry ids, guests, numbers and withdrawals coherent',()=>{
+ let world=initialWorld();const gameId=world.games[0].id,original=teamEntries(world.games[0]);
+ expect(original.a).toHaveLength(6);expect(original.b).toHaveLength(6);expect(original.unassigned).toHaveLength(0);
+ const a=original.a[0].id,b=original.b[0].id;
+ world=reduceWorld(world,{type:'lineup_swap',gameId,a,b});
+ expect(teamEntries(world.games[0]).a[0].id).toBe(b);expect(teamEntries(world.games[0]).b[0].id).toBe(a);
+ expect(reduceWorld(world,{type:'lineup_swap',gameId,a,b})).toBe(world);
+ expect(reduceWorld(world,{type:'lineup_swap',gameId,a:'reserve-p16',b})).toBe(world);
+ world=reduceWorld(world,{type:'lineup_reset',gameId});expect(teamEntries(world.games[0])).toEqual(original);
+ world=reduceWorld(world,{type:'user',id:'p02'});
+ const guest=world.games[0].entries.find(e=>e.inviterId&&!e.playerId)!;
+ world=reduceWorld(world,{type:'remove_guest',gameId,entryId:guest.id});
+ const teams=teamEntries(world.games[0]);expect([...teams.a,...teams.b]).toHaveLength(11);
+ expect([...teams.a,...teams.b].some(e=>e.id===guest.id)).toBe(false);expect(reserves(world.games[0])).toHaveLength(2);
+ world=reduceWorld(world,{type:'jersey',playerId:'p02',number:0});expect(world.players.find(p=>p.id===teams.a[0].playerId)?.jerseyNumber).toBe(0);
+});
+it('has honest empty teams, never auto-adds a new participant and resets from current registered entries only',()=>{
+ let world=initialWorld();expect(world.games[2].lineup).toBeUndefined();
+ world=reduceWorld(world,{type:'lineup_reset',gameId:'demo-3'});expect(teamEntries(world.games[2]).a.length+teamEntries(world.games[2]).b.length).toBe(6);
+ expect(reduceWorld(world,{type:'lineup_reset',gameId:'demo-4'})).toBe(world);
+ expect(reduceWorld(world,{type:'lineup_reset',gameId:'demo-9'})).toBe(world);
+ world=reduceWorld(world,{type:'join',gameId:'demo-1'});expect(teamEntries(world.games[0]).unassigned.map(e=>e.playerId)).toEqual(['p01']);
+ world=reduceWorld(world,{type:'lineup_reset',gameId:'demo-1'});expect(teamEntries(world.games[0]).unassigned).toHaveLength(0);
+ expect([...teamEntries(world.games[0]).a,...teamEntries(world.games[0]).b]).toHaveLength(13);
+ expect(reduceWorld(world,{type:'reset'})).toEqual(initialWorld());
 });

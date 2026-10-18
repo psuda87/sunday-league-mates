@@ -1030,3 +1030,59 @@ Commit implementacji: bde777560812d65e0564e237363b2fd0019af9d4.
 Przegląd staged/diff --check/sekrety/artefakty OK. Wszystkie opisane kontrole
 wykonano;108/108 Vitest, końcowy Chromium i oba buildy OK. Zwykły push tylko
 feat/ui-beta, bez merge/ręcznego deploy. Końcowy SHA raportu w historii/odpowiedzi.
+
+[2026-10-18 17:45:42 CEST] Premium España3.11 — interaktywne boisko i dwie drużyny
+Przeczytano AGENTS/STATUS/UI_BETA/DEMO_VERCEL/ostatni raport, obejrzano rzeczywiste
+zrzuty3.8/3.10/3.6. Nowy src/demo/Teams.tsx zastępuje tylko dwie listy Składów.
+Boisko CSS/SVG: naturalna ciemna murawa/pasy, komplet linii i pól, bramki,
+koło1:1, subtelne światło/cień i złoty detal. A góra bordo/złoto, B dół ivory/
+granat/złoto. Pasek drużyn/liczby, numery z tego samego world.players, nazwiska
+skrócone wizualnie (pełne dla dostępności), koła44px/hit66px+. Rozmieszczenie
+1/2/2 dla5,1/2/3 dla6,1/3/3 dla7,1/2/2/3 dla8, B w odwrotnej kolejności.
+Nie są to stałe pozycje ani produkcyjny algorytm doboru.
+
+Game.lineup przechowuje id Entry. teamEntries wybiera tylko registered, bez
+duplikatów/rezerwy/wycofanych; usunięcie gościa usuwa znacznik, bez usuwania
+profilu lub automatycznej promocji. Nowe osoby jawnie Poza podziałem do resetu.
+Zwykłe kliknięcie otwiera tę samą kartę3.10 i wraca do meczu/Składów/scrolla.
+Tryb Zamień zawodników osobno: wybór jednej osoby z A i jednej z B, obrys+✓,
+aria-pressed; reducer sprawdza aktualne przypisanie obu id. Bez konfliktu
+z profilem. Gość bez konta ma span/nazwę/G i brak odsyłacza do profilu; można
+go przestawić w trybie zamiany. Reset podziału odtwarza demonstracyjny układ
+aktualnych uczestników. Reset całego demo przywraca pierwotne fixture.
+Pusty mecz/składy: estetyczny stan i ręczne Utwórz przykładowe składy; minimum2,
+anulowany bez boiska. Zmiany tylko w pamięci, bez API i produkcyjnych uprawnień.
+
+Trzy iteracje i dodatkowy ogląd tabletowy:1 pierwsze boisko,2 prawdziwe koło
+i równe połowy przy różnej liczbie rzędów,3 zaznaczenie✓ i pusty stan przy<2;
+dodatkowo po oglądzie768 ograniczono szerokość do420px, żeby pozostało pionowe.
+Zachowano mobilne rozmiary. Nie pobierano ani nie generowano obrazów.
+
+## Weryfikacja końcowa
+
+ESLint/TypeScript/build aplikacji/build demo OK. Vitest112/112 w19 plikach.
+Nowe testy modelu i UI: zamiany tylko przeciwnych stron/stale żądanie, reset,
+własny gość/wycofanie/rezerwa/nieprzypisani, puste/anulowane mecze, nawigacja
+vs tryb zamiany, żywy numer0. Chromium320x844/390x844/768: obie drużyny i liczby,
+profile/Enter/powrót do Składów, zamiana/reset/utworzenie i brak tworzenia poniżej2,
+6–6/7–6/8–7, numer7→0→99 i marker po edycji, usunięcie gości12→10 bez promocji,
+powroty/scroll/wyszukiwanie, Dark/Light/Auto, szerokości/hit>=44/brak kolizji
+znaczników/równe połowy/pionowe boisko/brak poziomego overflow.
+Demo15plików,6 dotychczasowych assetów; kontrola allowlisty, CSP, bajtów zasobów,
+braku Auth/Supabase/Edge/API i obcych żądań OK. To testy demo i atrapy API aplikacji,
+nie rzeczywisty Supabase. Home Dark/Light, Details Dark, Participants Dark oraz
+karta3.10 Dark/Light porównane SHA256 — bajtowo identyczne z poprzednim etapem.
+Cypress niewykonany (brak Xvfb), Android/iOS nieweryfikowane. Duże chunki Ionic
+nadal. Backend/finanse/Firebase/konfiguracja Vercel nietknięte, bez migracji/
+merge/ręcznego deploy. Automatyczny podgląd Vercel niezweryfikowany.
+
+Zrzuty rzeczywistego React/Ionic Chromium, nie makiety:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium311-teams-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium311-teams-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium311-teams-320.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium311-teams-768.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium311-teams-swap.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium311-teams-empty.png
+Raport docs/ODPOWIEDZI_CODEX.txt, analiza docs/ui/PREMIUM311_VISUAL_REVIEW.md.
+STATUS/UI_BETA/AGENTS/DEMO_VERCEL zaktualizowane. SHA implementacji dopisany
+po commicie, końcowy SHA raportu w historii Git/odpowiedzi.

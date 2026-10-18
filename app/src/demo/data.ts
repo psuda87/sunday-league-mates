@@ -1,12 +1,23 @@
 // Deterministic, fictional, memory-only demo. Never imported by production screens.
 export interface DemoPlayer { id: string; name: string; jerseyNumber: number; demoTotals: {goals:number;assists:number;mvp:number}; portrait?: { src: string; column: 0 | 1; row: 0 | 1 } }
 export interface Entry { id: string; playerId: string | null; guestName?: string; inviterId?: string; status: 'registered' | 'reserve' | 'withdrawn'; attendance: boolean | null; paidCents: number }
-export interface Game { id: string; name: string; startsAt: string; status: 'upcoming' | 'completed' | 'cancelled'; capacity: number; costCents: number; entries: Entry[] }
+export interface Game { id: string; name: string; startsAt: string; status: 'upcoming' | 'completed' | 'cancelled'; capacity: number; costCents: number; entries: Entry[]; lineup?: {a:string[];b:string[]} }
 export interface World { players: DemoPlayer[]; games: Game[]; userId: string; notice: string }
 export const names = ['Alex Nowak','Kamil Zieliński','Marek Lis','Piotr Wójcik','Adrian Maj','Łukasz Wrona','Tomasz Wilk','Oskar Król','Jan Sokół','Filip Góral','Igor Biały','Leon Zając','Dawid Polny','Adam Brzoza','Patryk Las','Rafał Dąb','Michał Sowa','Artur Bór','Daniel Rzeka','Szymon Wiatr'];
 export const registered = (game: Game) => game.entries.filter(e => e.status === 'registered');
 export const reserves = (game: Game) => game.entries.filter(e => e.status === 'reserve');
 export const personName = (world: World, entry: Entry) => world.players.find(p => p.id === entry.playerId)?.name ?? entry.guestName ?? 'Gość bez profilu';
+// Entry ids keep guests distinct; selectors remove withdrawn/reserve entries without promoting anyone.
+export function teamEntries(game:Game) {
+  const active=registered(game),seen=new Set<string>();
+  const side=(ids:string[])=>ids.flatMap(id=>{const entry=active.find(e=>e.id===id);if(!entry||seen.has(id))return [];seen.add(id);return [entry];});
+  const a=side(game.lineup?.a??[]),b=side(game.lineup?.b??[]);
+  return {a,b,unassigned:active.filter(e=>!seen.has(e.id))};
+}
+function exampleLineup(game:Game) {
+  const ids=registered(game).map(e=>e.id);
+  return {a:ids.filter((_,i)=>i%2===0),b:ids.filter((_,i)=>i%2===1)};
+}
 export function charges(game: Game) {
   if(game.status==='cancelled')return [];
   const entries = [...registered(game)].sort((a,b) => a.id.localeCompare(b.id));
@@ -33,11 +44,12 @@ export function initialWorld(): World {
   for(const id of ['p16','p17']) games[0].entries.push({id:`reserve-${id}`,playerId:id,status:'reserve',attendance:null,paidCents:0});
   for(const game of games.filter(g=>g.status==='completed')) for(const {entry,due} of charges(game)) entry.paidCents=due;
   games[7].entries[3].paidCents=Math.floor(games[7].entries[3].paidCents/2);
+  for(const game of [games[0],games[1],...games.slice(4,8)])game.lineup=exampleLineup(game);
   return {players,games,userId:'p01',notice:''};
 }
 export type Scenario = 'free'|'full'|'joined'|'reserve'|'completed'|'cancelled'|'debt';
 export const scenarioGame:Record<Scenario,string>={free:'demo-1',full:'demo-2',joined:'demo-1',reserve:'demo-2',completed:'demo-5',cancelled:'demo-9',debt:'demo-1'};
-export type Action = {type:'reset';scenario?:Scenario}|{type:'user';id:string}|{type:'jersey';playerId:string;number:number}|{type:'join'|'withdraw'|'guest'|'remove_guest'|'resize'|'attendance'|'pay';gameId:string;entryId?:string;count?:number};
+export type Action = {type:'reset';scenario?:Scenario}|{type:'user';id:string}|{type:'lineup_reset';gameId:string}|{type:'lineup_swap';gameId:string;a:string;b:string}|{type:'jersey';playerId:string;number:number}|{type:'join'|'withdraw'|'guest'|'remove_guest'|'resize'|'attendance'|'pay';gameId:string;entryId?:string;count?:number};
 export function reduceWorld(previous:World,action:Action):World {
   if(action.type==='reset') {
     const world=initialWorld();
@@ -55,6 +67,16 @@ export function reduceWorld(previous:World,action:Action):World {
   const world=structuredClone(previous);world.notice='';
   if(action.type==='user'){world.userId=action.id;return world;}
   const game=world.games.find(g=>g.id===action.gameId);if(!game)return previous;
+  if(action.type==='lineup_reset') {
+    if(game.status==='cancelled'||registered(game).length<2)return previous;
+    game.lineup=exampleLineup(game);return world;
+  }
+  if(action.type==='lineup_swap') {
+    const sides=teamEntries(game);
+    if(game.status==='cancelled'||!sides.a.some(e=>e.id===action.a)||!sides.b.some(e=>e.id===action.b))return previous;
+    game.lineup={a:sides.a.map(e=>e.id===action.a?action.b:e.id),b:sides.b.map(e=>e.id===action.b?action.a:e.id)};
+    return world;
+  }
   const current=game.entries.find(e=>e.playerId===world.userId&&e.status!=='withdrawn');
   if(action.type==='attendance') {const entry=game.entries.find(e=>e.id===action.entryId);if(game.status==='completed'&&entry?.status==='registered')entry.attendance=!entry.attendance;return world;}
   if(action.type==='pay') {for(const {entry,due} of charges(game)) if(entry.id===action.entryId)entry.paidCents=due;world.notice='Symulacja wpłaty zapisana tylko w pamięci demo.';return world;}

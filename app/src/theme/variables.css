@@ -523,3 +523,49 @@ ion-toolbar:has(.slm-shell-header) { --background:var(--slm-brand-header-bg); }
 /*3.10 visual pass3: soften the jersey-to-stadium transition, keep identity crisp. */
 .slm-ultimate-portrait { mask-image:linear-gradient(transparent,black 8%,black 68%,transparent),linear-gradient(90deg,transparent,black 22%,black 78%,transparent); }
 .slm-ultimate-number { font-weight:850; }
+
+/* Premium3.11 — demo-only pitch, independent of global theme and production UI. */
+.slm-demo-teams { --slm-pitch-grass:#123D30; --slm-pitch-stripe:#194936; --slm-pitch-line:#D7E8C37A; --slm-pitch-light:#FFF0B92E; --slm-pitch-gold:#E8CB77; --slm-pitch-red:#720F27; --slm-pitch-red-deep:#380B18; --slm-pitch-ivory:#F3EAD5; --slm-pitch-navy:#172A39; --slm-pitch-name:#FFFCED; --slm-pitch-label:#081B16D9; --slm-pitch-shadow:#00000059; }
+.slm-teams-disclaimer { margin:0 0 12px; color:var(--slm-text-secondary); font-size:.7rem; }
+.slm-team-score { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:10px; border:1px solid var(--slm-border); border-radius:12px; background:linear-gradient(140deg,var(--slm-card-top),var(--slm-panel)); }
+.slm-team-score > span { display:flex; align-items:center; justify-content:center; gap:7px; font-size:.78rem; font-weight:650; }
+.slm-team-score strong { font-size:1rem; color:var(--slm-gold); }
+.slm-team-score i { width:10px; height:10px; border:1px solid var(--slm-pitch-gold); border-radius:50%; background:var(--slm-pitch-red); }
+.slm-team-score > span:last-child i { background:var(--slm-pitch-ivory); }
+.slm-team-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+.slm-team-actions button,.slm-teams-empty button { min-height:44px; padding:8px 12px; border:1px solid var(--slm-border); border-radius:10px; background:var(--slm-panel); color:var(--slm-text); font:inherit; font-size:.75rem; cursor:pointer; }
+.slm-team-actions [aria-pressed=true] { background:var(--slm-nav-active); border-color:var(--slm-gold); }
+.slm-demo-teams button:disabled { opacity:.5; cursor:default; }
+.slm-teams-hint { min-height:34px; margin:8px 0 10px; font-size:.73rem; line-height:1.45; color:var(--slm-text-secondary); }
+.slm-football-pitch { position:relative; isolation:isolate; overflow:hidden; border:1px solid var(--slm-gold); border-radius:16px; background:radial-gradient(ellipse 65% 30% at 5% 2%,var(--slm-pitch-light),transparent),radial-gradient(ellipse 65% 30% at 100% 98%,var(--slm-pitch-light),transparent),repeating-linear-gradient(0deg,var(--slm-pitch-grass) 0 8.33%,var(--slm-pitch-stripe) 8.33% 16.66%); box-shadow:0 8px 24px var(--slm-shadow),inset 0 0 24px var(--slm-pitch-shadow); }
+.slm-pitch-lines { position:absolute; z-index:-1; inset:9px 7px; width:calc(100% - 14px); height:calc(100% - 18px); pointer-events:none; }
+.slm-pitch-lines g { stroke:var(--slm-pitch-line); stroke-width:1px; }
+.slm-pitch-lines path,.slm-pitch-lines rect,.slm-pitch-lines ellipse { vector-effect:non-scaling-stroke; }
+.slm-pitch-spots { fill:var(--slm-pitch-line); stroke:none; }
+.slm-pitch-lines .slm-pitch-goal { stroke:var(--slm-pitch-gold); }
+.slm-team-half { position:relative; min-height:var(--pitch-half-height); padding:16px 12px; box-sizing:border-box; }
+.slm-team-half > ul { display:flex; flex-direction:column; justify-content:space-around; gap:8px; min-height:calc(var(--pitch-half-height) - 32px); list-style:none; padding:0; margin:0; }
+.slm-formation-row > ul { display:flex; align-items:center; justify-content:space-around; gap:3px; list-style:none; margin:0; padding:0; }
+.slm-formation-row > ul > li { flex:0 1 90px; min-width:0; display:flex; justify-content:center; }
+.slm-team-half .slm-pitch-player { display:flex; flex-direction:column; align-items:center; gap:3px; width:100%; min-width:44px; min-height:66px; margin:0; padding:0 2px; color:var(--slm-pitch-name); border:0; border-radius:10px; background:transparent; text-decoration:none; font:inherit; cursor:pointer; }
+.slm-pitch-token { display:grid; place-items:center; flex:none; width:44px; height:44px; box-sizing:border-box; border:2px solid var(--slm-pitch-gold); border-radius:50%; background:linear-gradient(145deg,var(--slm-pitch-red),var(--slm-pitch-red-deep)); box-shadow:0 3px 7px var(--slm-pitch-shadow),inset 0 1px 1px var(--slm-pitch-light); font-size:1.12rem; font-weight:800; font-variant-numeric:tabular-nums; }
+.slm-team-b .slm-pitch-token { background:var(--slm-pitch-ivory); color:var(--slm-pitch-navy); }
+.slm-pitch-name { display:block; max-width:100%; box-sizing:border-box; padding:2px 5px; border-radius:5px; background:var(--slm-pitch-label); color:var(--slm-pitch-name); font-size:.68rem; font-weight:650; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.slm-pitch-player[aria-pressed=true] .slm-pitch-token { outline:3px solid var(--slm-pitch-name); outline-offset:3px; box-shadow:0 0 14px var(--slm-pitch-gold); }
+.slm-team-half .slm-pitch-player:focus-visible { outline:2px solid var(--slm-pitch-gold); outline-offset:3px; }
+.slm-team-half .slm-pitch-guest { cursor:default; }
+.slm-team-unassigned,.slm-teams-empty { padding:16px; margin-top:12px; border:1px solid var(--slm-border); border-radius:12px; background:var(--slm-panel); }
+.slm-teams-empty { text-align:center; padding:26px 16px; }
+.slm-teams-empty > span { font-size:2rem; }
+.slm-teams-empty h3,.slm-team-unassigned h3 { margin:8px 0; color:var(--slm-gold); font-size:1rem; }
+.slm-teams-empty p,.slm-team-unassigned p { font-size:.8rem; line-height:1.5; color:var(--slm-text-secondary); }
+.slm-team-unassigned ul { list-style:none; margin:0; padding:0; }
+
+/*3.11 pass2: a true responsive centre circle; equal halves at every roster size. */
+.slm-pitch-centre { position:absolute; z-index:-1; left:37%; top:50%; width:26%; aspect-ratio:1; transform:translateY(-50%); box-sizing:border-box; border:1px solid var(--slm-pitch-line); border-radius:50%; pointer-events:none; }
+
+/*3.11 pass3: selection has a shape as well as an outline/color. */
+.slm-pitch-token { position:relative; }
+.slm-pitch-player[aria-pressed=true] .slm-pitch-token::after { content:'✓'; position:absolute; right:-5px; top:-5px; display:grid; place-items:center; width:17px; height:17px; border-radius:50%; background:var(--slm-pitch-gold); color:var(--slm-pitch-navy); font-size:.7rem; line-height:1; }
+/*3.11 tablet review: keep the pitch vertical instead of stretching across 768px. */
+.slm-football-pitch { max-width:420px; margin-inline:auto; }

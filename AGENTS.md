@@ -1,3 +1,12 @@
+# Premium3.11 — boisko wyłącznie demo
+
+- Game.lineup używa id wpisów uczestników, nie nowej listy profili. teamEntries
+  wyklucza rezerwę/wycofanych; nowi zapisani jawnie poza podziałem do resetu.
+  Teams.tsx: SVG/CSS, górna A/dolna B, numery żywe z DemoPlayer, gość bez profilu
+  bez linku. Osobny tryb zamiany, brak konfliktu z profilem; nie dodawać algorytmu
+  doboru/produkcyjnego zapisu. Puste stany i manualne utworzenie/reset w demo.
+  docs/ui/PREMIUM311_VISUAL_REVIEW.md. Zachować resztę zaakceptowanego UI i backend.
+
 # Premium3.10 — tylko demo, zastępuje zakres profilu3.8/3.9
 
 - Zachować zaakceptowaną tarczę/ramę/portrety3.9. Numer0–99 w DemoPlayer i wspólnym

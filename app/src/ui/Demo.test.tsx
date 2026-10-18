@@ -67,8 +67,8 @@ it('opens the selected fictional match with matching date, capacity and roster t
   fireEvent.click(screen.getByRole('tab', { name: 'Informacje' }));
   expect(screen.getByRole('tabpanel')).toHaveTextContent('29 października 2026');
   fireEvent.click(screen.getByRole('tab', { name: 'Składy' }));
-  expect(screen.getByRole('tabpanel')).toHaveTextContent('Podgląd demonstracyjny');
-  expect(screen.getByRole('tabpanel').querySelectorAll('.slm-demo-pitch li')).toHaveLength(15);
+  expect(screen.getByRole('tabpanel')).toHaveTextContent('Przykładowe składy · tylko pamięć demo');
+  expect(screen.getByRole('tabpanel').querySelectorAll('.slm-football-pitch [data-entry]')).toHaveLength(15);
 });
 it('filters fictional fixtures without inventing membership or changing the chosen card', () => {
   render(<Demo />);

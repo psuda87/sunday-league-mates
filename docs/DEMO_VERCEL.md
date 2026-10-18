@@ -1,3 +1,11 @@
+## Premium3.11 — boisko tylko demo
+
+Jawna allowlista modułów rozszerzona o src/demo/Teams.tsx; kontrola nadal odrzuca
+produkcję/Auth/Supabase/Edge. Boisko SVG/CSS bez nowych obrazów lub zależności,
+output nadal15 statycznych plików,6 dotychczasowych zasobów. CSP/env/publicDir
+i app/vercel.json bez zmian. Root app / npm run build:demo / dist-demo / bez env.
+Podział i zamiany wyłącznie w pamięci demo, bez zapisu do API. Bez ręcznego deploy.
+
 ## Premium3.9 — fikcyjne portrety
 
 Output15 plików,6 jawnych zasobów: dawnych5 branding + assets/demo/fictional-portraits.webp.

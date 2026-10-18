@@ -1,3 +1,23 @@
+# Premium España3.11 — 2026-10-18 17:43:30 CEST
+
+Wyłącznie demo: nowe boisko SVG/CSS w zakładce Składy, naturalne ciemne pasy,
+linie/koło/pola/bramki i światło. Dwie drużyny: bordo/złoto u góry, ivory/złoto
+u dołu; numery0–99 z tych samych DemoPlayer i czytelne skrócone nazwiska.
+Zwykłe kliknięcie otwiera tę samą kartę3.10; osobny tryb zamiany wybiera dwie
+osoby z przeciwnych drużyn (obrys+✓), reset podziału i puste stany/create.
+Game.lineup przechowuje id wpisów, teamEntries filtruje wyłącznie registered,
+bez rezerwy/wycofanych. Nowe osoby jawnie Poza podziałem do ręcznego resetu.
+Usunięty gość znika z boiska, gość bez profilu nie ma linku ani fikcyjnego konta.
+Podział wyłącznie w pamięci, bez algorytmu produkcyjnego/API/persistencji.
+Mecze/Szczegóły/Zawodnicy/karta3.10 bez przebudowy; backend/Auth/RPC/RLS/migracje/
+finanse/Firebase/vercel.json bez zmian. allowlista demo dopuszcza tylko Teams.tsx.
+Szczegóły i zrzuty ui/PREMIUM311_VISUAL_REVIEW.md, raport ODPOWIEDZI_CODEX.txt.
+TS/ESLint/oba buildy OK;112/112 Vitest i Chromium320/390/768: numery/profile/
+zamiany/reset/goście/puste stany/kolizje/motywy/izolacja15plików OK. Zrzuty
+premium311-* i porównanie SHA256 potwierdzają brak zmian zaakceptowanych ekranów.
+Cypress brak Xvfb, Android/iOS nieweryfikowane, duże chunki Ionic nadal.
+Wcześniejsze ograniczenia backendu/Dockera pozostają aktualne poniżej.
+
 # Premium España3.10 — 2026-10-18 17:29:33 CEST
 
 Wyłącznie demo: zaakceptowana tarcza/herb/portrety3.9 zachowane, stadion wyraźniejszy
