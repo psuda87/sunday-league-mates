@@ -1,5 +1,6 @@
 # Premium España3.6 — 2026-10-18 13:28:53 CEST
 
+Implementacja 4f9dff8616343eee04d4cdefa3d7d1f39f79e726, push zakończony.
 feat/ui-beta: CTA szczegółów widoczne34px (wcześniej44), obszar interakcji44px,
 font12.48px/800 bez zmian; brak powtórzonych h2 pod aktywnymi zakładkami,
 aria-labelledby zachowane. Pierwsza karta uczestników36px wyżej, odstęp14px.

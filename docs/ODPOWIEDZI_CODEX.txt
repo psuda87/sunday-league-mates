@@ -652,3 +652,9 @@ niezweryfikowany. Następny krok: ocena na telefonie, dotyk i skalowanie fontów
 Raport docs/ODPOWIEDZI_CODEX.txt; STATUS zaktualizowany, poprzednie informacje
 SQL/Docker/niewdrożone migracje zachowane. SHA implementacji zostanie dopisany
 po commicie; końcowy commit dokumentacji w historii Git i odpowiedzi.
+
+[2026-10-18 13:29:13 CEST] Zapis Premium3.6
+Commit implementacji: 4f9dff8616343eee04d4cdefa3d7d1f39f79e726.
+Zwykły push na feat/ui-beta zakończony. Przegląd zakresu i diff --check OK;
+brak nowych sekretów/.env/niepotrzebnych artefaktów. Końcowy SHA uzupełnienia
+w historii Git i odpowiedzi. Raport docs/ODPOWIEDZI_CODEX.txt.
