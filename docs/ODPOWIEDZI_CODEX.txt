@@ -469,3 +469,81 @@ Bez zmian backendu/Auth/RPC/RLS/migracji/zapisów/gości/rezerwy/finansów/Fireb
 konfiguracji Vercel i danych. Bez merge i ręcznego wdrożenia. Automatyczny
 podgląd po push niezweryfikowany. Raport: docs/ODPOWIEDZI_CODEX.txt; STATUS,
 UI_BETA, DEMO_VERCEL i AGENTS uaktualnione z zachowaniem informacji historycznych.
+
+
+=== 2026-10-18 13:01:34 CEST — Premium España3.4 / szczegóły i Uczestnicy ===
+Przeczytano dokumentację, obejrzano oba Premium JPG i home3.3 Dark/Light.
+Ekran Mecze3.3 bez przebudowy: końcowe zrzuty Dark/Light identyczne bajtowo,
+SHA i dowód w docs/ui/premium34-home-regression.json. Fixture meczów bez zmian.
+
+Szczegóły: niższa fotograficzna karta, czytelna nazwa z fixture lub Mecz+dzień
+w realnym modelu bez nazwy, data/godzina/lokalizacja/czas/rok, liczba miejsc i pasek
+minimum10. Kompaktowy powrót, CTA44px, lokalnie mniejszy herb tylko w szczegółach;
+home zachowuje pełną kompozycję3.3. Jeden poziomy pasek4 ikon, domyślnie Uczestnicy,
+ARIA/klawiatura, poziomy scroll tylko paska, po jednym panelu.
+
+Uczestnicy: wspólny ParticipantGroup/RosterSummary, Zapisani/Goście/Rezerwa,
+liczby grup i zajętych/wolnych/rezerwy, inicjały, jawne statusy i separatory.
+Zapisani początkowo5, Pokaż wszystkich/Zwiń z aria-expanded/aria-controls;
+stan zachowany po zmianie zakładki. Gość wciąż member_id=null + odpowiedzialny,
+nie osobne konto ani saldo. Rezerwa nie zwiększa zajętości. Brak kontaktu z serwera
+nie tworzy pustego dialera. Istniejące kontakty, role i operacje/formularze zachowane.
+
+Work() ma lokalny ref pending: ponowny klik przed rerenderem nie uruchamia drugiego
+promise, finally zwalnia guard, busy/disabled/komunikat sukcesu i błędu zachowane.
+Nie dodano RPC ani nie zmieniono argumentów, UUID gości, zasad zapisów i blokad.
+To ochrona tego UI, nie potwierdzenie współbieżności/atomowości backendu.
+Admin wciąż ma dotychczasowe operacje i panel finansowy. Nie zmieniano ledgera/FIFO.
+
+Rzeczywiście działa web: otwieranie wybranego przykładowego meczu, jego data/nazwa/
+licznik,4 zakładki, listy i rozwijanie, wejście/powrót, Dark/Light/Auto i orientacja.
+Operacje aplikacji korzystają z istniejących callbacków i danych zgodnych z rolą.
+Wyłącznie demonstracyjne: osoby i nazwy meczów w demo, licznik/suwak, nieaktywny
+przycisk zapisu. Składy Planowane i dekoracyjne koszulki, bez przypisań/algorytmu.
+Rozliczenie demo Funkcja w przygotowaniu, bez fikcyjnych należności/kwot/sald.
+Prawdziwe rozliczenia w aplikacji pozostały dostępne zgodnie z poprzednią rolą.
+
+Trzy iteracje:1 hero/nazwa, wspólne grupy, statusy i58px taby; po ocenie licznik
+zdublowany i lista za nisko.2 usunięcie duplikatu, góra fotografii38->24px,
+znak60px tylko w szczegółach, opisane pola Informacji.3 interlinia statusów,
+łamanie nazw,44px rozwijanie i focus/aria; ponowny render Dark/Light/320/390/768,
+obrót844x390 i dodatkowy zrzut po przewinięciu do trzech grup.
+Analiza i porównanie: docs/ui/PREMIUM34_VISUAL_REVIEW.md; cykle1/2 też zapisane.
+
+Końcowo: ESLint/TypeScript obu wejść/oba buildy OK, Vitest90/90 w14 plikach.
+Testy sprawdzają dotychczasowe join/reserve/withdraw, blokadę i zamknięcie oraz nowe
+pending/busy/zakończenie, gościa tylko raz, rezerwę poza zajętością, brak cudzych
+kontrolek i kontaktów bez danych, rozwijanie i zachowanie stanu. Pierwsze przebiegi
+wymagały dostosowania asercji do5 wierszy i asynchronicznych właściwości Ionic oraz
+prefiksu✓ komunikatu sukcesu; po poprawkach uruchomiono cały zestaw, bez pomijania.
+To atrapy API, nie testy rzeczywistego Supabase.
+
+Chromium3 cykle + końcowy smoke:320/390/768/obrót844x390, brak overflow dokumentu,
+karty/filtry/zakładki i klawiatura, jeden panel, rozwijanie, powrót/nawigacja,
+motywy/live system/suwak i kontrola safe area/scroll3.3 OK. Demo14 plików,
+nowa allowlista wyłącznie modułu UI ParticipantGroup; CSP/alfa/zasoby/env/publicDir
+bez poluzowania. Brak Auth/Supabase/API/Edge/sekretów/produkcyjnych danych i żądań
+zewnętrznych. Konfiguracja Vercel bez zmian. Pozostają duże chunki Ionic.
+Cypress niewykonany — brak Xvfb. Android/iOS i realny backend niewykonane.
+
+Rzeczywiste zrzuty React/Ionic, bez makiet i retuszu:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium34-details-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium34-details-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium34-participants-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium34-participants-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium34-teams-dark.png
+Dodatkowo wszystkie grupy po przewinięciu:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium34-participants-groups-dark.png
+
+Pozostałe różnice: inicjały zamiast portretów, systemowy font, inny oficjalny herb
+z3.3 i zdjęcie/kadr. Nie dodano atrap menu⋯. Prawdziwe uprawnione operacje,
+numery i formularze zajmują więcej wysokości niż koncepcyjne wiersze. Goście/rezerwa
+po przewinięciu;5 zapisanych to rozwijany podgląd. Bez pełnej zgodności pikselowej
+ani deklaracji produkcyjnej. Na telefonie: notch/safe areas, skalowanie tekstu,
+klawiatura formularzy, wznowienie i realne role na izolowanej bazie testowej.
+
+Commit implementacji: fe614069c1c0a6a93f48669bdb396b97986e1891. Końcowy commit raportu wskazuje
+historia Git i odpowiedź końcowa. Wyłącznie feat/ui-beta, normalny push.
+Bez merge, backendu/Auth/RPC/RLS/migracji/finansów/push/Firebase i ręcznego deploy.
+Automatyczny Vercel niezweryfikowany. Raport w docs/ODPOWIEDZI_CODEX.txt;
+STATUS/UI_BETA/DEMO_VERCEL/AGENTS zaktualizowane, wcześniejsze informacje zachowane.

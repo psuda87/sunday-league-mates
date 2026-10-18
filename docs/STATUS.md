@@ -1,3 +1,44 @@
+# Premium España3.4 — szczegóły i Uczestnicy — 2026-10-18 13:01:34 CEST
+
+Gałąź feat/ui-beta. Implementacja: fe614069c1c0a6a93f48669bdb396b97986e1891.
+Home3.3 zachowany: Dark/Light po zmianach bajtowo identyczne z zatwierdzonymi
+zrzutami, SHA w ui/premium34-home-regression.json. Zmiany ograniczone do szczegółów:
+niższy stadionowy hero z nazwą z danych/demo lub fallbackiem Mecz+dzień, datą,
+godziną, lokalizacją, czasem, licznikiem/paskiem/minimum10, powrotem i44px CTA.
+4 poziome zakładki, default Uczestnicy, jeden panel, klawiatura i lokalny scroll.
+
+Wspólne ParticipantGroup/RosterSummary: grupy Zapisani/Goście/Rezerwa, liczby
+zajętych/wolnych/rezerwowych, inicjały i tekstowe statusy. Pięciu zapisanych +
+Pokaż wszystkich/Zwiń z zachowaniem stanu między zakładkami. Goście nie są kontami.
+Istniejące role/operacje/formularze/numery tylko według danych backendu, brak tel
+przy niepodanym kontakcie. Lokalny synchroniczny guard work() chroni przed
+podwójnym kliknięciem; busy/disabled/sukces/błąd, bez zmiany RPC/argumentów/UUID.
+Składy wyłącznie Planowane, bez algorytmu. Finanse demo Funkcja w przygotowaniu,
+bez kwot/sald; rzeczywisty panel finansowy aplikacji nietknięty.
+
+ESLint/TypeScript obu wejść/build aplikacji/build demo OK (duże chunki Ionic).
+Vitest90/90 w14 plikach, w tym guard pending, grupowanie gości i rezerwy,
+uprawnienia/kontakty i rozwijanie. To testy z atrapami API, nie Supabase.
+Trzy iteracje Chromium + finalny przebieg320/390/768, obrót844x390 bez overflow,
+klawiatura kart/filtrów/zakładek, powrót/nawigacja, motywy/live system/suwak OK.
+Demo14 statycznych plików, nowy moduł allowlisty tylko UI ParticipantGroup,
+CSP/zasoby/alfa/izolacja OK, brak żądań backendu/zewnętrznych.
+Cypress niewykonany (brak Xvfb); Android/iOS/realny backend niewykonane.
+
+Zrzuty ui/premium34-details-dark/light.png, premium34-participants-dark/light.png,
+premium34-teams-dark.png oraz przewinięte premium34-participants-groups-dark.png.
+Analiza3 cykli/porównanie: ui/PREMIUM34_VISUAL_REVIEW.md. Pozostają inicjały zamiast
+zdjęć, systemowy font i inne źródłowe zdjęcie/herb. Produkcyjne operacje i formularze
+zajmują więcej miejsca niż w koncepcji; goście/rezerwa dostępni po przewinięciu.
+Bez deklaracji pełnej zgodności ani gotowości produkcyjnej.
+
+Bez backendu/Auth/RPC/RLS/migracji/finansów/Firebase/Vercel, nowych endpointów,
+merge i ręcznego deploy. Automatyczny podgląd po push niezweryfikowany.
+Następnie odbiór telefonu: safe areas/fonty/klawiatura, wznowienie i rzeczywiste role
+na izolowanym backendzie. Historyczne braki SQL/RLS/FIFO/Docker/migracji poniżej.
+
+---
+
 # Premium España3.3 — Floating Crest — 2026-10-18 11:13:17 CEST
 
 Gałąź feat/ui-beta. Implementacja: 4dfe5dc21c9d2b312ed7ffd3731b35bfee05ad36.
