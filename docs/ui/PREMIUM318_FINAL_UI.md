@@ -80,4 +80,4 @@ nowych pakietów/grafik brandingowych/sekretów. Status automatycznego Vercel ni
 - [Mecze](premium318-final-matches.png)
 - [Grupy](premium318-final-groups.png)
 
-Finalny SHA implementacji zostanie zapisany w ODPOWIEDZI_CODEX.txt po commicie.
+Commit implementacji: `f6e563861e1e69c194462ac97fcb801c4e6b6e0d`. Końcowy commit zapisu raportu w historii Git i odpowiedzi.
