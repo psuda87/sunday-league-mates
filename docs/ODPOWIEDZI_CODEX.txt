@@ -1367,3 +1367,6 @@ Pełny test regresji Chromium zakończony powodzeniem: profile wyłącznie z mec
 powrót do panelu, własny profil/edycja, zapisy/goście/rezerwa/składy/finanse,
 Dark/Light/Auto i izolacja/CSP. Test nie zawiesił się; zmiany oczekiwały zapisu
 w Git. Zapis i zwykły push tylko feat/ui-beta, bez ręcznego wdrożenia.
+
+[2026-10-19 08:25:28 CEST] Commit korekty menu: e72a36a5cfc805ebbc1a03b0de00bd9606f90e10.
+Końcowy SHA raportu w historii Git i odpowiedzi.
