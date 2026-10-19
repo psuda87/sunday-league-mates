@@ -1,5 +1,37 @@
 # Sunday League Mates — specyfikacja pierwszej wersji
 
+## Zatwierdzona aktualizacja SLM 1.0 — 19.10.2026
+
+Ta sekcja ma pierwszeństwo nad historycznymi zapisami o jednej grupie, braku
+samorejestracji i dokładnym podziale kosztu. Nie oznacza wykonania nowych funkcji.
+Docelowy interfejs: origin/feat/ui-beta d0f9fa9 (Premium3.18, España).
+
+- Docelowo samorejestracja e-mail + hasło z weryfikacją przez Supabase Auth.
+  Istniejące konta zachowują login/telefon do migracji. Poczta/SMTP, domena,
+  podpis i dokumenty prawne to osobne decyzje. Nie tworzymy tabeli haseł.
+- Wiele niezależnych grup, grupowe role i widoczność public/private zgodnie
+  z dokumentacją zatwierdzonego UI; demo RAM nie jest działającym backendem.
+- Każda grupa ma własny ledger, saldo, wpłaty, należności i nadwyżki. Główny admin
+  zarządza wszystkimi finansami swojej grupy; organizator konkretnego meczu tylko
+  jego rozliczeniami. Nie ma globalnego admina zatwierdzającego codzienne wpłaty.
+- Brak wglądu administratorów w szczegóły finansów innych grup. Globalny jest tylko
+  licznik kwalifikujących się zaległych meczów konta odpowiedzialnego. Dwie zaległości
+  ze wszystkich grup blokują nowe zapisy na płatne mecze w całym SLM; inni admini
+  dostają status uprawnienia, nie cudze grupy/kwoty/salda.
+- Opłata udziału w górę do pełnej złotówki; różnica od rzeczywistego kosztu jest
+  nadwyżką grupy, widoczną tylko jej administratorom. Rozróżniamy nadwyżkę naliczoną
+  i faktycznie otrzymaną. Nie utożsamiamy jej z zaliczką/nadpłatą zawodnika.
+- Nie przeliczamy istniejących rozliczeń; wymagana wersja polityki i bezpieczne
+  mapowanie/migracja z uzgodnieniem historycznych operacji.
+
+Szczegóły kontraktów i punktów otwartych:
+[FINANCE_SLM_1_0_CONTRACTS.md](FINANCE_SLM_1_0_CONTRACTS.md),
+[AUTH_MODEL_SLM_1_0.md](AUTH_MODEL_SLM_1_0.md),
+[UI_INTEGRATION_MAP.md](UI_INTEGRATION_MAP.md).
+Pozostała treść zachowuje historyczne ustalenia i propozycje; sprzeczne opisy
+aktualnej implementacji legacy nie są nowymi wymaganiami SLM 1.0.
+
+
 Wersja: 1.2 • Data: 13.10.2026 • Język aplikacji: polski
 
 Uzupełnienie 14.10.2026: bieżące zasady rozliczeń mają pierwszeństwo zgodnie

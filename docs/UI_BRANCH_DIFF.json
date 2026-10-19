@@ -1,0 +1,1592 @@
+{
+  "base": "20267546c125daf2100fcc41936e7826f936d210",
+  "target": "d0f9fa9f840d2bd7f4985d00c24ee9a703f6b3e4",
+  "merge_base": "20267546c125daf2100fcc41936e7826f936d210",
+  "categories": {
+    "other": 13,
+    "assets": 17,
+    "tooling": 8,
+    "application": 7,
+    "account presentation": 5,
+    "demo RAM": 35,
+    "shared UI": 19,
+    "documentation": 211
+  },
+  "files": [
+    {
+      "status": "M",
+      "path": ".gitignore",
+      "category": "other"
+    },
+    {
+      "status": "M",
+      "path": "AGENTS.md",
+      "category": "other"
+    },
+    {
+      "status": "M",
+      "path": "app/cypress/e2e/events.cy.ts",
+      "category": "other"
+    },
+    {
+      "status": "M",
+      "path": "app/cypress/e2e/settlements.cy.ts",
+      "category": "other"
+    },
+    {
+      "status": "M",
+      "path": "app/cypress/e2e/test.cy.ts",
+      "category": "other"
+    },
+    {
+      "status": "A",
+      "path": "app/cypress/e2e/ui-beta.cy.ts",
+      "category": "other"
+    },
+    {
+      "status": "A",
+      "path": "app/demo/index.html",
+      "category": "other"
+    },
+    {
+      "status": "A",
+      "path": "app/demo/main.tsx",
+      "category": "other"
+    },
+    {
+      "status": "M",
+      "path": "app/index.html",
+      "category": "other"
+    },
+    {
+      "status": "M",
+      "path": "app/package.json",
+      "category": "other"
+    },
+    {
+      "status": "A",
+      "path": "app/public/assets/branding/espana-dark-texture.jpg",
+      "category": "assets"
+    },
+    {
+      "status": "A",
+      "path": "app/public/assets/branding/slm-app-icon-192.png",
+      "category": "assets"
+    },
+    {
+      "status": "A",
+      "path": "app/public/assets/branding/slm-app-icon-512.png",
+      "category": "assets"
+    },
+    {
+      "status": "A",
+      "path": "app/public/assets/branding/slm-app-icon.png",
+      "category": "assets"
+    },
+    {
+      "status": "A",
+      "path": "app/public/assets/branding/slm-crest-espana.svg",
+      "category": "assets"
+    },
+    {
+      "status": "A",
+      "path": "app/public/assets/branding/slm-favicon-64.png",
+      "category": "assets"
+    },
+    {
+      "status": "A",
+      "path": "app/public/assets/branding/slm-favicon-source.png",
+      "category": "assets"
+    },
+    {
+      "status": "A",
+      "path": "app/public/assets/branding/slm-logo-header-transparent.png",
+      "category": "assets"
+    },
+    {
+      "status": "A",
+      "path": "app/public/assets/branding/slm-logo-header.png",
+      "category": "assets"
+    },
+    {
+      "status": "A",
+      "path": "app/public/assets/branding/slm-logo-primary-transparent.png",
+      "category": "assets"
+    },
+    {
+      "status": "A",
+      "path": "app/public/assets/branding/slm-logo-primary.png",
+      "category": "assets"
+    },
+    {
+      "status": "A",
+      "path": "app/public/assets/branding/stadium-bg-card.jpg",
+      "category": "assets"
+    },
+    {
+      "status": "A",
+      "path": "app/public/assets/branding/stadium-bg-main.jpg",
+      "category": "assets"
+    },
+    {
+      "status": "A",
+      "path": "app/public/assets/demo/fictional-portraits.webp",
+      "category": "assets"
+    },
+    {
+      "status": "A",
+      "path": "app/public/images/match-evening.jpg",
+      "category": "assets"
+    },
+    {
+      "status": "A",
+      "path": "app/public/images/stadium.svg",
+      "category": "assets"
+    },
+    {
+      "status": "M",
+      "path": "app/public/manifest.json",
+      "category": "assets"
+    },
+    {
+      "status": "A",
+      "path": "app/scripts/test-demo-accounts-browser.mjs",
+      "category": "tooling"
+    },
+    {
+      "status": "A",
+      "path": "app/scripts/test-demo-event-groups-browser.mjs",
+      "category": "tooling"
+    },
+    {
+      "status": "A",
+      "path": "app/scripts/test-demo-events-browser.mjs",
+      "category": "tooling"
+    },
+    {
+      "status": "A",
+      "path": "app/scripts/test-demo-groups-browser.mjs",
+      "category": "tooling"
+    },
+    {
+      "status": "A",
+      "path": "app/scripts/test-demo-themes-browser.mjs",
+      "category": "tooling"
+    },
+    {
+      "status": "A",
+      "path": "app/scripts/test-ui-beta-browser.mjs",
+      "category": "tooling"
+    },
+    {
+      "status": "A",
+      "path": "app/scripts/verify-demo-build.mjs",
+      "category": "tooling"
+    },
+    {
+      "status": "A",
+      "path": "app/scripts/verify-logo-alpha.mjs",
+      "category": "tooling"
+    },
+    {
+      "status": "M",
+      "path": "app/src/App.tsx",
+      "category": "application"
+    },
+    {
+      "status": "A",
+      "path": "app/src/account-ui/AccountScreens.test.tsx",
+      "category": "account presentation"
+    },
+    {
+      "status": "A",
+      "path": "app/src/account-ui/AccountScreens.tsx",
+      "category": "account presentation"
+    },
+    {
+      "status": "A",
+      "path": "app/src/account-ui/Fields.tsx",
+      "category": "account presentation"
+    },
+    {
+      "status": "A",
+      "path": "app/src/account-ui/account.css",
+      "category": "account presentation"
+    },
+    {
+      "status": "A",
+      "path": "app/src/account-ui/model.ts",
+      "category": "account presentation"
+    },
+    {
+      "status": "A",
+      "path": "app/src/auth/uiAdapter.test.ts",
+      "category": "application"
+    },
+    {
+      "status": "A",
+      "path": "app/src/auth/uiAdapter.ts",
+      "category": "application"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/AccountDemo.test.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/AccountDemo.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/App.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/DemoBottomNav.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/EventAccessView.test.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/EventAccessView.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/EventForm.test.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/EventForm.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/Finance.test.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/Finance.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/Groups.test.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/Groups.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/Identity.test.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/Identity.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/Panels.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/Profile.test.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/Profile.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/Teams.test.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/Teams.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/UltimatePlayerCard.test.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/UltimatePlayerCard.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/accountState.test.ts",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/accountState.ts",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/data.test.ts",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/data.ts",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/eventAccess.css",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/eventAccess.test.ts",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/eventAccess.ts",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/eventDraft.test.ts",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/eventDraft.ts",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/groups.test.ts",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/groups.ts",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/palettes.css",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/polishDate.test.tsx",
+      "category": "demo RAM"
+    },
+    {
+      "status": "A",
+      "path": "app/src/demo/portraits.ts",
+      "category": "demo RAM"
+    },
+    {
+      "status": "M",
+      "path": "app/src/main.tsx",
+      "category": "application"
+    },
+    {
+      "status": "M",
+      "path": "app/src/pages/Accounts.tsx",
+      "category": "application"
+    },
+    {
+      "status": "M",
+      "path": "app/src/pages/Events.tsx",
+      "category": "application"
+    },
+    {
+      "status": "M",
+      "path": "app/src/theme/variables.css",
+      "category": "application"
+    },
+    {
+      "status": "A",
+      "path": "app/src/ui/AppearanceSettings.tsx",
+      "category": "shared UI"
+    },
+    {
+      "status": "A",
+      "path": "app/src/ui/BottomNav.tsx",
+      "category": "shared UI"
+    },
+    {
+      "status": "A",
+      "path": "app/src/ui/Demo.test.tsx",
+      "category": "shared UI"
+    },
+    {
+      "status": "A",
+      "path": "app/src/ui/Demo.tsx",
+      "category": "shared UI"
+    },
+    {
+      "status": "A",
+      "path": "app/src/ui/MatchCapacityProgress.tsx",
+      "category": "shared UI"
+    },
+    {
+      "status": "A",
+      "path": "app/src/ui/MatchFilters.tsx",
+      "category": "shared UI"
+    },
+    {
+      "status": "A",
+      "path": "app/src/ui/MatchHeader.tsx",
+      "category": "shared UI"
+    },
+    {
+      "status": "A",
+      "path": "app/src/ui/MatchHero.tsx",
+      "category": "shared UI"
+    },
+    {
+      "status": "A",
+      "path": "app/src/ui/MatchSections.tsx",
+      "category": "shared UI"
+    },
+    {
+      "status": "A",
+      "path": "app/src/ui/MatchTabs.tsx",
+      "category": "shared UI"
+    },
+    {
+      "status": "A",
+      "path": "app/src/ui/ParticipantGroup.tsx",
+      "category": "shared UI"
+    },
+    {
+      "status": "A",
+      "path": "app/src/ui/Players.test.tsx",
+      "category": "shared UI"
+    },
+    {
+      "status": "A",
+      "path": "app/src/ui/Players.tsx",
+      "category": "shared UI"
+    },
+    {
+      "status": "A",
+      "path": "app/src/ui/UltimatePlayerCard.tsx",
+      "category": "shared UI"
+    },
+    {
+      "status": "A",
+      "path": "app/src/ui/capacity.ts",
+      "category": "shared UI"
+    },
+    {
+      "status": "A",
+      "path": "app/src/ui/palettes.test.tsx",
+      "category": "shared UI"
+    },
+    {
+      "status": "A",
+      "path": "app/src/ui/registration.test.tsx",
+      "category": "shared UI"
+    },
+    {
+      "status": "A",
+      "path": "app/src/ui/theme.ts",
+      "category": "shared UI"
+    },
+    {
+      "status": "A",
+      "path": "app/src/ui/ui.test.tsx",
+      "category": "shared UI"
+    },
+    {
+      "status": "A",
+      "path": "app/tsconfig.demo.json",
+      "category": "other"
+    },
+    {
+      "status": "A",
+      "path": "app/vercel.json",
+      "category": "other"
+    },
+    {
+      "status": "A",
+      "path": "app/vite.demo.config.ts",
+      "category": "other"
+    },
+    {
+      "status": "A",
+      "path": "docs/DEMO_VERCEL.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/FRONTEND_HANDOFF.md",
+      "category": "documentation"
+    },
+    {
+      "status": "M",
+      "path": "docs/KONTEKST_DLA_CODEX_I_CHATGPT.txt",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ODPOWIEDZI_CODEX.txt",
+      "category": "documentation"
+    },
+    {
+      "status": "M",
+      "path": "docs/SPECYFIKACJA_SOCCER_APP.md",
+      "category": "documentation"
+    },
+    {
+      "status": "M",
+      "path": "docs/STATUS.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/UI_BETA.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/BETA23_VISUAL_REVIEW.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/PREMIUM310_VISUAL_REVIEW.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/PREMIUM311_VISUAL_REVIEW.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/PREMIUM312_VISUAL_REVIEW.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/PREMIUM313_VISUAL_REVIEW.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/PREMIUM314_VISUAL_REVIEW.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/PREMIUM315_GROUPS.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/PREMIUM316_EVENTS.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/PREMIUM317_THEMES.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/PREMIUM318_FINAL_UI.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/PREMIUM31_VISUAL_REVIEW.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/PREMIUM32_VISUAL_REVIEW.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/PREMIUM33_VISUAL_REVIEW.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/PREMIUM34_VISUAL_REVIEW.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/PREMIUM37_VISUAL_REVIEW.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/PREMIUM38_DEMO_REVIEW.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/PREMIUM39_VISUAL_REVIEW.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/PREMIUM_VISUAL_SPEC.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta2-dark-full.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta2-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta2-light-full.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta2-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta21-details-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta21-details-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta21-home-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta21-home-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta22-a-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta22-a-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta22-b-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta22-b-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta22-compare-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta22-compare-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta22-home-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta22-home-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta23-details-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta23-details-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta23-home-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta23-home-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta23-iteration1-home-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta23-iteration1-home-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/beta23-measurements.json",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/create-logo-alpha.mjs",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/demo-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/demo-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/espana-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/espana-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium-details-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium-details-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium-home-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium-home-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium-iteration1-home-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium-iteration1-teams-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium-iteration2-home-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium-iteration2-teams-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium-measurements.json",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium-participants-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium-teams-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium31-home-320.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium31-home-768.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium31-home-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium31-home-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium31-iteration1-home-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium31-iteration2-home-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium31-measurements.json",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium310-player-card-320.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium310-player-card-768.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium310-player-card-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium310-player-card-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium310-player-number-edit.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium311-teams-320.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium311-teams-768.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium311-teams-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium311-teams-empty.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium311-teams-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium311-teams-swap.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium312-settlement-320.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium312-settlement-admin.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium312-settlement-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium312-settlement-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium312-settlement-partial.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium313-avatar-picker.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium313-my-profile-320.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium313-my-profile-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium313-my-profile-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium313-profile-edit.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium313-settings.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium314-bottom-nav-320.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium314-bottom-nav-admin-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium314-bottom-nav-admin-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium314-bottom-nav-user.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium314-compact-nav-320.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium314-compact-nav-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium314-compact-nav-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium314-compact-nav-user.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium314-create-match.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium314-create-preview.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium314-edit-match.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium315-admin-permissions.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium315-create-group.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium315-group-details.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium315-groups-320.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium315-groups-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium315-groups-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium315-invitations.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium315-join-request.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium316-bottom-nav-320.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium316-create-group-select.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium316-match-list.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium316-outsider-locked.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium316-private-match.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium316-public-match.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium316-visibility-edit.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium317-deimos-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium317-deimos-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium317-espana-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium317-espana-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium317-fcb-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium317-fcb-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium317-lime-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium317-lime-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium317-match-privacy-badges.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium317-polish-date-time.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium317-theme-settings.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium318-email-verification.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium318-final-groups.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium318-final-matches.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium318-first-profile.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium318-forgot-password.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium318-login.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium318-profile-settings.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium318-register.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium318-reset-password.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium32-alpha-audit.json",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium32-header-detail.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium32-home-320.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium32-home-768.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium32-home-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium32-home-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium32-iteration1-home-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium32-iteration2-home-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium32-logo-preview-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium32-logo-preview-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium32-measurements.json",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium33-home-320.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium33-home-768.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium33-home-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium33-home-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium33-iteration1-home-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium33-iteration2-home-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium33-measurements.json",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium34-details-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium34-details-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium34-home-regression.json",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium34-iteration1-participants-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium34-iteration2-participants-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium34-participants-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium34-participants-groups-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium34-participants-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium34-teams-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium35-cycle1/home-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium35-cycle1/participants-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium35-details-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium35-home-320.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium35-home-768.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium35-home-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium35-home-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium35-metrics.json",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium35-participants-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium36-details-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium36-details-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium36-measurements.json",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium36-participants-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium36-teams-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium37-cycle1/player-profile-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium37-cycle1/players-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium37-cycle2/player-profile-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium37-cycle2/players-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium37-player-profile-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium37-player-profile-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium37-players-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium37-players-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium37-players-search.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium37-regression.json",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium38-demo-tools.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium38-participants-clickable.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium38-participants-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium38-player-profile-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium38-player-profile.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium38-settlement.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium38-statistics.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium38-teams-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium38-teams.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium39-guest-remove.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium39-player-card-320.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium39-player-card-768.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium39-player-card-alternate.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium39-player-card-dark.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium39-player-card-fallback.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/premium39-player-card-light.png",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/reference/SLM_PREMIUM_DIRECTION.md",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/reference/approved-three-themes.jpg",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/reference/slm-premium-three-phones.jpg",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/reference/slm-premium-ui-branding-board.jpg",
+      "category": "documentation"
+    },
+    {
+      "status": "A",
+      "path": "docs/ui/reference/slm-ultimate-player-card-concept.jpg",
+      "category": "documentation"
+    }
+  ]
+}

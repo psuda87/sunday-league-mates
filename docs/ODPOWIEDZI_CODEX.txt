@@ -1,0 +1,530 @@
+AKTUALIZACJA 19.10.2026 ? AUDYT I ZABEZPIECZENIE GIT
+U?ytkownik autoryzowa? commit/push feat/integration i standardowy merge PR do main po kontroli.
+Aktualny raport: docs/REPOSITORY_AUDIT.md; stan skr?cony: docs/STATUS.md.
+Ponowiono: TS/lint/Deno, Vitest190, bootstrap6, SQL legacy31/v2 55/replay9,
+HTTP Auth7/scoped20/smoke9, real browser1, Cypress13, web/demo build, cap sync,
+Android assembleDebug/testDebugUnitTest (unit UP-TO-DATE), db lint exit0 (3 warning).
+Naprawiono wy??cznie zale?ny od pory dnia fixture testu FIFO; pe?ny zestaw55 PASS.
+Usuni?to zb?dne ko?cowe puste linie wykryte przez staged diff --check, bez zmiany SQL.
+0 kont/grup/mecz?w/scratch DB po sprz?taniu; 0 tabel SLM bez RLS i 0 RPC SLM dla anon.
+Aktualny audit6 moderate/produkcja3; brak high/critical. Nie wdra?ano niczego zdalnie.
+Zabezpieczono dostarczone grafiki, bez podmiany logo; oryginalny worktree zachowany.
+Wy??czono Git auto-deploy w root/app vercel.json. GitHub bez Actions/protection/rulesets.
+Sekcja poni?ej jest raportem historycznym; jej zakaz commit/push dotyczy? poprzedniego zadania.
+Fizyczny telefon, FCM i pe?ne SMTP nadal wymagaj? osobnego odbioru. CAPTCHA od?o?ona.
+
+SLM 1.0 — LOKALNA IMPLEMENTACJA INTEGRACJI, 19.10.2026
+feat/integration, HEAD 2026754, I:\slm\sunday-league-mates-integration
+
+STATUS: PASS dla wykonanych testów lokalnego rdzenia. BLOCKED pełne wydanie SLM1.0.
+Bez commit/push/merge/rebase, bez zmian zdalnego Supabase i bez resetu istniejącej bazy.
+Zachowano wcześniejsze niezacommitowane zmiany i oryginalny katalog wraz z pics/.
+
+ZAIMPLEMENTOWANO
+Rzeczywiste grupy, zgody/zaproszenia, role grupowe, sukcesję i zachowanie historii;
+publiczne/prywatne mecze, atomowe zapisy/duplikaty/limit/goście/rezerwa, obecność;
+niezależne grupowe finanse z celową wpłatą i ogólnym FIFO, globalną kwalifikacją
+płatnych zapisów, rounding do złotówki, dwoma projekcjami nadwyżek i audytem korekt.
+Organizator nie może przypisać długu obcemu kontu przez publiczny mecz.
+Zachowano starą historię i stare logowanie; dodano login potwierdzonym e-mailem,
+profil i reauth kontaktu. Tylko Auth przetwarza hasła. Metadata nie nadają admina.
+Nowe pola RLS/DTO ograniczają kontakty i finanse do aktualnego scope.
+Atomowy inbox/outbox powiadomień, finansowe przejścia blokady, vacancy bez awansu,
+przypomnienia, recheck workerów i deep link po match_id odczytanym z własnego inboxa.
+
+UI
+Produkcja używa live/Groups.tsx, Matches.tsx i Finance.tsx przez SessionManager.
+Zachowano Premium: motyw/assety, header/hero/filtry/zakładki/roster/nawigację.
+Filtr Moje odczytuje rzeczywisty udział. Przycisk Mecze wraca ze szczegółów na listę.
+Nie podłączono danych RAM demo. Demo buduje się osobno, nie jest trasą produkcyjną.
+Ekrany rejestracji/weryfikacji/recovery nadal wymagają uzgodnionej poczty i callbacków;
+nie przedstawiamy ich jako działających. Składy/oceny i pozostałe dodatki bez nowych atrap.
+
+MIGRACJE
+16 nowych migracji, stosowanych kolejno po 13 historycznych:
+- 20261019170413_slm_v2_groups.sql
+- 20261019170806_slm_v2_events_finance.sql
+- 20261019171024_slm_v2_rpc.sql
+- 20261019171542_slm_v2_access_hardening.sql
+- 20261019171627_slm_v2_inbox_alias.sql
+- 20261019171834_slm_v2_finance_notifications_guard.sql
+- 20261019171938_slm_v2_email_accounts.sql
+- 20261019172258_slm_v2_warsaw_forms.sql
+- 20261019172724_slm_v2_profile_contacts.sql
+- 20261019173216_slm_v2_match_notifications.sql
+- 20261019173620_slm_v2_legacy_scope_guard.sql
+- 20261019173839_slm_v2_access_transitions.sql
+- 20261019174004_slm_v2_legacy_cost_column.sql
+- 20261019175037_slm_v2_final_scope_hardening.sql
+- 20261019175309_slm_v2_own_event_filter.sql
+- 20261019175940_slm_v2_legacy_payment_dto.sql
+
+Łącznie lokalnie 29. Iteracyjne poprawki są kolejnymi migracjami, bez przepisywania
+już zastosowanych nowych plików. Zachowano trzy wcześniejsze naprawy historycznych
+migracji (opcjonalne rls_auto_enable, jednoznaczne kolumny preview, duplikat triggera).
+Nie utworzono fikcyjnej rls_auto_enable. Przed zdalnym rollout wymagana ocena różnic
+historii tych trzech plików. Brak jednoznacznego starego administratora zatrzymuje
+mapowanie legacy, nie wybiera dowolnego właściciela. Stary ledger zachowany 1:1.
+Historyczne należności spłaca nowe grupowe FIFO. Nie obsługujemy celowej wpłaty v2
+na stary identyfikator meczu; UI oznacza legacy i kieruje do ogólnej wpłaty.
+
+WYNIKI WYKONANYCH TESTÓW
+PASS SQL legacy 31: uprawnienia, last seat, goście/rezerwa, stare FIFO i wyścigi.
+Fixture starego meczu tworzony prywatnym core; publiczne tworzenie v1 jest zamknięte.
+PASS SQL v2 55: grupy/scope/RLS, cena 245/10=25, pending/cash, globalne dwa długi,
+free allowed, celowa vs FIFO, równoczesna wpłata/accept-reject/korekty, późny FIFO,
+last seat, vacancy inbox+queue, recheck po zajęciu miejsca, rollback awarii adaptera,
+zwrot i anulowanie, brak roli z metadata i brak dostępu niepotwierdzonego konta.
+PASS replay 29 migracji + 9 kontroli: czysty schemat aplikacji, fikcyjny stary dług,
+identyczna historia i aliasy przed/po, zachowana sesja oraz nowa spłata starego długu.
+Bazy testowe to NOWE scratch DB, usuwane w finally; istniejącej bazy nie resetowano.
+PASS HTTP Auth legacy 7 zestawów; nowe konta/scoped API 20 kontroli; smoke/worker 9.
+PASS rzeczywista przeglądarka 1 scenariusz BEZ MOCKÓW: e-mail login, grupa, mecz,
+własny zapis, Moje, gość na rezerwie, finanse i logout. Po teście usunięto fixture.
+PASS Vitest 190/190, 33 pliki, --maxWorkers=4; bootstrap 6/6.
+PASS Cypress z kontrolowanym API 13/13 (to osobna warstwa, nie test urządzenia).
+PASS TS/lint/Deno i web build; demo build i izolacja 15 artefaktów.
+PASS Android assembleDebug + testDebugUnitTest (1 szablonowy test), cap sync.
+PASS release guard: dry-run release odrzuca debugowy transport przed wykonaniem zadań.
+NOT TESTED Android na urządzeniu/iOS/FCM/poczta. adb devices: brak urządzenia.
+
+NAPRAWY WYKRYTE PODCZAS TESTÓW
+Alias SQL inbox kolidował ze zmienną; brak profilu e-mail w starej ścieżce aliasu;
+kolumna total_cost_cents legacy; brak propagacji globalnego statusu po anulowaniu;
+brak powrotu na listę przy ponownym kliknięciu Mecze. Poprawione i testowane ponownie.
+Cypress nie startował z ELECTRON_RUN_AS_NODE=1; usunięto tylko z procesu testu.
+Zaktualizowano asercję nowego komunikatu Auth. Jedna kontrola rejestracji w Vitest
+przekroczyła czas podczas przeciążenia równoległymi zadaniami; oddzielnie i w pełnym
+run maxWorkers=4 przeszła. Nie zwiększano timeoutu ani nie usuwano asercji.
+
+BEZPIECZEŃSTWO I OGRANICZENIA
+Żaden sekret ani prawdziwe dane kont nie są wpisywane do dokumentów/kodu.
+Hasła i tokeny testów tylko w pamięci. Live UI przekazuje je po stdin, nie w argumentach;
+wyłącza screenshot/video i publikuje tylko oczyszczony wynik. Local CLI klucze odczytuje
+w pamięci. Env/cache/build/APK pozostają ignorowane. Fixture HTTP sprzątane według
+wygenerowanych UUID i własności grup. Wyłącznie cleanup własnych fixture używa
+transakcyjnego session_replication_role; testy autoryzacji pracują z RLS i triggerami.
+Pozostają czasowe liczniki prób z retencją doby; nie zerowano limitów logowania.
+Historyczne tabele slm_auth_proof_accounts/sessions/protected i prywatny schemat
+pozostają bez dostępu klienta, oznaczone do odrębnego przeglądu/usunięcia migracją;
+nie są używane jako endpointy bieżących testów.
+Zachowane źródła Androida i package-lock.json. Punkt kontrolny w ignorowanym .cache,
+bez commita; raport nie stanowi zgody na push.
+
+BLOCKED pełny Auth: nie ma zaakceptowanej poczty/domeny/legal/callbacków. Serwerowe
+signup/resend/recover są domyślnie blokowane; Auth signup off i hooki wiadomości on.
+Fikcyjny email_confirm=true Admin API testuje kontrakt konta, nie dostarczenie weryfikacji.
+Brak automatycznej migracji technicznych adresów; stare konta nadal działają.
+FCM niekonfigurowane, CAPTCHA odłożona, iOS niezweryfikowany. Vector nadal niesprawny;
+auto-review odrzucił montowanie socketu jako zbyt szeroki dostęp. Nie obchodzono decyzji,
+nie otwierano TCP2375 i nie zmieniano Windows. Główne usługi/testy nie zależą od tej naprawy.
+Ostrzeżenia: duży bundle, Browserslist, Gradle flatDir; nie maskowano ich zmianą progów.
+Wdrożenia zdalne, rollout danych, odbiór biznesowy received surplus i urządzeń wymagają
+osobnego etapu. Nie ogłaszamy całej aplikacji gotowej do publikacji.
+
+URUCHOMIENIE LOKALNE — PowerShell z katalogu app
+1. Po restarcie lokalnego Supabase sprawdź Docker i uruchom:
+   npx --yes --package=supabase@2.121.0 supabase start
+   python scripts/configure-auth-local.py
+   python scripts/prepare-edge-local.py
+   npx --yes --package=supabase@2.121.0 supabase functions serve --workdir ../.cache/http-edge --env-file ../.cache/http-edge/worker.env
+   Nie kopiuj outputu status -o json: zawiera lokalne klucze. Nie używaj link/db push/reset.
+2. W drugim terminalu:
+   $env:VITE_SLM_FUNCTION_URL='http://127.0.0.1:54321/functions/v1/accounts'
+   $env:VITE_SLM_PUSH_ENABLED='false'
+   npm run dev -- --host 127.0.0.1 --port 5174 --strictPort
+3. Samoczyszczący test przeglądarki: node scripts/test-live-ui-local.mjs
+   SQL: python scripts/test-backend-local.py; python scripts/test-v2-local.py;
+   python scripts/test-migrations-local.py (oddzielne polecenia, sprawdzaj każdy wynik).
+4. Ręcznie użyj wyłącznie fikcyjnego konta lokalnego: Studio http://127.0.0.1:54323,
+   Authentication/Users → Add user (NIE invite), adres domeny .invalid, potwierdzony
+   lokalny fixture i hasło wprowadzone lokalnie. To nie jest test mailowej weryfikacji.
+   Nie używaj zdalnego bootstrap-admin. Konto samo tworzy grupę i zostaje jej administratorem.
+
+ANDROID PRZEZ USB — tylko lokalny debug, bez produkcyjnych kont
+   $env:VITE_SLM_FUNCTION_URL='http://127.0.0.1:54321/functions/v1/accounts'
+   $env:VITE_SLM_PUSH_ENABLED='false'
+   npm run build
+   $env:SLM_LOCAL_ANDROID='1'
+   npx cap sync android
+   $env:JAVA_HOME='C:\Program Files\Android\Android Studio\jbr'
+   $env:ANDROID_HOME=Join-Path $env:LOCALAPPDATA 'Android\Sdk'
+   .\android\gradlew.bat -p android :app:assembleDebug :app:testDebugUnitTest
+   & "$env:ANDROID_HOME\platform-tools\adb.exe" devices
+   & "$env:ANDROID_HOME\platform-tools\adb.exe" reverse tcp:54321 tcp:54321
+   & "$env:ANDROID_HOME\platform-tools\adb.exe" install -r android\app\build\outputs\apk\debug\app-debug.apk
+   npx cap open android
+
+Zachowano loggingBehavior=none. Debug manifest dopuszcza HTTP tylko localhost/127.0.0.1;
+SLM_LOCAL_ANDROID=1 pozwala na lokalny mixed content. Release guard odrzuca ten wariant
+oraz bundle z API localhost. Przed release usuń zmienną i wykonaj ponowny build/sync
+z zatwierdzonym HTTPS; brak zgody na publikację. Tych kroków instalacji na telefonie
+NIE wykonano: urządzenie niepodłączone.
+
+RĘCZNY ODBIÓR
+Zaloguj lokalny fixture, utwórz grupę, zaakceptuj drugie konto po jego prośbie/zaproszeniu,
+nadaj prawo tworzenia, utwórz prywatny/publiczny mecz z własną godziną i limitem.
+Sprawdź zapis/wycofanie, gościa z/bez telefonu, oddzielną rezerwę i Zadzwoń, zakładki,
+Mecze/Moje, widoczność po opuszczeniu grupy, zatwierdzanie zakończonego meczu,
+wpłatę celową/ogólną, korektę/zwrot i oddzielne nadwyżki. Sesja po ponownym otwarciu
+oraz reset/odrzucenie starej sesji wymagają odbioru nowego wariantu na urządzeniu.
+Nie traktuj dawnych ręcznych testów Auth jako odbioru obecnego modułu wielogrupowego.
+
+KOŃCOWE POTWIERDZENIE
+Końcowy web build, lint, TS/Deno i cap sync Android PASS. Ostatni assembleDebug oraz
+testDebugUnitTest PASS; test szablonowy natywny pozostaje UP-TO-DATE po uprzednim wykonaniu.
+Ostatni rzeczywisty test przeglądarki po finalnej korekcie loading/error: 1 PASS.
+Cypress kontrolowanego API końcowo 13/13. Replay 29 migracji: 9 PASS.
+Skan 157 zmienionych plików: brak trafień wzorców sekretów/kluczy i brak artefaktów.
+git diff --check PASS, pusty staging, HEAD 2026754 bez zmian. Pełna lista plików:
+docs/CHANGED_FILES_INTEGRATION.txt. Ignorowany checkpoint zawiera patch, manifest SHA256
+i snapshot.zip. Po cleanupie: 0 lokalnych kont, grup i meczów oraz scratch DB.
+Wszystkie tabele SLM mają RLS, żadne publiczne RPC SLM nie ma EXECUTE dla anon.
+Główne kontenery działają; Vector nadal restartuje się. Nie zmieniono zdalnego projektu.
+
+--- ARCHIWUM POPRZEDNIEGO ETAPU — poniżej historyczny raport, nie bieżący status ---
+
+SLM 1.0 — AKTUALIZACJA KOMPLEKSOWEJ INTEGRACJI 19.10.2026
+Branch feat/integration, HEAD 2026754. Zmiany wcześniejszego zadania zachowane.
+Bez git merge/rebase/commit/push, zdalnych operacji Supabase i wdrożeń.
+
+STATUS CAŁOŚCI: CZĘŚCIOWO GOTOWE / BLOCKED pełna integracja nowego modelu.
+PASS dla wykonanych testów istniejącej implementacji i nowej warstwy wizualnej.
+Nie deklarujemy PASS dla nowych grup/email/finansów v2, bo kontrakty nie są wdrożone.
+
+1. USTALENIA WŁAŚCICIELA (OSTATECZNE)
+Najnowszy ui-beta d0f9fa9 jest celem wizualnym. Zatwierdzono samorejestrację email
+z weryfikacją i zachowanie kont legacy do migracji; usługa poczty to osobna decyzja.
+Ostateczne finanse: grupa ma WŁASNY ledger/saldo/wpłaty/nadwyżki. Admin grupy
+zarządza jej całością, organizator konkretnego meczu swoim eventem. Brak globalnego
+admina finansów i cudzych szczegółów. Globalny wyłącznie licznik kwalifikujących
+się zaległych meczów i blokada PŁATNYCH zapisów przy dwóch. Opłata w górę do złotówki,
+oddzielne nadwyżki naliczone i otrzymane. To zastępuje wcześniejszą wypowiedź
+wspólne saldo. Istniejących rozliczeń NIE ZMIENIONO.
+
+Przygotowano FINANCE_SLM_1_0_CONTRACTS.md i AUTH_MODEL_SLM_1_0.md. Nowych migracji
+v2 nie utworzono i nie zastosowano. Plan zachowuje stare kwoty/policy, proponuje
+mapowanie legacy bez kasowania/ponownego księgowania i shadow reconciliation.
+Otwarty szczegół: cel wpłaty konkretnego meczu a grupowe FIFO, gdy organizator nie
+ma prawa obsługiwać innych wydarzeń. Propozycja w kontrakcie, nie wdrożona reguła.
+
+2. PORÓWNANIE I RĘCZNE PRZENIESIENIE UI
+Pełna lista: UI_BRANCH_DIFF.json, 315 ścieżek, w tym 102 app. Wspólna baza 2026754.
+Źródło origin/feat/ui-beta d0f9fa9f840d2bd7f4985d00c24ee9a703f6b3e4.
+Przeczytano handoff, AGENTS, źródła ekranów/reducerów i dokumenty Premium315/316/318.
+Źródłowy backend nie wnosi kontraktów grup/email; błędne byłoby skopiowanie jego
+migracji na zachowane lokalne poprawki. Szczegóły mapy ekran->API->tabela->RLS:
+UI_INTEGRATION_MAP.md. To pełna mapa istniejących i PROJEKTOWANYCH kontraktów.
+
+Ręcznie przeniesiono źródła UI/account-ui/demo/theme/assety i rzeczywiste Accounts,
+Events/main. Zachowano SessionManager/TokenStore/API/handler/SQL, polskie numery,
+mandatory password i magazyn sesji. Logowanie produkcyjne nadal LEGACY; nowy model
+email nie został pozornie uruchomiony przez symulator.
+Zachowano produkcyjny App routing / i /home. Demo wyłącznie osobny build, bez nowej
+trasy udającej grupy. Nie przeniesiono Vercel deploy config; nagłówki demo lokalnie.
+Package-lock i zależności bez zmian; package.json dodaje tylko dwa skrypty demo.
+
+3. NAPRAWY
+- Zachowano poprzednie poprawki trzech migracji: warunkowy REVOKE opcjonalnej funkcji,
+  aliasy kolumn finance_preview i usunięcie wyłącznie powtórnego CREATE triggera.
+- Niezależny snapshot ui-beta: 181/184 Vitest (3 błędy). Na Windows Groups.tsx/groups.ts
+  kolidują przy import ./Groups. Przeniesiony komponent nazwano GroupsScreen.tsx,
+  poprawiono importy i allowlistę demo. Regresja trzech testów i pełne 184/184 PASS.
+- CSP preview demo odłączono od brakującego vercel.json do demo/headers.json;
+  nie osłabiono connect-src none/form-action none/izolacji bundla.
+- Cypress po UI: pierwsze 8/10, z powodu starych selektorów Szczegóły i filtra historii.
+  Zachowano asercje, użyto dostępnego przycisku karty/Historia/zakładek; końcowo10/10.
+- Native cap sync dodał brakujące włączenie @capacitor/push-notifications do dwóch
+  śledzonych plików Gradle. Nie konfigurowano Firebase ani prawdziwej wysyłki.
+- Dodano ignorowanie dist-demo i cache Pythona; artefakty/APK nie trafią do zmian Git.
+
+4. DOCKER / VECTOR / LOKALNE AUTH
+Docker Desktop zatrzymał się w trakcie pracy (brak potoku). Uruchomiono istniejącą
+aplikację Hidden bez instalacji, zmian Windows lub otwarcia TCP; silnik wrócił.
+Vector nadal restartuje się z powodu Docker API :2375. Automatyczny przegląd
+bezpieczeństwa odrzucił udostępnienie kontenerowi pełnego socketu Docker. Nie
+zastosowano tej zmiany, nie otwierano niezabezpieczonego TCP. Czeka decyzja właściciela
+w sprawie takiej ekspozycji albo węższego rozwiązania infrastrukturalnego. BLOCKED.
+
+Lokalny Auth odtworzono z TYM SAMYM obrazem/siecią i zachowano zatrzymane oryginalne
+kontenery jako kopie. Bez restartu/resetu bazy i usuwania danych. Konfiguracja:
+public signup false, phone provider false, wymaganie obecnego hasła true, nonce
+reauth false (brak wiadomości), min8, autoconfirm false i istniejące hooki blokujące
+email/SMS. Skrypt configure-auth-local.py przekazuje env przez ignorowany tymczasowy
+plik i usuwa go, nie przez argv/logi. Nie zmienia zdalnego Auth.
+CLI start później może odtworzyć domyślne ustawienia: przed testami HTTP należy
+ponownie sprawdzić/ustawić bezpieczną konfigurację; helper sprawdza runtime, nie udaje
+Management API. Zatrzymane kopie są zachowane, bez automatycznego kasowania.
+
+Edge serwowany przez prawdziwy supabase-edge-runtime 1.77.4. Kopia w ignorowanym
+.cache/http-edge używa lokalnego entrypointu (produkcyjny index nadal chroni projekt).
+Konfiguracja nie jest do deploy. PUSH_WORKER_SECRET wygenerowany lokalnie, tylko
+w ignorowanym pliku/pamięci. Nie czytano PAT/produkcyjnych env ani sekretów FCM.
+
+5. TESTY RZECZYWIŚCIE WYKONANE
+PASS — PostgreSQL backend harness 31 kontroli: poprzednie fixtures/podział/FIFO,
+RLS role/session gate, last seat race, blocked/unblocked, ledger/inbox/outbox rollback
+oraz równoległe accept/accept, accept/reject i identyczne idempotentne żądanie.
+Własna scratch DB usuwana; nie kasowano/resetowano istniejącej bazy. NOWY FINANCE V2
+PER-GROUP/ROUNDING NIE ZOSTAŁ tu uruchomiony — to test dotychczasowego ledger.
+PASS — HTTP accounts: 7 wieloasercyjnych zestawów, prawdziwy GoTrue/REST/Edge:
+błędne dane, temporary gate, zmiana hasła, role/admin, profile/aliasy/uniqueness,
+recovery przerwanej operacji właściciela już istniejące (nie nowy mechanizm), reset,
+stare JWT i refresh po resecie oraz po zakończeniu zmiany hasła, logout/refresh.
+PASS — HTTP smoke 9: obecne signup odrzucone (nowy model nieaktywny), Auth health,
+401 bez/błędny token, 405 metoda, worker403 bez sekretu i worker200 fcm_unconfigured
+claimed0 z poprawnym dedykowanym sekretem. Brak żądania do FCM/SMTP/SMS.
+PASS — Vitest186/186 w33plikach, bootstrap Node6/6.
+PASS — Cypress10/10,4specyfikacje, kontrolowane API (nie dowód nowego backendu grup).
+PASS — TypeScript, ESLint, Deno check trzech wejść, build web i build:demo.
+PASS — izolacja demo15plików bez modułów produkcyjnego Auth/Supabase; allowlista.
+PASS — git diff --check (ostrzeżenia końców linii nie są błędami).
+PASS — Android :app:assembleDebug oraz :app:testDebugUnitTest (1 szablonowy test).
+Build z JDK21.0.10 Android Studio jbr + istniejący Android SDK, bez instalowania SDK.
+APK w ignorowanym app/android/app/build/outputs/apk/debug/app-debug.apk.
+Ostrzeżenia: duże chunki, Electron deprecated/Browserslist, Gradle flatDir i biblioteka
+natywna bez strip. To nie jest test urządzenia ani FCM/iOS.
+
+Końcowa poprawka CORS: lokalny entrypoint dopuszcza jawnie localhost/127.0.0.1:5174,
+bez zmiany produkcyjnego index. Lokalny Kong ustawia ACAO *, dlatego w HTTP testujemy
+status odmowy dla obcego origin (403); osobne dwa testy handlera sprawdzają ścisły
+nagłówek allowlisty i brak nagłówka dla obcego. Pierwsze dwie próby CORS nie przeszły
+założenia o nagłówku proxy; ustalono przyczynę, nie osłabiano logiki serwera. Finalnie
+HTTP smoke9/9, Vitest186/186. Realny frontend na5174 może korzystać z tego backendu.
+Dodano prepare-edge-local.py: kopiuje tylko śledzone pliki .ts do ignorowanego katalogu,
+bez env/PAT, zachowuje istniejący lokalny sekret workera i drukuje tylko instrukcję.
+ADB:0 autoryzowanych urządzeń. Brak instalacji/odbioru na fizycznym telefonie.
+
+6. BAZA I USŁUGI NA KOŃCU
+13 migracji, 29 tabel SLM wszystkie z RLS. Po testach auth.users=0, slm_events=0,
+brak pozostawionych scratch DB. Główne DB/Auth/Kong/Storage/Realtime/Studio/pgmeta/
+Analytics zdrowe; REST/Edge running. Vector FAIL/restarting jak wyżej.
+Poczta Inbucket działa lokalnie jako usługa, ale nie testowano wysyłki; hooki blokują.
+Stan migracji i historie nie zostały zresetowane ani naprawiane zdalnie.
+
+7. GOTOWOŚĆ I BLOKADY
+Gotowe: warstwa wizualna i rzeczywiste dotychczasowe operacje accounts/events/finanse/
+inbox, build Android. NOT IMPLEMENTED/NOT TESTED: nowe grupy/membership/RLS,
+public/private/own kontrakt serwera, email self-service, nowy profile/avatar/number,
+serwerowy zapis składów i FINANCE V2 PER-GROUP/ROUNDING/SURPLUS.
+Nie nazywać symulacji działającymi funkcjami. Pełne SLM1.0 nadal NIE JEST gotowe
+produkcyjnie, mimo poprawnego builda Android.
+
+BLOCKED: SMTP/dostarczanie/redirecty i dokumenty prawne; Vector decyzja socket lub
+węższy dostęp; alokacja wpłaty na mecz vs grupowe FIFO wymaga doprecyzowania przed
+implementacją finansów v2. FCM zewnętrzne sekrety/projekt i test telefonu osobno.
+NOT TESTED: fizyczny Android, iOS, realne FCM. Nie osłabiano cleartext/mixed-content
+w release. Obecny lokalny URL 127.0.0.1 nie wystarczy na telefonie: wymaga lokalnego
+transportu/adb reverse i debug-only rozwiązania HTTP albo zaufanego lokalnego HTTPS.
+Nie przedstawiać APK jako gotowego połączenia z backendem telefonu bez tego kroku.
+
+8. PLIKI I RYZYKA
+Zmiany: trzy wcześniej naprawione migracje, skrypty test-backend-local,
+configure-auth-local/accounts-admin-local/test-accounts-local/test-edge-local,
+przeniesione src/ui, src/demo, src/account-ui, Accounts/Events/main/theme, assety,
+config/demo/build/scripts, fixtures Cypress i dwa Gradle. Dokumenty: AGENTS,
+STATUS, SPECYFIKACJA, AUTH_MODEL_SLM_1_0, FINANCE_SLM_1_0_CONTRACTS,
+UI_INTEGRATION_MAP, UI_BRANCH_DIFF i ten raport. Pełna lista w git status/diff.
+Zachowano oryginalny pics/. Bez zmian remote, commitów i push.
+Historyczne migracje: opis ryzyka i uzasadnienia w poniższym zachowanym raporcie.
+Nowe grupy/Auth/finanse wymagają NOWYCH migracji z CLI, nie nadpisania istniejących
+kwot ani skopiowania starego backendu z ui-beta. Globalne granty v1 nie mogą
+pozostać drogą obejścia nowej izolacji grup. Legacy kwoty muszą uzgodnić się co grosz.
+
+9. NASTĘPNY KROK
+Odebrać kontrakty finansów (zwłaszcza cel wpłaty i received surplus), przygotować
+nowe wersjonowane migracje grup/RLS/finansów bez zmiany starego ledger, wykonać
+shadow reconciliation, dopiero potem podłączyć nowe ekrany grup/public-private.
+Osobno zatwierdzić pocztę/callback/legal i uruchomić nowy model email. Następnie
+lokalny transport telefonu i ręczny odbiór Androida. Vector bez obejścia odrzuconej
+kontroli bezpieczeństwa. Zachować modele testowe i środowisko wyłącznie lokalnie.
+
+--- ZACHOWANY RAPORT WCZEŚNIEJSZEJ NAPRAWY MIGRACJI / MODELU LEGACY ---
+SLM — NAPRAWA MIGRACJI I LOKALNY SUPABASE
+19.10.2026, Europe/Warsaw
+Branch feat/integration; I:/slm/sunday-league-mates-integration; aplikacja app/.
+
+WYNIK: PASS — start lokalnej bazy, wszystkie 13 migracji i wykonane testy SQL/RPC/RLS.
+FAIL — pełna sprawność wszystkich usług: opcjonalny kolektor logów Vector restartuje się.
+Nie jest to pełny odbiór SLM ani potwierdzenie działania HTTP Auth/Edge/FCM/urządzeń.
+
+1. STAN POCZĄTKOWY I ZAKRES
+Git był czysty, branch prawidłowy. Po eskalacji uprawnień sandbox Docker działał.
+Początkowy permission denied do potoku Dockera dotyczył sandboxa, nie awarii silnika.
+Przed startem odczytano kontenery i wolumeny: brak wyników, brak istniejącej bazy
+lokalnej w bieżącym silniku. Nie wykonano resetu, link, db push ani deploy.
+Nie odczytywano produkcyjnych env/PAT, nie łączono się ze zdalnym Supabase.
+Zmiany nie obejmują funkcjonalności SLM 1.0/1.1 ani wyglądu.
+
+2. PRZYCZYNA I NAPRAWY
+A. 20261013193844_accounts_recovery_and_permissions.sql
+Bezwarunkowy REVOKE zakładał public.rls_auto_enable(). Żadna migracja repo nie
+zawiera jej definicji. To opcjonalna infrastruktura automatycznego RLS, a nie
+wbudowana obowiązkowa funkcja PostgreSQL/Supabase ani wymóg architektury SLM.
+Najpewniej pochodziła z ustawienia/konfiguracji wcześniejszego środowiska; nie
+odczytywano zdalnej bazy, więc jej pochodzenia tam nie potwierdzano.
+Dodano DO z to_regprocedure: REVOKE tylko jeśli funkcja istnieje, bez tworzenia
+zastępczej funkcji. Jeżeli istnieje, dotychczasowe odebranie uprawnień jest zachowane.
+Jeśli nie istnieje, nie ma funkcji, której dostęp można by odebrać.
+Tabele SLM nadal mają jawne ENABLE ROW LEVEL SECURITY; nie zależą od tego triggera.
+Źródło: https://supabase.com/docs/guides/database/postgres/event-triggers
+RLS/granty: https://supabase.com/docs/guides/database/postgres/row-level-security
+Próba odczytu changelog.md przez przeglądarkę zwróciła unsupported content-type;
+korzystano z aktualnych oficjalnych dokumentów RLS/event triggers i help CLI.
+
+B. 20261014100000_settlements_ledger.sql
+Kolejny rzeczywisty błąd startu: column reference id is ambiguous, SQLSTATE 42702.
+W finance_preview końcowy SELECT/CROSS JOIN łączył ranked i slm_events; id/status
+były niekwalifikowane. Dodano alias r i kwalifikację wszystkich kolumn wynikowych.
+Wzór podziału kosztu i obsługa reszty groszy pozostają bez zmian.
+
+C. 20261014122000_notifications_events_eligibility.sql
+Przegląd wykrył powtórne CREATE TRIGGER settlement_event_history_immutable,
+który został już utworzony w 20261014102000. Usunięto tylko powtórne tworzenie
+z ostatniej migracji. Wcześniejszy trigger niezmienności i REVOKE UPDATE/DELETE/TRUNCATE
+pozostają aktywne. Nie usunięto istniejącego triggera ani migracji.
+
+3. KOLEJNOŚĆ / ZALEŻNOŚCI I HISTORIA
+Zastosowano od pustego środowiska wszystkie 13 migracji w kolejności:
+20261013185250 — historyczny proof/Auth i hooki
+20261013191910 — konta, aliasy, role, security/sessions, RLS i RPC
+20261013193036 — utwardzenie sesji
+20261013193844 — recovery i uprawnienia opcjonalnej funkcji
+20261013212841 — wydarzenia, uczestnicy, historia, RPC/RLS
+20261013213423 — walidacja edycji
+20261013213917 — skończone koszty
+20261014100000 — ledger/FIFO/podział kosztu i triggery
+20261014101000 — RPC rozliczeń i idempotencja
+20261014102000 — integracja zapisów/finansów, niezmienna historia
+20261014120000 — inbox/outbox/urządzenia, RLS i trigger powiadomień
+20261014121000 — RPC powiadomień, leases/worker
+20261014122000 — połączony dispatch, odbiorcy i transakcyjny adapter finansowy
+Finanse powstają przed powiadomieniami; ostatnia migracja przenosi rdzenie RPC do
+slm_private i zakłada publiczne wrappery z tymi samymi sygnaturami/grantami service-only.
+Wspólna blokada advisory zabezpiecza zapisy i zmiany finansów. Finansowy trigger
+historii działa przed triggerem powiadomień; nie zdublowano triggera niezmienności.
+Granty/RLS zweryfikowano w katalogach systemowych i testami rzeczywistych ról.
+
+Zmieniono historyczną migrację recovery stosowaną wcześniej zdalnie: ryzyko różnicy
+tekstu migracji w historii istnieje. Zmiana jest konieczna dla fresh bootstrap:
+nowa późniejsza migracja nie mogłaby ominąć wcześniejszego błędu startu.
+Warunkowy REVOKE ma ten sam efekt tam, gdzie funkcja istnieje; brak zmiany docelowego
+schematu SLM, więc nie dodano sztucznej migracji ani nie naprawiano zdalnej historii.
+Dwie migracje finansów/push były dotąd niewdrożone zdalnie według dokumentacji;
+teraz sprawdzono ich pełne zastosowanie tylko lokalnie. Przed przyszłym deploy
+porównać rzeczywistą historię zdalną read-only i nie wykonywać repair/replay na ślepo.
+Nie wykonano żadnych zmian zdalnych ani commita/pusha w tym zadaniu.
+
+4. RZECZYWISTY START I INWENTARYZACJA
+W app uruchomiono oficjalny CLI 2.121.0 przez npx supabase start.
+Pierwsza próba po warunkowym REVOKE wykryła błąd finance_preview; kolejna po poprawce
+zakończyła się exit 0. Nie stosowano ignore-health-check ani reset.
+Przy nieudanym starcie CLI sam zatrzymał nowo tworzone kontenery; odczyt stanu
+potwierdził brak pozostawionej bazy przed ponowieniem.
+
+Baza: supabase_db_sunday-league-mates, lokalny projekt sunday-league-mates.
+13/13 wpisów w supabase_migrations.schema_migrations.
+29 tabel public.slm_*, 29/29 RLS włączone, 13 polityk public, 10 triggerów użytkownika.
+21 funkcji o nazwach zawierających slm w public/slm_private (nie licząc helperów).
+0 publicznych slm RPC z grantem anon. SECURITY DEFINER dostępne authenticated
+wyłącznie helpery własnej sesji i roli admin; ograniczony search_path zachowany.
+Po testach: auth.users=0, slm_events=0, brak pozostawionych slm_backend_test_* DB.
+Studio http://127.0.0.1:54323, API http://127.0.0.1:54321 (standardowe porty CLI).
+Nie wypisywano kluczy CLI ani DSN do raportu.
+
+Kontenery DB, Auth, Kong, Storage, Realtime, Studio, pg-meta i Analytics healthy.
+REST i Edge runtime running (bez Docker healthcheck). Inbucket healthy; w testach
+nie wywoływano wysyłek Auth/mail/SMS. Żadnych realnych haseł/JWT/kont w fixtures.
+Nie jest to test uruchomionego handlera accounts przez HTTP ani blokowania maili.
+
+Vector FAIL: restartuje się, docker_logs próbuje TCP [fdc4:f303:9324::254]:2375
+i otrzymuje NetworkUnreachable. To osobny problem dostępu kolektora do Docker API.
+Nie udostępniono niezabezpieczonego Docker TCP ani nie zmieniano Windows/network,
+nie wyłączano kontroli zdrowia lub RLS. Rozwiązanie dostępu Vector wymaga osobnej
+decyzji/konfiguracji infrastruktury; nie blokuje wykonanych testów bazy i RPC.
+
+5. WYKONANE TESTY
+Bezpośrednio na głównej lokalnej bazie: settlements.sql, notifications.sql,
+integration-contracts.sql — wszystkie exit 0, transakcje zakończone ROLLBACK.
+Fixtures sprawdzają m.in. grosze, gości/odpowiedzialność, próg 10 po 17:00,
+zastąpienie, nieobecność, rewizje, niezmienność, FIFO kredytów, częściowe wpłaty,
+korekty do zera, brak blokady przyszłych meczów, odbiorców i brak autoawansu,
+leases, preferencje, odwołanie, spóźnione operacje urządzenia i granty.
+
+Nowy app/scripts/test-backend-local.py — końcowo 25/25 kontroli PASS.
+Tworzy nową bazę slm_backend_test_<losowy sufiks> w dokładnie wskazanym lokalnym
+kontenerze, kopiuje wyłącznie schemat z grantami i właścicielami. Odtwarzanie schematu
+używa lokalnego supabase_admin, a testy postgres/service_role/authenticated/anon.
+Nie kopiuje danych ani env i usuwa tylko własną utworzoną DB w finally.
+Pierwsze próby harnessu wymagały supabase_admin zamiast postgres do restore oraz
+72-znakowego fikcyjnego sekretu urządzenia; poprawiono fixture, bez osłabienia walidacji.
+Nie są to błędy kodu aplikacji. Końcowy przebieg i sprzątanie przeszły.
+
+25 pozycji końcowego przebiegu (pierwsze trzy to zestawy wieloasercyjne):
+1 settlements.sql
+2 notifications.sql
+3 integration-contracts.sql
+4 zawodnik nie tworzy meczu
+5 dwa równoległe połączenia: dokładnie jeden skuteczny zapis na ostatnie miejsce
+6 brak duplikatów/przepełnienia
+7 gość zajmuje miejsce
+8 rezerwa bez automatycznego awansu
+9 dokładny błąd duplikatu oraz brak zarządzania cudzym gościem
+10 poprawna sesja authenticated czyta przez RLS
+11 hasło tymczasowe blokuje RLS
+12 stara sesja po zmianie security_version nie czyta RLS/RPC
+13 brak możliwości samodzielnego nadania admina
+14 anon nie może wywołać service RPC
+15 rollback decyzji wpłaty cofa stan wpłaty i powiadomienie
+16 akceptacja i retry request_id: dokładnie jedno powiadomienie
+17 źródło finansowe zapisane razem z powiadomieniem
+18 pojedynczy wpis wpłaty w ledger
+19 inbox i rzeczywisty rekord kolejki push zapisane razem
+20 RLS ukrywa dziennik innego zawodnika
+21 dwa zatwierdzone długi blokują zapis/gościa i tworzą powiadomienie blokady
+22 częściowa wpłata FIFO usuwa jeden dług i atomowo odblokowuje zapis
+23 odrzucenie wpłaty tworzy powiadomienie
+24 odwołany mecz blokuje zapis
+25 czas serwera zamyka zapisy na początku meczu
+
+Supabase db lint --local --schema public,slm_private --level warning --fail-on error:
+exit 0, brak błędów. Jedno ostrzeżenie slm_push_claim: inicjalizacja result jsonb:='[]'
+korzysta z niejawnego text->jsonb; funkcja została wykonana w testach poprawnie.
+Nie zmieniano działającej migracji wyłącznie dla kosmetycznego jawnego castu.
+
+Powtórzono: ESLint PASS, build/TypeScript PASS (ostrzeżenie chunków >500 kB),
+Vitest 66/66 PASS i bootstrap Node mock 6/6 PASS.
+Cypress w tym zadaniu NIE PONAWIANO (brak zmian web/TS); poprzedni wynik 17.10: 10/10.
+Nie wykonywano testów Android/iOS/FCM, rzeczywistych JWT/logowania przez HTTP,
+równoczesnych accept/accept i accept/reject ani pełnego audytu wszystkich CRUD RLS.
+Nie przedstawiać testowych wpisów auth.sessions jako prawdziwych sesji Supabase Auth.
+
+6. ODTWORZENIE I DALEJ
+Z repo na feat/integration:
+cd app
+npx --yes --package=supabase@2.121.0 supabase start
+python scripts/test-backend-local.py
+npx --yes --package=supabase@2.121.0 supabase db lint --local --schema public,slm_private --level warning --fail-on error
+Nie używać db reset do powtórzenia testów; harness używa własnej nowej bazy.
+Przy start/status nie publikować outputu z lokalnymi kluczami.
+Stary test-integration-local.ps1 wskazuje inny projekt w .cache; nie uruchamiać go
+równocześnie na domyślnych portach. Aktualny przebieg używa app/supabase.
+
+Następny krok: decyzja w sprawie Vector/Docker API, lokalne HTTP Auth/Edge oraz
+pozostałe wyścigi finansowe, potem odbiór urządzenia. Brak zmian zakresu i UI.
+CAPTCHA nadal odłożona, iOS/FCM niezweryfikowane; raporty 14/17.10 są historyczne.
+
+AKTUALNE ODTWORZENIE (repo na feat/integration, bez resetów/deploy):
+cd app
+python scripts/configure-auth-local.py
+python scripts/prepare-edge-local.py
+npx --yes --package=supabase@2.121.0 supabase functions serve --workdir ../.cache/http-edge --env-file ../.cache/http-edge/worker.env
+W drugim terminalu app:
+node scripts/test-accounts-local.mjs
+node scripts/test-edge-local.mjs
+python scripts/test-backend-local.py
+npm run dev -- --host 127.0.0.1 --port 5174 --strictPort
+Skrypty wymagają działającego lokalnego Supabase. configure-auth zachowuje stare
+kontenery jako stopped backup, nie zmienia bazy. Nie kopiować env do rozmowy/Git.
+JDK21 do builda Android znajduje się w Android Studio jbr; domyślny java na PATH
+jest17 i nie należy go mylić z użytym JDK21. Nie zmieniano globalnego JAVA_HOME.
