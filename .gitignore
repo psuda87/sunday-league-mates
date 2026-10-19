@@ -168,3 +168,10 @@ app/android/app/src/main/assets/capacitor.plugins.json
 app/android/capacitor-cordova-android-plugins/
 cypress/screenshots/
 cypress/videos/
+
+# Konfiguracja Firebase/APNs tylko lokalnie; nigdy klucze konta usługi w repozytorium.
+google-services.json
+GoogleService-Info.plist
+*service-account*.json
+*.p8
+*.p12

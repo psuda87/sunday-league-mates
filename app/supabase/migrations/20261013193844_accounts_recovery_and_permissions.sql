@@ -1,5 +1,11 @@
--- Funkcja triggera pozostaje; odbieramy jedynie przypadkowy dostęp klientów do RPC.
-revoke execute on function public.rls_auto_enable() from public,anon,authenticated;
+-- Opcjonalna funkcja środowiska zarządzanego, nie jest zależnością SLM.
+-- Zachowaj trigger/funkcję, jeśli istnieją; lokalna baza nie musi ich zawierać.
+do $$
+begin
+ if to_regprocedure('public.rls_auto_enable()') is not null then
+  execute 'revoke execute on function public.rls_auto_enable() from public,anon,authenticated';
+ end if;
+end $$;
 
 create index slm_account_rate_limits_bucket_idx on public.slm_account_rate_limits(bucket);
 

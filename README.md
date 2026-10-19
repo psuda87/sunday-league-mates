@@ -1,5 +1,12 @@
 # Sunday League Mates
 
+Na `feat/integration` połączono lokalnie moduły wydarzeń, rozliczeń i powiadomień.
+TypeScript, ESLint i build webowy przeszły. Migracje, SQL/RLS/wyścigi, Cypress,
+Android oraz rzeczywiste FCM pozostają niewykonane na zintegrowanej wersji.
+[Raport integracji i kolejność sześciu migracji](docs/INTEGRATION_REPORT.md).
+[Rozliczenia](docs/SETTLEMENTS_MODULE.md), [powiadomienia](docs/PUSH_NOTIFICATIONS.md),
+[adapter finansowy](docs/PUSH_FINANCE_ADAPTER.md). Brak Firebase nie blokuje inbox.
+
 Aplikacja mobilna dla jednej zamkniętej grupy grającej w piłkę na orliku. Docelowo ma obsługiwać zapisy na mecze, gości i rezerwę, ewidencję składek, oceny zawodników i wyrównywanie drużyn. Pierwszą platformą jest Android; wspólny kod umożliwia późniejsze przygotowanie iOS.
 
 Na `feat/auth` przygotowano moduł kont: logowanie loginem lub telefonem, wymuszoną zmianę hasła, zapamiętywanie sesji, profil i panel administratora. Backend Supabase jest wdrożony wyłącznie w `hjtcyybkxebvdropchac`; źródła i migracje znajdują się w repozytorium. Użytkownik utworzył administratora i potwierdził podstawowe testy Androida. Mecze, rozliczenia, oceny i powiadomienia pozostają poza bieżącym etapem.

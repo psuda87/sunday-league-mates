@@ -2,14 +2,14 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { randomBytes, randomUUID } from 'node:crypto';
 import { checkFirstAdmin, createFirstAdmin, validateBootstrap } from './bootstrap-admin-core.mjs';
-const values = () => ({login:' Żółw_Test ',phone:'+1 (202) 555-0111',password:randomBytes(24).toString('base64url'),confirm:'CREATE_FIRST_ADMIN'});
+const values = () => ({login:' Żółw_Test ',phone:'+48 (000) 000-111',password:randomBytes(24).toString('base64url'),confirm:'CREATE_FIRST_ADMIN'});
 
-test('walidacja nie zgaduje kraju, wymaga świadomego potwierdzenia i limitu UTF-8', () => {
+test('walidacja polskiego numeru, świadomego potwierdzenia i limitu UTF-8', () => {
   const input=values();
   const validated=validateBootstrap(input);
-  assert.equal(validated.login,'Żółw_Test'); assert.equal(validated.phone,'+12025550111');
+  assert.equal(validated.login,'Żółw_Test'); assert.equal(validated.phone,'+48000000111');
   assert.throws(()=>validateBootstrap({...input,confirm:''}),/Potwierdzenie/);
-  assert.throws(()=>validateBootstrap({...input,phone:'2025550111'}),/prefiksu/);
+  assert.throws(()=>validateBootstrap({...input,phone:'2025550111'}),/9 cyfr/);
   assert.doesNotThrow(()=>validateBootstrap({...input,password:randomBytes(6).toString('base64url')}));
   assert.throws(()=>validateBootstrap({...input,password:randomBytes(5).toString('base64url')}),/minimum 8/);
   assert.throws(()=>validateBootstrap({...input,password:'ą'.repeat(37)}),/72 bajty/);

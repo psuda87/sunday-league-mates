@@ -3,6 +3,74 @@ import { webcrypto } from 'node:crypto';
 import { createHandler, displayName, normalizeLogin, normalizePhone, randomPassword } from './handler';
 
 afterEach(() => vi.unstubAllGlobals());
+describe('brama rozliczeń (kontrolowane RPC)', () => {
+  async function attempt(code: string, temporary = false) {
+    vi.stubGlobal('crypto', webcrypto);
+    const id = webcrypto.randomUUID(), sid = webcrypto.randomUUID(), request = webcrypto.randomUUID();
+    const token = ['synthetic', btoa(JSON.stringify({ sub: id, session_id: sid })), 'unsigned'].join('.');
+    let called = false;
+    vi.stubGlobal('fetch', vi.fn(async (url: string, options: RequestInit) => {
+      const reply = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status });
+      if (url.includes('slm_account_rate')) return reply(true);
+      if (url.endsWith('/auth/v1/user')) return reply({ id });
+      if (url.includes('slm_account_context')) return reply({ role: 'member', must_change_password: temporary });
+      if (url.includes('slm_settlements_dispatch')) {
+        called = true;
+        const body = JSON.parse(options.body as string);
+        expect(body.p_user).toBe(id); expect(body.p_session).toBe(sid); expect(body.p_action).toBe('approve');
+        expect(body.p_body.request_id).toBe(request);
+        return reply({ code: 'P0001', message: code }, 400);
+      }
+      throw new Error('Nieoczekiwane żądanie');
+    }));
+    const handler = createHandler({ url: 'https://example.invalid', anon: '', service: '', origins: [] });
+    const response = await handler(new Request('https://example.invalid', { method: 'POST', headers: { authorization: 'Bearer ' + token },
+      body: JSON.stringify({ action: 'settlements_approve', request_id: request, p_user: webcrypto.randomUUID(), role: 'admin' }) }));
+    return { response, called };
+  }
+  it('nie ufa roli ani tożsamości z formularza i zachowuje identyfikator operacji', async () => {
+    const r = await attempt('forbidden');
+    expect(r.called).toBe(true); expect(r.response.status).toBe(403); expect((await r.response.json()).code).toBe('forbidden');
+  });
+  it('odrzuca hasło tymczasowe przed wywołaniem finansowego RPC', async () => {
+    const r = await attempt('forbidden', true); expect(r.called).toBe(false); expect(r.response.status).toBe(403);
+  });
+  it.each(['stale_version', 'already_approved', 'payment_processed', 'idempotency_conflict'])('tłumaczy bezpiecznie konflikt %s', async code => {
+    const r = await attempt(code); expect(r.response.status).toBe(409); expect((await r.response.json()).code).toBe(code);
+  });
+});
+describe('brama wydarzeń', () => {
+  async function attempt(temporary: boolean) {
+    vi.stubGlobal('crypto', webcrypto);
+    const id = webcrypto.randomUUID(), sid = webcrypto.randomUUID();
+    const token = ['synthetic', btoa(JSON.stringify({ sub: id, session_id: sid })), 'unsigned'].join('.');
+    let eventsCalled = false;
+    vi.stubGlobal('fetch', vi.fn(async (url: string, options: RequestInit) => {
+      const reply = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status });
+      if (url.includes('slm_account_rate')) return reply(true);
+      if (url.endsWith('/auth/v1/user')) return reply({ id });
+      if (url.includes('slm_account_context')) return reply({ user_id: id, role: 'member', must_change_password: temporary });
+      if (url.includes('slm_events_dispatch')) {
+        eventsCalled = true;
+        const body = JSON.parse(options.body as string);
+        expect(body.p_user).toBe(id); expect(body.p_session).toBe(sid); expect(body.p_action).toBe('join');
+        return reply({ code: 'P0001', message: 'event_full' }, 400);
+      }
+      throw new Error('Nieoczekiwane żądanie testowe');
+    }));
+    const handler = createHandler({ url: 'https://example.invalid', anon: '', service: '', origins: [] });
+    const response = await handler(new Request('https://example.invalid', { method: 'POST', headers: { authorization: 'Bearer ' + token },
+      body: JSON.stringify({ action: 'events_join', p_user: webcrypto.randomUUID(), role: 'admin' }) }));
+    return { response, eventsCalled };
+  }
+  it('wymaga zmiany hasła przed wywołaniem RPC wydarzeń', async () => {
+    const r = await attempt(true); expect(r.response.status).toBe(403); expect(r.eventsCalled).toBe(false);
+  });
+  it('przekazuje zweryfikowaną tożsamość i bezpiecznie tłumaczy odmowę limitu', async () => {
+    const r = await attempt(false); expect(r.eventsCalled).toBe(true); expect(r.response.status).toBe(409);
+    expect((await r.response.json()).code).toBe('event_full');
+  });
+});
 it('generuje hasła tymczasowe o długości dokładnie 12 znaków', () => {
   vi.stubGlobal('crypto', webcrypto);
   const samples = new Set(Array.from({ length: 100 }, () => randomPassword()));
@@ -19,9 +87,9 @@ describe('granice modułu kont', () => {
     expect(r.status).toBe(503);expect((await r.json()).code).toBe('service_unavailable');
     expect(fetchMock.mock.calls.some(call=>call[0].includes('logout'))).toBe(false);
   });
-  it('normalizuje aliasy bez zgadywania kraju i odrzuca login telefoniczny', () => {
+  it('normalizuje aliasy z domyślną Polską i odrzuca login telefoniczny', () => {
     expect(normalizePhone('+48 (555) 010-123')).toBe('+48555010123');
-    expect(() => normalizePhone('555010123')).toThrow();
+    expect(normalizePhone('555010123')).toBe('+48555010123');
     expect(normalizeLogin(' Żółw_27 ')).toBe('Żółw_27');
     expect(() => normalizeLogin('+48555010123')).toThrow();
     expect(() => normalizeLogin('login,phone.eq.other')).toThrow();
@@ -83,5 +151,44 @@ describe('granice modułu kont', () => {
     const result=await handler(new Request('https://example.invalid',{method:'POST',body:JSON.stringify({action:'login',identifier:'Fikcyjny',password:webcrypto.randomUUID()})}));
     expect(authStarted).toBe(true);
     expect(result.status).toBe(401);
+  });
+});
+
+describe('lokalna allowlista CORS bez bramy Kong', () => {
+  const handler = createHandler({url:'http://127.0.0.1:54321',anon:'',service:'',origins:['http://localhost:5174']});
+  it('preflight zwraca wyłącznie zatwierdzony origin', async () => {
+    const r=await handler(new Request('http://localhost',{method:'OPTIONS',headers:{Origin:'http://localhost:5174'}}));
+    expect(r.status).toBe(204);expect(r.headers.get('Access-Control-Allow-Origin')).toBe('http://localhost:5174');
+  });
+  it('obcy origin jest odrzucony bez nagłówka dostępu', async () => {
+    const r=await handler(new Request('http://localhost',{method:'OPTIONS',headers:{Origin:'https://untrusted.fixture.invalid'}}));
+    expect(r.status).toBe(403);expect(r.headers.has('Access-Control-Allow-Origin')).toBe(false);
+  });
+});
+
+describe('brama wielu grup', () => {
+  it.each(['groups_list','matches_join','group_finance_approve'])('używa zweryfikowanej tożsamości: %s', async action => {
+    vi.stubGlobal('crypto',webcrypto);
+    const id=webcrypto.randomUUID(),sid=webcrypto.randomUUID();
+    const token=['synthetic',btoa(JSON.stringify({sub:id,session_id:sid})),'unsigned'].join('.');
+    const calls:string[]=[];
+    vi.stubGlobal('fetch',vi.fn(async (url:string,options:RequestInit)=>{
+      const response=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status});
+      if(url.includes('slm_account_rate'))return response(true);
+      if(url.endsWith('/auth/v1/user'))return response({id});
+      if(url.includes('slm_account_context'))return response({role:'member',must_change_password:false});
+      if(url.includes('_dispatch')){calls.push(url);const body=JSON.parse(options.body as string);expect(body.p_user).toBe(id);expect(body.p_session).toBe(sid);expect(body.p_body).not.toHaveProperty('role');expect(body.p_body).not.toHaveProperty('password');return response({code:'P0001',message:'forbidden'},400);}
+      throw new Error('Nieoczekiwany kontrakt');
+    }));
+    const handler=createHandler({url:'https://example.invalid',anon:'',service:'',origins:[]});
+    const r=await handler(new Request('https://example.invalid',{method:'POST',headers:{authorization:'Bearer '+token},body:JSON.stringify({action,p_user:webcrypto.randomUUID(),role:'admin',password:webcrypto.randomUUID()})}));
+    expect(r.status).toBe(403);expect(calls).toHaveLength(1);
+  });
+  it('nie uruchamia poczty bez konfiguracji',async()=>{
+    vi.stubGlobal('fetch',vi.fn(async()=>new Response('true')));
+    const handler=createHandler({url:'https://example.invalid',anon:'',service:'',origins:[]});
+    const r=await handler(new Request('https://example.invalid',{method:'POST',body:JSON.stringify({action:'signup',email:'fixture@example.invalid',password:'fictional only'})}));
+    expect(r.status).toBe(503);expect((await r.json()).code).toBe('mail_unconfigured');
+    expect(vi.mocked(fetch).mock.calls.every(([url])=>String(url).includes('slm_account_rate'))).toBe(true);
   });
 });

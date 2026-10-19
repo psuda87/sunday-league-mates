@@ -52,3 +52,21 @@ try {
 } catch(Exception e) {
     logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
 }
+
+// A local debug Capacitor configuration must never enter a release artifact.
+gradle.taskGraph.whenReady { graph ->
+    if (graph.allTasks.any { it.project == project && it.name.toLowerCase().contains('release') }) {
+        def configFile = file('src/main/assets/capacitor.config.json')
+        if (configFile.exists()) {
+            def cap = new groovy.json.JsonSlurper().parse(configFile)
+            if (cap.android?.allowMixedContent == true || cap.server?.cleartext == true) {
+                throw new GradleException('Local Android transport is forbidden in release builds. Sync without SLM_LOCAL_ANDROID.')
+            }
+        }
+        fileTree('src/main/assets/public/assets').matching { include '*.js' }.each { asset ->
+            if (asset.text.contains('http://127.0.0.1:54321') || asset.text.contains('http://localhost:54321')) {
+                throw new GradleException('Release contains a localhost Supabase endpoint. Build with the approved HTTPS endpoint first.')
+            }
+        }
+    }
+}

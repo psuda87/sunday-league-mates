@@ -56,3 +56,16 @@ Pods/
 # Supabase CLI local state
 /supabase/.temp/
 /supabase/.branches/
+
+# Local demo build and Python test caches
+/dist-demo/
+__pycache__/
+*.pyc
+
+# Local distributables and database snapshots; never publish user data
+*.apk
+*.aab
+*.sqlite
+*.sqlite3
+*.db
+*.dump

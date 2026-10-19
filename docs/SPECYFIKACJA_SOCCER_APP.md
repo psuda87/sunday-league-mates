@@ -1,6 +1,42 @@
 # Sunday League Mates — specyfikacja pierwszej wersji
 
+## Zatwierdzona aktualizacja SLM 1.0 — 19.10.2026
+
+Ta sekcja ma pierwszeństwo nad historycznymi zapisami o jednej grupie, braku
+samorejestracji i dokładnym podziale kosztu. Nie oznacza wykonania nowych funkcji.
+Docelowy interfejs: origin/feat/ui-beta d0f9fa9 (Premium3.18, España).
+
+- Docelowo samorejestracja e-mail + hasło z weryfikacją przez Supabase Auth.
+  Istniejące konta zachowują login/telefon do migracji. Poczta/SMTP, domena,
+  podpis i dokumenty prawne to osobne decyzje. Nie tworzymy tabeli haseł.
+- Wiele niezależnych grup, grupowe role i widoczność public/private zgodnie
+  z dokumentacją zatwierdzonego UI; demo RAM nie jest działającym backendem.
+- Każda grupa ma własny ledger, saldo, wpłaty, należności i nadwyżki. Główny admin
+  zarządza wszystkimi finansami swojej grupy; organizator konkretnego meczu tylko
+  jego rozliczeniami. Nie ma globalnego admina zatwierdzającego codzienne wpłaty.
+- Brak wglądu administratorów w szczegóły finansów innych grup. Globalny jest tylko
+  licznik kwalifikujących się zaległych meczów konta odpowiedzialnego. Dwie zaległości
+  ze wszystkich grup blokują nowe zapisy na płatne mecze w całym SLM; inni admini
+  dostają status uprawnienia, nie cudze grupy/kwoty/salda.
+- Opłata udziału w górę do pełnej złotówki; różnica od rzeczywistego kosztu jest
+  nadwyżką grupy, widoczną tylko jej administratorom. Rozróżniamy nadwyżkę naliczoną
+  i faktycznie otrzymaną. Nie utożsamiamy jej z zaliczką/nadpłatą zawodnika.
+- Nie przeliczamy istniejących rozliczeń; wymagana wersja polityki i bezpieczne
+  mapowanie/migracja z uzgodnieniem historycznych operacji.
+
+Szczegóły kontraktów i punktów otwartych:
+[FINANCE_SLM_1_0_CONTRACTS.md](FINANCE_SLM_1_0_CONTRACTS.md),
+[AUTH_MODEL_SLM_1_0.md](AUTH_MODEL_SLM_1_0.md),
+[UI_INTEGRATION_MAP.md](UI_INTEGRATION_MAP.md).
+Pozostała treść zachowuje historyczne ustalenia i propozycje; sprzeczne opisy
+aktualnej implementacji legacy nie są nowymi wymaganiami SLM 1.0.
+
+
 Wersja: 1.2 • Data: 13.10.2026 • Język aplikacji: polski
+
+Uzupełnienie 14.10.2026: bieżące zasady rozliczeń mają pierwszeństwo zgodnie
+z sekcją „Aktualizacja zasad rozliczeń” po rozdziale 6. Moduł na
+`feat/settlements` jest przygotowany lokalnie, bez uruchomionej weryfikacji ani wdrożenia.
 
 Dokument przeznaczony do dalszej pracy w VS Code, Android Studio i Codexie. Przygotowano repozytorium i szkielet Ionic React + TypeScript + Capacitor. Zatwierdzona nazwa produktu: Sunday League Mates; identyfikator: pl.psuda87.slm. Kierunek wizualny i karta zawodnika są zatwierdzone zgodnie z rozdziałami 4 i 12. Wersja 1.2 aktualizuje wyłącznie dokumentację, bez implementacji wyglądu ani uwierzytelniania.
 
@@ -44,6 +80,7 @@ Zasady oznaczone jako „ustalone” wynikają z rozmowy z użytkownikiem. „Pr
 
 - Nie ma publicznej rejestracji ani zaproszeń mailowych. Nie wysyłamy SMS-ów ani automatycznej poczty, także przy tworzeniu konta i resetowaniu hasła.
 - Konto pozwala logować się numerem telefonu lub unikalnym loginem/pseudonimem, z tym samym hasłem. Pole logowania ma etykietę „Login lub numer telefonu”. Numer jest identyfikatorem, bez weryfikacji SMS.
+- Ustalenie 14.10.2026: domyślnie polskie numery, dokładnie 9 cyfr, również wejście z +48, 0048 i spacjami. Formularze mają stały prefiks +48; zapis +48XXXXXXXXX. Za krótki lub za długi numer jest odrzucany. Istniejące konta i zagraniczne aliasy zachowujemy bez migracji danych; niezmieniony historyczny numer może pozostać przy edycji innych danych.
 - Administrator ustawia hasło tymczasowe. Pierwsze logowanie wymaga jego zmiany przed korzystaniem z pozostałych funkcji aplikacji.
 - Generowane hasło tymczasowe ma maksymalnie 12 znaków; moduł generuje dokładnie 12 znaków kryptograficznie losowych. Hasło ustawiane przez użytkownika wymaga minimum 8 znaków (maksimum 72 bajty UTF-8 w obecnym Supabase Auth); maksimum 12 znaków nie dotyczy własnego hasła użytkownika.
 - Administrator może resetować hasło do tymczasowego i przekazać je ręcznie. Po takim resecie następne logowanie ponownie wymaga zmiany hasła. Administrator nie może odczytać obecnego hasła zawodnika.
@@ -147,6 +184,35 @@ Sama nieobecność nie anuluje opłaty. Administrator może rozstrzygnąć wyją
 | Z 13 osób jedna rezygnuje, administrator anuluje jej opłatę | 12 udziałów po 22,50 zł |
 | Wśród 10 osób jest zawodnik i jego jeden gość | Zawodnik odpowiada za 54 zł: dwa udziały po 27 zł |
 
+### Aktualizacja zasad rozliczeń — 14.10.2026, polecenie użytkownika
+
+Poniższe ustalenia mają pierwszeństwo przed historycznymi zapisami rozdziałów
+6 i 8 dotyczącymi obowiązku każdej rezygnacji po 17:00, automatycznego naliczania
+na początku oraz odłożonych częściowych wpłat:
+
+- Po rezygnacji od 17:00, w lokalnej strefie wydarzenia, domyślny obowiązek
+  pozostaje tylko wtedy, gdy liczba zapisanych spada poniżej minimum 10 i nie
+  nastąpi skuteczne zastępstwo. Przy pozostającym minimum 10 domyślnie brak opłaty.
+  Skuteczny zastępca przejmuje domyślne zobowiązanie FIFO. Administrator może
+  zmienić decyzję; jego jawne rozstrzygnięcie ma pierwszeństwo.
+- Obecność fizyczna nie oznacza automatycznego zwolnienia ani naliczenia.
+  Administrator może ją poprawiać przed, podczas i po meczu. Roboczy podział
+  jest dynamiczny, a ostateczny wymaga zatwierdzenia administratora po zakończeniu.
+- Koszt dzieli się równo na płatne udziały, również gości, z dokładnym rozdziałem
+  groszy. Gości finansuje zapraszający; nie mają własnych sald.
+- Administrator rejestruje dowolną dodatnią wpłatę; zawodnik zgłasza wpłatę do
+  akceptacji/odrzucenia. Zgłoszenie nie zmienia salda. Wpłaty pokrywają najstarsze
+  należności, mogą być częściowe i tworzyć nadpłatę. Dodatnie saldo to nadpłata,
+  ujemne to zadłużenie. Brak banków, bramek i BLIK.
+- Dwa różne zakończone i zatwierdzone mecze z kwotą pozostałą po pokryciu wpłatami
+  blokują nowe zapisy i gości po stronie serwera. Jedno wydarzenie z kilkoma
+  udziałami pozostaje jednym meczem. Wpłata/korekta może odblokować konto.
+- Korekta po zatwierdzeniu przelicza równy podział i dopisuje różnice bez usuwania
+  poprzednich kwot. Zachowuje powód i wykonawcę. Operacje są atomowe, kontrolują
+  role/RLS oraz chronią przed powtórnym zatwierdzeniem meczu lub wpłaty.
+
+Szczegóły implementacji i niewykonanej weryfikacji: [SETTLEMENTS_MODULE.md](SETTLEMENTS_MODULE.md).
+
 ## 7. Goście — ustalone
 
 Każdy uprawniony zawodnik może dodać osobę bez konta, podając jej imię lub pseudonim. Gość jest uczestnikiem konkretnego wydarzenia, nie staje się członkiem grupy.
@@ -180,6 +246,23 @@ Propozycja wdrożeniowa: potwierdzanie całych pozycji (udział własny/gość) 
 
 ## 9. Faktyczna obecność i oceny
 
+### Zatwierdzone dodatki — bez implementacji w etapie wydarzeń
+
+- Odznaki za liczbę rozegranych meczów oraz serie co 10 spotkań. Szczegółowe progi liczby meczów i definicja ciągłości serii pozostają do dopracowania.
+- Odznaka za komplet obecności w miesiącu oraz odznaki okresowe: kwartał, półrocze i rok. Szczegółowe progi i zasady kwalifikacji wymagają dopracowania.
+- Odznaki zawierają datę zdobycia i opis. Nie ustalono jeszcze nazw ani wyglądu odznak.
+- Podsumowania frekwencji, bez rankingu duetów.
+- Status „Już jadę” i możliwość zgłoszenia spóźnienia. Nie zastępują faktycznej obecności oznaczanej przez administratora i nie zmieniają odpowiedzialności finansowej.
+
+### MVP — zatwierdzony kierunek, szczegóły otwarte
+
+Próg dotyczy liczby głosujących, a nie liczby głosów oddanych na zwycięzcę.
+Przy 10 uczestnikach wymagane jest minimum 6 głosujących. Wariant zastępczy
+jest oparty na średniej ocen meczowych. Nie ustalono jeszcze ogólnego progu
+dla innych liczebności ani warunków uruchomienia wariantu zastępczego.
+Remisy i uwzględnianie gości (jako głosujących i kandydatów) wymagają doprecyzowania.
+MVP, odznaki, statusy dojazdu i podsumowania nie są obecnie zaimplementowane.
+
 ### Ustalone
 
 - Zapisani uczestnicy są domyślnie obecni; administrator odznacza nieobecnych.
@@ -200,6 +283,11 @@ Propozycja wdrożeniowa: potwierdzanie całych pozycji (udział własny/gość) 
 - Jeśli administrator później oznaczy kogoś jako nieobecnego, oceny wystawione przez tę osobę i jej wystawione za ten mecz tracą ważność. Jej należność pozostaje niezależna.
 
 ## 10. Automatyczne składy
+
+### Dodatkowe ustalenia — do późniejszej implementacji
+
+- Mieszamy składy między meczami przy zachowaniu wyrównanego poziomu drużyn. Konkretny algorytm i waga różnorodności wymagają dopracowania; nie zatwierdzamy dotychczasowych propozycji algorytmicznych przez ten zapis.
+- Wskazujemy drużynę zakładającą narzutki. Sposób wskazania pozostaje do doprecyzowania.
 
 Ustalone: po zebraniu ocen aplikacja proponuje wyrównane drużyny; widok na grafice boiska z nazwami wybranymi w „Wyświetlaj mnie jako”, z loginem/pseudonimem przy braku imienia i nazwiska. Goście są podpisani podanym imieniem lub pseudonimem. Znacznik dobrego bramkarza jest wzmocnieniem drużyny, bez przydzielania stałej pozycji. Administrator może zmienić podział.
 

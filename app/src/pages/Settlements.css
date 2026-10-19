@@ -1,0 +1,8 @@
+.slm-finance-row { padding: 1rem 0; border-bottom: 1px solid var(--ion-color-step-150, #31443d); overflow-wrap: anywhere; }
+.slm-finance-row:last-child { border-bottom: 0; }
+.slm-finance-row p { margin: .45rem 0; }
+.slm-balance { font-size: 1.4rem; }
+.slm-share-list { list-style: none; margin: 0; padding: 0; }
+.slm-settlements details { margin-top: 1rem; }
+.slm-settlements pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 20rem; overflow: auto; font-size: .8rem; }
+.slm-settlements .slm-actions { flex-wrap: wrap; }

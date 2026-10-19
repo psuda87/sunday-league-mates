@@ -118,8 +118,7 @@ ochrony w RLS oraz reguł właściciela/roli; nie kopiować samego `TO authentic
 - Login: 3–32 znaki, NFC, pierwsza litera, dalej litery Unicode, cyfry, `_`, `.`, `-`.
   W bazie unikalna postać `lower(login)`; otaczające spacje są usuwane. Nie przyjmujemy
   loginu wyglądającego jak telefon. To opis bieżącej implementacji, nie nowa propozycja biznesowa.
-- Telefon: jawny prefiks kraju, format E.164; spacje, nawiasy i myślniki usuwane,
-  8–15 cyfr po `+`. Nie zgadujemy kraju, nie sprawdzamy własności SMS-em.
+- Telefon: domyślnie Polska, dokładnie 9 cyfr; dopuszczalne +48, 0048 oraz spacje, nawiasy i myślniki. Zapis +48XXXXXXXXX. W formularzach stały prefiks +48. Bez weryfikacji SMS. Istniejących zagranicznych aliasów nie przepisujemy: logowanie nadal działa, a niezmieniony numer można zachować przy edycji innych danych. Nowe numery są polskie.
 - Nowe hasło: co najmniej 8 znaków i najwyżej 72 bajty UTF-8 (granica bcrypt).
 - Tworzenie konta i reset generują dokładnie 12 znaków base64url z 9 kryptograficznie losowych bajtów (72 bity entropii). Limit 12 znaków dotyczy generatora, nie własnego hasła użytkownika. Hasło tymczasowe nadal wymaga zmiany.
 - Zmianę minimum Auth odtwarza `node app/scripts/configure-password-policy.mjs`: zmienia wyłącznie `password_min_length` na 8 i sprawdza niezmienność limitów oraz blokad wiadomości. Wdrożona funkcja `accounts`: wersja 5.
@@ -263,7 +262,7 @@ trwale polityki systemu. Skrypt działa też w PowerShell 7.
    Nie wpisuj jego wartości w komendzie ani w rozmowie.
 2. `-Check` wyłącznie odczytuje konfigurację i role. Musi potwierdzić bezpieczne Auth
    oraz brak administratora. Nie włącza usług, nie zmienia hooków, limitów lub planu.
-3. Uruchom skrypt bez `-Check`. Podaj login i numer z prefiksem kraju.
+3. Uruchom skrypt bez `-Check`. Podaj login i polski numer (9 cyfr; +48 lub 0048 opcjonalnie).
    Skrypt poprosi o hasło tymczasowe oraz jego powtórzenie przez
    `Read-Host -AsSecureString`; znaki nie są pokazywane wprost.
    Minimum 8 znaków, maksimum 72 bajty UTF-8; hasło nie jest przycinane.
@@ -378,7 +377,7 @@ po teście przez autoryzowane narzędzie właściciela, nie prawdziwe konto admi
    informować o braku potwierdzenia zdalnego. Bez klikania logout odłączenie internetu
    nie powinno samo usuwać zapisanego refresh tokenu.
 4. W panelu administratora utwórz fikcyjnego zawodnika z unikalnym loginem testowym
-   i np. numerem `+12025550199` z zarezerwowanego zakresu 555-01xx (wyłącznie alias,
+   i np. numerem `000000199` (fikcyjny, nieużywalny numer testowy; wyłącznie alias,
    nie wykonuj połączenia). Hasło tymczasowe przekaż sobie ręcznie, bez screenshotów
    lub logów. Nie resetuj i nie zmieniaj rzeczywistego administratora.
 5. Na telefonie zaloguj fikcyjnego zawodnika; administrator może pozostać zalogowany

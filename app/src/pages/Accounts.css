@@ -16,3 +16,7 @@
 .slm-managed p { margin: 8px 0; }
 .slm-temporary { overflow-wrap: anywhere; user-select: all; font-family: monospace; padding: 12px; border: 1px dashed var(--ion-color-primary); }
 @media (max-width: 380px) { .slm-panel { padding: 18px 14px; } .slm-accounts { padding: 16px 10px; } }
+
+.slm-phone-field { display: grid; grid-template-columns: auto minmax(0,1fr); gap: .5rem; align-items: center; }
+.slm-phone-prefix { padding: .5rem; color: var(--ion-color-primary); font-weight: bold; }
+.slm-phone-field small { grid-column: 1 / -1; }
