@@ -1,6 +1,6 @@
 // Demo-only input contract. No production events, API or persistence.
 export interface EventInput {
-  name:string; startsAt:string; location:string; address:string;
+  groupId:string; visibility:'private'|'public'; name:string; startsAt:string; location:string; address:string;
   durationMinutes:number; minimum:number; capacity:number; costCents:number;
 }
 export const eventZone='Europe/Warsaw';
@@ -24,6 +24,7 @@ export function eventInstant(date:string,time:string):string|null {
 }
 export function validateEvent(input:EventInput,occupied=0,now=Date.now()):string[] {
   const errors:string[]=[];
+  if(!['private','public'].includes(input.visibility))errors.push('Wybierz widoczność prywatną lub publiczną.');
   if(!Number.isFinite(Date.parse(input.startsAt))||Date.parse(input.startsAt)<=now)errors.push('Wybierz przyszłą datę i godzinę meczu.');
   if(!Number.isSafeInteger(input.durationMinutes)||input.durationMinutes<=0||input.durationMinutes>1440)errors.push('Czas trwania: liczba całkowita od 1 do 1440 minut.');
   if(!Number.isSafeInteger(input.minimum)||input.minimum<=0)errors.push('Minimum musi być dodatnią liczbą całkowitą.');
@@ -37,5 +38,5 @@ export function validateEvent(input:EventInput,occupied=0,now=Date.now()):string
 }
 export function defaultEvent(now=Date.now()):EventInput {
   const date=localEventTime(now+86400000).date;
-  return {name:'',startsAt:eventInstant(date,'18:00')!,location:'Boisko przy ul. Harcerskiej 1',address:'Harcerska 1, Chorzów',durationMinutes:90,minimum:10,capacity:15,costCents:27000};
+  return {groupId:'',visibility:'private',name:'',startsAt:eventInstant(date,'18:00')!,location:'Boisko przy ul. Harcerskiej 1',address:'Harcerska 1, Chorzów',durationMinutes:90,minimum:10,capacity:15,costCents:27000};
 }

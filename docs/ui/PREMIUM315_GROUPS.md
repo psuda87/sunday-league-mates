@@ -1,5 +1,9 @@
 # Premium España 3.15 — kontrakt grup demo
 
+Aktualizacja3.16: odroczenie wiązania wydarzeń i globalne eventRole poniżej są
+historyczne. Integracja ukończona wyłącznie w demo: [PREMIUM316_EVENTS.md](PREMIUM316_EVENTS.md).
+Grupy/członkostwa/zaproszenia nadal korzystają z jednego istniejącego GroupState.
+
 Gałąź `feat/ui-beta`, baza `a3bcaf1` z korektą `e72a36a`. Tylko izolowane
 `npm run build:demo`. Brak backendu, nowych zależności, obrazów i zmian Vercel.
 Najnowszy raport i SHA: [ODPOWIEDZI_CODEX.txt](../ODPOWIEDZI_CODEX.txt).

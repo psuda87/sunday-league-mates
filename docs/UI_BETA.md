@@ -1,3 +1,39 @@
+# Premium España 3.16 — 2026-10-19 09:54:56 CEST
+
+Wyłącznie izolowane demo. Game ma groupId/createdBy/visibility; wszystkie10 meczów
+przypisano deterministycznie do istniejących grup, bez zmiany wpisów/składów/wpłat.
+Formularz wybiera tylko grupy admina/organizatora, domyślnie private; jedna grupa
+wybierana automatycznie. Usunięto globalne eventRole. Plus korzysta na żywo
+z członkostw/uprawnień grupowych, bez zmiany56px/20px/notch i menu Mecze/Grupy/Profil.
+Uprawnienia ponownie sprawdzane przy podglądzie, zatwierdzeniu i w reducerze.
+Edycja/widoczność wyłącznie twórcy, który nadal jest członkiem grupy; brak prawa
+edycji cudzych wydarzeń dla administratora. Utrata organizer blokuje nowe mecze,
+ale nie odbiera własności już utworzonych; wyjście z grupy blokuje ich edycję.
+
+Private outsider: tylko nazwa/termin/grupa/oznaczenie, bez przycisku szczegółów,
+licznika, uczestników, profili, składów, finansów i suwaka w narzędziach.
+Public: dostęp i dotychczasowe zapisy/goście/rezerwa, bez automatycznego członkostwa.
+Ponowne zamknięcie zachowuje wszystkie wpisy i historię. Zapisany outsider ma
+ograniczony widok własnego udziału, miejsca/terminu i własnych zobowiązań;
+może wycofać swój wpis/usunąć własnego gościa, a istniejący rezerwowy ręcznie
+zająć zwolnione miejsce (bez awansu automatycznego i bez nowych zapisów/gości).
+Cudze profile/składy/wpłaty i lista grupy pozostają niedostępne. Istniejąca wpłata
+po wycofaniu zachowuje własny wgląd finansowy, bez nowych uprawnień uczestnictwa.
+Finansowy tryb admina demo działa tylko dla członków grupy; outsider zawsze tylko
+własne pozycje. Nie zmieniono zasad finansowych/FIFO/blokady dwóch zaległych meczów.
+
+STANDARD: TS i ESLint zmienionych plików OK; build demo + ścisła izolacja15 plików
+OK; Vitest164/164 w27 plikach, końcowo formularz7/7 (w tym dodatkowy przypadek
+odebrania wybranej grupy, gdy inna nadal daje prawo tworzenia). Wybrane Chromium
+320/390/768, Dark/Light/Auto, dostęp/własność/zapis/reclose/powrót profilu i krótki
+smoke grup/składów/rozliczeń OK; bez zewnętrznych żądań i błędów CSP.7 rzeczywistych
+zrzutów premium316-*.png. Bez pełnej starej regresji Chromium, produkcyjnego builda,
+Cypress i testów natywnych Android/iOS. Znane ostrzeżenie chunka Ionic >500kB.
+Backend/Auth/RPC/RLS/migracje/Firebase/finanse produkcyjne/vercel.json bez zmian;
+bez merge i ręcznego wdrożenia. Historyczne ograniczenia Dockera/backendu poniżej
+pozostają aktualne. Szczegóły: [ui/PREMIUM316_EVENTS.md](ui/PREMIUM316_EVENTS.md).
+Zakończono3.16; kolejny etap wymaga osobnego zadania.
+
 # Premium España3.15 — 2026-10-19 08:54:16 CEST
 
 Wyłącznie izolowane demo: wspólny GroupState (grupy, członkostwa, zgłoszenia),

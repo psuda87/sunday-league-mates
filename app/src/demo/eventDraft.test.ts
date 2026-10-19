@@ -1,8 +1,10 @@
+import { canCreateEvents } from './eventAccess';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { defaultEvent, eventInstant, localEventTime, validateEvent } from './eventDraft';
-import { canManageDemoEvents, charges, initialWorld, reduceWorld, registered, reserves } from './data';
+import { charges, initialWorld, reduceWorld, registered, reserves } from './data';
 afterEach(()=>vi.useRealTimers());
-const admin=()=>reduceWorld(initialWorld(),{type:'event_role',role:'admin'});
+const admin=()=>initialWorld();
+const inputEvent=()=>({...defaultEvent(),groupId:'group-1'});
 describe('demo events only',()=>{
  it('converts Warsaw dates and rejects DST gaps/ambiguity and invalid dates',()=>{
   expect(eventInstant('2026-07-01','18:00')).toBe('2026-07-01T16:00:00.000Z');
@@ -20,27 +22,27 @@ describe('demo events only',()=>{
   expect(validateEvent({...draft,costCents:0.5})).not.toEqual([]);
  });
  it('guards create/edit in reducer, allocates stable ids and deduplicates create',()=>{
-  const input=defaultEvent(),ordinary=initialWorld();
+  const input=inputEvent(),ordinary=reduceWorld(initialWorld(),{type:'user',id:'p04'});
   expect(reduceWorld(ordinary,{type:'event_create',input,key:'one'})).toBe(ordinary);
-  let world=admin();expect(canManageDemoEvents(world)).toBe(true);
+  let world=admin();expect(canCreateEvents(world)).toBe(true);
   world=reduceWorld(world,{type:'event_create',input,key:'one'});const game=world.games[0];
   expect(game.id).toBe('demo-11');expect(game.entries).toEqual([]);expect(charges(game)).toEqual([]);
   expect(reduceWorld(world,{type:'event_create',input,key:'one'})).toBe(world);
   world=reduceWorld(world,{type:'event_create',input,key:'two'});expect(world.games[0].id).toBe('demo-12');
-  expect(canManageDemoEvents(reduceWorld(world,{type:'user',id:'p02'}))).toBe(false);
+  expect(canCreateEvents(reduceWorld(world,{type:'user',id:'p04'}))).toBe(false);
   expect(reduceWorld(world,{type:'reset'})).toEqual(initialWorld());
  });
  it('edits metadata without touching entries/guests/reserve/lineup and rejects undersized limits',()=>{
   vi.useFakeTimers();vi.setSystemTime(new Date('2026-10-18T12:00:00Z'));
-  let world=admin();const game=world.games[0],input={...defaultEvent(),startsAt:game.startsAt,name:'Nowa nazwa',capacity:12,minimum:8,costCents:30001};
+  let world=admin();const game=world.games[0],input={...inputEvent(),startsAt:game.startsAt,name:'Nowa nazwa',capacity:12,minimum:8,costCents:30001};
   world=reduceWorld(world,{type:'event_update',gameId:game.id,input});
   expect(world.games[0].entries).toEqual(game.entries);expect(world.games[0].lineup).toEqual(game.lineup);expect(reserves(world.games[0])).toHaveLength(2);
   expect(charges(world.games[0]).reduce((s,r)=>s+r.due,0)).toBe(30001);
   expect(reduceWorld(world,{type:'event_update',gameId:game.id,input:{...input,capacity:11}})).toBe(world);
-  const ordinary=reduceWorld(world,{type:'event_role',role:'player'});expect(reduceWorld(ordinary,{type:'event_update',gameId:game.id,input})).toBe(ordinary);
+  const ordinary=reduceWorld(world,{type:'user',id:'p02'});expect(reduceWorld(ordinary,{type:'event_update',gameId:game.id,input})).toBe(ordinary);
  });
  it('new event supports registration, guest removal, teams and financial shares',()=>{
-  let world=reduceWorld(admin(),{type:'event_create',input:defaultEvent(),key:'demo'});const id=world.games[0].id;
+  let world=reduceWorld(admin(),{type:'event_create',input:inputEvent(),key:'demo'});const id=world.games[0].id;
   world=reduceWorld(world,{type:'join',gameId:id});world=reduceWorld(world,{type:'guest',gameId:id});expect(registered(world.games[0])).toHaveLength(2);
   world=reduceWorld(world,{type:'lineup_reset',gameId:id});expect(world.games[0].lineup?.a).toHaveLength(1);
   expect(charges(world.games[0]).reduce((sum,r)=>sum+r.due,0)).toBe(27000);

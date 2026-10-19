@@ -35,9 +35,10 @@ describe('isolated demo groups',()=>{
   expect(reduceWorld(user(w,'p02'),{type:'group_cancel',requestId:r.id}).groupState).toEqual(w.groupState);
   w=reduceWorld(w,{type:'group_cancel',requestId:r.id});expect(w.groupState.requests.find(x=>x.id===r.id)!.status).toBe('cancelled');w=reduceWorld(w,{type:'group_join',groupId:'group-1'});const next=pending(w,'join','p40');w=user(w,'p01');w=reduceWorld(w,{type:'group_decide',requestId:next.id,accept:true});expect(membership(w,'group-1','p40')).toBeTruthy();coherent(w);
  });
- it('keeps organizer permission group-local and independent from event role',()=>{
+ it('keeps organizer permission group-local and independent from roles in other groups',()=>{
   let w=user(initialWorld(),'p04');const before=w;expect(groupCanOrganize(w,'group-1')).toBe(false);expect(reduceWorld(w,{type:'group_permission',groupId:'group-1',targetId:'p04',allow:true})).toBe(w);
-  w=reduceWorld(w,{type:'event_role',role:'admin'});expect(groupAdmin(w,'group-1')).toBe(false);expect(groupCanOrganize(w,'group-1')).toBe(false);
+  // Other group roles do not grant administration here.
+  expect(groupAdmin(w,'group-1')).toBe(false);expect(groupCanOrganize(w,'group-1')).toBe(false);
   w=user(w,'p01');w=reduceWorld(w,{type:'group_permission',groupId:'group-1',targetId:'p04',allow:true});expect(groupCanOrganize(w,'group-1','p04')).toBe(true);expect(groupCanOrganize(before,'group-1','p04')).toBe(false);
   w=reduceWorld(w,{type:'group_permission',groupId:'group-1',targetId:'p04',allow:false});expect(groupCanOrganize(w,'group-1','p04')).toBe(false);expect(groupCanOrganize(w,'group-1','p01')).toBe(true);expect(reduceWorld(w,{type:'group_permission',groupId:'group-1',targetId:'p40',allow:true})).toBe(w);expect(reduceWorld(w,{type:'group_permission',groupId:'group-1',targetId:'p01',allow:false})).toBe(w);
  });

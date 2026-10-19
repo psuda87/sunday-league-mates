@@ -1489,3 +1489,100 @@ Chromium STANDARD: jeden pełny scenariusz nowych grup i krótki focus telefonu,
 bez pełnej starej regresji.8 rzeczywistych zrzutów w docs/ui/premium315-*.png.
 3.16 nie rozpoczęto. Zwykły push tylko feat/ui-beta, bez merge i ręcznego deploy.
 Końcowy SHA raportu w historii Git i odpowiedzi.
+
+[2026-10-19 09:54:56 CEST] Premium España3.16 — grupy i widoczność wydarzeń, wyłącznie demo
+Baza3a3a69b, zawiera2c9b2e5; stan początkowy czysty, fetch origin/feat/ui-beta
+zgodny z HEAD. Nie ponawiano implementacji3.14/3.15.
+
+Wdrożono w kodzie demo: groupId/createdBy/visibility i deterministyczne przypisanie
+10 fixture meczów; tworzenie według per-group admin/organizer, bez eventRole.
+Selektor właściwej grupy/private-public, default private, jedna grupa auto,
+zero bez formularza/plus. Recheck w podglądzie/zatwierdzeniu/reducerze, deduplikacja.
+Edycja wyłącznie właściciela-członka, bez automatycznego prawa admina grupy.
+Utrata organizer nie odbiera istniejącej własności, odejście z grupy blokuje edycję;
+pusta grupa może zniknąć, ale wydarzenia/createdBy/historia zostają archiwalne.
+
+Private outsider: wyłącznie podstawowa pozycja, bez szczegółów/licznika/list
+osób/profili/składów/finansów. Public: istniejące zapisy/goście/rezerwa, bez
+członkostwa w grupie. Reclose zachowuje wszystkich/entries/wpłaty/lineup/attendance.
+Zapisany outsider ma własny widok organizacyjny/finansowy, wycofanie i usunięcie
+własnego gościa; istniejąca rezerwa może ręcznie zająć miejsce, bez automatycznej
+promocji, nowych zapisów i nowych gości. Zachowane wpłaty po wycofaniu nadal
+widoczne własnemu płatnikowi. Brak cudzych profili/składów/wpłat i danych grupy.
+Finansowy admin demo nie działa dla outsidera, nawet po wywołaniu akcji roli.
+Nie zmieniono naliczania/FIFO/blokad; tylko projekcję i kontrolę dostępu.
+Profile zachowują gameId/groupId; powrót i ponowny guard na zmianę użytkownika.
+
+Testy: TypeScript OK; ESLint zmienionych plików OK; build izolowanego demo OK,
+izolacja15 plików/zasoby/CSP OK. Allowlista rozszerzona wyłącznie o3 nowe pliki
+demo; bez zmian vercel.json/sieci/sekretów. Vitest164/164 w27 plikach; następnie
+końcowy dodatkowy scenariusz formularza i zawężone7/7 (łącznie165 różnych testów
+sprawdzonych, nie deklaruję jednego pełnego uruchomienia165/165).
+Chromium STANDARD:320/390/768, brak przewijania poziomego, Dark/Light/Auto,
+wybór grupy, organizator tworzy, zwykły członek bez plusa/direct form, publiczny
+zapis/gość bez członkostwa, private/public/reclose, outsider own/locked,
+admin-nietwórca bez edycji, reset, profile i powrót oraz ponowna kontrola otwartej
+karty przy zmianie użytkownika. Zachowana rezerwa ręcznie zajmuje miejsce.
+Krótki smoke grup/zapisów/gości/składów/rozliczeń, bez pełnej starej regresji.
+Brak zewnętrznych żądań i błędów CSP. Plus zmierzony56×56px/wysunięcie20px.
+Odebranie uprawnień w trakcie podglądu i próby obejścia modelu sprawdzone Vitest.
+
+7 nowych prawdziwych PNG React/Ionic, bez wygenerowanych makiet:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium316-match-list.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium316-create-group-select.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium316-private-match.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium316-public-match.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium316-outsider-locked.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium316-visibility-edit.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium316-bottom-nav-320.png
+
+Ograniczenia: cała autoryzacja to wyłącznie fikcyjny model RAM, nie produkcyjne
+zabezpieczenia. Bez trwałości/serwera/multi-client concurrency. Znane ostrzeżenie
+chunka Ionic >500kB. Nie uruchamiano produkcyjnego builda, pełnej starej regresji
+Chromium, Cypress ani Android/iOS/klawiatury/safe area na urządzeniu. Nie zmieniano
+backendu/Supabase/Auth/RPC/RLS/migracji/Firebase/finansów produkcyjnych/konfiguracji
+Vercel. Bez merge i ręcznego deploy. Status automatycznego podglądu niezweryfikowany.
+Historyczne ograniczenia Dockera i niewykonanych migracji pozostają w STATUS.
+Zakończono3.16; następnego etapu nie rozpoczęto. Kontrakt:docs/ui/PREMIUM316_EVENTS.md.
+
+Lista zmienionych/nowych plików:
+app/scripts/test-demo-event-groups-browser.mjs
+app/src/demo/EventAccessView.test.tsx
+app/src/demo/EventAccessView.tsx
+app/src/demo/eventAccess.css
+app/src/demo/eventAccess.test.ts
+app/src/demo/eventAccess.ts
+docs/ui/PREMIUM316_EVENTS.md
+docs/ui/premium316-bottom-nav-320.png
+docs/ui/premium316-create-group-select.png
+docs/ui/premium316-match-list.png
+docs/ui/premium316-outsider-locked.png
+docs/ui/premium316-private-match.png
+docs/ui/premium316-public-match.png
+docs/ui/premium316-visibility-edit.png
+AGENTS.md
+app/scripts/test-demo-groups-browser.mjs
+app/src/demo/App.tsx
+app/src/demo/EventForm.test.tsx
+app/src/demo/EventForm.tsx
+app/src/demo/Finance.tsx
+app/src/demo/Groups.test.tsx
+app/src/demo/Panels.tsx
+app/src/demo/Teams.tsx
+app/src/demo/data.ts
+app/src/demo/eventDraft.test.ts
+app/src/demo/eventDraft.ts
+app/src/demo/groups.test.ts
+app/src/ui/Demo.test.tsx
+app/vite.demo.config.ts
+docs/STATUS.md
+docs/UI_BETA.md
+docs/ui/PREMIUM315_GROUPS.md
+docs/ODPOWIEDZI_CODEX.txt
+
+SHA implementacji zostanie dopisany po utworzeniu commita, w kolejnym wpisie
+raportu; bieżący końcowy SHA raportu także w odpowiedzi i historii Git.
+
+Skrypty historyczne grup i formularza dostosowano do usunięcia eventRole.
+Pełnego historycznego scenariusza formularza nie uruchamiano (poza STANDARD);
+nowy wybrany scenariusz test-demo-event-groups-browser.mjs przeszedł.

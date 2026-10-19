@@ -1,0 +1,14 @@
+/* Demo-only additions: the approved card, navigation and theme tokens stay intact. */
+.slm-event-label { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:0 2px 7px; font-size:.7rem; color:var(--ion-text-color); }
+.slm-event-label span { min-width:0; overflow-wrap:anywhere; opacity:.8; }
+.slm-event-label strong { flex-shrink:0; color:var(--slm-gold); font-size:.68rem; }
+.slm-locked-event,.slm-own-event { padding:14px; border:1px solid var(--slm-border); border-radius:16px; background:var(--slm-card-bottom); }
+.slm-locked-event h2,.slm-own-event h2 { font-size:1rem; margin:8px 0; overflow-wrap:anywhere; }
+.slm-locked-event time { font-size:.85rem; }
+.slm-locked-event > p:last-child,.slm-own-event > p { font-size:.8rem; line-height:1.5; }
+.slm-own-event ul { padding:0; list-style:none; }
+.slm-own-event li { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; margin-block:8px; }
+.slm-own-event button { min-height:44px; padding:8px; border:1px solid var(--slm-border); border-radius:9px; color:var(--ion-text-color); background:var(--ion-background-color); }
+.slm-own-event + .slm-finance { margin-top:16px; }
+.slm-event-form select { width:100%; min-width:0; min-height:44px; padding:9px; font:inherit; border:1px solid var(--slm-border); border-radius:9px; background:var(--ion-background-color); color:var(--ion-text-color); }
+.slm-event-group { overflow-wrap:anywhere; }

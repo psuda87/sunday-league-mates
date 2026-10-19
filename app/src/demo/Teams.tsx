@@ -1,3 +1,4 @@
+import { eventAccess } from './eventAccess';
 import { DemoAvatar } from './Identity';
 import { useState } from 'react';
 import type { CSSProperties, Dispatch } from 'react';
@@ -26,6 +27,7 @@ export default function DemoTeams({world,game,dispatch,onPlayer}:{world:World;ga
     const content=<><span className="slm-pitch-token" aria-hidden="true">{player?.portraitEdited?<><DemoAvatar player={player}/><span className="slm-pitch-custom-number">{player.jerseyNumber}</span></>:player?.jerseyNumber??'G'}</span><span className="slm-pitch-name" aria-hidden="true">{short}</span><span className="slm-sr-only">{name}{!player?' · gość bez profilu':''}</span></>;
     return <li key={entry.id} data-entry={entry.id} data-player={entry.playerId??''}>{swap||player?<button type="button" className={`slm-pitch-player${!swap?' slm-demo-person':''}`} aria-label={`${swap?'Wybierz do zamiany':'Otwórz kartę'}: ${name}`} aria-pressed={swap?activeSelected===entry.id:undefined} onClick={()=>choose(entry,side)}>{content}</button>:<span className="slm-pitch-player slm-pitch-guest" title="Gość bez profilu">{content}</span>}</li>;
   }
+  if(eventAccess(world,game)!=='full')return <p role="status">Składy niedostępne w tym widoku.</p>;
   return <section className="slm-demo-teams" aria-label="Demonstracyjne składy na boisku">
     <p className="slm-teams-disclaimer">Przykładowe składy · tylko pamięć demo</p>
     {game.status==='cancelled'?<div className="slm-teams-empty"><h3>Mecz anulowany</h3><p>Brak składów dla odwołanego spotkania.</p></div>:!game.lineup||registered(game).length<2?<div className="slm-teams-empty"><span aria-hidden="true">⚽</span><h3>Boisko czeka na drużyny</h3><p>{registered(game).length<2?'Potrzeba co najmniej dwóch uczestników.':'Użyj uczestników tego meczu do przykładowego podziału.'}</p><button type="button" disabled={registered(game).length<2} onClick={()=>dispatch({type:'lineup_reset',gameId:game.id})}>Utwórz przykładowe składy</button></div>:<>

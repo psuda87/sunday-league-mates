@@ -1,3 +1,4 @@
+// Legacy extended form regression, adapted to group permissions in3.16. Not part of STANDARD.
 import fs from 'node:fs/promises';
 import assert from 'node:assert/strict';
 const base = process.env.SLM_UI_URL || 'http://127.0.0.1:5175/';
@@ -47,18 +48,19 @@ try {
  await evaluate("window.$demo=selector=>[...document.querySelectorAll(selector)].find(el=>el.checkVisibility())");
  for(let i=0;i<100;i++){if(await evaluate("!!$demo('.slm-card-link')"))break;await pause();}
  await fs.mkdir(output,{recursive:true});
+ await tools(true);await select('demo-user','p04');await tools(false);
  assert.equal(await evaluate("!!$demo('[aria-label=\"Utwórz mecz\"]')"),false);
  await shot('bottom-nav-user');
- await evaluate("location.hash='match-create'");await pause();assert((await evaluate("$demo('.slm-event-form').textContent")).includes('tylko dla administratora'));
+ await evaluate("location.hash='match-create'");await pause();assert((await evaluate("$demo('.slm-event-form').textContent")).includes('Brak uprawnień'));
  assert.equal(await evaluate("!!$demo('#event-name')"),false);await back();
- await tools(true);await select('demo-event-role','admin');await tools(false);
+ await tools(true);await select('demo-user','p01');await tools(false);
  for(const mode of ['dark','light']){
   await tools(true);await evaluate(`document.querySelector('input[value=${mode}]').click()`);await tools(false);await viewport();
   await shot(`bottom-nav-admin-${mode}`);
   for(const width of [320,390,768]){await viewport(width);const geometry=await evaluate("(()=>{const nav=document.querySelector('.slm-demo-nav'),b=$demo('.slm-demo-create'),r=b.getBoundingClientRect(),n=nav.getBoundingClientRect();return {w:r.width,h:r.height,protrude:n.top-r.top,center:r.left+r.width/2,overflow:document.documentElement.scrollWidth>innerWidth,touch:[...nav.querySelectorAll('button')].every(el=>el.getBoundingClientRect().height>=44)};})()");assert.equal(geometry.w,56);assert.equal(geometry.h,56);assert.equal(geometry.protrude,20);assert.equal(geometry.center,width/2);assert.equal(geometry.overflow,false);assert(geometry.touch);assert.equal(await evaluate("[...document.querySelectorAll('.slm-demo-nav button:not(.slm-demo-create)')].map(el=>el.textContent).join(',')"),'Mecze,Grupy,Profil');assert.equal(await evaluate("document.querySelector('ion-footer').getBoundingClientRect().height"),105);if(width===320&&mode==='dark')await shot('bottom-nav-320');}
  }
  await viewport();await tools(true);await evaluate("document.querySelector('input[value=dark]').click()");await tools(false);
- await click('Historia');await evaluate("$demo('.slm-demo-create').click()");await pause();await widths();await shot('create-match');
+ await click('Historia');await evaluate("$demo('.slm-demo-create').click()");await pause();await select('event-groupId','group-1');await widths();await shot('create-match');
  assert.equal(await evaluate("document.getElementById('event-durationMinutes').value"),'90');
  await input('event-location','');await click('Podgląd meczu');assert((await evaluate("$demo('[role=alert]').textContent")).includes('Podaj miejsce'));
  await input('event-location','Boisko demo · Chorzów');await input('event-name','Mecz testowy 3.14');await input('event-cost','12,345');await click('Podgląd meczu');assert((await evaluate("$demo('[role=alert]').textContent")).includes('Koszt'));
@@ -77,10 +79,10 @@ try {
  await tab('Informacje');assert((await panel()).includes('75 minut'));assert((await panel()).includes('Boisko demo · Chorzów'));
  await tab('Rozliczenie');assert((await panel()).includes('270,01'));await widths();
  await nav('Mecze');assert.equal(await evaluate("[...document.querySelectorAll('.slm-match-filters button')].find(el=>el.textContent==='Nadchodzące')?.getAttribute('aria-pressed')"),'true');assert.equal(await evaluate("document.querySelectorAll('.slm-card-link').length"),5);assert((await evaluate("$demo('.slm-matches-screen').textContent")).includes('Zmieniony mecz demo'));
- await tools(true);await select('demo-event-role','player');await tools(false);assert.equal(await evaluate("!!$demo('.slm-demo-create')"),false);
+ await tools(true);await select('demo-user','p04');await tools(false);assert.equal(await evaluate("!!$demo('.slm-demo-create')"),false);
  await nav('Mecze');await evaluate("$demo('.slm-card-link').click()");await pause();assert.equal(await evaluate("!!$demo('.slm-demo-edit-event')"),false);
- await tools(true);await select('demo-event-role','admin');await tools(false);await click('Edytuj mecz');await tools(true);await select('demo-event-role','player');await tools(false);assert.equal(await evaluate("!!$demo('#event-name')"),false);
- await tools(true);await click('Reset danych demo');await tools(false);assert.equal(await evaluate("document.querySelectorAll('.slm-card-link').length"),4);assert.equal(await evaluate("!!$demo('.slm-demo-create')"),false);
+ await tools(true);await select('demo-user','p01');await tools(false);await click('Edytuj mecz');await tools(true);await select('demo-user','p04');await tools(false);assert.equal(await evaluate("!!$demo('#event-name')"),false);
+ await tools(true);await click('Reset danych demo');await tools(false);assert.equal(await evaluate("document.querySelectorAll('.slm-card-link').length"),4);assert.equal(await evaluate("!!$demo('.slm-demo-create')"),true);
  assert.equal(errors.length,0,errors.join('\n'));assert.equal(requests.filter(url=>!url.startsWith(base)&&!url.startsWith('data:')).length,0,'No external requests');
  console.log('Premium3.14 Chromium OK: role guards, notch geometry, 320/390/768, validation, preview/no mutation, create, join/guest, edit/cancel/limits, minimum, cost, three tabs, reset, CSP/isolation.');
 } finally { ws.close(); }

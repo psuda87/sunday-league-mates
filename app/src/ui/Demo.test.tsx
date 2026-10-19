@@ -26,7 +26,7 @@ it('opens chosen B directly from the whole card, defaults to Participants and re
   expect(screen.getByRole('img', { name: 'Sunday League Mates' }).closest('ion-content')).not.toBeNull();
   expect(document.querySelector('ion-header')).toBeNull();
   const nav = screen.getByRole('navigation', { name: 'Główna nawigacja' });
-  expect([...nav.querySelectorAll('button')].map(el=>el.textContent)).toEqual(['Mecze','Grupy','Profil']);
+  expect([...nav.querySelectorAll('button[data-tab]')].map(el=>el.textContent)).toEqual(['Mecze','Grupy','Profil']);
   const card = screen.getAllByRole('button', { name: /Otwórz szczegóły meczu:/ })[0];
   expect(card.querySelector('button, ion-button, a')).toBeNull(); fireEvent.click(card);
   expect(screen.getByRole('heading', { name: 'Szczegóły meczu' })).toBeTruthy();

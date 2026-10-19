@@ -1,3 +1,20 @@
+# Premium3.16 — wydarzenia grupowe wyłącznie w demo
+
+- Ten wpis zastępuje odroczenie integracji3.16 i globalne eventRole ze starszych
+  sekcji. Game.groupId/createdBy/visibility, eventAccess.ts i istniejący GroupState.
+  Tworzy admin/organizer wybranej grupy; edytuje tylko twórca nadal należący do niej.
+  Recheck w formularzu/reducerze/ramce profilu; nie kopiować do produkcyjnego Auth/RLS.
+- Private outsider bez udziału widzi tylko podstawową kartę, bez szczegółów/licznika.
+  Public zapis nie daje członkostwa. Reclose nie usuwa wpisów/gości/składów/wpłat;
+  outsider z zachowanym udziałem ma własny widok organizacyjny i finansowy, bez
+  cudzych profili/składów/wpłat. Istniejąca rezerwa może ręcznie zająć miejsce;
+  nowe zapisy/goście wymagają pełnego dostępu. Finance admin demo tylko w swojej
+  grupie. Zostawić ledger/FIFO/backend bez zmian. Pusta grupa może zniknąć, ale
+  jej mecze/historia zostają z groupId/createdBy i etykietą Grupa archiwalna.
+- Nawigacja Mecze/Grupy/Profil +56px/20px plus z organizujących członkostw,
+  bez zmiany wyglądu zatwierdzonych komponentów. STANDARD, bez pełnej starej
+  regresji. Patrz docs/ui/PREMIUM316_EVENTS.md. Zakończyć na3.16.
+
 # Premium3.15 — grupy tylko w demo
 
 - Najnowsze menu demo: Mecze/Grupy/Profil + osobny plus admina wydarzeń3.14.
