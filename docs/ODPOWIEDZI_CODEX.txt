@@ -1479,3 +1479,13 @@ administratorem w propozycji telefonicznej i dwie zgody. Bez powtórzenia całeg
 scenariusza grup/pełnej starej regresji. Końcowy Vitest150/150; po ostatnim
 utwardzeniu deduplikacji dodatkowo uruchomiono wyłącznie testy modelu i UI grup (19/19).
 Znane ostrzeżenie dużego chunka Ionic (>500kB) pozostaje; build jest zaliczony.
+
+[2026-10-19 09:00:04 CEST] Zapis Premium3.15
+Commit implementacji: 2c9b2e536312e16b41b9ca915497a081700ee07f.
+Kontrola28 ścieżek i diff --check zaliczona, bez sekretów/.env/artefaktów builda/
+zmian backendu/Vercel. TS,lint zmienionego zakresu,build demo/izolacja zaliczone;
+pełny Vitest150/150 i końcowa zawężona kontrola modelu/UI grup19/19 zaliczone.
+Chromium STANDARD: jeden pełny scenariusz nowych grup i krótki focus telefonu,
+bez pełnej starej regresji.8 rzeczywistych zrzutów w docs/ui/premium315-*.png.
+3.16 nie rozpoczęto. Zwykły push tylko feat/ui-beta, bez merge i ręcznego deploy.
+Końcowy SHA raportu w historii Git i odpowiedzi.
