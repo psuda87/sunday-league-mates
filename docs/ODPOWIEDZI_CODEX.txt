@@ -1586,3 +1586,14 @@ raportu; bieżący końcowy SHA raportu także w odpowiedzi i historii Git.
 Skrypty historyczne grup i formularza dostosowano do usunięcia eventRole.
 Pełnego historycznego scenariusza formularza nie uruchamiano (poza STANDARD);
 nowy wybrany scenariusz test-demo-event-groups-browser.mjs przeszedł.
+
+[2026-10-19 09:57:15 CEST] Zapis Premium3.16 i kontrola końcowa
+Commit implementacji/testów/dokumentacji/7 zrzutów: 15d91a817b5c17eb23143c30683832f94a8d191a.
+Uzupełnienie listy34 zmienionych plików: app/scripts/test-demo-events-browser.mjs
+(historyczny szerszy scenariusz formularza dostosowany do grup, bez uruchamiania).
+TS/ESLint/build demo/izolacja OK; Vitest164/164 i końcowy formularz7/7,
+wybrane Chromium STANDARD i brak zewnętrznych żądań/CSP OK.
+Przegląd34 ścieżek: bez sekretów/.env/artefaktów/backendu/zmian vercel.json;
+git diff --check OK. Dotychczasowe wpisy raportu zachowane bez zmian.
+Zwykły push wyłącznie feat/ui-beta, bez merge/migracji/ręcznego deploy.
+Końcowy SHA commita raportu podany w odpowiedzi i widoczny w historii Git.
