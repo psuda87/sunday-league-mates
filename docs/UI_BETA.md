@@ -1,3 +1,17 @@
+# Premium3.14 — korekta menu — 2026-10-18 20:05:31 CEST
+
+Na polecenie użytkownika dolne menu demo ma teraz wyłącznie Mecze / Profil.
+Zawodnicy nie są osobną zakładką ani katalogiem w demo. Profile innych osób
+otwiera się wyłącznie z konkretnego meczu: Uczestnicy, Składy, Rozliczenie;
+powrót przywraca mecz/panel i aktywną pozycją menu pozostają Mecze.
+Admin: centralny plus56px/20px pomiędzy dwiema zakładkami. Zmieniono górny padding
+z40px na standardowe5px: footer w Chromium bez
+safe area ma86px zamiast121px (o35px mniej). Gracz: dwa symetryczne przyciski,
+bez plusa. Produkcyjny BottomNav/Auth/backend/Vercel bez zmian.
+TS/ESLint/oba buildy/131 Vitest i kontrola Chromium320/390/768 OK; demo izolacja
+15 plików/CSP OK. Rzeczywiste zrzuty ui/premium314-compact-nav-*.png.
+Android/iOS/klawiatura natywna nadal wymagają weryfikacji, bez ręcznego deploy.
+
 # Premium España3.14 — 2026-10-18 19:57:42 CEST
 
 Wyłącznie demo: centralny plus56px / wystaje20px, rzeczywista maska i złota

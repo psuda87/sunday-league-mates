@@ -1,3 +1,14 @@
+# Korekta po decyzji użytkownika — menu dwuelementowe
+
+Aktualne demo: Mecze / plus admina / Profil. Zawodnicy tylko wewnątrz meczu,
+bez osobnego katalogu. Footer admina121→86px w Chromium bez safe area.
+Pierwotny zapis iteracji3.14 poniżej jest historyczny.
+
+- [Aktualny Dark](premium314-compact-nav-dark.png)
+- [Aktualny Light](premium314-compact-nav-light.png)
+- [Zwykły zawodnik](premium314-compact-nav-user.png)
+- [320px](premium314-compact-nav-320.png)
+
 # Premium España 3.14 — tworzenie i edycja tylko w demo
 
 Użytkownik doprecyzował w trakcie pracy: **pozostają trzy zakładki Mecze /

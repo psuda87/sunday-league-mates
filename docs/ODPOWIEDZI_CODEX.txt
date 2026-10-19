@@ -1338,3 +1338,32 @@ credentiali, prywatnych danych ani artefaktów builda;7 zrzutów fikcyjnego UI.
 Push tylko feat/ui-beta. Bez merge/migracji/ręcznego deploy. Android/iOS/
 klawiatura natywna/Cypress oraz automatyczny Vercel nadal nieweryfikowane.
 Końcowy SHA raportu jest w historii Git i odpowiedzi.
+
+[2026-10-18 20:05:31 CEST] Premium3.14 — usunięcie zakładki Zawodnicy
+
+W demo zostają Mecze / centralny plus admina / Profil. Zwykły zawodnik ma dwa
+symetryczne przyciski, bez plusa. Usunięto także kod globalnego katalogu i
+wyszukiwarki demo, więc przeglądanie cudzych zawodników zaczyna się w konkretnym
+meczu (Uczestnicy/Składy/Rozliczenie). Istniejąca karta Ultimate i mechanizm
+powrotu są zachowane; aktywne menu przy cudzym profilu to Mecze. Mój profil
+pozostaje osobną dolną zakładką. Źródłowy katalog produkcyjny bez zmian.
+Footer admina zmierzony w Chromium:121→86px, odzyskane35px wysokości; plus
+nadal56px i20px ponad paskiem. Standardowy padding5px zamiast40px usuwa puste
+miejsce przeznaczone wcześniej na środkowy przycisk Zawodnicy. Safe area
+zachowane. Obejrzano rzeczywisty Dark i Light; kontrole320/390/768 i tworzenie/
+edycja/role/podgląd/reset/izolacja demo zaliczone. TS,ESLint,oba buildy i131/131
+Vitest zaliczone. Skrypty regresji dostosowano do profili otwieranych z meczu,
+bez wymagania usuniętego katalogu. Bez zmian backendu/Auth/finansów/Firebase/
+Vercel, bez migracji/merge/ręcznego deploy. Android/iOS nadal nieweryfikowane.
+Zrzuty rzeczywistego React/Ionic:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium314-compact-nav-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium314-compact-nav-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium314-compact-nav-user.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium314-compact-nav-320.png
+Raport: docs/ODPOWIEDZI_CODEX.txt. SHA dopisany po commicie.
+
+[2026-10-19 08:25:19 CEST] Dokończenie korekty menu
+Pełny test regresji Chromium zakończony powodzeniem: profile wyłącznie z meczu,
+powrót do panelu, własny profil/edycja, zapisy/goście/rezerwa/składy/finanse,
+Dark/Light/Auto i izolacja/CSP. Test nie zawiesił się; zmiany oczekiwały zapisu
+w Git. Zapis i zwykły push tylko feat/ui-beta, bez ręcznego wdrożenia.

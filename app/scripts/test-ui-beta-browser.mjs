@@ -88,9 +88,8 @@ try {
     await click('Nadchodzące');
     await evaluate("document.querySelectorAll('.slm-bottom-nav button')[0].click()");await pause();await evaluate("$demo('.slm-card-link').click()");await pause();assert.equal(await evaluate("$demo('.slm-match-cta').disabled"),false);
     await tools(true);await click('Reset danych demo');await tools(false);assert.equal(await evaluate("$demo('.slm-compact-count strong').textContent"),'12/15');
-    await evaluate("document.querySelectorAll('.slm-bottom-nav button')[1].click()");await pause();await widths();
-    await evaluate("(() => {const el=document.getElementById('demo-player-search');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,'lukasz');el.dispatchEvent(new Event('input',{bubbles:true}));})()");await pause();assert.equal(await evaluate("document.querySelectorAll('.slm-player-list li').length"),1);
-    await profile('Łukasz Wrona');await back();assert.equal(await evaluate("document.getElementById('demo-player-search').value"),'lukasz');
+    assert.equal(await evaluate("[...document.querySelectorAll('.slm-bottom-nav button')].some(el=>el.textContent==='Zawodnicy')"),false);
+    await evaluate("$demo('.slm-card-link').click()");await pause();await profile('Kamil Zieliński');await back();assert.equal(await evaluate("$demo('[role=tab][aria-selected=true]').textContent"),'Uczestnicy');
     await evaluate("document.querySelectorAll('.slm-bottom-nav button')[0].click()");await pause();
   }
   const textField=async(selector,value)=>{await evaluate(`(() => {const el=$demo(${JSON.stringify(selector)});Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,${JSON.stringify(value)});el.dispatchEvent(new Event('input',{bubbles:true}));})()`);await pause();};
@@ -114,11 +113,9 @@ try {
     await evaluate("$demo('.slm-identity-settings input[value=light]').click()");assert.equal(await evaluate("document.documentElement.classList.contains('ion-palette-dark')"),false);
     await evaluate(`$demo('.slm-identity-settings input[value=${mode}]').click()`);
 
-    await evaluate("document.querySelectorAll('.slm-bottom-nav button')[1].click()");await pause();
-    assert.equal(await evaluate("[...$demo('.slm-player-list').querySelectorAll('li')].some(el=>el.textContent.includes('Mateusz Próbny')&&el.querySelector('.slm-custom-avatar'))"),true);
+    await evaluate("document.querySelectorAll('.slm-bottom-nav button')[0].click()");await pause();await evaluate("$demo('.slm-card-link').click()");await pause();
     await profile('Mateusz Próbny');assert.equal(await evaluate("$demo('.slm-ultimate-portrait').dataset.portrait"),'1-1');await back();
     await profile('Marek Lis');assert.equal(await evaluate("!!$demo('.slm-ultimate-number-edit')||!!$demo('.slm-my-identity')"),false);await back();
-    await evaluate("document.querySelectorAll('.slm-bottom-nav button')[0].click()");await pause();await evaluate("$demo('.slm-card-link').click()");await pause();
     assert.equal(await evaluate("$demo('.slm-demo-roster').textContent.includes('Mateusz Próbny')"),true);assert.equal(await evaluate("!!$demo('.slm-demo-roster .slm-custom-avatar')"),true);
     await tab('Składy');assert.equal(await evaluate("$demo('.slm-team-a [data-player=p02]').textContent.includes('Próbny')"),true);assert.equal(await evaluate("$demo('.slm-team-a [data-player=p02] .slm-pitch-custom-number').textContent"),'0');
     await profile('Mateusz Próbny');await back();assert.equal(await evaluate("$demo('[role=tab][aria-selected=true]').textContent"),'Składy');
@@ -214,5 +211,5 @@ try {
   await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:'dark'}]});await evaluate("document.querySelector('input[value=auto]').click()");await pause();assert.equal(await evaluate("document.documentElement.classList.contains('ion-palette-dark')"),true);
   await cmd('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:'light'}]});await pause();assert.equal(await evaluate("document.documentElement.classList.contains('ion-palette-dark')"),false);
   assert.equal(requests.some(url=>url.startsWith('http')&&new URL(url).origin!==new URL(base).origin),false);assert.deepEqual(errors,[]);
-  console.log('PASS: demo world 320/390/768, global profiles with Enter/tab and scroll return, identity/name/number/avatar/local-file/cancel/settings, teams, private/admin finance/partial/full/zero/overpayment, join/guest/withdraw/reserve/cancel/debt/reset, search, Ultimate portraits/ratios/fallback/four stats/own number validation and persistence, pitch counts/swap/reset/empty/guest sync, own guest confirmation/cancel/removal and isolation/CSP.');
+  console.log('PASS: demo world 320/390/768, global profiles with Enter/tab and scroll return, identity/name/number/avatar/local-file/cancel/settings, teams, private/admin finance/partial/full/zero/overpayment, join/guest/withdraw/reserve/cancel/debt/reset, match-only player profiles, Ultimate portraits/ratios/fallback/four stats/own number validation and persistence, pitch counts/swap/reset/empty/guest sync, own guest confirmation/cancel/removal and isolation/CSP.');
 } finally {ws.close();}

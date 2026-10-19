@@ -4,9 +4,9 @@ import EventForm from './EventForm';
 import DemoBottomNav from './DemoBottomNav';
 import { initialWorld, reduceWorld } from './data';
 afterEach(cleanup);
-it('keeps three real tabs and exposes create as a separate administrator action',()=>{
+it('keeps two real tabs and exposes create as a separate administrator action',()=>{
  const onCreate=vi.fn(),onSelect=vi.fn();const {rerender}=render(<DemoBottomNav active="events" onSelect={onSelect} canCreate={false} onCreate={onCreate}/>);
- expect(screen.getAllByRole('button').map(el=>el.textContent)).toEqual(['Mecze','Zawodnicy','Profil']);expect(screen.queryByLabelText('Utwórz mecz')).toBeNull();
+ expect(screen.getAllByRole('button').map(el=>el.textContent)).toEqual(['Mecze','Profil']);expect(screen.queryByLabelText('Utwórz mecz')).toBeNull();
  rerender(<DemoBottomNav active="events" onSelect={onSelect} canCreate onCreate={onCreate}/>);
  const create=screen.getByRole('button',{name:'Utwórz mecz'});expect(create.hasAttribute('aria-current')).toBe(false);fireEvent.click(create);expect(onCreate).toHaveBeenCalledOnce();expect(onSelect).not.toHaveBeenCalled();
 });

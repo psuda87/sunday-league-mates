@@ -1,3 +1,9 @@
+## Korekta menu po3.14
+
+Demo ma tylko Mecze/Profil i osobny plus administratora; katalog Zawodnicy
+usunięty z demo. Profile innych osób otwierane z meczu. Izolacja/build/CSP/
+konfiguracja Vercel bez zmian. Starsze opisy3 zakładek poniżej są historyczne.
+
 ## Premium3.14 — wydarzenia w pamięci demo
 
 Allowlista rozszerzona tylko o src/demo/DemoBottomNav.tsx, EventForm.tsx,

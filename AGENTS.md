@@ -1,3 +1,11 @@
+# Premium3.14 — najnowsza decyzja o menu demo
+
+- Demo ma tylko Mecze/Profil; plus jest osobną akcją admina pomiędzy nimi.
+  Usunięto katalog i zakładkę Zawodnicy z demo. Cudze profile tylko z meczu
+  (Uczestnicy/Składy/Rozliczenie); powrót zachowuje panel, menu aktywne Mecze.
+  To zastępuje starszy wymóg3 zakładek wyłącznie w demo. Produkcja bez zmian.
+  Footer admina86px bez safe area, standardowe5px paddingu zamiast40px.
+
 # Premium3.14 — wydarzenia wyłącznie demo
 
 - Użytkownik doprecyzował: nadal3 zakładki Mecze/Zawodnicy/Profil, Składy tylko
