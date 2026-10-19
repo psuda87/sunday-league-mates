@@ -1,3 +1,24 @@
+# Premium3.15 — grupy tylko w demo
+
+- Najnowsze menu demo: Mecze/Grupy/Profil + osobny plus admina wydarzeń3.14.
+  Nie przywracać katalogu Zawodnicy. Profile innych osób także z grupy, ale
+  wyłącznie wspólnego członkostwa; kontekst groupId w Frame i ponowny guard
+  przy zmianie użytkownika. DemoPlayer wspólne, Ultimate bez duplikacji.
+- GroupState/groups.ts: jedyny adminId na grupę, Membership.organizer/joinedAt,
+  role obliczane per grupa. Zaproszenie/propozycja/prośba mają różne etapy zgód,
+  idempotentne decyzje. Nie wymuszać członkostwa przez admina. Sukcesja: najstarszy
+  organizator, potem najstarszy członek, remis po playerId. Pusta grupa znika
+  po potwierdzeniu wyjścia ostatniego. Reducer sprawdza uprawnienia, to nie RLS.
+- Telefon: normalizacja dokładna, brak wyników i identyczny komunikat dla
+  istniejącego/nieistniejącego. Niedzwoniące fikcyjne000000001…040; dane prywatne
+  nie trafiają do publicznych selektorów/UI. Próby prywatne mogą mieć null target
+  jako jednakowe pokwitowanie; nie pokazywać odbiorcy ani wyniku adminowi.
+- Nie integrować meczów z grupami przed3.16. Formularz/eventRole3.14 bez zmian;
+  groupCanOrganize gotowy do późniejszego użycia. Docelowo edytuje wyłącznie
+  twórca meczu. Zamrożony SLM1.0 obejmuje4 palety (España/FCB/Classic Lime/
+  Deimos-Code) i samorejestrację, ale nie wdrażać ich teraz. Patrz docs/ui/
+  PREMIUM315_GROUPS.md. Bez backendu/migracji/Vercel i nowych zależności.
+
 # Premium3.14 — najnowsza decyzja o menu demo
 
 - Demo ma tylko Mecze/Profil; plus jest osobną akcją admina pomiędzy nimi.

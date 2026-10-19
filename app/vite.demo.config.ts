@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 const app = fileURLToPath(new URL('.', import.meta.url));
 // Explicit allowlist: accidentally importing App/Auth/Edge fails the build.
 const allowed = new Set([
+  'src/demo/groups.ts', 'src/demo/Groups.tsx',
   'src/demo/eventDraft.ts', 'src/demo/EventForm.tsx', 'src/demo/DemoBottomNav.tsx',
   'src/demo/Identity.tsx', 'src/demo/portraits.ts', 'src/demo/Finance.tsx', 'src/demo/Teams.tsx', 'src/demo/UltimatePlayerCard.tsx', 'src/demo/App.tsx', 'src/demo/data.ts', 'src/demo/Panels.tsx', 'src/demo/Profile.tsx', 'demo/index.html', 'demo/main.tsx', 'src/ui/Demo.tsx', 'src/ui/MatchHero.tsx',
   'src/ui/Players.tsx', 'src/ui/MatchHeader.tsx', 'src/ui/ParticipantGroup.tsx', 'src/ui/MatchFilters.tsx', 'src/ui/MatchCapacityProgress.tsx', 'src/ui/capacity.ts', 'src/ui/BottomNav.tsx',

@@ -1370,3 +1370,112 @@ w Git. Zapis i zwykły push tylko feat/ui-beta, bez ręcznego wdrożenia.
 
 [2026-10-19 08:25:28 CEST] Commit korekty menu: e72a36a5cfc805ebbc1a03b0de00bd9606f90e10.
 Końcowy SHA raportu w historii Git i odpowiedzi.
+
+[2026-10-19 08:54:16 CEST] PREMIUM ESPAÑA3.15 — grupy, członkostwa i zgody
+
+Stan bazowy czysty, feat/ui-beta; zweryfikowano commit korekty nawigacji
+ e72a36a5cfc805ebbc1a03b0de00bd9606f90e10 i HEAD a3bcaf1, zgodny z origin.
+Nie implementowano ponownie3.14. Wyłącznie izolowane demo, bez backendu.
+
+Zaimplementowano wspólny GroupState w World i groups.ts: stabilne id grup/
+zgłoszeń, członkostwa z datą dołączenia i flagą organizatora, jeden administrator
+adminId/grupę. Grupy tworzy każdy symulowany zarejestrowany użytkownik; nazwa
+1–64/opis0–180 znaków, bez wymogu globalnej unikalności. Twórca zostaje członkiem
+/adminem. Wiele grup jednocześnie, brak limitów/płatnych grup. Reset przywraca
+fixture i usuwa tworzone grupy.40 fikcyjnych zawodników (20 dotychczasowych
+zachowanych,20 dodatkowych do grup35-osobowych i scenariuszy osób z zewnątrz),
+4 grupy z rzeczywistymi licznikami25/35/8/1. Nie generowano nowych obrazów;
+powtórzono4 istniejące fikcyjne portrety. Nowe osoby bez wymyślonych statystyk
+występów; demoTotals0, występy nadal z potwierdzonych fikcyjnych obecności.
+
+Nowe Groups.tsx: Moje grupy, karty z rolą/licznikiem, otrzymane zaproszenia,
+formularz tworzenia, wyszukanie grupy po nazwie, szczegóły i członkowie,
+panel administratora. Mecze/Grupy/Profil i osobny plus. Środkowa zakładka Grupy
+ma kompaktowy układ ikona+napis poniżej plusa i44px odsłoniętego celu dotykowego;
+plus56px, wystaje20px i zachowuje rzeczywisty notch. Zwykły użytkownik bez
+symulowanego uprawnienia eventRole nie widzi plusa. Istniejący formularz meczów,
+zapisy/goście/rezerwa/składy/rozliczenia/profil/Ultimate nie przebudowane.
+
+A: admin wysyła zaproszenie, tylko odbiorca je akceptuje lub odrzuca.
+B: członek proponuje, admin akceptuje/odrzuca, po akceptacji zaproszenie trafia
+do odbiorcy i nadal wymaga jego zgody. Admin nie wymusza członkostwa.
+C: outsider widzi w wynikach tylko nazwę/opis/liczbę członków; prosi o dołączenie,
+admin akceptuje/odrzuca, autor anuluje własną prośbę. Aktywne prośby deduplikowane.
+Decyzje przyjmowane tylko raz, przy dołączeniu pozostałe pending tego odbiorcy
+w grupie są anulowane. Usunięcie członka cofa rolę i dostęp, bez usuwania jego
+profilu lub wpisów meczowych. Propozycje usuniętego autora są anulowane.
+
+Nick/nazwa wyszukiwane tylko w członkowskim panelu zaproszeń (minimum2 znaki,
+maks5 wyników), bez globalnego katalogu zawodników. Telefon tylko dokładny po
+normalizacji9 cyfr/+48/0048. Zawsze ten sam komunikat; brak wyników, numerów
+w profilach i potwierdzenia istnienia użytkownika. Prywatne propozycje pokazują
+adminowi jedynie ogólną nazwę, bez tożsamości odbiorcy. Dla kontaktu nieistniejącego,
+już zaproszonego lub aktualnego członka istnieje identyczne prywatne pokwitowanie
+z null target (bez dostarczenia rzeczywistego zaproszenia do członka). Kontakty
+000000001…040 są świadomie niedzwoniące i fikcyjne; to nie walidator produkcyjny.
+Nie zapisywano ich w DemoPlayer ani publicznych selektorach. Client demo nadal
+zawiera wszystkie fikcyjne dane; te ograniczenia nie są produkcyjnym RLS/Auth.
+
+Admin zarządza prośbami/propozycjami, nadaje/odbiera organizer tylko własnej grupy,
+usuwaniem i przekazaniem roli z potwierdzeniem. Nie może sam odebrać sobie
+administracji przez zmianę flagi/usunięcie bez transferu. Odejście administratora
+przekazuje rolę najstarszemu organizatorowi, w jego braku najstarszemu członkowi;
+remis po stabilnym playerId. Ostatni członek potwierdza usunięcie pustej grupy.
+Jedna operacja reducera aktualizuje spójnie członkostwa/rolę/zgłoszenia. Wszystkie
+uprawnienia sprawdzane również w modelu, niezależnie od ukrycia przycisków.
+Zmiana użytkownika i bezpośredni adres grupy nie ujawniają członków outsiderowi;
+otwarta karta Ultimate ma dodatkowy guard groupId, a powrót zachowuje grupę.
+
+STANDARD — wyniki:
+- TypeScript zaliczony (osobne noEmit i w buildzie demo).
+- ESLint wyłącznie zmienionych TS/TSX/config zaliczony.
+- Build izolowanego demo/allowlista:15 plików,6 dotychczasowych assetów, bez
+  Auth/API/Supabase/Edge/sekretów; CSP bez błędów i zero zewnętrznych żądań.
+- Vitest150/150 w25 plikach, w tym19 nowych testów modeli/UI grup. Pierwszy
+  przebieg ujawnił selektor testu szukający członka poza zwiniętym podglądem;
+  test poprawiono o rozwinięcie listy i ponowiono niedrogi Vitest. Brak pominiętych
+  testów. Testy dotychczasowych modeli pozostały zaliczone.
+- Jeden wybrany przebieg Chromium320/390/768: tworzenie z długą nazwą, zaproszenie
+  admina/odmowa, propozycja członka/dwie zgody, prośba/akceptacja/anulowanie,
+  organizer nadanie/odebranie, usunięcie członka, transfer manualny, automatyczny
+  następca, ostatni członek/usunięcie pustej grupy, wiele członkostw, profile
+  Ultimate/powrót i zmiana użytkownika w otwartej karcie, directroute outsidera,
+  reset, Dark/Light/Auto, plus/geometria/hit≥44/brak overflow i telefonowa odpowiedź
+  known/unknown. Krótki smoke starego meczu (licznik12), bez pełnej starej regresji.
+- Obejrzano8 rzeczywistych zrzutów. Nie wymagano3 cykli renderowania; po poprawnym
+  pierwszym przeglądzie nie powtarzano pełnych kontroli Chromium bez potrzeby.
+- Nie uruchamiano builda produkcyjnej aplikacji, starej pełnej regresji Chromium,
+  Cypress, Androida/iOS ani testów prawdziwego Supabase. Klawiatura natywna i
+  systemowe safe areas nadal do weryfikacji na telefonie.
+
+3.16 pozostaje niewykonane: groupId meczu, wybór grupy w formularzu i wymuszanie
+jego tworzenia przez uprawnionych członków, prywatne/publiczne wydarzenia,
+widoczność i edycja wyłącznie przez twórcę, zachowanie zapisanych outsiderów po
+zamknięciu oraz brak automatycznego dopisywania ich do grupy. GroupCanOrganize
+jest przygotowany, ale globalny plus i edycja meczów nadal mają symulację3.14.
+Nowych palet, rejestracji, ocen, push, płatności i pozostałych funkcji nie dodano.
+Backend/Auth/RPC/RLS/migracje/finanse produkcyjne/Firebase/vercel.json/sekrety
+bez zmian. Bez merge/migracji/ręcznego deploy. Automatyczny Vercel niezweryfikowany.
+
+Rzeczywiste zrzuty React/Ionic:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium315-groups-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium315-groups-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium315-group-details.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium315-create-group.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium315-invitations.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium315-join-request.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium315-admin-permissions.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium315-groups-320.png
+Dokumentacja: docs/ui/PREMIUM315_GROUPS.md, STATUS/UI_BETA/AGENTS/DEMO_VERCEL.
+Raport docs/ODPOWIEDZI_CODEX.txt; SHA implementacji dopisany po commicie.
+
+Końcowa kontrola telefonu: przypadek próby zaproszenia obecnego członka, jego
+usunięcia i ponownego zaproszenia został poprawiony i sprawdzony w modelu oraz
+krótkim Chromium SLM_GROUPS_FOCUS=phone. Pokwitowanie bez odbiorcy jest od razu
+cancelled, a nie aktywnym zaproszeniem blokującym przyszłe zaproszenie. Wysyłka
+z zaakceptowanej propozycji ponownie rozwiązuje kontakt i respektuje istniejącą
+ofertę, aby nie duplikować dostarczenia. Sprawdzono także ukrycie odbiorcy przed
+administratorem w propozycji telefonicznej i dwie zgody. Bez powtórzenia całego
+scenariusza grup/pełnej starej regresji. Końcowy Vitest150/150; po ostatnim
+utwardzeniu deduplikacji dodatkowo uruchomiono wyłącznie testy modelu i UI grup (19/19).
+Znane ostrzeżenie dużego chunka Ionic (>500kB) pozostaje; build jest zaliczony.

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { charges, history, initialWorld, reduceWorld, registered, reserves, statistics, unpaidGames, teamEntries, demoFinance, parseDemoMoney, paymentStatus, validDemoName, personName } from './data';
 import type { World } from './data';
 function coherent(world:World) {
-  expect(world.players).toHaveLength(20);expect(world.games).toHaveLength(10);
+  expect(world.players).toHaveLength(40);expect(world.games).toHaveLength(10);
   for(const game of world.games){
     expect(registered(game).length).toBeLessThanOrEqual(game.capacity);
     const active=game.entries.filter(e=>e.status!=='withdrawn'&&e.playerId);
@@ -70,7 +70,7 @@ describe('isolated demo world',()=>{
     expect(reduceWorld(world,{type:'withdraw',gameId:'demo-1'})).toBe(world);
     expect(registered(world.games[0])).toHaveLength(12);
   });
-  it('assigns four fixed portrait variants across all twenty fictional players',()=>{
+  it('assigns four fixed portrait variants across all forty fictional players',()=>{
     const a=initialWorld(),b=initialWorld();expect(a.players.map(p=>p.portrait)).toEqual(b.players.map(p=>p.portrait));
     expect(new Set(a.players.map(p=>`${p.portrait!.column}-${p.portrait!.row}`)).size).toBe(4);
   });

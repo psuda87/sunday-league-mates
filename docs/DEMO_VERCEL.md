@@ -1,3 +1,11 @@
+## Premium3.15 — grupy wyłącznie demo
+
+Jawna allowlista rozszerzona o src/demo/groups.ts i Groups.tsx. Nadal15 plików,
+6 istniejących zasobów, bez nowych zdjęć/sekretów/dependencies. CSP/env/
+app/vercel.json bez zmian. GroupState i kontakty tylko fikcyjne w RAM, reset
+usuwa zmiany; przełącznik użytkownika nie jest Auth. Root app / npm run
+build:demo / dist-demo / bez env. Bez ręcznego wdrożenia.
+
 ## Korekta menu po3.14
 
 Demo ma tylko Mecze/Profil i osobny plus administratora; katalog Zawodnicy

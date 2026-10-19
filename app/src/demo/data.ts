@@ -1,13 +1,15 @@
+import { initialGroups, isGroupAction, reduceGroups } from './groups';
+import type { GroupState, GroupAction } from './groups';
 import { validateEvent } from './eventDraft';
 import type { EventInput } from './eventDraft';
 import { validDemoPortrait } from './portraits';
 import type { DemoPortrait } from './portraits';
 // Deterministic, fictional, memory-only demo. Never imported by production screens.
-export interface DemoPlayer { id: string; name: string; jerseyNumber: number; demoTotals: {goals:number;assists:number;mvp:number}; portrait?: DemoPortrait; portraitEdited?:boolean }
+export interface DemoPlayer { id: string; name: string; jerseyNumber: number; demoTotals: {goals:number;assists:number;mvp:number}; portrait?: DemoPortrait; portraitEdited?:boolean; nick?:string }
 export interface Entry { id: string; playerId: string | null; guestName?: string; inviterId?: string; status: 'registered' | 'reserve' | 'withdrawn'; attendance: boolean | null; paidCents: number }
 export interface Game { id: string; name: string; startsAt: string; status: 'upcoming' | 'completed' | 'cancelled'; capacity: number; costCents: number; entries: Entry[]; location?:string; address?:string; durationMinutes?:number; minimum?:number; creationKey?:string; lineup?: {a:string[];b:string[]} }
-export interface World { players: DemoPlayer[]; games: Game[]; userId: string; financeRole: 'player'|'admin'; eventRole:'player'|'admin'; nextGameId:number; notice: string }
-export const names = ['Alex Nowak','Kamil Zieliński','Marek Lis','Piotr Wójcik','Adrian Maj','Łukasz Wrona','Tomasz Wilk','Oskar Król','Jan Sokół','Filip Góral','Igor Biały','Leon Zając','Dawid Polny','Adam Brzoza','Patryk Las','Rafał Dąb','Michał Sowa','Artur Bór','Daniel Rzeka','Szymon Wiatr'];
+export interface World { groupState:GroupState; players: DemoPlayer[]; games: Game[]; userId: string; financeRole: 'player'|'admin'; eventRole:'player'|'admin'; nextGameId:number; notice: string }
+export const names = ['Alex Nowak','Kamil Zieliński','Marek Lis','Piotr Wójcik','Adrian Maj','Łukasz Wrona','Tomasz Wilk','Oskar Król','Jan Sokół','Filip Góral','Igor Biały','Leon Zając','Dawid Polny','Adam Brzoza','Patryk Las','Rafał Dąb','Michał Sowa','Artur Bór','Daniel Rzeka','Szymon Wiatr','Bruno Gaj','Emil Buk','Norbert Klon','Konrad Grab','Wiktor Cedr','Julian Świerk','Bartosz Cis','Hubert Jawor','Eryk Modrzew','Miłosz Topola','Alan Kasztan','Kacper Jesion','Robert Wiąz','Mateusz Wiśnia','Borys Jodła','Nikodem Lipa','Cezary Orzech','Marcel Deren','Witold Olcha','Dominik Leszczyna'];
 export const registered = (game: Game) => game.entries.filter(e => e.status === 'registered');
 export const reserves = (game: Game) => game.entries.filter(e => e.status === 'reserve');
 export const personName = (world: World, entry: Entry) => world.players.find(p => p.id === entry.playerId)?.name ?? entry.guestName ?? 'Gość bez profilu';
@@ -40,7 +42,7 @@ export function statistics(world: World, playerId: string) {
 export function initialWorld(): World {
   // Explicit fictional career totals, not a formula based on attendance or sign-ups.
   const totals=[[2,1,1],[1,2,0],[3,1,1],[1,1,0],[2,0,0],[0,2,0],[1,1,0],[2,1,1],[0,1,0],[1,0,0],[1,1,0],[0,1,0],[1,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]];
-  const players=names.map((name,i)=>({id:`p${String(i+1).padStart(2,'0')}`,name,jerseyNumber:[10,7,9,4,8,6,11,3,5,14,17,20,21,23,25,27,30,33,40,99][i],demoTotals:{goals:totals[i][0],assists:totals[i][1],mvp:totals[i][2]},portrait:{src:'/assets/demo/fictional-portraits.webp',column:(i%2) as 0|1,row:(Math.floor(i/2)%2) as 0|1}}));
+  const players=names.map((name,i)=>({id:`p${String(i+1).padStart(2,'0')}`,name,nick:`slm${String(i+1).padStart(2,'0')}`,jerseyNumber:[10,7,9,4,8,6,11,3,5,14,17,20,21,23,25,27,30,33,40,99][i]??i,demoTotals:{goals:totals[i]?.[0]??0,assists:totals[i]?.[1]??0,mvp:totals[i]?.[2]??0},portrait:{src:'/assets/demo/fictional-portraits.webp',column:(i%2) as 0|1,row:(Math.floor(i/2)%2) as 0|1}}));
   const counts=[12,15,6,0,12,10,14,11,9,0];
   const games:Game[]=counts.map((count,index)=>({ id:`demo-${index+1}`,name:['El Clásico','La Liga','Rondo Cup','Derby','Jesienny sparing','Mecz przyjaźni','Wieczorne granie','Liga koleżeńska','Spotkanie odwołane','Przerwa techniczna'][index]+' · demo',startsAt:index<4?`2026-${index<2?'10':'11'}-${['22','29','05','12'][index]}T${index===0?'16':'17'}:00:00Z`:`2026-10-${String(18-(index-3)*2).padStart(2,'0')}T16:00:00Z`,status:index<4?'upcoming':index<8?'completed':'cancelled',capacity:15,costCents:27000,entries:Array.from({length:count},(_,i)=>({id:`g${index}-e${i}`,playerId:players[(i+(index<4?1:0))%players.length].id,status:'registered' as const,attendance:index>=4&&index<8?(i+index)%5!==0:null,paidCents:0})) }));
   games[0].entries[10]={...games[0].entries[10],playerId:'p19',inviterId:'p02'};
@@ -51,13 +53,14 @@ export function initialWorld(): World {
   for(const game of games.filter(g=>g.status==='completed')) for(const {entry,due} of charges(game)) entry.paidCents=due;
   games[7].entries[3].paidCents=Math.floor(games[7].entries[3].paidCents/2);
   for(const game of [games[0],games[1],...games.slice(4,8)])game.lineup=exampleLineup(game);
-  return {players,games,userId:'p01',financeRole:'player',eventRole:'player',nextGameId:11,notice:''};
+  return {groupState:initialGroups(players),players,games,userId:'p01',financeRole:'player',eventRole:'player',nextGameId:11,notice:''};
 }
 export type Scenario = 'free'|'full'|'joined'|'reserve'|'completed'|'cancelled'|'debt';
 export const scenarioGame:Record<Scenario,string>={free:'demo-1',full:'demo-2',joined:'demo-1',reserve:'demo-2',completed:'demo-5',cancelled:'demo-9',debt:'demo-1'};
 export const canManageDemoEvents=(world:World)=>world.eventRole==='admin';
-export type Action = {type:'event_role';role:'player'|'admin'}|{type:'event_create';input:EventInput;key:string}|{type:'event_update';gameId:string;input:EventInput}|{type:'reset';scenario?:Scenario}|{type:'user';id:string}|{type:'finance_role';role:'player'|'admin'}|{type:'payment_set';gameId:string;entryId:string;cents:number}|{type:'lineup_reset';gameId:string}|{type:'lineup_swap';gameId:string;a:string;b:string}|{type:'identity';playerId:string;name:string}|{type:'portrait';playerId:string;portrait:DemoPortrait}|{type:'jersey';playerId:string;number:number}|{type:'join'|'withdraw'|'guest'|'remove_guest'|'resize'|'attendance'|'pay';gameId:string;entryId?:string;count?:number};
+export type Action = GroupAction|{type:'event_role';role:'player'|'admin'}|{type:'event_create';input:EventInput;key:string}|{type:'event_update';gameId:string;input:EventInput}|{type:'reset';scenario?:Scenario}|{type:'user';id:string}|{type:'finance_role';role:'player'|'admin'}|{type:'payment_set';gameId:string;entryId:string;cents:number}|{type:'lineup_reset';gameId:string}|{type:'lineup_swap';gameId:string;a:string;b:string}|{type:'identity';playerId:string;name:string}|{type:'portrait';playerId:string;portrait:DemoPortrait}|{type:'jersey';playerId:string;number:number}|{type:'join'|'withdraw'|'guest'|'remove_guest'|'resize'|'attendance'|'pay';gameId:string;entryId?:string;count?:number};
 export function reduceWorld(previous:World,action:Action):World {
+  if(isGroupAction(action))return reduceGroups(previous,action);
   if(action.type==='reset') {
     const world=initialWorld();
     if(action.scenario==='joined') world.userId='p02';

@@ -1,3 +1,29 @@
+# Premium España3.15 — 2026-10-19 08:54:16 CEST
+
+Wyłącznie izolowane demo: wspólny GroupState (grupy, członkostwa, zgłoszenia),
+Moje grupy / tworzenie / szukanie / szczegóły / panel administratora. Nawigacja
+Mecze–Grupy–Profil, osobny plus56px/20px nadal z symulacji eventRole3.14;
+uprawnienia grupowe przygotowane, bez wiązania meczów z grupą przed3.16.
+Zaproszenie admina wymaga zgody odbiorcy; propozycja członka najpierw zgody
+admina, potem odbiorcy; prośba o dołączenie zgody admina i może być anulowana.
+Deduplikacja i sprawdzanie uprawnień również w reducerze. Jedyny admin grupy,
+organizer lokalny dla członkostwa, usunięcie cofa dostęp/uprawnienia, transfer
+manualny z potwierdzeniem. Odejście admina: najstarszy organizator → najstarszy
+członek → stabilny playerId przy remisie; ostatni usuwa pustą grupę po potwierdzeniu.
+Członkowie otwierają istniejącą kartę Ultimate innych członków. Outsider nie
+widzi listy ani profili grupy, także po zmianie użytkownika w otwartej karcie.
+Telefon: dokładna normalizacja, brak wyników/ujawnienia istnienia kontaktu,
+stały komunikat; wyłącznie niedzwoniące kontakty fikcyjne. Nick szukany tylko
+w panelu zapraszania członka, min2 znaki/max5 wyników, bez globalnego katalogu.
+Fixture40 zawodników,4 grupy (25/35/8/1 członków), stan bez grup i otrzymane
+zaproszenie; stare20 profili i mecze zachowane, bez nowych obrazów.
+TS i ESLint zmienionego zakresu OK, demo build/izolacja15 plików/CSP OK,
+150/150 Vitest w25 plikach, wybrane Chromium320/390/768 i8 rzeczywistych zrzutów
+premium315-*.png OK. STANDARD: bez produkcyjnego builda, pełnej starej regresji
+Chromium, Cypress, Android/iOS. Backend/Auth/RPC/RLS/Firebase/finanse/Vercel
+bez zmian. Migracji/merge/ręcznego deploy nie wykonywano. Ograniczenia Dockera
+/backendu poniżej zachowane. Kontrakty i zakres3.16: ui/PREMIUM315_GROUPS.md.
+
 # Premium3.14 — korekta menu — 2026-10-18 20:05:31 CEST
 
 Na polecenie użytkownika dolne menu demo ma teraz wyłącznie Mecze / Profil.
