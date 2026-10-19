@@ -1,7 +1,7 @@
 # Aktualny stan Sunday League Mates
 
 19.10.2026 ? branch roboczy `feat/integration`, worktree `I:\slm\sunday-league-mates-integration`.
-Rdze? integracji zapisano w `0ec5200`; etap: audyt, zabezpieczenie na GitHubie i integracja przez PR. Bez wdro?enia aplikacji i zdalnej bazy.
+Rdze? integracji: `0ec5200`; dokumentacja i ?r?d?a grafik: `309d57c`. Oba commity wypushowano. [PR #2](https://github.com/psuda87/sunday-league-mates/pull/2) scalono standardowym merge `c28b09d77a6a203954c10060d1e87aa105cfeef2` do main. Lokalny main zsynchronizowano fast-forward bez prze??czania worktree. Bez wdro?enia aplikacji i zdalnej bazy.
 
 ## Wykonane funkcje
 
@@ -39,7 +39,7 @@ Auth/events/settlements/push zachowane w historii integracji; ui-beta zachowany 
 Nowy dostarczony herb 1254?1254 zabezpieczono w `docs/branding/slm-crest-duo-source.png`; dwie grafiki ?r?d?owe w `pics/`. Nie podmieniano logo aplikacji 450?505.
 Oryginalny worktree ui-beta i jego nie?ledzone pliki zachowano; identyczne kopie grafik s? cz??ci? integracji.
 Automatyczne wdro?enia Git dla tej wersji wy??czaj? root i app/vercel.json. Nie wywo?ywano deploy ani produkcyjnych migracji.
-Stan i rezultat scalenia nale?y odczyta? z PR `feat/integration` ? `main`; ga??zie ?r?d?owe pozostaj? zachowane.
+Ga??zie ?r?d?owe pozostaj? zachowane. Po scaleniu #2 potwierdzono identyczno?? drzew origin/main i sprawdzonej integracji oraz niezmieniony ostatni deployment Vercel. Dodatkow? grafik?, kt?ra pojawi?a si? podczas audytu, zabezpieczono 1:1 jako `docs/branding/slm-gold-crest-comparison-source.png`; nie jest u?ywana przez aplikacj?. Ko?cowa aktualizacja dokumentacji i kopia tej grafiki stanowi? osobny commit zabezpieczaj?cy.
 
 ## Ograniczenia i nast?pny etap
 
