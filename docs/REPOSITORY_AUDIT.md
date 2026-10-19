@@ -69,3 +69,9 @@ GitHub przy audycie: main bez branch protection i rulesets, 0 workflow Actions, 
 - SLM 1.0 nie jest jeszcze gotowe do publikacji.
 
 Wynik publikacji i merge jest rejestrowany w PR feat/integration ? main; bie??cy dokument opisuje faktycznie sprawdzon? zawarto?? przed scaleniem.
+
+## Wynik publikacji
+
+Commity `0ec5200` i `309d57c` wypushowano bez force na origin/feat/integration. PR https://github.com/psuda87/sunday-league-mates/pull/2 mia? mergeable=true, mergeable_state=clean, 0 wymaganych kontroli, 0 check runs i workflow. Zosta? scalony standardowym merge c28b09d77a6a203954c10060d1e87aa105cfeef2. Lokalny main pobrano fast-forward bez zmiany ga??zi worktree. Drzewa origin/main i przetestowanego feat/integration by?y identyczne. Vercel nadal wskazywa? ten sam deployment dpl_42Gau4hZ9o6PesfUfY3E3MWBeNw5 ? brak nowego wdro?enia.
+
+W trakcie audytu w oryginalnym worktree pojawi? si? dodatkowy nie?ledzony plik SLM Gold Crest Logo Comparison.png. Zabezpieczono identyczn? kopi? w docs/branding/slm-gold-crest-comparison-source.png. Orygina? i pozosta?e nie?ledzone grafiki pozostaj? bez zmian. Ko?cowy commit tej kopii i dokumentacji nie zmienia kodu ani wynik?w test?w; wystarcza kontrola integralno?ci PNG i git diff --check.
