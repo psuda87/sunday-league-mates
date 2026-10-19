@@ -1,10 +1,18 @@
+import LiveGroups from '../live/Groups';
+import LiveMatches from '../live/Matches';
+import GroupFinance from '../live/Finance';
+import { AccountHeading, PasswordField, SignInFields } from '../account-ui/Fields';
+import Players from '../ui/Players';
+import { notificationsOutline } from 'ionicons/icons';
+import AppearanceSettings from '../ui/AppearanceSettings';
+import BottomNav from '../ui/BottomNav';
 import PhoneInput from '../components/PhoneInput';
 import { normalizePolishPhone, normalizePhoneUpdate, nationalPhone } from '../../supabase/functions/_shared/phone';
-import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
-import { IonButton, IonContent, IonHeader, IonInput, IonItem, IonPage, IonSelect,
-  IonSelectOption, IonSpinner, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButton, IonContent, IonInput, IonItem, IonPage, IonSelect,
+  IonSelectOption, IonSpinner, IonFooter, IonIcon } from '@ionic/react';
 import { AccountError, accountRequest } from '../auth/api';
 import type { ManagedAccount, Profile } from '../auth/api';
 import { SessionManager } from '../auth/sessionManager';
@@ -21,14 +29,16 @@ export default function Accounts() {
   const auth = useSyncExternalStore(manager.subscribe, manager.getSnapshot);
   const session = auth.session;
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [screen, setScreen] = useState<'profile' | 'admin' | 'events' | 'notifications' | 'settlements'>('profile');
+  const [screen, setScreen] = useState<'profile' | 'admin' | 'events' | 'notifications' | 'settlements' | 'players' | 'groups' | 'legacy-events' | 'legacy-finance'>('events');
   const [eventTarget, setEventTarget] = useState<string | null>(null);
+  const [eventsViewVersion, setEventsViewVersion] = useState(0);
   const [pendingNotification, setPendingNotification] = useState<string | null>(null);
   const [unread, setUnread] = useState<number | null>(null);
   const [notificationVersion, setNotificationVersion] = useState(0);
   const [pushStatus, setPushStatus] = useState('Systemowy push jest opcjonalny.');
   const [push] = useState(() => new NativePush(manager,setPendingNotification,
     () => setNotificationVersion(v => v+1),setPushStatus));
+  const busyFlight=useRef(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -59,8 +69,9 @@ export default function Accounts() {
     }
   }, [clearSecrets]);
   async function perform(work: () => Promise<void>) {
+    if(busyFlight.current)return;busyFlight.current=true;
     setBusy(true); setError(''); setNotice('');
-    try { await work(); } catch (e) { failed(e); } finally { setBusy(false); }
+    try { await work(); } catch (e) { failed(e); } finally { busyFlight.current=false;setBusy(false); }
   }
   async function logout() { await push.beforeLogout(); await manager.logout(); }
   const openNotification = useCallback(async (id: string) => {
@@ -69,8 +80,10 @@ export default function Accounts() {
     setNotificationVersion(v => v+1);
     if (notification.category === 'finance') {
       setScreen('settlements'); setTemporary(null);
+    } else if (notification.match_id) {
+      setEventTarget(notification.match_id); setScreen('events');
     } else if (notification.event_id) {
-      setEventTarget(notification.event_id); setScreen('events');
+      setEventTarget(notification.event_id); setScreen('legacy-events');
     } else setScreen('notifications');
   },[manager]);
   useEffect(() => { void push.start(); return () => { void push.stop(); }; },[push]);
@@ -144,21 +157,18 @@ export default function Accounts() {
     }).finally(() => { setCurrentPassword(''); setNewPassword(''); setConfirmation(''); });
   };
   const passwordForm = <form onSubmit={changePassword} className="slm-form">
-    <IonInput label={session?.must_change_password ? 'Hasło tymczasowe' : 'Obecne hasło'} labelPlacement="stacked"
-      type="password" autocomplete="current-password" required value={currentPassword}
-      onIonInput={e => setCurrentPassword(e.detail.value ?? '')} />
-    <IonInput label="Nowe hasło" labelPlacement="stacked" type="password" autocomplete="new-password" required
-      minlength={8} value={newPassword} onIonInput={e => setNewPassword(e.detail.value ?? '')} />
-    <IonInput label="Powtórz nowe hasło" labelPlacement="stacked" type="password" autocomplete="new-password" required
-      value={confirmation} onIonInput={e => setConfirmation(e.detail.value ?? '')} />
+    <PasswordField ionic label={session?.must_change_password?'Hasło tymczasowe':'Obecne hasło'} value={currentPassword} onChange={setCurrentPassword}/>
+    <PasswordField ionic newPassword label="Nowe hasło" value={newPassword} onChange={setNewPassword}/>
+    <PasswordField ionic newPassword label="Powtórz nowe hasło" value={confirmation} onChange={setConfirmation}/>
     <p className="slm-muted">Co najmniej 8 znaków. Użyj unikalnego hasła.</p>
     <IonButton type="submit" expand="block" disabled={busy}>Zmień hasło</IonButton>
   </form>;
 
   return <IonPage>
-    <IonHeader><IonToolbar><IonTitle>Sunday League Mates</IonTitle></IonToolbar></IonHeader>
     <IonContent><main className="slm-accounts">
-      <div className="slm-brand"><span aria-hidden="true">SLM</span><p>Twoja drużyna. Twoje konto.</p></div>
+    {!(auth.phase === 'ready' && session && !session.must_change_password && (screen === 'events' || screen === 'players')) && <div className="slm-shell-header slm-floating-brand"><img className="slm-logo slm-crest slm-floating-crest" src="/assets/branding/slm-logo-primary-transparent.png" alt="Sunday League Mates" width="450" height="505" />
+      {auth.phase === 'ready' && session && !session.must_change_password && <IonButton fill="clear" aria-label={`Powiadomienia${unread ? `, nieprzeczytane: ${unread}` : ''}`} onClick={() => setScreen('notifications')}><IonIcon icon={notificationsOutline} aria-hidden="true" /> {unread ? `(${unread})` : ''}</IonButton>}</div>}
+
       {error && <p role="alert" className="slm-error">⚠ {error}</p>}
       {notice && <p role="status" className="slm-notice">✓ {notice}</p>}
       {auth.message && <p role="alert" className="slm-error">⚠ {auth.message}</p>}
@@ -170,18 +180,15 @@ export default function Accounts() {
           <IonButton disabled={busy} onClick={() => void perform(() => manager.refresh())}>Spróbuj ponownie</IonButton>
           <IonButton fill="outline" disabled={busy} onClick={() => void perform(logout)}>Wyloguj się</IonButton>
         </section> : !session ? <section className="slm-panel">
-        <h1>Zaloguj się</h1><p className="slm-muted">Dane konta otrzymasz od administratora grupy.</p>
+        <AccountHeading title="Zaloguj się">Zaloguj się e-mailem albo zachowanym loginem lub telefonem konta legacy.</AccountHeading>
         <form className="slm-form" onSubmit={event => {
           event.preventDefault(); void perform(async () => {
-            await manager.signIn(identifier, loginPassword); setScreen('profile');
+            await manager.signIn(identifier, loginPassword); setScreen('events');
           }).finally(() => setLoginPassword(''));
         }}>
-          <IonInput label="Login lub numer telefonu" labelPlacement="stacked" autocomplete="username" required
-            value={identifier} onIonInput={e => setIdentifier(e.detail.value ?? '')} />
-          <IonInput label="Hasło" labelPlacement="stacked" type="password" autocomplete="current-password" required
-            value={loginPassword} onIonInput={e => setLoginPassword(e.detail.value ?? '')} />
+          <SignInFields legacy identifier={identifier} password={loginPassword} onIdentifier={setIdentifier} onPassword={setLoginPassword}/>
           <IonButton expand="block" type="submit" disabled={busy}>Zaloguj się</IonButton>
-        </form><p className="slm-muted">Nie pamiętasz hasła? Poproś administratora o reset.</p>
+        </form><p className="slm-muted">Rejestracja e-mail jest obecnie niedostępna. Nie pamiętasz hasła istniejącego konta? Skontaktuj się z administratorem aplikacji.</p>
       </section> : <>
         <nav className="slm-actions" aria-label="Konto">
           {!session.must_change_password && <IonButton fill={screen === 'settlements' ? 'solid' : 'outline'}
@@ -189,7 +196,7 @@ export default function Accounts() {
           {!session.must_change_password && <IonButton fill={screen === 'notifications' ? 'solid' : 'outline'}
             onClick={() => { setScreen('notifications'); setTemporary(null); }}>Powiadomienia{unread !== null && unread>0 ? ` (${unread})` : ''}</IonButton>}
           {!session.must_change_password && <IonButton fill={screen === 'events' ? 'solid' : 'outline'}
-            onClick={() => { setScreen('events'); setEventTarget(null); setTemporary(null); }}>Mecze</IonButton>}
+            onClick={() => { setScreen('events'); setEventTarget(null); setEventsViewVersion(v => v + 1); setTemporary(null); }}>Mecze</IonButton>}
           {!session.must_change_password && <IonButton fill={screen === 'profile' ? 'solid' : 'outline'}
             onClick={() => { setScreen('profile'); setTemporary(null); }}>Mój profil</IonButton>}
           {!session.must_change_password && session.role === 'admin' && <IonButton fill={screen === 'admin' ? 'solid' : 'outline'}
@@ -199,14 +206,15 @@ export default function Accounts() {
               finally { setProfile(null); setAccounts([]); clearSecrets(); } });
           }}>Wyloguj się</IonButton>
         </nav>
+        {!session.must_change_password && screen === 'profile' && <AppearanceSettings />}
         {session.must_change_password ? <section className="slm-panel">
           <h1>Zmień hasło tymczasowe</h1><p>Przed korzystaniem z grupy ustaw własne hasło.</p>{passwordForm}
-        </section> : screen === 'settlements' ? <Settlements manager={manager} session={session} /> : screen === 'notifications' ? <Notifications manager={manager} push={push} pushStatus={pushStatus}
+        </section> : screen === 'players' ? <Players players={[]} unavailable action={<IonButton fill="clear" aria-label={`Powiadomienia${unread ? `, nieprzeczytane: ${unread}` : ''}`} onClick={() => setScreen('notifications')}><IonIcon icon={notificationsOutline} aria-hidden="true" />{unread ? `(${unread})` : ''}</IonButton>} /> : screen === 'groups' ? <LiveGroups manager={manager} userId={session.user_id} /> : screen === 'settlements' ? <><GroupFinance manager={manager} /><IonButton fill="clear" onClick={() => setScreen('legacy-finance')}>Rozliczenia historyczne</IonButton></> : screen === 'legacy-finance' ? <Settlements manager={manager} session={session} /> : screen === 'notifications' ? <Notifications manager={manager} push={push} pushStatus={pushStatus}
           onOpen={openNotification} onRefresh={() => setNotificationVersion(v => v+1)} /> :
-          screen === 'events' ? <Events manager={manager} session={session} initialEventId={eventTarget} /> : screen === 'profile' || session.role !== 'admin' ? <>
+          screen === 'events' ? <LiveMatches key={eventsViewVersion} manager={manager} initialEventId={eventTarget} userId={session.user_id} onLegacy={() => setScreen('legacy-events')} /> : screen === 'legacy-events' ? <Events allowCreate={false} manager={manager} session={session} initialEventId={eventTarget} headerAction={<IonButton fill="clear" aria-label={`Powiadomienia${unread ? `, nieprzeczytane: ${unread}` : ''}`} onClick={() => setScreen('notifications')}><IonIcon icon={notificationsOutline} aria-hidden="true" />{unread ? `(${unread})` : ''}</IonButton>} /> : screen === 'profile' || session.role !== 'admin' ? <>
           <section className="slm-panel">
             <h1>{profile?.display_name || 'Mój profil'}</h1>
-            {profile && <a className="slm-call" href={`tel:${profile.phone}`}>Zadzwoń</a>}
+            {profile?.phone && <a className="slm-call" href={`tel:${profile.phone}`}>Zadzwoń</a>}
             <form className="slm-form" onSubmit={event => { event.preventDefault(); void perform(async () => {
               const p = await manager.call<Profile>('save_profile', { full_name: fullName, display_as: displayAs });
               setProfile(p); setNotice('Profil zapisany.');
@@ -221,18 +229,24 @@ export default function Accounts() {
               <IonButton type="submit" disabled={busy}>Zapisz profil</IonButton>
             </form>
           </section>
-          <section className="slm-panel"><h2>Login i telefon</h2>
+          <section className="slm-panel"><h2>{profile?.email_account ? 'Pseudonim i kontakt' : 'Login i telefon'}</h2>
             <form className="slm-form" onSubmit={event => { event.preventDefault(); void perform(async () => {
-              await manager.changeSession('identifiers', { login, phone: normalizePhoneUpdate(phone, profile?.phone), current_password: identityPassword });
-              setNotice('Login i telefon zostały zapisane. Poprzednie sesje wylogowano.');
+              if (profile?.email_account) {
+                const p = await manager.call<Profile>('save_email_profile', { nickname: login,
+                  phone: phone.trim() ? normalizePolishPhone(phone) : '', current_password: identityPassword });
+                setProfile(p); setNotice('Pseudonim i kontakt zapisane.');
+              } else {
+                await manager.changeSession('identifiers', { login, phone: normalizePhoneUpdate(phone, profile?.phone), current_password: identityPassword });
+                setNotice('Login i telefon zostały zapisane. Poprzednie sesje wylogowano.');
+              }
             }).finally(() => setIdentityPassword('')); }}>
               <IonInput label="Login/pseudonim" labelPlacement="stacked" required value={login}
                 onIonInput={e => setLogin(e.detail.value ?? '')} />
               <PhoneInput label="Numer telefonu" value={phone} onChange={setPhone} />
               <IonInput label="Obecne hasło" labelPlacement="stacked" type="password" autocomplete="current-password" required
                 value={identityPassword} onIonInput={e => setIdentityPassword(e.detail.value ?? '')} />
-              <p className="slm-muted">Numer służy do logowania i kontaktu w grupie. Nie wysyłamy SMS-ów.</p>
-              <IonButton type="submit" disabled={busy}>Zmień login i telefon</IonButton>
+              <p className="slm-muted">{profile?.email_account ? 'Telefon kontaktowy jest opcjonalny. Logujesz się e-mailem.' : 'Numer służy do logowania i kontaktu w grupie.'} Nie wysyłamy SMS-ów.</p>
+              <IonButton type="submit" disabled={busy}>{profile?.email_account ? 'Zapisz pseudonim i kontakt' : 'Zmień login i telefon'}</IonButton>
             </form>
           </section>
           <section className="slm-panel"><h2>Zmień hasło</h2>{passwordForm}</section>
@@ -273,5 +287,6 @@ export default function Accounts() {
         </>}
       </>}
     </main></IonContent>
+    {auth.phase === 'ready' && session && !session.must_change_password && <IonFooter><BottomNav active={screen} onSelect={value => { setScreen(value); setTemporary(null); if (value === 'events') { setEventTarget(null); setEventsViewVersion(v => v + 1); } }} /></IonFooter>}
   </IonPage>;
 }

@@ -1,5 +1,5 @@
 import { isPhoneIdentifier, normalizeLoginPhone, normalizePhoneUpdate } from '../_shared/phone.ts';
-export interface Environment { url: string; anon: string; service: string; origins: string[] }
+export interface Environment { url: string; anon: string; service: string; origins: string[]; emailSignupEnabled?: boolean }
 type Row = Record<string, unknown>;
 class ApiError extends Error {
   constructor(public status: number, public code: string, message: string) { super(message); }
@@ -73,8 +73,10 @@ export function createHandler(env: Environment) {
   }
   async function alias(id: string) {
     const rows = await db(`slm_aliases?user_id=eq.${id}`);
-    if (rows.length !== 1) throw unauthorized();
-    return rows[0];
+    if (rows.length === 1) return rows[0];
+    const identity = await db('rpc/slm_email_identity', 'POST', { p_user: id });
+    if (!identity) throw unauthorized();
+    return identity;
   }
   async function verify(token: string) {
     const r = await call('/auth/v1/user', 'GET', undefined, token);
@@ -118,7 +120,7 @@ export function createHandler(env: Environment) {
     const [a, profiles] = await Promise.all([alias(id), db(`slm_profiles?user_id=eq.${id}`)]);
     const p = profiles[0];
     if (!p) throw unauthorized();
-    return { user_id: id, login: a.login, phone: a.phone, full_name: p.full_name,
+    return { user_id: id, login: a.login, phone: a.phone, email_account: a.email_account === true, full_name: p.full_name,
       display_as: p.display_as, display_name: displayName(a.login, p.full_name, p.display_as) };
   }
   async function verifyPassword(ctx: Row, pwd: string) {
@@ -150,15 +152,38 @@ export function createHandler(env: Environment) {
       const body = parsed as Row;
       const action = field(body, 'action', 40);
       await rate('global', 300);
+      if (action === 'signup' || action === 'resend_verification' || action === 'recover_email') {
+        await rate('email-flow', 12);
+        if (!env.emailSignupEnabled) throw new ApiError(503, 'mail_unconfigured', 'Rejestracja i odzyskiwanie e-mail czekają na konfigurację poczty.');
+        // Enabling the environment flag alone must never bypass the existing blocking hook.
+        const email = field(body, 'email', 254).trim().toLowerCase();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new ApiError(400, 'invalid_input', 'Podaj poprawny e-mail.');
+        const path = action === 'signup' ? '/auth/v1/signup' : action === 'resend_verification' ? '/auth/v1/resend' : '/auth/v1/recover';
+        const values = action === 'signup' ? { email, password: password(body, 'password', true) } : action === 'resend_verification' ? { email, type: 'signup' } : { email };
+        const result = await call(path, 'POST', values);
+        if (!result.ok) throw new ApiError(503, 'mail_unavailable', 'Nie udało się uruchomić procesu e-mail. Spróbuj później.');
+        if (result.data?.access_token) {
+          await rejectSession(result.data);
+          throw new ApiError(503, 'verification_required', 'Rejestracja wymaga weryfikacji adresu e-mail.');
+        }
+        return respond({ verification_required: true });
+      }
       if (action === 'login') {
         const start = Date.now();
         const raw = field(body, 'identifier').trim();
         const pwd = password(body, 'password');
         let rows: Row[] = [];
         try {
+          if (raw.includes('@')) {
+            const email = raw.toLowerCase();
+            await rate('identifier:' + email, 16);
+            const identity = await db('rpc/slm_email_identity', 'POST', { p_email: email });
+            if (identity) rows = [identity];
+          } else {
           const normalized = isPhoneIdentifier(raw) ? normalizeLoginPhone(raw) : normalizeLogin(raw).toLowerCase();
           await rate('identifier:' + normalized, 16);
           rows = await db(`slm_aliases?${isPhoneIdentifier(raw) ? 'phone' : 'login_normalized'}=eq.${encodeURIComponent(normalized)}`);
+          }
         } catch (e) { if (e instanceof ApiError && e.status === 429) throw e; }
         if (rows[0]) await rate('account:' + rows[0].user_id, 16);
         // Wersję odczytujemy PRZED sprawdzeniem hasła. Reset między tymi krokami
@@ -212,6 +237,63 @@ export function createHandler(env: Environment) {
       if (action === 'status') return respond({ must_change_password: ctx.must_change_password, role: ctx.role, user_id: ctx.id });
       if (ctx.must_change_password && action !== 'password')
         throw new ApiError(403, 'password_required', 'Najpierw zmień hasło tymczasowe.');
+      if (action === 'finance_groups') {
+        await rate('scoped:' + ctx.id, 90);
+        const result = await call('/rest/v1/rpc/slm_finance_groups', 'POST', { p_user: ctx.id, p_session: ctx.sid }, undefined, true);
+        if (!result.ok) throw new ApiError(503, 'service_unavailable', 'Nie udało się pobrać własnych grup finansowych.');
+        return respond(result.data);
+      }
+      const scoped = [
+        ['group_finance_', 'slm_group_finance_dispatch'],
+        ['groups_', 'slm_groups_dispatch'],
+        ['matches_', 'slm_matches_dispatch'],
+      ].find(([prefix]) => action.startsWith(prefix));
+      if (scoped) {
+        await rate('scoped:' + ctx.id, 90);
+        const [prefix, rpc] = scoped;
+        if ((action === 'groups_phone' || action === 'matches_guest' || action === 'matches_edit_guest')) {
+          const key = action === 'groups_phone' ? 'phone' : 'guest_phone';
+          if (body[key] !== undefined && typeof body[key] !== 'string')
+            throw new ApiError(400, 'invalid_phone', 'Podaj polski numer telefonu.');
+          if (typeof body[key] === 'string' && body[key].trim()) body[key] = normalizePhone(body[key]);
+        }
+        const allowed = prefix === 'groups_'
+          ? ['name','description','query','group_id','user_id','phone','id','request_id','accept','organizer']
+          : prefix === 'matches_'
+          ? ['event_id','guest_name','guest_phone','list','participant_id','user_id','name','group_id','date','time','starts_at','location','address','duration_minutes','capacity','cost_cents','visibility','expected_version','absent','reason','request_id','offset']
+          : ['group_id','event_id','user_id','participant_id','payment_id','request_id','amount_cents','expected_amount_cents','expected_version','reason','payable','absent'];
+        const payload = Object.fromEntries(allowed.filter(key => Object.hasOwn(body, key)).map(key => [key, body[key]]));
+        const r = await call('/rest/v1/rpc/' + rpc, 'POST', {
+          p_user: ctx.id, p_session: ctx.sid, p_action: action.slice(prefix.length), p_body: payload,
+        }, undefined, true);
+        if (!r.ok) {
+          const code = typeof r.data?.message === 'string' ? r.data.message : '';
+          const errors: Record<string, [number, string]> = {
+            session_invalid: [401, 'Sesja wygas?a. Zaloguj si? ponownie.'],
+            forbidden: [403, 'Brak uprawnie? do tej operacji.'],
+            not_found: [404, 'Nie znaleziono wskazanych danych.'],
+            registration_blocked: [403, 'Zaleg?o?ci blokuj? nowe zapisy na p?atne mecze.'],
+            event_full: [409, 'Brak wolnych miejsc. Mo?esz wybra? rezerw?.'],
+            duplicate_signup: [409, 'Ten zapis ju? istnieje.'],
+            registration_closed: [409, 'Zapisy s? zamkni?te.'],
+            event_cancelled: [409, 'Mecz zosta? odwo?any.'],
+            stale_version: [409, 'Dane zmieni?y si?. Od?wie? je przed ponown? decyzj?.'],
+            idempotency_conflict: [409, 'Identyfikator dotyczy innej operacji.'],
+            payment_processed: [409, 'Wp?ata zosta?a ju? rozpatrzona.'],
+            request_processed: [409, 'Pro?ba zosta?a ju? rozpatrzona.'],
+            already_member: [409, 'Zawodnik ju? nale?y do grupy.'],
+            group_archived: [409, 'Grupa jest zarchiwizowana.'],
+            match_not_finished: [409, 'Mecz jeszcze si? nie zako?czy?.'],
+            already_approved: [409, 'Rozliczenie jest ju? zatwierdzone.'],
+            reason_required: [400, 'Podaj pow?d decyzji (do 500 znak?w).'],
+          };
+          if (errors[code]) throw new ApiError(errors[code][0], code, errors[code][1]);
+          if (r.data?.code === '22P02' || r.data?.code === '23514' || r.data?.code === '23502')
+            throw new ApiError(400, 'invalid_input', 'Sprawd? wymagane pola i poprawno?? danych.');
+          throw new ApiError(503, 'service_unavailable', 'Nie uda?o si? potwierdzi? operacji. Pon?w z tym samym identyfikatorem.');
+        }
+        return respond(r.data);
+      }
       if (action.startsWith('settlements_')) {
         await rate('settlements:' + ctx.id, 60);
         const r = await call('/rest/v1/rpc/slm_settlements_dispatch', 'POST', {
@@ -299,6 +381,7 @@ export function createHandler(env: Environment) {
             session_invalid: [401, 'Sesja wygasła. Zaloguj się ponownie.'],
             forbidden: [403, 'Brak uprawnień do tej operacji.'],
             not_found: [404, 'Nie znaleziono meczu lub uczestnika.'],
+            legacy_read_only: [409, 'Nowe mecze twórz w module grupowym. Ten widok zachowuje dane historyczne.'],
             registration_closed: [409, 'Zapisy i rezygnacje są zamknięte od początku meczu.'],
             event_cancelled: [409, 'Mecz został odwołany.'],
             event_full: [409, 'Brak wolnych miejsc. Możesz dołączyć do rezerwy.'],
@@ -323,6 +406,19 @@ export function createHandler(env: Environment) {
         }
         return respond(r.data);
       }
+      if (action === 'save_email_profile') {
+        await rate('sensitive:' + ctx.id, 8);
+        const identity = await alias(ctx.id);
+        if (!identity.email_account) throw new ApiError(403, 'forbidden', 'To konto korzysta z profilu legacy.');
+        const nickname = field(body, 'nickname', 48).trim();
+        if (!nickname) throw new ApiError(400, 'invalid_input', 'Podaj pseudonim.');
+        const rawPhone = field(body, 'phone', 32).trim();
+        const phone = rawPhone ? normalizePhone(rawPhone) : '';
+        if (phone !== identity.phone) await verifyPassword(ctx, password(body, 'current_password'));
+        await db('rpc/slm_email_profile_save', 'POST', { p_user: ctx.id, p_session: ctx.sid,
+          p_nickname: nickname, p_phone: phone, p_number: null });
+        return respond(await profile(ctx.id));
+      }
       if (action === 'profile') return respond(await profile(ctx.id));
       if (action === 'save_profile') {
         const name = field(body, 'full_name', 100).trim();
@@ -338,6 +434,7 @@ export function createHandler(env: Environment) {
         if (action === 'password' && next === current) throw new ApiError(400, 'same_password', 'Nowe hasło musi być inne.');
         const login = action === 'identifiers' ? normalizeLogin(field(body, 'login')) : null;
         const a = await verifyPassword(ctx, current);
+        if (action === 'identifiers' && a.email_account === true) throw new ApiError(400, 'legacy_only', 'Konto e-mail nie używa aliasów logowania legacy.');
         const phone = action === 'identifiers' ? normalizePhone(field(body, 'phone'), a.phone as string) : null;
         if (action === 'identifiers') {
           const conflicts = await db(`slm_aliases?or=(login_normalized.eq.${encodeURIComponent(login!.toLowerCase())},phone.eq.${encodeURIComponent(phone!)})`);

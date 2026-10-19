@@ -217,9 +217,9 @@ language sql stable security invoker set search_path='' as $$
  ), ranked as (
   select *,count(*) filter(where payable) over() n,
    count(*) filter(where payable) over(order by id rows unbounded preceding) position from shares
- ) select id,responsible_user_id,name,status,absent,payable,charge_override,replacement_id,
-  case when payable and n>0 then e.total_cost_cents/n+case when position<=e.total_cost_cents%n then 1 else 0 end else 0 end
- from ranked cross join public.slm_events e where e.id=p_event order by id;
+ ) select r.id,r.responsible_user_id,r.name,r.status,r.absent,r.payable,r.charge_override,r.replacement_id,
+  case when r.payable and r.n>0 then e.total_cost_cents/r.n+case when r.position<=e.total_cost_cents%r.n then 1 else 0 end else 0 end
+ from ranked r cross join public.slm_events e where e.id=p_event order by r.id;
 $$;
 
 create function slm_private.finance_revise(p_event uuid,p_actor uuid,p_reason text) returns void

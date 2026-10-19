@@ -1,0 +1,324 @@
+/* Demo palette registry: one set of existing semantic tokens, no duplicated screens.
+España inherits approved values; only the bright CTA stop is adjusted for small-text contrast.
+Fixed SLM crest, Ultimate card and natural pitch retain their approved artwork. */
+:root[data-theme="fcb"]:not(.ion-palette-dark) {
+ --ion-background-color:#F4F5FA;
+ --ion-background-color-rgb:244,245,250;
+ --ion-text-color:#18243B;
+ --ion-text-color-rgb:24,36,59;
+ --ion-color-primary:#173B83;
+ --ion-color-primary-rgb:23,59,131;
+ --ion-color-primary-contrast:#FFFFFF;
+ --ion-color-primary-contrast-rgb:255,255,255;
+ --ion-color-primary-shade:color-mix(in srgb,#173B83 85%,black);
+ --ion-color-primary-tint:color-mix(in srgb,#173B83 85%,white);
+ --ion-color-secondary-contrast:#20242A;
+ --slm-panel:#FFFFFF;
+ --slm-card-bottom:#FFFFFF;
+ --slm-card-top:#EBEFF8;
+ --slm-card-edge:#71520E20;
+ --slm-text-secondary:#526078;
+ --slm-border:#CBD3E4;
+ --slm-match-border:#71520E70;
+ --slm-gold:#71520E;
+ --slm-fill:#E8BE62;
+ --slm-gold-edge:#F5DB95;
+ --slm-track:#CBD3E4;
+ --slm-premium-burgundy:#101B37;
+ --slm-premium-gold:#E8BE62;
+ --slm-button-top:#173B83;
+ --slm-button-bottom:color-mix(in srgb,#173B83 82%,black);
+ --slm-button-shadow:#173B8340;
+ --slm-glow:#173B8320;
+ --slm-home-tint:#9C173B12;
+ --slm-canvas-glow:#173B8330;
+ --slm-canvas-shade:#F4F5FA20;
+ --slm-header-glow:#9C173B25;
+ --slm-nav-active:#71520E15;
+ --slm-active-top:#173B831A;
+ --slm-active-bottom:#173B8308;
+ --slm-photo-line:#71520E55;
+ --slm-light-flare:#9C173B26;
+ --slm-card-light:#71520E38;
+ --slm-card-rim:#71520E70;
+ --slm-card-burgundy:#9C173B26;
+ --slm-date-floor:#173B8380;
+ --slm-crest-halo:#71520E20;
+ --slm-crest-burgundy:#9C173B10;
+ --slm-detail-rim:#71520E40;
+ --slm-roster-avatar-top:#EBEFF8;
+ --slm-roster-avatar-bottom:#173B8330;
+ --slm-field-bg:#FFFFFF;
+ --slm-field-edge:#71520E;
+}
+:root[data-theme="fcb"].ion-palette-dark {
+ --ion-background-color:#080F22;
+ --ion-background-color-rgb:8,15,34;
+ --ion-text-color:#F5F7FF;
+ --ion-text-color-rgb:245,247,255;
+ --ion-color-primary:#173B83;
+ --ion-color-primary-rgb:23,59,131;
+ --ion-color-primary-contrast:#FFFFFF;
+ --ion-color-primary-contrast-rgb:255,255,255;
+ --ion-color-primary-shade:color-mix(in srgb,#173B83 85%,black);
+ --ion-color-primary-tint:color-mix(in srgb,#173B83 85%,white);
+ --ion-color-secondary-contrast:#20242A;
+ --slm-panel:#101B37;
+ --slm-card-bottom:#101B37;
+ --slm-card-top:#172849;
+ --slm-card-edge:#E8BE6220;
+ --slm-text-secondary:#B7C5DF;
+ --slm-border:#354869;
+ --slm-match-border:#E8BE6270;
+ --slm-gold:#E8BE62;
+ --slm-fill:#E8BE62;
+ --slm-gold-edge:#F5DB95;
+ --slm-track:#354869;
+ --slm-premium-burgundy:#101B37;
+ --slm-premium-gold:#E8BE62;
+ --slm-button-top:#173B83;
+ --slm-button-bottom:color-mix(in srgb,#173B83 82%,black);
+ --slm-button-shadow:#173B8340;
+ --slm-glow:#173B8320;
+ --slm-home-tint:#9C173B40;
+ --slm-canvas-glow:#173B8330;
+ --slm-canvas-shade:#080F2220;
+ --slm-header-glow:#9C173B25;
+ --slm-nav-active:#E8BE6215;
+ --slm-active-top:#173B8370;
+ --slm-active-bottom:#173B8322;
+ --slm-photo-line:#E8BE6255;
+ --slm-light-flare:#9C173B26;
+ --slm-card-light:#E8BE6238;
+ --slm-card-rim:#E8BE6270;
+ --slm-card-burgundy:#9C173B26;
+ --slm-date-floor:#173B8380;
+ --slm-crest-halo:#E8BE6220;
+ --slm-crest-burgundy:#9C173B35;
+ --slm-detail-rim:#E8BE6240;
+ --slm-roster-avatar-top:#172849;
+ --slm-roster-avatar-bottom:#173B8330;
+ --slm-field-bg:#101B37;
+ --slm-field-edge:#E8BE62;
+}
+:root[data-theme="lime"]:not(.ion-palette-dark) {
+ --ion-background-color:#F4F8EF;
+ --ion-background-color-rgb:244,248,239;
+ --ion-text-color:#172A27;
+ --ion-text-color-rgb:23,42,39;
+ --ion-color-primary:#30643A;
+ --ion-color-primary-rgb:48,100,58;
+ --ion-color-primary-contrast:#FFFFFF;
+ --ion-color-primary-contrast-rgb:255,255,255;
+ --ion-color-primary-shade:color-mix(in srgb,#30643A 85%,black);
+ --ion-color-primary-tint:color-mix(in srgb,#30643A 85%,white);
+ --ion-color-secondary-contrast:#20242A;
+ --slm-panel:#FFFFFF;
+ --slm-card-bottom:#FFFFFF;
+ --slm-card-top:#EAF1E2;
+ --slm-card-edge:#42651620;
+ --slm-text-secondary:#4E6356;
+ --slm-border:#C7D6BD;
+ --slm-match-border:#42651670;
+ --slm-gold:#426516;
+ --slm-fill:#77A32B;
+ --slm-gold-edge:#C5EF8C;
+ --slm-track:#C7D6BD;
+ --slm-premium-burgundy:#172A27;
+ --slm-premium-gold:#77A32B;
+ --slm-button-top:#30643A;
+ --slm-button-bottom:color-mix(in srgb,#30643A 82%,black);
+ --slm-button-shadow:#30643A40;
+ --slm-glow:#30643A20;
+ --slm-home-tint:#4A721812;
+ --slm-canvas-glow:#30643A30;
+ --slm-canvas-shade:#F4F8EF20;
+ --slm-header-glow:#4A721825;
+ --slm-nav-active:#42651615;
+ --slm-active-top:#30643A1A;
+ --slm-active-bottom:#30643A08;
+ --slm-photo-line:#42651655;
+ --slm-light-flare:#4A721826;
+ --slm-card-light:#42651638;
+ --slm-card-rim:#42651670;
+ --slm-card-burgundy:#4A721826;
+ --slm-date-floor:#30643A80;
+ --slm-crest-halo:#42651620;
+ --slm-crest-burgundy:#4A721810;
+ --slm-detail-rim:#42651640;
+ --slm-roster-avatar-top:#EAF1E2;
+ --slm-roster-avatar-bottom:#30643A30;
+ --slm-field-bg:#FFFFFF;
+ --slm-field-edge:#426516;
+}
+:root[data-theme="lime"].ion-palette-dark {
+ --ion-background-color:#172A27;
+ --ion-background-color-rgb:23,42,39;
+ --ion-text-color:#F2FBEA;
+ --ion-text-color-rgb:242,251,234;
+ --ion-color-primary:#30643A;
+ --ion-color-primary-rgb:48,100,58;
+ --ion-color-primary-contrast:#FFFFFF;
+ --ion-color-primary-contrast-rgb:255,255,255;
+ --ion-color-primary-shade:color-mix(in srgb,#30643A 85%,black);
+ --ion-color-primary-tint:color-mix(in srgb,#30643A 85%,white);
+ --ion-color-secondary-contrast:#20242A;
+ --slm-panel:#28463D;
+ --slm-card-bottom:#28463D;
+ --slm-card-top:#315347;
+ --slm-card-edge:#B9F25420;
+ --slm-text-secondary:#C0D3C3;
+ --slm-border:#52735C;
+ --slm-match-border:#B9F25470;
+ --slm-gold:#B9F254;
+ --slm-fill:#B9F254;
+ --slm-gold-edge:#D8FAA0;
+ --slm-track:#52735C;
+ --slm-premium-burgundy:#172A27;
+ --slm-premium-gold:#B9F254;
+ --slm-button-top:#30643A;
+ --slm-button-bottom:color-mix(in srgb,#30643A 82%,black);
+ --slm-button-shadow:#30643A40;
+ --slm-glow:#30643A20;
+ --slm-home-tint:#4A721840;
+ --slm-canvas-glow:#30643A30;
+ --slm-canvas-shade:#172A2720;
+ --slm-header-glow:#4A721825;
+ --slm-nav-active:#B9F25415;
+ --slm-active-top:#30643A70;
+ --slm-active-bottom:#30643A22;
+ --slm-photo-line:#B9F25455;
+ --slm-light-flare:#4A721826;
+ --slm-card-light:#B9F25438;
+ --slm-card-rim:#B9F25470;
+ --slm-card-burgundy:#4A721826;
+ --slm-date-floor:#30643A80;
+ --slm-crest-halo:#B9F25420;
+ --slm-crest-burgundy:#4A721835;
+ --slm-detail-rim:#B9F25440;
+ --slm-roster-avatar-top:#315347;
+ --slm-roster-avatar-bottom:#30643A30;
+ --slm-field-bg:#28463D;
+ --slm-field-edge:#B9F254;
+}
+:root[data-theme="deimos"]:not(.ion-palette-dark) {
+ --ion-background-color:#F7F3FC;
+ --ion-background-color-rgb:247,243,252;
+ --ion-text-color:#241A32;
+ --ion-text-color-rgb:36,26,50;
+ --ion-color-primary:#7142BD;
+ --ion-color-primary-rgb:113,66,189;
+ --ion-color-primary-contrast:#FFFFFF;
+ --ion-color-primary-contrast-rgb:255,255,255;
+ --ion-color-primary-shade:color-mix(in srgb,#7142BD 85%,black);
+ --ion-color-primary-tint:color-mix(in srgb,#7142BD 85%,white);
+ --ion-color-secondary-contrast:#FFFFFF;
+ --slm-panel:#FFFFFF;
+ --slm-card-bottom:#FFFFFF;
+ --slm-card-top:#EEE7F8;
+ --slm-card-edge:#65409A20;
+ --slm-text-secondary:#65576F;
+ --slm-border:#DACCE9;
+ --slm-match-border:#65409A70;
+ --slm-gold:#65409A;
+ --slm-fill:#7142BD;
+ --slm-gold-edge:#CFB5FF;
+ --slm-track:#DACCE9;
+ --slm-premium-burgundy:#53308C;
+ --slm-premium-gold:#7142BD;
+ --slm-button-top:#7142BD;
+ --slm-button-bottom:color-mix(in srgb,#7142BD 82%,black);
+ --slm-button-shadow:#7142BD40;
+ --slm-glow:#7142BD20;
+ --slm-home-tint:#C534DF12;
+ --slm-canvas-glow:#7142BD30;
+ --slm-canvas-shade:#F7F3FC20;
+ --slm-header-glow:#C534DF25;
+ --slm-nav-active:#65409A15;
+ --slm-active-top:#7142BD1A;
+ --slm-active-bottom:#7142BD08;
+ --slm-photo-line:#65409A55;
+ --slm-light-flare:#C534DF26;
+ --slm-card-light:#65409A38;
+ --slm-card-rim:#65409A70;
+ --slm-card-burgundy:#C534DF26;
+ --slm-date-floor:#7142BD80;
+ --slm-crest-halo:#65409A20;
+ --slm-crest-burgundy:#C534DF10;
+ --slm-detail-rim:#65409A40;
+ --slm-roster-avatar-top:#EEE7F8;
+ --slm-roster-avatar-bottom:#7142BD30;
+ --slm-field-bg:#FFFFFF;
+ --slm-field-edge:#65409A;
+}
+:root[data-theme="deimos"].ion-palette-dark {
+ --ion-background-color:#121212;
+ --ion-background-color-rgb:18,18,18;
+ --ion-text-color:#FFFFFF;
+ --ion-text-color-rgb:255,255,255;
+ --ion-color-primary:#7142BD;
+ --ion-color-primary-rgb:113,66,189;
+ --ion-color-primary-contrast:#FFFFFF;
+ --ion-color-primary-contrast-rgb:255,255,255;
+ --ion-color-primary-shade:color-mix(in srgb,#7142BD 85%,black);
+ --ion-color-primary-tint:color-mix(in srgb,#7142BD 85%,white);
+ --ion-color-secondary-contrast:#20242A;
+ --slm-panel:#1E1E1E;
+ --slm-card-bottom:#1E1E1E;
+ --slm-card-top:#2A2235;
+ --slm-card-edge:#B58AFF20;
+ --slm-text-secondary:#C7BBD7;
+ --slm-border:#7B44D4;
+ --slm-match-border:#B58AFF70;
+ --slm-gold:#B58AFF;
+ --slm-fill:#9D6BFF;
+ --slm-gold-edge:#D1B5FF;
+ --slm-track:#60487B;
+ --slm-premium-burgundy:#53308C;
+ --slm-premium-gold:#9D6BFF;
+ --slm-button-top:#7142BD;
+ --slm-button-bottom:color-mix(in srgb,#7142BD 82%,black);
+ --slm-button-shadow:#7142BD40;
+ --slm-glow:#7142BD20;
+ --slm-home-tint:#C534DF40;
+ --slm-canvas-glow:#7142BD30;
+ --slm-canvas-shade:#12121220;
+ --slm-header-glow:#C534DF25;
+ --slm-nav-active:#B58AFF15;
+ --slm-active-top:#7142BD70;
+ --slm-active-bottom:#7142BD22;
+ --slm-photo-line:#B58AFF55;
+ --slm-light-flare:#C534DF26;
+ --slm-card-light:#B58AFF38;
+ --slm-card-rim:#B58AFF70;
+ --slm-card-burgundy:#C534DF26;
+ --slm-date-floor:#7142BD80;
+ --slm-crest-halo:#B58AFF20;
+ --slm-crest-burgundy:#C534DF35;
+ --slm-detail-rim:#B58AFF40;
+ --slm-roster-avatar-top:#2A2235;
+ --slm-roster-avatar-bottom:#7142BD30;
+ --slm-field-bg:#1E1E1E;
+ --slm-field-edge:#B58AFF;
+}
+.slm-appearance .slm-palette-picker { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+.slm-palette-picker legend { grid-column:1/-1; }
+.slm-palette-picker label { border:1px solid var(--slm-border); border-radius:9px; min-width:0; font-size:.78rem; }
+.slm-palette-picker label:has(input:checked) { border-color:var(--slm-gold); background:var(--slm-nav-active); }
+.slm-palette-swatch { display:flex; flex-shrink:0; gap:2px; }
+.slm-palette-swatch i { width:8px; height:18px; border-radius:4px; background:var(--swatch-primary); }
+.slm-palette-swatch i:first-child { background:var(--swatch-bg); border:1px solid var(--slm-border); }
+.slm-palette-swatch i:last-child { background:var(--swatch-accent); }
+[data-palette=espana] { --swatch-bg:#0B0C10; --swatch-primary:#880000; --swatch-accent:#D4AF37; }
+[data-palette=fcb] { --swatch-bg:#101B37; --swatch-primary:#173B83; --swatch-accent:#9C173B; }
+[data-palette=lime] { --swatch-bg:#172A27; --swatch-primary:#28463D; --swatch-accent:#B9F254; }
+[data-palette=deimos] { --swatch-bg:#121212; --swatch-primary:#7142BD; --swatch-accent:#C534DF; }
+@media(max-width:350px) { .slm-appearance .slm-palette-picker { grid-template-columns:1fr; } }
+
+:root[data-theme="espana"].ion-palette-dark { --slm-button-top:#E71835; }
+
+/* España keeps its approved texture; the other families use their own quiet tint.
+   Stadium photographs and official brand assets are unchanged. */
+:root[data-theme="fcb"].ion-palette-dark,:root[data-theme="lime"].ion-palette-dark,:root[data-theme="deimos"].ion-palette-dark {
+ --slm-dark-texture:radial-gradient(ellipse at 80% 10%,var(--slm-glow),transparent 70%);
+}

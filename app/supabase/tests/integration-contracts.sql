@@ -1,4 +1,4 @@
--- PRZYGOTOWANE, NIEURUCHOMIONE. Tylko izolowana lokalna baza; bez JWT/wyścigów.
+-- Lokalny test struktury delegacji. Testy transakcji/JWT/wyścigów są w skryptach local.
 begin;
 do $$
 declare signature text; before_state jsonb;
@@ -14,7 +14,9 @@ begin
    raise exception 'Publiczny dostęp do %',signature; end if;
   if not has_function_privilege('service_role',signature,'EXECUTE') then raise exception 'Brak grantu service_role %',signature; end if;
  end loop;
- if position('finance_notification_changes' in pg_get_functiondef('public.slm_events_dispatch(uuid,uuid,text,jsonb)'::regprocedure))=0
+ if (position('finance_notification_changes' in pg_get_functiondef('public.slm_events_dispatch(uuid,uuid,text,jsonb)'::regprocedure))=0
+ and not (position('legacy_events_dispatch' in pg_get_functiondef('public.slm_events_dispatch(uuid,uuid,text,jsonb)'::regprocedure))>0
+ and position('finance_notification_changes' in pg_get_functiondef('slm_private.legacy_events_dispatch(uuid,uuid,text,jsonb)'::regprocedure))>0))
   or position('finance_notification_changes' in pg_get_functiondef('public.slm_settlements_dispatch(uuid,uuid,text,jsonb)'::regprocedure))=0 then
   raise exception 'Brak adaptera w wrapperach'; end if;
  before_state:=slm_private.finance_notification_snapshot();

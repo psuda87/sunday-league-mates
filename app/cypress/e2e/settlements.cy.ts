@@ -4,7 +4,7 @@ describe('Rozliczenia — przygotowany interfejs z kontrolowanym API', () => {
   const session = (role: 'member' | 'admin') => ({ user_id: crypto.randomUUID(), access_token: crypto.randomUUID(),
     refresh_token: crypto.randomUUID(), role, must_change_password: false, expires_in: 3600 });
   const profile = (user_id: string) => ({ user_id, login: 'Fixture', phone: '+12025550150', full_name: '', display_as: 'nickname', display_name: 'Fixture' });
-  const login = () => { cy.visit('/'); input('Login lub numer telefonu', 'Fixture'); input('Hasło', crypto.randomUUID()); cy.contains('ion-button', 'Zaloguj się').click(); };
+  const login = () => { cy.visit('/'); input('E-mail, login lub numer telefonu', 'Fixture'); input('Hasło', crypto.randomUUID()); cy.contains('ion-button', 'Zaloguj się').click(); };
 
   it('pokazuje własny dług/gościa i blokadę; zgłoszenie wpłaty nie zmienia salda', () => {
     const s = session('member'), event = crypto.randomUUID();
@@ -15,7 +15,10 @@ describe('Rozliczenia — przygotowany interfejs z kontrolowanym API', () => {
         reason: 'Zatwierdzenie fixture', actor_name: 'Admin fixture', participant_name: 'Gość fixture', is_guest: true,
         starts_at: '2026-10-08T17:30:00Z', created_at: '2026-10-08T19:01:00Z' }], payments: [] as unknown[], decisions: [] };
     cy.intercept('POST', '**/functions/v1/accounts', req => {
-      if (req.body.action === 'login') req.reply(s);
+      if (req.body.action === 'matches_list') req.reply({events:[],server_now:'2026-10-19T12:00:00Z'});
+      else if ((req.body.action === 'groups_list'||req.body.action === 'finance_groups')) req.reply({groups:[]});
+      else if (req.body.action === 'events_list') req.reply({ events: [], server_now: '2026-10-17T12:00:00Z' });
+      else if (req.body.action === 'login') req.reply(s);
       else if (req.body.action === 'profile') req.reply(profile(s.user_id));
       else if (req.body.action === 'settlements_account') req.reply(account);
       else if (req.body.action === 'settlements_submit_payment') {
@@ -25,7 +28,7 @@ describe('Rozliczenia — przygotowany interfejs z kontrolowanym API', () => {
         req.reply({ payment_id: req.body.request_id, status: 'pending' });
       } else req.reply({ ok: true });
     });
-    login(); cy.contains('ion-button', 'Rozliczenia').click();
+    login(); cy.contains('ion-button', 'Rozliczenia').click(); cy.contains('ion-button','Rozliczenia historyczne').click();
     cy.contains('Zapisy i dodawanie gości zablokowane').should('be.visible');
     cy.contains('Gość: Gość fixture').should('be.visible');
     cy.contains('.slm-balance', '-54,00').should('be.visible');
@@ -46,6 +49,8 @@ describe('Rozliczenia — przygotowany interfejs z kontrolowanym API', () => {
     cy.intercept('POST', '**/functions/v1/accounts', req => {
       if (req.body.action === 'login') req.reply(s);
       else if (req.body.action === 'profile') req.reply(profile(s.user_id));
+      else if (req.body.action === 'matches_list') req.reply({events:[],server_now:'2026-10-19T12:00:00Z'});
+      else if ((req.body.action === 'groups_list'||req.body.action === 'finance_groups')) req.reply({groups:[]});
       else if (req.body.action === 'events_list') req.reply({ events: [match()], server_now: '2026-10-14T17:00:00Z' });
       else if (req.body.action === 'events_detail') req.reply({ event: match(), participants: [], server_now: '2026-10-14T17:00:00Z' });
       else if (req.body.action === 'settlements_account') req.reply({ blocked: false, unpaid_matches: 0 });
@@ -60,7 +65,7 @@ describe('Rozliczenia — przygotowany interfejs z kontrolowanym API', () => {
         approvals++; approved = true; req.reply({ event_id: eid, version: 2 });
       } else req.reply({ ok: true });
     });
-    login(); cy.contains('ion-button', 'Mecze').click(); cy.contains('ion-button', 'Szczegóły').click();
+    login(); cy.contains('ion-button', 'Mecze').click(); cy.contains('ion-button', 'Wydarzenia i rozliczenia historyczne').click(); cy.contains('button', 'Historia').click(); cy.get('button[aria-label^="Otwórz szczegóły meczu"]').first().click(); cy.contains('[role=tab]', 'Rozliczenie').click();
     cy.contains('Wstępne — nie tworzy zaległości ani blokady').should('be.visible');
     input('Powód decyzji / korekty', 'Odbiór fixture');
     cy.on('window:confirm', () => true); cy.contains('ion-button', 'Zatwierdź rozliczenie').click();

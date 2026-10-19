@@ -7,6 +7,7 @@ export interface Session {
   must_change_password: boolean;
 }
 export interface Profile {
+  email_account?: boolean;
   user_id: string;
   login: string;
   phone: string;

@@ -1,0 +1,26 @@
+import { profileProblems } from '../account-ui/model';
+import { useEffect, useId, useRef, useState } from 'react';
+import type { CSSProperties, Dispatch, FormEvent } from 'react';
+import type { Action, DemoPlayer } from './data';
+import { normalizeDemoName, validDemoName } from './data';
+import type { DemoPortrait } from './portraits';
+import { demoPortraits, readDemoPortrait } from './portraits';
+export function DemoAvatar({player}:{player:DemoPlayer}) {
+ const p=player.portrait;
+ return player.portraitEdited&&p?<span className="slm-custom-avatar" data-layout={p.column===undefined?'single':'sheet'}><img src={p.src} alt="" style={{'--portrait-column':p.column??0,'--portrait-row':p.row??0} as CSSProperties}/></span>:<>{player.name.split(' ').slice(0,2).map(s=>s[0]).join('')}</>;
+}
+function Preview({portrait}:{portrait?:DemoPortrait}) {
+ return <span className="slm-identity-preview" data-layout={portrait?.column===undefined?'single':'sheet'}>{portrait&&<img alt="Podgląd wybranego zdjęcia" src={portrait.src} style={{'--portrait-column':portrait.column??0,'--portrait-row':portrait.row??0} as CSSProperties}/>}</span>;
+}
+export function IdentityEditor({player,dispatch,onClose,onNumber}:{player:DemoPlayer;dispatch:Dispatch<Action>;onClose:()=>void;onNumber:()=>void}) {
+ const [first,setFirst]=useState(player.accountSetup?player.name:player.name.split(' ')[0]),[last,setLast]=useState(player.accountSetup?player.fullName??'':player.name.split(' ').slice(1).join('')),[error,setError]=useState('');
+ const prefix=useId();
+ function save(event:FormEvent){event.preventDefault();const name=normalizeDemoName(player.accountSetup?first:`${first} ${last}`);if(!first.trim()||!validDemoName(name)||(player.accountSetup&&profileProblems({nickname:name,fullName:last,phone:''}).length)){setError('Wpisz imię i nazwę o łącznej długości do 48 znaków, bez znaków sterujących i nawiasów < >.');return;}dispatch({type:'identity',playerId:player.id,name,...(player.accountSetup?{fullName:last.trim()}: {})});onClose();}
+ return <form className="slm-identity-editor" onSubmit={save} noValidate aria-label="Edycja danych demonstracyjnych"><h2>Edytuj profil</h2><p>Używaj fikcyjnych danych. Zmiany tylko w pamięci demo.</p><label htmlFor={prefix+'-first'}>{player.accountSetup?'Pseudonim / nazwa zawodnika':'Imię'}</label><input id={prefix+'-first'} autoFocus autoComplete="off" maxLength={48} value={first} onChange={e=>{setFirst(e.target.value);setError('');}} aria-describedby={error?prefix+'-error':undefined} aria-invalid={!!error}/><label htmlFor={prefix+'-last'}>{player.accountSetup?'Imię i nazwisko · opcjonalnie':'Nazwisko / nazwa wyświetlana'}</label><input id={prefix+'-last'} autoComplete="off" maxLength={player.accountSetup?100:48} value={last} onChange={e=>{setLast(e.target.value);setError('');}} aria-describedby={error?prefix+'-error':undefined}/>{error&&<p role="alert" id={prefix+'-error'}>{error}</p>}<button type="button" onClick={onNumber}>Zmień numer koszulki · {player.jerseyNumber??'nie ustawiono'}</button><div className="slm-identity-actions"><button type="submit">Zapisz dane demo</button><button type="button" onClick={onClose}>Anuluj</button></div></form>;
+}
+export function AvatarPicker({player,dispatch,onClose}:{player:DemoPlayer;dispatch:Dispatch<Action>;onClose:()=>void}) {
+ const [portrait,setPortrait]=useState(player.portrait),[error,setError]=useState(''),[busy,setBusy]=useState(false),generation=useRef(0),fileId=useId();
+ useEffect(()=>()=>{generation.current++;},[]);
+ async function chooseFile(file?:File){if(!file)return;const attempt=++generation.current;setBusy(true);setError('');try{const next=await readDemoPortrait(file);if(attempt===generation.current)setPortrait(next);}catch(e){if(attempt===generation.current)setError(e instanceof Error?e.message:'Nie udało się odczytać obrazu.');}finally{if(attempt===generation.current)setBusy(false);}}
+ return <section className="slm-avatar-picker" aria-label="Demonstracyjny wybór zdjęcia"><h2>Zmień zdjęcie</h2><p>Fikcyjne portrety lub plik lokalny. Bez wysyłania i zapisywania zdjęć.</p><div className="slm-avatar-options" role="group" aria-label="Fikcyjne portrety">{demoPortraits.map((p,i)=><button type="button" key={i} aria-label={`Portret demonstracyjny ${i+1}`} aria-pressed={portrait?.src===p.src&&portrait.column===p.column&&portrait.row===p.row} onClick={()=>{generation.current++;setBusy(false);setError('');setPortrait(p);}}><Preview portrait={p}/></button>)}</div><div className="slm-avatar-preview-wrap"><Preview portrait={portrait}/><span>Podgląd przed zatwierdzeniem</span></div><label htmlFor={fileId}>Wybierz lokalny plik · PNG/JPEG/WebP, do 2 MB</label><input className="slm-local-file-input" id={fileId} type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>{void chooseFile(e.target.files?.[0]);e.target.value='';}}/>{busy&&<p role="status">Otwieranie obrazu…</p>}{error&&<p role="alert">{error}</p>}<div className="slm-identity-actions"><button type="button" disabled={busy||!portrait||!!error} onClick={()=>{if(portrait)dispatch({type:'portrait',playerId:player.id,portrait});onClose();}}>Zatwierdź zdjęcie</button><button type="button" onClick={onClose}>Anuluj</button></div></section>;
+}

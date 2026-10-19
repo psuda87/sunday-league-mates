@@ -40,8 +40,8 @@ export default function Notifications({ manager, push, pushStatus, onOpen, onRef
         <h2>{!n.read_at && <span aria-label="Nieprzeczytane">● </span>}{n.title}</h2>
         <p>{n.body}</p><p className="slm-muted">{date(n.created_at)} · {n.read_at ? 'Przeczytane' : 'Nowe'}</p>
         <div className="slm-actions"><IonButton fill="outline" disabled={busy} onClick={() => void work(async () => {
-          await onOpen(n.id); if (!n.event_id) await load();
-        })}>{n.event_id ? 'Otwórz mecz' : n.category === 'finance' ? 'Otwórz powiadomienie' : 'Przeczytaj'}</IonButton>
+          await onOpen(n.id); if (!n.event_id && !n.match_id) await load();
+        })}>{n.event_id || n.match_id ? 'Otwórz mecz' : n.category === 'finance' ? 'Otwórz powiadomienie' : 'Przeczytaj'}</IonButton>
           {!n.read_at && <IonButton fill="clear" disabled={busy} onClick={() => void work(async () => {
             await manager.call('notifications_read',{ notification_id: n.id }); await load();
           })}>Oznacz jako przeczytane</IonButton>}</div>

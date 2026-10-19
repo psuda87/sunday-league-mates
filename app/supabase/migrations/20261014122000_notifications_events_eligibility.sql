@@ -2,8 +2,7 @@
 -- Integracja istniejącego RPC wydarzeń z serwerowym dziennikiem rozliczeń.
 -- Zachowuje kontrolę sesji, limitów i historii z feat/events.
 revoke update,delete,truncate on public.slm_event_history from service_role;
-create trigger settlement_event_history_immutable before update or delete on public.slm_event_history
- for each row execute function slm_private.finance_immutable();
+-- Trigger niezmienności został utworzony w 20261014102000; zachowaj go.
 create or replace function public.slm_events_dispatch(p_user uuid,p_session uuid,p_action text,p_body jsonb default '{}')
 returns jsonb language plpgsql security invoker set search_path='' as $$
 declare
