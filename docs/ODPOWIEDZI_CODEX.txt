@@ -1597,3 +1597,100 @@ Przegląd34 ścieżek: bez sekretów/.env/artefaktów/backendu/zmian vercel.json
 git diff --check OK. Dotychczasowe wpisy raportu zachowane bez zmian.
 Zwykły push wyłącznie feat/ui-beta, bez merge/migracji/ręcznego deploy.
 Końcowy SHA commita raportu podany w odpowiedzi i widoczny w historii Git.
+
+[2026-10-19 11:39:28 CEST] Premium3.17 —4 palety, kłódki i polska lokalizacja; tylko demo
+Baza0e83425 z ukończonym3.16/15d91a8, czysty Git i zgodny origin przy rozpoczęciu.
+Zrobiono: España/FCB/Classic Lime/Deimos-Code, niezależne Light/Dark/Auto,
+próbki kolorów w Profil→Ustawienia i Narzędziach demo. Jeden rejestr istniejących
+tokenów CSS, bez duplikacji ekranów; primary/Ionic/powierzchnie/nawigacja/plus/
+formularze/grupy/otoczenie profilu/finanse spójne. Oficjalne zasoby/Ultimate/boisko
+pozostają bez przebudowy. España domyślna; drobna korekta CTA Dark F01937→E71835
+zwiększa kontrast małego białego tekstu4,29→4,59:1. Reszta kompozycji zachowana.
+Deimos rzeczywiście zweryfikowany w3 wskazanych plikach CSS psuda87/code-finder,
+SHAa13f389d6d477afbb6fc34aeb0ee9c49847a3ade. Wyłącznie HEX, bez kopiowania kodu,
+danych/logo; użyto121212/1E1E1E/7142BD/9D6BFF/C534DF/53308C/7B44D4/FFFFFF.
+Nowe palety mają własne spokojne tła zamiast narzuconej bordowej tekstury España.
+
+Preferencje slm.palette i slm.appearance lokalne, bez danych prywatnych i sieci;
+reset wydarzeń ich nie usuwa. Auto reaguje na system, manual override zachowany,
+blocked storage działa w pamięci strony. Opt-in nowych palet wyłącznie demo,
+produkcja nadal España, bez zmian Auth ani sesji.
+Prywatne/Publiczne wewnątrz prawego górnego rogu kart, Ionic kłódka zamknięta/
+otwarta, bez emoji i podwójnych etykiet; grupa zostaje nad kartą. Karty121px,
+plus56px/20px i nawigacja bez przebudowy. Locked outsider zachowuje ograniczenia.
+Formularze tworzenia/edycji: kontrolowane DD.MM.RRRR/HH:mm, klawiatura numeryczna
+z separatorami. ISO/Warsaw/DST/validateEvent bez zmian; podgląd/Informacje/own
+pokazują pl-PL h23. Wymuszone en-US i America/New_York w Chromium nadal pokazały
+20.10.2026 i18:00; wejście cyframi20102026/1800 i ponowna edycja również OK.
+
+Testy STANDARD: TypeScript OK, ESLint zmienionych plików obsługiwanych przez
+konfigurację OK, MJS node --check OK. Build demo/izolacja15 plików/CSP OK;
+allowlista rozszerzona tylko o palettes.css, bez zmian vercel.json i zależności.
+Pełny Vitest173/173 w29 plikach; po ostatnich poprawkach wybrane5 plików32/32,
+łącznie174 różne przypadki sprawdzone, bez deklaracji jednego pełnego174/174.
+Chromium12 kombinacji/320/390/768, badge geometry/brak kolizji/duplikacji/overflow,
+Auto/system/restore/reset, formularz/podgląd/edycja i smoke zapis/grupy/profil/
+rozliczenia/uprawnienia OK. Wybrane pary tekstowe/CTA/akcent≥4,5:1, szczegóły
+w dokumencie motywów; dodatkowo Deimos modal1E1E1E/FFFFFF i focus klawiatury2px.
+Brak zewnętrznych żądań i błędów CSP. Obejrzano prawdziwe rendery i poprawiono
+wysokość karty po dodaniu badge oraz resztkową bordową teksturę nowych palet.
+11 prawdziwych zrzutów, nie makiety:
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium317-espana-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium317-espana-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium317-fcb-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium317-fcb-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium317-lime-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium317-lime-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium317-deimos-dark.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium317-deimos-light.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium317-theme-settings.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium317-match-privacy-badges.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium317-polish-date-time.png
+
+Ograniczenia: bez pełnego audytu WCAG wszystkich stanów/zdjęć, pełnej starej
+regresji Chromium, Cypress, produkcyjnego builda i rzeczywistego Android/iOS/
+klawiatury. Duży chunk Ionic nadal ostrzeżeniem. Brak zmian reguł grup/finansów/
+udziału/widoczności, backendu/Auth/RPC/RLS/migracji/Firebase/push/Vercel/sekretów.
+Brak merge i ręcznego wdrożenia; automatycznego podglądu Vercel nie zweryfikowano.
+Nie przenoszono Code-Finder poza nieszkodliwymi wartościami stylistycznymi.
+Historyczne informacje o Dockerze/migracjach zachowane. Zakończono3.17.
+Dokładne kolory i architektura: docs/ui/PREMIUM317_THEMES.md.
+
+Lista zmienionych/nowych plików:
+AGENTS.md
+app/demo/main.tsx
+app/scripts/test-demo-events-browser.mjs
+app/scripts/test-demo-themes-browser.mjs
+app/src/demo/App.tsx
+app/src/demo/EventAccessView.tsx
+app/src/demo/EventForm.tsx
+app/src/demo/Panels.tsx
+app/src/demo/Profile.tsx
+app/src/demo/eventAccess.css
+app/src/demo/eventDraft.ts
+app/src/demo/palettes.css
+app/src/demo/polishDate.test.tsx
+app/src/ui/AppearanceSettings.tsx
+app/src/ui/Demo.test.tsx
+app/src/ui/MatchHero.tsx
+app/src/ui/palettes.test.tsx
+app/src/ui/theme.ts
+app/vite.demo.config.ts
+docs/ODPOWIEDZI_CODEX.txt
+docs/STATUS.md
+docs/UI_BETA.md
+docs/ui/PREMIUM317_THEMES.md
+docs/ui/premium317-deimos-dark.png
+docs/ui/premium317-deimos-light.png
+docs/ui/premium317-espana-dark.png
+docs/ui/premium317-espana-light.png
+docs/ui/premium317-fcb-dark.png
+docs/ui/premium317-fcb-light.png
+docs/ui/premium317-lime-dark.png
+docs/ui/premium317-lime-light.png
+docs/ui/premium317-match-privacy-badges.png
+docs/ui/premium317-polish-date-time.png
+docs/ui/premium317-theme-settings.png
+
+SHA implementacji zostanie dopisany po commicie w następnym wpisie; końcowy SHA
+commita raportu będzie w odpowiedzi i historii Git.

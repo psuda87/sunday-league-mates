@@ -1,3 +1,22 @@
+# Premium3.17 —4 palety wyłącznie w demo
+
+- Nowe palety są opt-in: demo/main initializeTheme({palettes:true}), wspólny
+  theme.ts i AppearanceSettings enablePalettes. Produkcja domyślnie España.
+  slm.palette=espana/fcb/lime/deimos niezależne od slm.appearance=auto/light/dark;
+  default España/Auto. Reset fikcyjnych wydarzeń nie resetuje preferencji.
+- Jeden rejestr semantycznych tokenów src/demo/palettes.css, bez kopii ekranów.
+  Deimos źródła CSS rzeczywiście odczytane z psuda87/code-finder a13f389; tylko
+  HEX, bez przenoszenia kodu/danych/logo. España zachowana z małą korektą
+  kontrastu najjaśniejszego CTA F01937→E71835. Nie przebudowywać Ultimate/herbu/
+  boiska/nav ani istniejących reguł grup, widoczności, udziałów i finansów.
+- MatchHero ma opcjonalny prezentacyjny badge. Demo EventPrivacy używa Ionic
+  lockClosedOutline/lockOpenOutline wewnątrz karty, nazwy Prywatne/Publiczne
+  bez zmian; nad kartą tylko grupa. Nie odsłaniać danych locked outsiderów.
+- Formularz demo: kontrolowane DD.MM.RRRR/HH:mm, cyfry z separatorami, parse do
+  tego samego ISO/eventInstant Warsaw/DST. Nie wracać do natywnych date/time,
+  których wygląd jest zależny od locale przeglądarki. STANDARD, dokumentacja
+  docs/ui/PREMIUM317_THEMES.md. Zakończyć na3.17, bez kolejnego etapu.
+
 # Premium3.16 — wydarzenia grupowe wyłącznie w demo
 
 - Ten wpis zastępuje odroczenie integracji3.16 i globalne eventRole ze starszych

@@ -65,7 +65,7 @@ it('opens the selected fictional match with matching date, capacity and roster t
   expect(panel.querySelectorAll('.slm-roster-group')[1].querySelectorAll('li')).toHaveLength(0);
   expect(panel.querySelectorAll('.slm-roster-group')[2].querySelectorAll('li')).toHaveLength(0);
   fireEvent.click(screen.getByRole('tab', { name: 'Informacje' }));
-  expect(screen.getByRole('tabpanel')).toHaveTextContent('29 października 2026');
+  expect(screen.getByRole('tabpanel')).toHaveTextContent('29.10.2026');
   fireEvent.click(screen.getByRole('tab', { name: 'Składy' }));
   expect(screen.getByRole('tabpanel')).toHaveTextContent('Przykładowe składy · tylko pamięć demo');
   expect(screen.getByRole('tabpanel').querySelectorAll('.slm-football-pitch [data-entry]')).toHaveLength(15);
@@ -81,7 +81,7 @@ it('filters fictional fixtures without inventing membership or changing the chos
   fireEvent.click(screen.getAllByRole('button', { name: /Otwórz szczegóły meczu:/ })[0]);
   expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '12');
   fireEvent.click(screen.getByRole('tab', { name: 'Informacje' }));
-  expect(screen.getByRole('tabpanel')).toHaveTextContent('16 października 2026');
+  expect(screen.getByRole('tabpanel')).toHaveTextContent('16.10.2026');
   fireEvent.click(screen.getByLabelText('Wróć do meczów'));
   expect(screen.getByRole('button', { name: 'Historia' })).toHaveAttribute('aria-pressed', 'true');
   fireEvent.click(screen.getByRole('button', { name: 'Nadchodzące' }));

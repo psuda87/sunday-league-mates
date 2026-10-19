@@ -1,3 +1,43 @@
+# Premium 3.17 — 2026-10-19 11:39:28 CEST
+
+Tylko izolowane demo:4 palety España/FCB/Classic Lime/Deimos-Code, niezależne
+od Jasny/Ciemny/Auto (12 kombinacji). Jeden rejestr istniejących tokenów CSS,
+wybór w Profil→Ustawienia oraz Narzędziach demo. Domyślnie España/Auto;
+localStorage slm.palette + istniejące slm.appearance, bez danych osobowych/API.
+Reset wydarzeń zachowuje preferencje; zmiany systemowe działają na żywo w Auto.
+Gdy magazyn przeglądarki jest zablokowany, wybór działa w pamięci bieżącej strony.
+Produkcja nie aktywuje nowych palet (initializeTheme domyślnie bez opt-in).
+
+Deimos: rzeczywiście odczytano3 wskazane CSS repo psuda87/code-finder, commit
+`a13f389d6d477afbb6fc34aeb0ee9c49847a3ade`; użyto wyłącznie wartości kolorów,
+bez kopiowania kodu/danych/logotypu. FCB granat/bordo, Lime ciemna zieleń/limonka.
+España zachowuje układ/teksturę/zasoby; jedyna korekta starego koloru: najjaśniejszy
+stop czerwonego CTA Dark F01937→E71835, kontrast białego tekstu4,29→4,59:1.
+Nowe palety mają własne subtelne tła zamiast narzuconej bordowej tekstury España.
+Herb, zdjęcia, Ultimate i boisko/dolna nawigacja nie zostały przebudowane.
+
+Prywatne/Publiczne z ikonami zamkniętej/otwartej kłódki Ionic wewnątrz prawego
+górnego rogu kart; tylko nazwa grupy pozostaje nad kartą. Po jednej etykiecie,
+bez emoji i kolizji. Karty nadal121px, plus56px/20px. Lokalizacja formularzy:
+kontrolowane DD.MM.RRRR i HH:mm z klawiaturą numeryczną i separatorami; brak
+natywnych date/time zależnych od języka systemu. ISO, Warsaw/DST i walidacja
+pozostają. Podgląd/Informacje/ograniczony udział wyświetlają pl-PL h23.
+
+STANDARD: TypeScript i ESLint zmienionego zakresu OK; demo build + izolacja15
+plików/CSP OK. Vitest173/173 w29 plikach, po końcowych poprawkach zawężone32/32
+w5 plikach (w tym dodatkowy test wejścia cyframi; bez deklaracji pełnego174/174).
+Chromium:12 kombinacji,8 widoków palet+3 dodatkowe zrzuty,320/390/768, brak overflow,
+privacy badge w karcie, persistence/reload/reset/Auto, smoke zapis/grupa/profil/
+rozliczenie i zachowanie uprawnień. Kontrast wybranych par tekst/powierzchnia,
+muted/surface, primary/accent i gradient CTA≥4,5:1. Dodatkowo sprawdzono focus,
+modal Deimos (1E1E1E/FFFFFF), cyfrowe wpisanie terminu/podgląd. Rzeczywiste20.10.2026
+18:00 sprawdzone również przy en-US i America/New_York. Brak zewnętrznych żądań.
+Bez pełnej starej regresji Chromium, Cypress, produkcyjnego builda i Android/iOS;
+nie jest to pełny audyt WCAG. Duży chunk Ionic nadal ostrzeżeniem. Backend/model
+grup i finansów/RPC/RLS/migracje/Firebase/vercel.json bez zmian; bez merge/deploy.
+Historia Dockera i niezweryfikowanych migracji poniżej zachowana. Zakończono3.17.
+Dokumentacja i11 prawdziwych zrzutów: [ui/PREMIUM317_THEMES.md](ui/PREMIUM317_THEMES.md).
+
 # Premium España 3.16 — 2026-10-19 09:54:56 CEST
 
 Wyłącznie izolowane demo. Game ma groupId/createdBy/visibility; wszystkie10 meczów

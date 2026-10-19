@@ -40,3 +40,24 @@ export function defaultEvent(now=Date.now()):EventInput {
   const date=localEventTime(now+86400000).date;
   return {groupId:'',visibility:'private',name:'',startsAt:eventInstant(date,'18:00')!,location:'Boisko przy ul. Harcerskiej 1',address:'Harcerska 1, Chorzów',durationMinutes:90,minimum:10,capacity:15,costCents:27000};
 }
+
+// Explicit demo presentation: independent of the OS/browser locale. Internal dates stay ISO.
+export const displayEventDate=(iso:string)=>iso.split('-').reverse().join('.');
+export function parseEventDate(value:string):string|null {
+ if(!/^\d{2}\.\d{2}\.\d{4}$/.test(value))return null;
+ const [day,month,year]=value.split('.'),iso=`${year}-${month}-${day}`;
+ return eventInstant(iso,'12:00')?iso:null;
+}
+export const formatEventDateTime=(instant:string)=>new Intl.DateTimeFormat('pl-PL',{timeZone:eventZone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(new Date(instant));
+
+// Numeric keyboards can enter digits only; separators are visual, never OS date widgets.
+export function dateEntry(value:string) {
+ if(!/^[\d.,]*$/.test(value))return value;
+ const digits=value.replace(/\D/g,'').slice(0,8);
+ return [digits.slice(0,2),digits.slice(2,4),digits.slice(4)].filter(Boolean).join('.');
+}
+export function timeEntry(value:string) {
+ if(!/^[\d:]*$/.test(value))return value;
+ const digits=value.replace(/\D/g,'').slice(0,4);
+ return [digits.slice(0,2),digits.slice(2)].filter(Boolean).join(':');
+}

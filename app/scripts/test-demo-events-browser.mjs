@@ -65,8 +65,8 @@ try {
  await input('event-location','');await click('Podgląd meczu');assert((await evaluate("$demo('[role=alert]').textContent")).includes('Podaj miejsce'));
  await input('event-location','Boisko demo · Chorzów');await input('event-name','Mecz testowy 3.14');await input('event-cost','12,345');await click('Podgląd meczu');assert((await evaluate("$demo('[role=alert]').textContent")).includes('Koszt'));
  await input('event-cost','270,01');await input('event-capacity','9');await click('Podgląd meczu');assert((await evaluate("$demo('[role=alert]').textContent")).includes('Limit'));
- await input('event-capacity','15');await input('event-date','2020-01-01');await click('Podgląd meczu');assert((await evaluate("$demo('[role=alert]').textContent")).includes('przyszłą'));
- const date=await evaluate("new Date(Date.now()+86400000*2).toISOString().slice(0,10)");await input('event-date',date);
+ await input('event-capacity','15');await input('event-date','01.01.2020');await click('Podgląd meczu');assert((await evaluate("$demo('[role=alert]').textContent")).includes('przyszłą'));
+ const date=await evaluate("new Date(Date.now()+86400000*2).toISOString().slice(0,10)");await input('event-date',date.split('-').reverse().join('.'));
  await click('Podgląd meczu');await widths();await shot('create-preview');for(const width of [320,768]){await viewport(width);await shot(`preview-${width}`);}await viewport();assert.equal(await evaluate("document.querySelectorAll('.slm-matches-screen .slm-card-link').length"),6,'Preview does not create');
  await click('Wróć do edycji');assert.equal(await evaluate("document.getElementById('event-name').value"),'Mecz testowy 3.14');await click('Podgląd meczu');await click('Utwórz mecz');
  assert.equal(await evaluate("$demo('[role=progressbar]').getAttribute('aria-valuenow')"),'0');assert((await evaluate("$demo('.slm-hero-card').textContent")).includes('Mecz testowy 3.14'));

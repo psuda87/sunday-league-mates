@@ -4,14 +4,15 @@ import { locationOutline, timeOutline } from 'ionicons/icons';
 import type { Match } from '../events/model';
 import { capacityState } from './capacity';
 import MatchCapacityProgress from './MatchCapacityProgress';
-export default function MatchHero({ match, children, imageSrc = '/assets/branding/stadium-bg-card.jpg', title = 'Następny mecz', onOpen, openDisabled = false, compact = false, displayName, minimum = 10 }: { match: Match; children?: ReactNode; imageSrc?: string; title?: string; onOpen?: () => void; openDisabled?: boolean; compact?: boolean; displayName?: string; minimum?:number }) {
+export default function MatchHero({ match, children, badge, imageSrc = '/assets/branding/stadium-bg-card.jpg', title = 'Następny mecz', onOpen, openDisabled = false, compact = false, displayName, minimum = 10 }: { match: Match; children?: ReactNode; badge?:ReactNode; imageSrc?: string; title?: string; onOpen?: () => void; openDisabled?: boolean; compact?: boolean; displayName?: string; minimum?:number }) {
   const date = new Date(match.starts_at);
   const isDetail = title === 'Szczegóły meczu';
   const capacity = capacityState(match.registered_count, match.capacity, minimum);
-  const format = (options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('pl-PL', { timeZone: 'Europe/Warsaw', ...options }).format(date);
-  return <section className={`slm-next-match${compact ? ' slm-match-compact' : ''}${title === 'Szczegóły meczu' ? ' slm-match-detail' : ''}`} aria-label={title}>
+  const format = (options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('pl-PL', { timeZone: 'Europe/Warsaw', hourCycle:'h23', ...options }).format(date);
+  return <section className={`slm-next-match${compact ? ' slm-match-compact' : ''}${badge?' slm-has-privacy-badge':''}${title === 'Szczegóły meczu' ? ' slm-match-detail' : ''}`} aria-label={title}>
     {!compact && <h1>{title}</h1>}
     <article className={`slm-hero-card${onOpen ? ' slm-hero-interactive' : ''}`}>
+      {badge}
       <div className="slm-stadium-frame" aria-hidden="true"><img src={title === 'Szczegóły meczu' && imageSrc === '/assets/branding/stadium-bg-card.jpg' ? '/assets/branding/stadium-bg-main.jpg' : imageSrc} width="1400" height="800" decoding="async" alt="" className="slm-stadium" onError={event => { const image = event.currentTarget; if (!image.src.endsWith('/assets/branding/stadium-bg-main.jpg')) image.src = '/assets/branding/stadium-bg-main.jpg'; }} /></div>
       {onOpen && <button type="button" className="slm-card-link" aria-label={`Otwórz szczegóły meczu: ${format({ day: 'numeric', month: 'long' })}, ${match.location}`} disabled={openDisabled} onClick={onOpen}><span aria-hidden="true" /></button>}
       <div className="slm-match-top">

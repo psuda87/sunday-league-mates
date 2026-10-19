@@ -1,3 +1,4 @@
+import { formatEventDateTime } from './eventDraft';
 import { eventAccess } from './eventAccess';
 import { DemoAvatar } from './Identity';
 import DemoFinance from './Finance';
@@ -20,7 +21,7 @@ export function DemoPanels({world,game,dispatch,onPlayer,actions}:{world:World;g
   const person=(entry:Entry)=>entry.playerId?<PlayerLink world={world} id={entry.playerId} onPlayer={onPlayer}/>:<span>{personName(world,entry)}<small>Gość bez własnego profilu</small></span>;
   if(eventAccess(world,game)!=='full')return <p role="status">Brak dostępu do uczestników i paneli tego meczu.</p>;
   return <><IonAlert isOpen={!!removing} header="Usunąć gościa?" subHeader={removing?personName(world,removing):undefined} message={`Usuniesz wyłącznie wpis z tego meczu demonstracyjnego. ${removing?.playerId?'Profil zawodnika pozostanie dostępny.':'Gość nie ma własnego profilu.'} Rezerwa nie zostanie automatycznie awansowana.`} buttons={[{text:'Anuluj',role:'cancel'},{text:'Usuń gościa',role:'destructive',handler:()=>{if(removeId)dispatch({type:'remove_guest',gameId:game.id,entryId:removeId});}}]} onDidDismiss={()=>setRemoveId(null)}/><MatchTabs panels={[
-    <section className="slm-panel slm-match-info"><dl className="slm-match-facts"><div><dt>Termin · Europe/Warsaw</dt><dd>{new Intl.DateTimeFormat('pl-PL',{timeZone:'Europe/Warsaw',dateStyle:'long',timeStyle:'short'}).format(new Date(game.startsAt))}</dd></div><div><dt>Lokalizacja</dt><dd>{game.location??'Boisko demonstracyjne'}{game.address&&<small>{game.address}</small>}</dd></div><div><dt>Czas gry</dt><dd>{game.durationMinutes??90} minut</dd></div><div><dt>Status</dt><dd>{game.status==='completed'?'Zakończony':game.status==='cancelled'?'Anulowany':'Nadchodzący'}</dd></div></dl><p>Wyłącznie fikcyjny scenariusz. Żadna akcja nie zmienia prawdziwego systemu.</p></section>,
+    <section className="slm-panel slm-match-info"><dl className="slm-match-facts"><div><dt>Termin · Europe/Warsaw</dt><dd>{formatEventDateTime(game.startsAt)}</dd></div><div><dt>Lokalizacja</dt><dd>{game.location??'Boisko demonstracyjne'}{game.address&&<small>{game.address}</small>}</dd></div><div><dt>Czas gry</dt><dd>{game.durationMinutes??90} minut</dd></div><div><dt>Status</dt><dd>{game.status==='completed'?'Zakończony':game.status==='cancelled'?'Anulowany':'Nadchodzący'}</dd></div></dl><p>Wyłącznie fikcyjny scenariusz. Żadna akcja nie zmienia prawdziwego systemu.</p></section>,
     <section className="slm-demo-roster"><RosterSummary occupied={rows.length} capacity={game.capacity} reserve={waiting.length}/>{actions}{[
       {title:'Zapisani',entries:rows.filter(e=>!e.inviterId)},
       {title:'Goście',entries:rows.filter(e=>e.inviterId)},
