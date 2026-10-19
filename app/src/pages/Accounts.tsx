@@ -1,10 +1,11 @@
+import { AccountHeading, PasswordField, SignInFields } from '../account-ui/Fields';
 import Players from '../ui/Players';
 import { notificationsOutline } from 'ionicons/icons';
 import AppearanceSettings from '../ui/AppearanceSettings';
 import BottomNav from '../ui/BottomNav';
 import PhoneInput from '../components/PhoneInput';
 import { normalizePolishPhone, normalizePhoneUpdate, nationalPhone } from '../../supabase/functions/_shared/phone';
-import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { IonButton, IonContent, IonInput, IonItem, IonPage, IonSelect,
@@ -33,6 +34,7 @@ export default function Accounts() {
   const [pushStatus, setPushStatus] = useState('Systemowy push jest opcjonalny.');
   const [push] = useState(() => new NativePush(manager,setPendingNotification,
     () => setNotificationVersion(v => v+1),setPushStatus));
+  const busyFlight=useRef(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -63,8 +65,9 @@ export default function Accounts() {
     }
   }, [clearSecrets]);
   async function perform(work: () => Promise<void>) {
+    if(busyFlight.current)return;busyFlight.current=true;
     setBusy(true); setError(''); setNotice('');
-    try { await work(); } catch (e) { failed(e); } finally { setBusy(false); }
+    try { await work(); } catch (e) { failed(e); } finally { busyFlight.current=false;setBusy(false); }
   }
   async function logout() { await push.beforeLogout(); await manager.logout(); }
   const openNotification = useCallback(async (id: string) => {
@@ -148,13 +151,9 @@ export default function Accounts() {
     }).finally(() => { setCurrentPassword(''); setNewPassword(''); setConfirmation(''); });
   };
   const passwordForm = <form onSubmit={changePassword} className="slm-form">
-    <IonInput label={session?.must_change_password ? 'Hasło tymczasowe' : 'Obecne hasło'} labelPlacement="stacked"
-      type="password" autocomplete="current-password" required value={currentPassword}
-      onIonInput={e => setCurrentPassword(e.detail.value ?? '')} />
-    <IonInput label="Nowe hasło" labelPlacement="stacked" type="password" autocomplete="new-password" required
-      minlength={8} value={newPassword} onIonInput={e => setNewPassword(e.detail.value ?? '')} />
-    <IonInput label="Powtórz nowe hasło" labelPlacement="stacked" type="password" autocomplete="new-password" required
-      value={confirmation} onIonInput={e => setConfirmation(e.detail.value ?? '')} />
+    <PasswordField ionic label={session?.must_change_password?'Hasło tymczasowe':'Obecne hasło'} value={currentPassword} onChange={setCurrentPassword}/>
+    <PasswordField ionic newPassword label="Nowe hasło" value={newPassword} onChange={setNewPassword}/>
+    <PasswordField ionic newPassword label="Powtórz nowe hasło" value={confirmation} onChange={setConfirmation}/>
     <p className="slm-muted">Co najmniej 8 znaków. Użyj unikalnego hasła.</p>
     <IonButton type="submit" expand="block" disabled={busy}>Zmień hasło</IonButton>
   </form>;
@@ -175,16 +174,13 @@ export default function Accounts() {
           <IonButton disabled={busy} onClick={() => void perform(() => manager.refresh())}>Spróbuj ponownie</IonButton>
           <IonButton fill="outline" disabled={busy} onClick={() => void perform(logout)}>Wyloguj się</IonButton>
         </section> : !session ? <section className="slm-panel">
-        <h1>Zaloguj się</h1><p className="slm-muted">Dane konta otrzymasz od administratora grupy.</p>
+        <AccountHeading title="Zaloguj się">Dane konta otrzymasz od administratora grupy.</AccountHeading>
         <form className="slm-form" onSubmit={event => {
           event.preventDefault(); void perform(async () => {
             await manager.signIn(identifier, loginPassword); setScreen('events');
           }).finally(() => setLoginPassword(''));
         }}>
-          <IonInput label="Login lub numer telefonu" labelPlacement="stacked" autocomplete="username" required
-            value={identifier} onIonInput={e => setIdentifier(e.detail.value ?? '')} />
-          <IonInput label="Hasło" labelPlacement="stacked" type="password" autocomplete="current-password" required
-            value={loginPassword} onIonInput={e => setLoginPassword(e.detail.value ?? '')} />
+          <SignInFields legacy identifier={identifier} password={loginPassword} onIdentifier={setIdentifier} onPassword={setLoginPassword}/>
           <IonButton expand="block" type="submit" disabled={busy}>Zaloguj się</IonButton>
         </form><p className="slm-muted">Nie pamiętasz hasła? Poproś administratora o reset.</p>
       </section> : <>

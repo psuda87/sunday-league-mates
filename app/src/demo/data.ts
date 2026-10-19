@@ -7,7 +7,7 @@ import type { EventInput } from './eventDraft';
 import { validDemoPortrait } from './portraits';
 import type { DemoPortrait } from './portraits';
 // Deterministic, fictional, memory-only demo. Never imported by production screens.
-export interface DemoPlayer { id: string; name: string; jerseyNumber: number; demoTotals: {goals:number;assists:number;mvp:number}; portrait?: DemoPortrait; portraitEdited?:boolean; nick?:string }
+export interface DemoPlayer { id: string; name: string; jerseyNumber?: number; fullName?:string; accountSetup?:boolean; demoTotals: {goals:number;assists:number;mvp:number}; portrait?: DemoPortrait; portraitEdited?:boolean; nick?:string }
 export interface Entry { id: string; playerId: string | null; guestName?: string; inviterId?: string; status: 'registered' | 'reserve' | 'withdrawn'; attendance: boolean | null; paidCents: number }
 export interface Game { id: string; groupId:string; visibility:'private'|'public'; createdBy:string; name: string; startsAt: string; status: 'upcoming' | 'completed' | 'cancelled'; capacity: number; costCents: number; entries: Entry[]; location?:string; address?:string; durationMinutes?:number; minimum?:number; creationKey?:string; lineup?: {a:string[];b:string[]} }
 export interface World { groupState:GroupState; players: DemoPlayer[]; games: Game[]; userId: string; financeRole: 'player'|'admin'; nextGameId:number; notice: string }
@@ -59,7 +59,7 @@ export function initialWorld(): World {
 }
 export type Scenario = 'free'|'full'|'joined'|'reserve'|'completed'|'cancelled'|'debt';
 export const scenarioGame:Record<Scenario,string>={free:'demo-1',full:'demo-2',joined:'demo-1',reserve:'demo-2',completed:'demo-5',cancelled:'demo-9',debt:'demo-1'};
-export type Action = GroupAction|{type:'event_create';input:EventInput;key:string}|{type:'event_update';gameId:string;input:EventInput}|{type:'reset';scenario?:Scenario}|{type:'user';id:string}|{type:'finance_role';role:'player'|'admin'}|{type:'payment_set';gameId:string;entryId:string;cents:number}|{type:'lineup_reset';gameId:string}|{type:'lineup_swap';gameId:string;a:string;b:string}|{type:'identity';playerId:string;name:string}|{type:'portrait';playerId:string;portrait:DemoPortrait}|{type:'jersey';playerId:string;number:number}|{type:'join'|'withdraw'|'guest'|'remove_guest'|'resize'|'attendance'|'pay';gameId:string;entryId?:string;count?:number};
+export type Action = GroupAction|{type:'event_create';input:EventInput;key:string}|{type:'event_update';gameId:string;input:EventInput}|{type:'reset';scenario?:Scenario}|{type:'user';id:string}|{type:'finance_role';role:'player'|'admin'}|{type:'payment_set';gameId:string;entryId:string;cents:number}|{type:'lineup_reset';gameId:string}|{type:'lineup_swap';gameId:string;a:string;b:string}|{type:'identity';playerId:string;name:string;fullName?:string}|{type:'portrait';playerId:string;portrait:DemoPortrait}|{type:'jersey';playerId:string;number:number}|{type:'join'|'withdraw'|'guest'|'remove_guest'|'resize'|'attendance'|'pay';gameId:string;entryId?:string;count?:number};
 export function reduceWorld(previous:World,action:Action):World {
   if(isGroupAction(action))return reduceGroups(previous,action);
   if(action.type==='reset') {
@@ -85,9 +85,9 @@ export function reduceWorld(previous:World,action:Action):World {
   }
   if(action.type==='identity'||action.type==='portrait') {
     if(action.playerId!==previous.userId||!previous.players.some(p=>p.id===action.playerId))return previous;
-    if(action.type==='identity'&&!validDemoName(action.name))return previous;
+    if(action.type==='identity'&&(!validDemoName(action.name)||(action.fullName!==undefined&&(action.fullName.length>100||Array.from(action.fullName).some(char=>char.charCodeAt(0)<32||char.charCodeAt(0)===127||char==='<'||char==='>')))))return previous;
     if(action.type==='portrait'&&!validDemoPortrait(action.portrait))return previous;
-    return {...previous,players:previous.players.map(p=>p.id!==action.playerId?p:action.type==='identity'?{...p,name:normalizeDemoName(action.name)}:{...p,portrait:{...action.portrait},portraitEdited:true}),notice:''};
+    return {...previous,players:previous.players.map(p=>p.id!==action.playerId?p:action.type==='identity'?{...p,name:normalizeDemoName(action.name),...(p.accountSetup?{nick:normalizeDemoName(action.name),fullName:action.fullName??p.fullName}: {})}:{...p,portrait:{...action.portrait},portraitEdited:true}),notice:''};
   }
   if(action.type==='jersey') {
     if(action.playerId!==previous.userId||!Number.isInteger(action.number)||action.number<0||action.number>99)return previous;

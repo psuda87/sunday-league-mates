@@ -1,2 +1,2 @@
-// The interactive world is an isolated demo entry, never a production data source.
-export { default } from '../demo/App';
+// One account gate around the existing shared demo world; no real Auth in this build.
+export { default } from '../demo/AccountDemo';

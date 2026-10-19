@@ -31,6 +31,6 @@ for (const path of files) {
   if (branding.some(name => path === `${root}/assets/branding/${name}`)) continue;
   assert(/\.(html|js|css|svg)$/.test(path), `Unexpected output: ${path}`);
   const text = await readFile(path, 'utf8');
-  assert(!/DEMO_ENV_MUST_NOT_SHIP|demo-canary\.invalid|supabase\.co|hjtcyybkxebvdropchac|functions\/v1|SessionManager|Zaloguj się|Zarządzaj kontami|slm\.auth\.|FCM_SERVICE_ACCOUNT|BEGIN PRIVATE KEY|VITE_SLM_FUNCTION_URL/.test(text), `Forbidden application content: ${path}`);
+  assert(!/DEMO_ENV_MUST_NOT_SHIP|demo-canary\.invalid|supabase\.co|hjtcyybkxebvdropchac|functions\/v1|SessionManager|Zarządzaj kontami|slm\.auth\.|FCM_SERVICE_ACCOUNT|BEGIN PRIVATE KEY|VITE_SLM_FUNCTION_URL/.test(text), `Forbidden application content: ${path}`);
 }
-console.log(`Demo isolation verified: ${files.length} static files, no app/Auth/Supabase/Edge markers.`);
+console.log(`Demo isolation verified: ${files.length} static files, no production app/Auth/Supabase/Edge markers (account UI simulator is allowed).`);

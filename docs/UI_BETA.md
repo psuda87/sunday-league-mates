@@ -1,3 +1,30 @@
+# Premium3.18 FINAL UI — 2026-10-19 12:25:09 CEST
+
+Zakończono frontendowy zakres SLM1.0 do dalszej integracji, bez deklaracji gotowości
+produkcyjnej aplikacji. Dodano wspólne ekrany kont i jawny symulator: login/signup/
+verify/resend/forgot/reset/change password/first profile oraz checking/expired/
+network/logout. Nowy zawodnik ma0statystyk/brak grupy; używa istniejącej Ultimate,
+publiczne/prywatne i grupy zgodnie z3.15/3.16. Brak haseł w trwałym stanie/sieci.
+Kontrola generacji blokuje spóźnione logowanie, logout usuwa poprzednie widoki.
+España pozostaje domyślna,4palety×3tryby, preferencje zachowane po logout.
+
+Produkcja zachowuje login/telefon, SessionManager/TokenStore i istniejący kontrakt;
+współdzieli pola Ionic. Nowe UI e-mail NIE jest podłączone do serwera. Obecny Auth
+blokuje signup/pocztę; wymagane przyszłe kontrakty/migracje i dokumenty prawne.
+Nie zmieniano backendu/SQL/RLS/RPC/Firebase/finansów/config Vercel i zasad grup/meczów.
+
+Weryfikacja: TS/fullESLint/oba buildy/izolacja15plików OK; pełny Vitest184/184
+(33pliki). Chromium pełny świat demo + grupy/widoczność/palety/konta,320/390/768,
+12kombinacji, brak żądań zewnętrznych/CSP. Dziewięć prawdziwych zrzutów premium318.
+Cypress próbowano: brak binarnej instalacji16.1.1 (i Xvfb), niewykonany. Android/iOS,
+realna klawiatura, e-mail/deep links i baza/RLS/transakcje niewykonane; mocki nie są
+Supabase. Ostrzeżenie chunków pozostaje. Nie wykonano merge/migracji/ręcznego deploy.
+Nie zweryfikowano automatycznego Vercel. Historyczne ograniczenia Dockera/SQL poniżej
+pozostają. Nie rozpoczęto3.19 ani backendu.
+
+Dokumenty: [zamknięcie UI](ui/PREMIUM318_FINAL_UI.md),
+[przekazanie backendowe](FRONTEND_HANDOFF.md). Raport i SHA w ODPOWIEDZI_CODEX.txt.
+
 # Premium 3.17 — 2026-10-19 11:39:28 CEST
 
 Tylko izolowane demo:4 palety España/FCB/Classic Lime/Deimos-Code, niezależne

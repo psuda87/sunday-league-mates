@@ -1,3 +1,19 @@
+## Premium3.18 — jawny symulator kont, bez produkcyjnego Auth
+
+Punkt wejścia i konfiguracja Vercel bez zmian: app / npm run build:demo /
+dist-demo / brak zmiennych środowiskowych. Dozwolono wspólne AccountScreens/Fields,
+model UI, AccountDemo/accountState i współdzieloną Ultimate, bez produkcyjnego
+Accounts/SessionManager/api/uiAdapter. Sam napis „Zaloguj się” nie jest już zakazanym
+markerem, ponieważ demo prezentuje formularz; nadal zakazane są produkcyjne API,
+sekrety, sesje i endpointy, kontrolowane przez allowlistę, skan i connect-src none.
+15 statycznych plików, brak dodanych zasobów/SDK/usług. Symulator nie zakłada kont,
+nie porównuje haseł i nie wysyła poczty. #account/login lub Narzędzia demo → Ekrany
+kont; domyślny świat jest nadal podglądem fikcyjnych danych bez trwałej sesji.
+Żaden callback URL nie potwierdza użytkownika bez wyniku adaptera. Szczegóły i
+regresja: [PREMIUM318_FINAL_UI](ui/PREMIUM318_FINAL_UI.md),
+[FRONTEND_HANDOFF](FRONTEND_HANDOFF.md). Nie wdrażano ręcznie ani nie sprawdzano
+statusu automatycznego Vercel. Starsze opisy poniżej pozostają historią.
+
 ## Premium3.15 — grupy wyłącznie demo
 
 Jawna allowlista rozszerzona o src/demo/groups.ts i Groups.tsx. Nadal15 plików,

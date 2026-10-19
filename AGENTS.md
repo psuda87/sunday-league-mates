@@ -1,3 +1,24 @@
+# Premium3.18 FINAL UI — stan zamknięcia frontendu
+
+- Bieżący zakres3.18 zastępuje historyczne instrukcje „zakończyć na3.17”. Nie
+  rozpoczynać backendu/kolejnego etapu bez polecenia. España nadal domyślna.
+- AccountScreens/Fields to wspólna prezentacja; Accounts produkcyjne nadal ma
+  login/telefon. auth/uiAdapter wiąże tylko istniejący SessionManager i jawnie
+  NIE zapewnia signup/email recovery. Nie podłączać symulatora do prawdziwego Auth.
+- Demo AccountDemo nad dotychczasowym App: domyślny fixture bez serwerowej sesji;
+  #account/login/register/forgot i jawny symulator. Sam callback URL nie autoryzuje.
+  Logout/expiry usuwa świat/ramki, generacja blokuje późny login. Hasła tylko
+  chwilowo w formularzu, brak trwałego zapisu/logów/sieci. Preferencje motywów trwałe.
+- Nowy profil: jedna publiczna projekcja bez email/phone/password, inicjały lub
+  istniejący portret, opcjonalny numer,0/0/0/0 i brak grupy. Ultimate przeniesiona
+  bajtowo do ui/, demo re-export; nie zmieniać jej zatwierdzonego wyglądu.
+- Ścisła allowlista demo obejmuje wyłącznie nowe moduły UI/RAM. Produkcyjne Auth/
+  API/adapter nie mogą wejść do bundle; CSP/connect-src none/env separacja bez zmian.
+- docs/FRONTEND_HANDOFF.md opisuje rzeczywiste kontrakty i brakujące integracje;
+  docs/ui/PREMIUM318_FINAL_UI.md zawiera wyniki i zrzuty. Zachować historyczne
+  ograniczenia Dockera/SQL, nie deklarować gotowej produkcyjnej rejestracji ani
+  stosowania migracji na podstawie UI/mocków. Brak zmian backendu/Vercel.
+
 # Premium3.17 —4 palety wyłącznie w demo
 
 - Nowe palety są opt-in: demo/main initializeTheme({palettes:true}), wspólny

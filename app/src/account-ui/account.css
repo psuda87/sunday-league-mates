@@ -1,0 +1,41 @@
+.slm-account-page .slm-accounts { min-height:100%; padding-bottom:24px !important; }
+.slm-account-shell { width:100%; max-width:480px; margin-inline:auto; padding:calc(12px + var(--ion-safe-area-top,env(safe-area-inset-top,0px))) 0 calc(20px + env(safe-area-inset-bottom)); }
+.slm-account-brand { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+.slm-account-brand img { width:78px; height:auto; object-fit:contain; }
+.slm-account-brand span { color:var(--slm-gold); font-size:.75rem; font-weight:700; letter-spacing:.06em; }
+.slm-account-panel { background:var(--slm-panel); border:1px solid var(--slm-border); border-radius:18px; padding:20px; box-shadow:0 12px 32px var(--slm-shadow); }
+.slm-account-panel h1 { margin:0 0 10px; font-size:1.65rem; font-style:italic; line-height:1.2; }
+.slm-account-panel p { font-size:.83rem; line-height:1.55; overflow-wrap:anywhere; }
+.slm-account-panel form { display:grid; gap:13px; }
+.slm-account-field { display:grid; gap:7px; min-width:0; font-size:.82rem; margin:0; }
+.slm-account-field > span { color:var(--ion-text-color); }
+.slm-account-field input { width:100%; min-width:0; box-sizing:border-box; min-height:46px; border:1px solid var(--slm-border); border-radius:10px; background:var(--ion-background-color); color:var(--ion-text-color); padding:10px 12px; font:inherit; scroll-margin-block:90px; }
+.slm-password-field { position:relative; min-width:0; }
+.slm-password-field input { padding-right:49px; }
+.slm-password-eye { position:absolute; right:1px; bottom:1px; min-height:44px; width:44px; border:0; border-radius:9px; background:transparent; color:var(--slm-gold); display:grid; place-items:center; z-index:1; }
+.slm-password-eye ion-icon { font-size:20px; }
+.slm-account-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.slm-account-panel button:not(.slm-password-eye),.slm-account-simulator button,.slm-account-appearance summary { min-height:44px; border:1px solid var(--slm-border); border-radius:10px; color:var(--slm-gold); background:var(--ion-background-color); padding:9px 12px; cursor:pointer; font-size:.82rem; }
+.slm-account-panel button.slm-account-primary { background:linear-gradient(120deg,var(--slm-button-top),var(--slm-button-bottom)); color:var(--ion-color-primary-contrast); border-color:var(--ion-color-primary); font-weight:750; width:100%; }
+.slm-account-panel button:disabled { cursor:wait; opacity:.65; }
+.slm-account-consent { display:flex; align-items:flex-start; gap:10px; min-height:44px; font-size:.78rem; line-height:1.5; }
+.slm-account-consent input { flex-shrink:0; width:20px; height:20px; accent-color:var(--ion-color-primary); }
+.slm-account-error { border:1px solid var(--ion-color-danger); border-radius:10px; padding:10px; color:var(--ion-color-danger); font-size:.8rem; line-height:1.5; }
+.slm-account-error ul { padding-left:18px; margin:5px 0; }
+.slm-account-demo-note { color:var(--slm-text-secondary); font-size:.72rem; margin:12px 0; line-height:1.5; }
+.slm-account-simulator { margin-top:18px; border-top:1px solid var(--slm-border); padding-top:10px; font-size:.76rem; }
+.slm-account-simulator summary { min-height:44px; padding-block:12px; color:var(--slm-gold); cursor:pointer; }
+.slm-account-simulator label { display:grid; gap:7px; margin-block:10px; }
+.slm-account-simulator select { min-height:44px; width:100%; border:1px solid var(--slm-border); border-radius:9px; padding:8px; background:var(--slm-panel); color:var(--ion-text-color); }
+.slm-account-simulator > div { display:flex; flex-wrap:wrap; gap:7px; }
+.slm-account-appearance { margin-top:14px; }
+.slm-account-appearance > summary { color:var(--slm-gold); cursor:pointer; padding:12px 0; min-height:44px; }
+.slm-account-profile-preview .slm-ultimate-shell { width:230px; max-width:100%; margin:0 auto 16px; }
+.slm-account-profile-preview .slm-ultimate-card { width:100%; }
+.slm-account-portraits { display:flex; flex-wrap:wrap; gap:6px; }
+.slm-account-portraits button[aria-pressed=true] { border-color:var(--slm-gold); box-shadow:inset 0 -2px var(--slm-gold); }
+.slm-account-policies { margin-block:8px; font-size:.76rem; }
+.slm-account-policies summary { min-height:44px; padding-block:12px; color:var(--slm-gold); cursor:pointer; }
+@media(max-width:350px) { .slm-account-panel { padding:15px; } .slm-account-shell { padding-inline:0; } }
+.slm-demo-tools .slm-account-actions button,.slm-identity-account > button { min-height:44px; border:1px solid var(--slm-border); border-radius:9px; padding:9px 12px; margin:5px 5px 5px 0; color:var(--slm-gold); background:var(--slm-panel); }
+.slm-demo-world[hidden] { display:none !important; }

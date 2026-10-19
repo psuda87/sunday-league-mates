@@ -1705,3 +1705,130 @@ modala/klawiatury/numerycznego terminu OK. Bez pełnej starej regresji i Android
 Zwykły push tylko feat/ui-beta, bez merge i ręcznego deploy. Końcowy SHA raportu
 w odpowiedzi i historii Git. Pełna lista plików, kolory i linki do zrzutów powyżej
 oraz w docs/ui/PREMIUM317_THEMES.md. Zakończono3.17.
+
+[2026-10-19 12:28:50 CEST] PREMIUM3.18 FINAL UI — FRONTEND SLM1.0
+
+Baza91816f67ff81d65e6f70094294f3817a49a4c98d zawiera ukończone3.17
+beeb11eadb715846d79027cb9934d5450cb8e51a. Git początkowo czysty, fetch właściwej
+gałęzi zgodny z HEAD. Nie implementowano wcześniejszych etapów ponownie.
+
+Gotowe: wspólne AccountScreens/Fields i minimalny AccountDemo nad istniejącym
+światem, login e-mail/hasło, pokaż/ukryj, walidacje/serializacja submit, signup
+bez obowiązkowego telefonu/grupy, zgoda demo, verify/resend30s, expired link,
+forgot/reset/change password, checking/network/expired/signing-out, pierwszy
+profil bez zdjęcia/numeru lub ze starymi fikcyjnymi zasobami. Brak nowych grafik
+lub zależności. Ultimate przeniesiono bajtowo do ui/, z re-exportem demo; wygląd
+zaakceptowanej tarczy, pozostałych ekranów i España nie był przebudowywany.
+
+Nowy zawodnik ma0/0/0/0 i brak grup. Jedna projekcja publiczna, bez email/telefonu/
+hasła; dotychczasowe edycje i modele wspólne. Może dołączyć do publicznego meczu,
+poprosić o grupę lub stworzyć własną, potem utworzyć mecz. Prywatne dane obcych
+grup nadal niedostępne. Logout/wygaśnięcie usuwa poprzedni świat/ramki, generacja
+blokuje spóźnione logowanie. Powrót tylko do bezpiecznego modułu. Preferencje4palet
+×3tryby pozostają lokalnie. Domyślny świat to jawny podgląd fixture bez sesji;
+Narzędzia demo → Ekrany kont albo #account/login otwiera symulator. Formularze
+nie zakładają kont, nie porównują/przechowują haseł i nie wysyłają poczty.
+Poprawny link emuluje jawna kontrolka, nie sam URL. Narzędzia są zwijane.
+
+Produkcja współdzieli pola w wariancie Ionic i zachowuje stary login/telefon oraz
+SessionManager/TokenStore. Nowy uiAdapter wiąże tylko istniejące operacje, z
+signup/emailRecovery=false. Konta z e-mail nie są podłączone do obecnego serwera.
+Obecny Auth ma disable_signup, techniczne adresy i blokujące hooki poczty;
+backend musi rozwiązać zgodność dawnych kont, profili i samorejestracji. Brak
+zatwierdzonych dokumentów prawnych/SMTP/prawdziwych callbacków to blokady wdrożenia.
+Nie tworzono nowych API/migracji/RLS, nie zmieniano zasad grup/meczów/finansów.
+W audycie poprawiono tylko nieaktualny tekst panelu grup i przewijanie kont.
+
+Testy:
+- TypeScript (oba wejścia), pełny ESLint, build produkcyjnego frontendu bez
+  sekretów, build:demo i kontrola izolacji15plików OK. Końcowo po korekcie zwijania
+  paneli ponowiono lint, TS/demo build,8/8 testów kont i Chromium kont.
+- Pełny Vitest184/184 w33plikach: także obecne SessionManager/Edge mocks i modele.
+- Chromium test-ui-beta-browser: wcześniejsze mecze/profil/klawiatura/powrót,
+  zapis/goście/usuwanie/rezerwa/obecność/składy/finanse/player-admin/zero-partial-
+  full-overpayment/reset/320-390-768 OK.
+- Chromium grup3.15, widoczności/uprawnień3.16 i palet3.17: pełne istniejące
+  skrypty OK. Transfer/sukcesja/zgody/wnioski/organizator/outsider/reclose/reset,
+  12kombinacji/Auto/persistence, pl data/godzina przy en-US i NewYork sprawdzone.
+- Nowy Chromium kont: register→verify/resend→firstprofile, nowe0stats/brak grup,
+  public join/privateblock, prośba/anulowanie→własna grupa→nowy mecz, change password,
+  login/reset/expiredcallback/checking/logout/errors,12kombinacji i320/390/768 OK.
+- Produkcyjny login wyrenderowano bez wysłania formularza, z Supabase zablokowanym
+  w przeglądarce: stare pola, pokaż/ukryj, brak footer/overflow OK. To NIE test Auth.
+- Demo: brak żądań zewnętrznych i naruszeń CSP. HTTP nadal connect-src none oraz
+  form-action none, allowlista/env separacja bez zmian. Produkcyjne API/Auth/adapter
+  nie wchodzą do bundle. Git diff --check i skan nowych plików: brak .env/sekretów/
+  artefaktów. Oryginalne zasoby/karta niezmienione.
+
+Cypress próbowano uruchomić — brak binarnej instalacji16.1.1 (w PATH brak także
+Xvfb). NIE wykonano testów Cypress, realnego Supabase/SQL/RLS/współbieżności,
+Android/iOS, prawdziwej klawiatury, e-mail/deeplinków na urządzeniu ani pełnego
+WCAG/czytnika. Testy UI/RAM/mocków nie są testami bazy. Historyczne ograniczenia
+Docker i sześciu nieweryfikowanych migracji integracji zachowane. Duże chunki
+Ionic nadal ostrzeżeniem; frontend nie oznacza produkcyjnej gotowości całej SLM.
+
+Dokument przekazania: docs/FRONTEND_HANDOFF.md — rzeczywiste kontrakty/struktury
+Auth/events/settlements/notifications,13 zastanych migracji, brakujące grupowe
+RLS/RPC/onboarding/widoczność/składy, rozbieżności profilu i legacy minimum/role,
+kolejność integracji i testy po podłączeniu. To dokumentacja, nie autoryzacja
+uruchomienia backendu. Szczegółowy audyt: docs/ui/PREMIUM318_FINAL_UI.md.
+
+Rzeczywiste zrzuty React/Ionic390×844 (bez makiet):
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium318-email-verification.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium318-final-groups.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium318-final-matches.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium318-first-profile.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium318-forgot-password.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium318-login.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium318-profile-settings.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium318-register.png
+https://github.com/psuda87/sunday-league-mates/blob/feat/ui-beta/docs/ui/premium318-reset-password.png
+
+Zmienione/nowe pliki:
+AGENTS.md
+app/scripts/test-demo-accounts-browser.mjs
+app/scripts/verify-demo-build.mjs
+app/src/account-ui/AccountScreens.test.tsx
+app/src/account-ui/AccountScreens.tsx
+app/src/account-ui/Fields.tsx
+app/src/account-ui/account.css
+app/src/account-ui/model.ts
+app/src/auth/uiAdapter.test.ts
+app/src/auth/uiAdapter.ts
+app/src/demo/AccountDemo.test.tsx
+app/src/demo/AccountDemo.tsx
+app/src/demo/App.tsx
+app/src/demo/Groups.tsx
+app/src/demo/Identity.test.tsx
+app/src/demo/Identity.tsx
+app/src/demo/Profile.tsx
+app/src/demo/Teams.tsx
+app/src/demo/UltimatePlayerCard.tsx
+app/src/demo/accountState.test.ts
+app/src/demo/accountState.ts
+app/src/demo/data.ts
+app/src/pages/Accounts.tsx
+app/src/ui/Demo.tsx
+app/src/ui/UltimatePlayerCard.tsx
+app/vite.demo.config.ts
+docs/DEMO_VERCEL.md
+docs/FRONTEND_HANDOFF.md
+docs/ODPOWIEDZI_CODEX.txt
+docs/STATUS.md
+docs/UI_BETA.md
+docs/ui/PREMIUM318_FINAL_UI.md
+docs/ui/premium318-email-verification.png
+docs/ui/premium318-final-groups.png
+docs/ui/premium318-final-matches.png
+docs/ui/premium318-first-profile.png
+docs/ui/premium318-forgot-password.png
+docs/ui/premium318-login.png
+docs/ui/premium318-profile-settings.png
+docs/ui/premium318-register.png
+docs/ui/premium318-reset-password.png
+
+SHA implementacji zostanie dopisany po commicie. Końcowy SHA zapisu raportu
+będzie podany w odpowiedzi i historii Git. Tylko feat/ui-beta; zwykły push,
+bez merge/migracji/ręcznego deploy. Status automatycznego Vercel niebadany.
+Zakończono3.18. Następny krok dopiero na kolejne polecenie: integracja zgodnie
+z FRONTEND_HANDOFF.md. Nie rozpoczęto3.19 ani backendu.

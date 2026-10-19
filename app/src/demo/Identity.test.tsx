@@ -23,7 +23,7 @@ it('previews a fictional portrait without changing shared state until confirmati
 it('uses the existing card once for My Profile and exposes no own editors on another identity',()=>{
  const world=initialWorld(),dispatch=vi.fn();const {rerender}=render(<DemoProfile world={world} id="p01" personal dispatch={dispatch}/>);
  expect(screen.getByRole('heading',{name:'Mój profil'})).toBeTruthy();expect(document.querySelectorAll('.slm-ultimate-card')).toHaveLength(1);expect(document.querySelectorAll('.slm-ultimate-stats > div')).toHaveLength(4);
- fireEvent.click(screen.getByRole('button',{name:'Ustawienia'}));expect(screen.getAllByText('Niedostępne w demo')).toHaveLength(4);
+ fireEvent.click(screen.getByRole('button',{name:'Ustawienia'}));expect(screen.getAllByText('Niedostępne w demo')).toHaveLength(2);
  rerender(<DemoProfile world={world} id="p02" personal dispatch={dispatch}/>);expect(screen.queryByRole('button',{name:'Edytuj profil'})).toBeNull();expect(screen.queryByRole('button',{name:/Zmień numer/})).toBeNull();
 });
 it('does not admit remote/SVG pictures and rejects oversized local files before reading',async()=>{
