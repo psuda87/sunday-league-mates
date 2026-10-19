@@ -2,7 +2,7 @@
 from pathlib import Path
 import subprocess,secrets
 repo=Path(__file__).resolve().parents[2]
-assert subprocess.check_output(["git","branch","--show-current"],cwd=repo,text=True).strip()=="feat/integration"
+assert subprocess.check_output(["git","branch","--show-current"],cwd=repo,text=True).strip() in ("feat/integration", "chore/android-phone-readiness")
 local=repo/".cache/http-edge"
 (local/"supabase/functions").mkdir(parents=True,exist_ok=True)
 files=subprocess.check_output(["git","ls-files","app/supabase/functions"],cwd=repo,text=True).splitlines()
