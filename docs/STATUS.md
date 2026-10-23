@@ -1,3 +1,6 @@
+﻿# Aktualizacja POCO — 2026-10-23 21:39:28 Europe/Warsaw
+
+feat/premium318-live: nowe APK z96755b8 zainstalowane (install -r Success) i uruchomione; hash telefonu zgodny. Backend lokalny30migracji PASS, reverse54321. Logcat PID:0sprawdzanych markerów fatal/WebView/JS. Nie wykonywano uninstall/clear-data. Ekran logowania: użytkownik proszony o login i odbiór profilu/nawigacji; sesja/chroniona nawigacja nowego APK jeszcze NOT TESTED. firstInstallTime zmienił się względem wcześniejszego odczytu; przyczyna nieustalona, nie deklarujemy zachowania poprzedniej sesji. Testy automatyczne/build i naprawa lokalnego SQL zgodnie z raportem poniżej. Bez push/merge/deploy. Następny krok: potwierdzenie użytkownika na telefonie. Raport docs/ui/PREMIUM318_LIVE_ANDROID.md, historia docs/ODPOWIEDZI_CODEX.txt.
 # Premium3.18 live / fizyczny Android — 2026-10-23 21:36:57 Europe/Warsaw
 
 Branch feat/premium318-live; worktree .worktrees/premium318-live; kod96755b8 od feat/integration13cf1a8.

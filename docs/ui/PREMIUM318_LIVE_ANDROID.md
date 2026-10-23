@@ -67,8 +67,10 @@ Frontend dodatkowo odrzuca szczegóły o innym ID niż żądane.
 | assembleDebug + testDebugUnitTest (JDK21) | PASS; 192 zadania wykonane, 1 test JUnit, 0 błędów |
 | APK/dist/podpis/appId/SecureStorage/lokalne API/brak AccountDemo | PASS; 43 pliki identyczne |
 | Guard release z lokalnym HTTP | PASS: release odrzucony przed wykonaniem zadań |
-| Instalacja i start nowego APK na telefonie | OCZEKUJE: ADB unauthorized po utracie USB |
-| Nawigacja i sesja nowej wersji na fizycznym telefonie | NOT TESTED — wymaga instalacji |
+| Instalacja i start nowego APK na telefonie | PASS: po ponownej autoryzacji USB, install -r Success, MainActivity Status ok |
+| Hash APK zainstalowanego na telefonie | PASS: identyczny z nowym artefaktem |
+| Logcat bieżącego PID SLM | 0 markerów FATAL EXCEPTION/Fatal signal i 0 sprawdzanych markerów błędów WebView/JS |
+| Nowa nawigacja i sesja na fizycznym telefonie | OCZEKUJE: dostępność Androida wykryła ekran logowania; użytkownik proszony o login i odbiór profilu |
 
 Testy początkowo wykryły zależny od daty historyczny test demo: pierwszy mecz
 fixture był już w przeszłości. Przypięto `Date.now` tylko w tym zestawie testów.
@@ -112,3 +114,13 @@ pola DD.MM.RRRR/HH:mm. Nie ma fikcyjnych osób/statystyk ani narzędzi demo.
 Potrzebne ręcznie: profil → ustawienia, przejścia zakładek, klawiatura, plus przy
 właściwej roli, Home/powrót, wylogowanie i ponowne logowanie. Nie podawaj hasła
 w rozmowie. Pozostaw USB i Docker dla lokalnego API.
+
+Aktualizacja telefonu wykonana przez `adb install -r`, bez uninstall/clear-data.
+Przywrócono reverse 54321. Po aktualizacji proces działa i aplikacja pokazuje
+logowanie; przed aktualizacją nie potwierdzono stanu zalogowania, dlatego nie
+wnioskujemy z tego ekranu o utracie zapisanej sesji. Kod Auth/tokenStore niezmieniony.
+Odczyt `firstInstallTime` i `lastUpdateTime` po instalacji: 23.10.2026 21:38:01
+(wcześniejszy `firstInstallTime`: 19:56:22). Przyczyna zmiany nieustalona;
+nie deklarujemy zachowania poprzedniej sesji na podstawie samego `install -r`.
+XML dostępności przetworzono wyłącznie w pamięci, bez zapisu prywatnych danych;
+usunięto wyłącznie własny tymczasowy plik diagnostyczny poza danymi aplikacji.
