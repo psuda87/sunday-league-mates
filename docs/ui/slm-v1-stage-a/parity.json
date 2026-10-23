@@ -1,0 +1,632 @@
+{
+  "pairs": 88,
+  "exact": 87,
+  "results": [
+    {
+      "image": "details-320-dark.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "details-320-light.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 12335,
+      "fraction": 0.061675,
+      "max_channel_delta": 4,
+      "difference_bbox": [
+        11,
+        147,
+        293,
+        358
+      ]
+    },
+    {
+      "image": "details-360-dark.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "details-360-light.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "details-390-dark.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "details-390-light.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "details-430-dark.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "details-430-light.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "forgot-320-dark.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "forgot-320-light.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "forgot-360-dark.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "forgot-360-light.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "forgot-390-dark.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "forgot-390-light.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "forgot-430-dark.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "forgot-430-light.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "form-320-dark.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "form-320-light.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "form-360-dark.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "form-360-light.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "form-390-dark.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "form-390-light.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "form-430-dark.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "form-430-light.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "groups-320-dark.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "groups-320-light.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "groups-360-dark.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "groups-360-light.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "groups-390-dark.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "groups-390-light.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "groups-430-dark.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "groups-430-light.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "home-320-dark.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "home-320-light.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "home-360-dark.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "home-360-light.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "home-390-dark.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "home-390-light.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "home-430-dark.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "home-430-light.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "login-320-dark.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "login-320-light.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "login-360-dark.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "login-360-light.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "login-390-dark.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "login-390-light.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "login-430-dark.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "login-430-light.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "pitch-320-dark.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "pitch-320-light.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "pitch-360-dark.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "pitch-360-light.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "pitch-390-dark.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "pitch-390-light.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "pitch-430-dark.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "pitch-430-light.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "player-320-dark.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "player-320-light.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "player-360-dark.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "player-360-light.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "player-390-dark.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "player-390-light.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "player-430-dark.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "player-430-light.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "profile-320-dark.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "profile-320-light.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "profile-360-dark.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "profile-360-light.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "profile-390-dark.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "profile-390-light.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "profile-430-dark.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "profile-430-light.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "register-320-dark.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "register-320-light.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "register-360-dark.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "register-360-light.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "register-390-dark.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "register-390-light.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "register-430-dark.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "register-430-light.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "roster-320-dark.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "roster-320-light.png",
+      "width": 320,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "roster-360-dark.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "roster-360-light.png",
+      "width": 360,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "roster-390-dark.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "roster-390-light.png",
+      "width": 390,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "roster-430-dark.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    },
+    {
+      "image": "roster-430-light.png",
+      "width": 430,
+      "height": 625,
+      "different_pixels": 0,
+      "fraction": 0.0
+    }
+  ],
+  "reference_commit": "d0f9fa9f840d2bd7f4985d00c24ee9a703f6b3e4",
+  "test_date": "2026-10-19T10:00:00Z",
+  "note": "Desktop Chrome only; viewport 844px requested, PNG captures 625px height. Native phone comparison pending."
+}

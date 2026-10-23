@@ -1,3 +1,7 @@
+# Frozen Premium 3.18 — etap A — 2026-10-24 01:39:16 Europe/Warsaw
+
+Gałąź feat/slm-v1-live, nowy worktree .worktrees/slm-v1-live; baza dokładnie d0f9fa9, implementacja1c4afb5. Oryginalny UI/demo zachowany; bez live UI3.19/3.20 i bez etapuB. Tylko moduły Windows, niewizualny Wstecz, adjustResize i pakowanie dist-demo. CSS/assets/Ultimate/Teams/nav niezmienione.
+PASS: TS/lint,186Vitest,build/build-demo/izolacja16plików,sync/debug/JUnit1/appId/podpis;8scenariuszykandydata+1callbackWstecz,8oryginału. Ścisłe piksele87/88PASS,1FAILmaks4/255whero320Light; bez deklaracji fizycznej1:1. APK app/android/app/build/outputs/apk/debug/app-debug.apk, SHA256 b424136a9df449203bfe364032f0ee675f2e96b528a3a9c9b55d2210386a8db4. Nie instalowano: ADBbraktelefonu i zgodnie z punktemkontrolnym właściciel instaluje. Fizyczne UI/klawiatura/safearea/Wstecz/lifecycle NOT TESTED. Supabase/migracje/Edge/deploy/Firebase bez zmian; żaden backend nie został wywołany. Brak push/merge. Następnykrok: wyłącznie ręczny odbiór i wyraźna akceptacja; nie rozpoczynać etapuB. Raport docs/SLM_V1_STAGE_A.md; historia docs/ODPOWIEDZI_CODEX.txt.
 # Premium3.18 FINAL UI — 2026-10-19 12:25:09 CEST
 
 Zakończono frontendowy zakres SLM1.0 do dalszej integracji, bez deklaracji gotowości
