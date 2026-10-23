@@ -1,3 +1,4 @@
+import { useBackAction } from '../ui/backNavigation';
 import { useEffect, useState } from 'react';
 import { IonButton, IonSpinner } from '@ionic/react';
 import type { SessionManager } from '../auth/sessionManager';
@@ -17,8 +18,9 @@ export default function Finance({manager,eventId,groupId,onBack,manageEvent=true
  useEffect(()=>{if(groupId)return;let live=true;setGroupsLoading(true);manager.call<{groups:Group[]}>('finance_groups').then(r=>{if(live){setGroups(r.groups);if(!groupId)setSelected(r.groups[0]?.id??'');setGroupsLoading(false);}}).catch(e=>{if(live){setInitialError(e instanceof Error?e.message:'Nie udało się pobrać grup.');setGroupsLoading(false);}});return()=>{live=false;};},[manager,groupId]);
  useEffect(()=>{if(!selected)return;let live=true;setAccount(null);setAccountLoading(true);Promise.all([manager.call<Account>('group_finance_account',{group_id:selected}),eventId&&manageEvent?manager.call<EventFinance>('group_finance_detail',{group_id:selected,event_id:eventId}):Promise.resolve(null)]).then(([a,b])=>{if(live){setAccount(a);setDetail(b);setInitialError('');setAccountLoading(false);}}).catch(e=>{if(live){setInitialError(e instanceof Error?e.message:'Nie udało się pobrać rozliczeń.');setAccountLoading(false);}});return()=>{live=false;};},[manager,selected,eventId,manageEvent]);
  async function paymentAction(action:string,p:Payment,value?:number){await mutate('group_finance_'+action,{payment_id:p.id,group_id:selected,reason,expected_amount_cents:p.corrected_amount_cents,...(value===undefined?{}:{amount_cents:value})});await refresh();setPending([]);}
+ useBackAction(40, !!onBack, () => { if (!busy) onBack?.(); });
  const receipts=detail?.payments??pending;
- return <div className="slm-finance slm-live-finance"><MatchHeader title="Rozliczenia grupy" onBack={onBack}/>{(error||initialError)&&<p role="alert" className="slm-error">⚠ {error||initialError}</p>}{(busy||groupsLoading||accountLoading)&&<div role="status"><IonSpinner/><span>Wczytywanie rozliczeń…</span></div>}
+ return <div className="slm-finance slm-live-finance"><MatchHeader busy={busy} title="Rozliczenia grupy" onBack={onBack}/>{(error||initialError)&&<p role="alert" className="slm-error">⚠ {error||initialError}</p>}{(busy||groupsLoading||accountLoading)&&<div role="status"><IonSpinner/><span>Wczytywanie rozliczeń…</span></div>}
  {!groupId&&<label>Grupa<select value={selected} onChange={e=>{setSelected(e.target.value);setAccount(null);setDetail(null);setPending([]);setTarget('');setAmount('');setReason('');}}><option value="">Wybierz grupę</option>{groups.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></label>}
  {!selected&&!groupsLoading&&!initialError&&<p>Dołącz do grupy, aby korzystać z jej rozliczeń.</p>}
  {selected&&<IonButton disabled={busy} fill="outline" onClick={()=>void run(()=>refresh())}>Odśwież rozliczenia</IonButton>}

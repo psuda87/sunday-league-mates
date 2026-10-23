@@ -1,3 +1,4 @@
+import { useBackAction } from '../ui/backNavigation';
 import MatchHeader from '../ui/MatchHeader';
 import type { ReactNode } from 'react';
 import ParticipantGroup, { RosterSummary } from '../ui/ParticipantGroup';
@@ -42,6 +43,7 @@ export default function Events({ manager, session, initialEventId, headerAction,
   const [responsible, setResponsible] = useState(session.user_id);
   const [offset, setOffset] = useState(0);
   const [finance, setFinance] = useState<{ blocked: boolean; unpaid_matches: number } | null>(null);
+  useBackAction(30, form !== null || detail !== null, () => { if (!busy) { if (form) setForm(null); else setDetail(null); } });
   const admin = session.role === 'admin';
   const findNext = useCallback(async (initialRows: Match[], now: string): Promise<Match | null> => {
     let rows = initialRows;

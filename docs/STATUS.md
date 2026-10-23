@@ -1,4 +1,8 @@
-﻿# Dane testowe GOTOWE — 2026-10-23 21:49:44 Europe/Warsaw
+# Premium 3.19 — 2026-10-23 22:24:28 Europe/Warsaw
+
+Branch feat/premium319-android, worktree .worktrees/premium318-live; baza ac4954c plus lokalne zmiany (bez commit/push/merge). Naprawiono Wstecz/formularze/grupy/karty/footer, dodano prywatne własne zdjęcia. Końcowy debug APK zainstalowany i uruchomiony przez install -r, bez usuwania danych. Ręczny PASS użytkownika: zdjęcie, Wstecz podstron, minimalizacja z Mecze i logowanie po powrocie.
+Lokalnie31migracji, nowa20261023200138_profile_photos_private i accounts get/upload/delete po zgodzie. Zdalne migracje/Edge/deploy/Firebase bez zmian. PASS automatyczne TS/lint,205Vitest,35Cypress (+rozszerzone19),58SQL/RLS,20HTTP,13photo,1realbrowser,build/sync/native/JUnit1/43zasoby/releaseguard. Logi0sprawdzanych markerów krytycznych. NOT TESTED: pełny fizyczny audyt wszystkich ekranów/kontrastu, reboot i wszystkie źródła galerii. Następny krok: dalsze testy użytkownika na lokalnych danych. Raport docs/ui/PREMIUM319_ANDROID.md; historia docs/ODPOWIEDZI_CODEX.txt.
+# Dane testowe GOTOWE — 2026-10-23 21:49:44 Europe/Warsaw
 
 chore/local-phone-fixtures:14fikcyjnych zawodników,3grupy,12meczów(4historyczne),35wpłat(3oczekujące). Zaproszenia przyjęte, konto telefonu adminem tylko TESTEspaña i zwykłym członkiem TESTLiga; globalna rola member. SQL potwierdził1własny zaległy mecz,17zł pozostało. Narzędzie zakończone, dane trwałe, bez zapisanych haseł/tokenów. Syntax/lint/API/idempotencja/odczytowa weryfikacja PASS. Nie zmieniano APK/migracji/Edge/polityk; bez resetu/usuwania istniejących danych/push/merge. Następny krok: ręczny odbiór scenariuszy telefonu z docs/ANDROID_LOCAL_TEST_DATA.md. Historia docs/ODPOWIEDZI_CODEX.txt.
 # Lokalne dane telefonu — 2026-10-23 21:48:38 Europe/Warsaw

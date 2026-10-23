@@ -525,7 +525,7 @@ ion-toolbar:has(.slm-shell-header) { --background:var(--slm-brand-header-bg); }
 .slm-ultimate-number { font-weight:850; }
 
 /* Premium3.11 — demo-only pitch, independent of global theme and production UI. */
-.slm-demo-teams { --slm-pitch-grass:#123D30; --slm-pitch-stripe:#194936; --slm-pitch-line:#D7E8C37A; --slm-pitch-light:#FFF0B92E; --slm-pitch-gold:#E8CB77; --slm-pitch-red:#720F27; --slm-pitch-red-deep:#380B18; --slm-pitch-ivory:#F3EAD5; --slm-pitch-navy:#172A39; --slm-pitch-name:#FFFCED; --slm-pitch-label:#081B16D9; --slm-pitch-shadow:#00000059; }
+:is(.slm-demo-teams,.slm-premium-teams) { --slm-pitch-grass:#123D30; --slm-pitch-stripe:#194936; --slm-pitch-line:#D7E8C37A; --slm-pitch-light:#FFF0B92E; --slm-pitch-gold:#E8CB77; --slm-pitch-red:#720F27; --slm-pitch-red-deep:#380B18; --slm-pitch-ivory:#F3EAD5; --slm-pitch-navy:#172A39; --slm-pitch-name:#FFFCED; --slm-pitch-label:#081B16D9; --slm-pitch-shadow:#00000059; }
 .slm-teams-disclaimer { margin:0 0 12px; color:var(--slm-text-secondary); font-size:.7rem; }
 .slm-team-score { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:10px; border:1px solid var(--slm-border); border-radius:12px; background:linear-gradient(140deg,var(--slm-card-top),var(--slm-panel)); }
 .slm-team-score > span { display:flex; align-items:center; justify-content:center; gap:7px; font-size:.78rem; font-weight:650; }

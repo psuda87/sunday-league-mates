@@ -2,7 +2,7 @@
 from pathlib import Path
 import subprocess,secrets
 repo=Path(__file__).resolve().parents[2]
-assert subprocess.check_output(["git","branch","--show-current"],cwd=repo,text=True).strip() in ("feat/integration", "feat/premium318-live")
+assert subprocess.check_output(["git","branch","--show-current"],cwd=repo,text=True).strip() in ("feat/integration", "feat/premium318-live", "feat/premium319-android", "feat/premium320-visual-parity")
 local=repo/".cache/http-edge"
 (local/"supabase/functions").mkdir(parents=True,exist_ok=True)
 files=subprocess.check_output(["git","ls-files","app/supabase/functions"],cwd=repo,text=True).splitlines()

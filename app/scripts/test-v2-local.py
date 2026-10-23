@@ -50,7 +50,7 @@ def rpc(index, action, body, finance=False, expected=None, rollback=False):
 
 try:
     branch = subprocess.check_output(["git", "branch", "--show-current"], text=True).strip()
-    assert branch in ("feat/integration", "feat/premium318-live"), "Requires approved local integration branch"
+    assert branch in ("feat/integration", "feat/premium318-live", "feat/premium319-android", "feat/premium320-visual-parity"), "Requires approved local integration branch"
     context_host = subprocess.check_output(["docker","context","inspect","--format","{{.Endpoints.docker.Host}}"],text=True).strip()
     docker_host = os.environ.get("DOCKER_HOST") or context_host
     assert docker_host.startswith(("npipe://", "unix://")), "Only a local Docker socket is allowed"

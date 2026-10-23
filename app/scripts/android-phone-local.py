@@ -30,7 +30,7 @@ def required(args):
 
 def guard():
     branch = required(['git', 'branch', '--show-current']).decode().strip()
-    if branch not in ('feat/integration', 'chore/android-phone-readiness', 'feat/premium318-live'):
+    if branch not in ('feat/integration', 'chore/android-phone-readiness', 'feat/premium318-live','feat/premium319-android','feat/premium320-visual-parity'):
         raise RuntimeError('Requires an approved local integration/readiness branch; no automatic checkout')
     host = os.environ.get('DOCKER_HOST') or required(['docker', 'context', 'inspect', '--format', '{{.Endpoints.docker.Host}}']).decode().strip()
     if not host.startswith(('npipe://', 'unix://')):

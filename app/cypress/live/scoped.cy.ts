@@ -41,7 +41,8 @@ describe('Rzeczywista przeglądarka i lokalny Supabase',()=>{
   cy.contains('h2','Live fixture match').should('be.visible');
   cy.contains('ion-button','Zapisz się').click();cy.contains('Jesteś zapisany').should('be.visible');
   cy.contains('nav.slm-bottom-nav button','Mecze').click();cy.contains('button','Moje').click();cy.contains('h2','Live fixture match').should('be.visible');cy.get('button[aria-label^="Otwórz szczegóły meczu"]').first().click();
-  cy.contains('section','Dodaj gościa').within(()=>{cy.contains('label','Imię / pseudonim').find('input').type('Live fixture guest');cy.get('input[type="checkbox"]').check();cy.contains('ion-button','Dodaj gościa').click();});
+  cy.contains('summary','Dodaj gościa').click();
+  cy.get('.slm-guest-form').within(()=>{cy.contains('label','Imię / pseudonim').find('input').type('Live fixture guest');cy.get('input[type="checkbox"]').check();cy.contains('ion-button','Dodaj gościa').click();});
   cy.contains('h3','Rezerwa').closest('section').should('contain','Live fixture guest');
   // Two different matches in the same real group catch an unfiltered match_summary.
   cy.contains('nav.slm-bottom-nav button','Mecze').click();

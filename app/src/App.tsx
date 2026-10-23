@@ -31,7 +31,7 @@ import '@ionic/react/css/palettes/dark.class.css';
 /* Theme variables */
 import './theme/variables.css';
 
-setupIonicReact();
+setupIonicReact({ hardwareBackButton:true });
 
 const App: React.FC = () => (
   <IonApp>

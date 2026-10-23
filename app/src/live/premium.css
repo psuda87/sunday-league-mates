@@ -10,7 +10,7 @@
 .slm-profile-links { display:grid; gap:8px; padding:12px; }
 .slm-profile-links ion-button { margin:0; }
 .slm-premium-live .slm-panel { border-radius:16px; background:linear-gradient(145deg,var(--slm-card-top),var(--slm-panel)); }
-.slm-premium-live input:not([type=checkbox]),.slm-premium-live select,.slm-premium-live textarea { box-sizing:border-box; width:100%; min-width:0; min-height:46px; border:1px solid var(--slm-border); border-radius:10px; padding:10px 12px; background:var(--ion-background-color); color:var(--ion-text-color); font:inherit; scroll-margin-block:100px; }
+.slm-premium-live input:not(.native-input):not([type=checkbox]):not([type=radio]),.slm-premium-live select:not(.native-select),.slm-premium-live textarea:not(.native-textarea) { box-sizing:border-box; width:100%; min-width:0; min-height:46px; border:1px solid var(--slm-border); border-radius:10px; padding:10px 12px; background:var(--ion-background-color); color:var(--ion-text-color); font:inherit; scroll-margin-block:100px; }
 .slm-premium-live input[type=checkbox] { width:20px; height:20px; accent-color:var(--ion-color-primary); }
 .slm-premium-live label { min-width:0; }
 .slm-premium-live .slm-group-card { display:block; width:100%; text-align:left; margin-bottom:10px; padding:16px; border:1px solid var(--slm-border); border-radius:14px; color:var(--slm-text); background:linear-gradient(130deg,var(--slm-card-top),var(--slm-panel)); }
@@ -32,7 +32,89 @@
 .slm-live-create ion-icon { font-size:30px; }
 .slm-live-nav-organizer button[data-tab=groups] { align-self:end; }
 .slm-live-nav button:focus-visible,.slm-premium-live summary:focus-visible { outline:2px solid var(--slm-gold); outline-offset:2px; }
-.slm-premium-page ion-footer { overflow:visible; padding-top:20px; background:var(--ion-background-color); }
+.slm-premium-page ion-footer { overflow:visible; padding-top:0; background:var(--ion-background-color); }
 .slm-premium-live .slm-finance-tiles { margin-block:12px; }
 .slm-premium-live .slm-finance-tiles p { margin:0; }
 @media (max-width:380px) { .slm-premium-live.slm-accounts { padding-inline:10px; } .slm-live-tools { gap:3px; } }
+
+/* 3.19: common control rhythm, without restyling Ionic's internal native inputs. */
+.slm-premium-live .slm-form { gap:16px; align-content:start; grid-auto-rows:max-content; }
+.slm-premium-live .slm-form > label,.slm-premium-live .slm-account-field { display:grid; gap:10px; margin:0; line-height:1.4; font-size:.85rem; }
+.slm-premium-live .slm-form > label:has(input[type=checkbox]) { display:flex; align-items:center; gap:10px; }
+.slm-premium-live .slm-form ion-input,.slm-premium-live .slm-form ion-select { margin:0; min-height:0; --padding-top:10px; --padding-bottom:10px; }
+.slm-premium-live ion-input .label-text-wrapper { margin-bottom:10px; }
+.slm-premium-live ion-input .native-input { min-height:26px; border:0; border-radius:0; background:transparent; padding:0; }
+.slm-premium-live .slm-password-field { align-self:start; }
+.slm-premium-live .slm-password-field ion-input { --padding-end:48px; }
+.slm-premium-live .slm-password-eye { bottom:4px; }
+.slm-premium-live .slm-form > p { margin:0; }
+.slm-premium-live .slm-panel { padding:16px; margin-bottom:14px; min-width:0; }
+.slm-premium-live.slm-accounts { padding-bottom:32px !important; }
+.slm-premium-live .slm-group-card { padding:12px; margin-bottom:8px; }
+.slm-premium-live .slm-group-card p:empty { display:none; }
+.slm-premium-live .slm-group-hero { padding:14px; margin-bottom:14px; }
+.slm-premium-live .slm-group-hero h2,.slm-premium-live .slm-group-card strong { overflow-wrap:anywhere; }
+.slm-premium-live .slm-group-request { display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:12px 0; border-top:1px solid var(--slm-border); }
+.slm-group-request > strong,.slm-group-request > p { flex:1 0 100%; margin:0; overflow-wrap:anywhere; }
+.slm-group-request > ion-button { flex:1 1 110px; margin:0; min-height:44px; }
+.slm-premium-live .slm-live-member { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:start; gap:8px; padding:12px 0; border-bottom:1px solid var(--slm-border); }
+.slm-live-member > strong { grid-column:1; }
+.slm-live-member > span { font-size:.75rem; color:var(--slm-text-secondary); }
+.slm-live-member > a { margin:0; }
+.slm-live-member .slm-group-actions { grid-column:1/-1; display:flex; flex-wrap:wrap; gap:6px; }
+.slm-live-member .slm-group-actions button { flex:1 1 130px; min-height:44px; white-space:normal; }
+.slm-premium-live .slm-match-compact .slm-hero-card { min-height:146px; }
+.slm-premium-live .slm-card-name { overflow-wrap:anywhere; line-height:1.3; }
+.slm-premium-live .slm-match-compact .slm-match-top { padding-right:12px; }
+.slm-premium-live .slm-match-meta { min-width:0; }
+.slm-premium-live .slm-location { overflow-wrap:anywhere; }
+.slm-premium-live .slm-privacy-badge { max-width:calc(100% - 80px); }
+.slm-limited-match .slm-limited-access { position:relative; z-index:2; margin:8px 0 0; font-size:.72rem; color:var(--slm-photo-text); pointer-events:none; }
+.slm-limited-match .slm-match-meta { padding-bottom:0; }
+.slm-premium-page ion-footer[hidden] { display:none !important; }
+.slm-premium-page .slm-live-nav { box-sizing:border-box; min-height:66px; }
+.slm-premium-page .slm-live-nav-organizer { min-height:86px; }
+@media (orientation:landscape) and (max-height:500px) { .slm-premium-live .slm-floating-brand { padding-top:8px; } .slm-premium-page .slm-live-nav button { min-height:44px; } }
+.slm-photo-editor { position:relative; margin:14px 0; padding:14px; border:1px solid var(--slm-border); border-radius:14px; background:var(--slm-panel); }
+.slm-premium-live .slm-photo-input { position:absolute; width:1px !important; height:1px; min-height:0 !important; padding:0 !important; overflow:hidden; clip-path:inset(50%); }
+.slm-photo-editor .slm-actions { margin-bottom:8px; }
+.slm-photo-editor .slm-muted { margin:0; font-size:.75rem; }
+.slm-photo-preview { max-width:520px; margin:auto; padding:20px; }
+.slm-photo-preview img { display:block; max-width:100%; max-height:65vh; margin:0 auto 20px; object-fit:contain; border-radius:14px; }
+
+/* Premium 3.20: original roster/pitch presentation with scoped live data. */
+.slm-live-roster .slm-roster-person { display:grid; grid-template-columns:31px minmax(0,1fr) auto; gap:10px; padding:7px 0; min-height:52px; }
+.slm-live-roster .slm-demo-person-meta { min-width:0; }
+.slm-person-link { display:block; padding:0; border:0; background:transparent; color:var(--slm-text); text-align:left; font:inherit; font-weight:650; overflow-wrap:anywhere; cursor:pointer; }
+.slm-roster-person strong,.slm-roster-person small { overflow-wrap:anywhere; }
+.slm-roster-call { display:inline-block; margin-top:4px; color:var(--slm-gold); font-size:.7rem; }
+.slm-person-actions { align-self:start; }
+.slm-person-actions > summary { display:grid; place-items:center; min-width:44px; min-height:44px; border:1px solid var(--slm-border); border-radius:10px; cursor:pointer; color:var(--slm-gold); list-style:none; }
+.slm-person-actions > summary::-webkit-details-marker { display:none; }
+.slm-person-actions[open] { grid-column:1/-1; display:grid; grid-template-columns:1fr 44px; }
+.slm-person-actions[open] > summary { grid-column:2; }
+.slm-person-actions > div { grid-column:1/-1; display:flex; flex-wrap:wrap; padding:6px; border:1px solid var(--slm-border); border-radius:10px; background:var(--slm-panel); }
+.slm-match-management > summary,.slm-guest-form > summary,.slm-local-lineup-editor > summary { min-height:44px; padding:12px 0; cursor:pointer; color:var(--slm-gold); font-weight:650; }
+.slm-match-management > ion-button { margin:6px; }
+.slm-local-lineup-editor { margin-top:12px; padding:12px; border:1px solid var(--slm-border); border-radius:12px; background:var(--slm-panel); }
+.slm-local-lineup-editor label { display:grid; grid-template-columns:minmax(0,1fr) minmax(120px,42%); align-items:center; gap:12px; padding:8px 0; font-size:.78rem; overflow-wrap:anywhere; }
+.slm-participant-profile { max-width:580px; margin:auto; padding:20px 16px 40px; text-align:center; }
+.slm-participant-profile .slm-call { margin:16px auto; }
+.slm-ultimate-portrait[data-framed=true] { inset:60px 15% auto; aspect-ratio:4/5; border-radius:44% 44% 38% 38%; mask-image:linear-gradient(black 76%,transparent); }
+.slm-ultimate-portrait[data-framed=true] > img { width:100%; height:100%; border-radius:inherit; object-fit:cover; object-position:var(--portrait-x,50%) var(--portrait-y,32%); transform:scale(var(--portrait-zoom,1)); }
+/* Original 3.18 notch and 56px button; the group icon/label sit below its hit box. */
+.slm-live-nav-notch { position:absolute; top:0; left:calc(50% - 40px); pointer-events:none; fill:none; stroke:var(--slm-gold); stroke-opacity:.45; stroke-width:1; }
+.slm-live-nav-organizer .slm-live-nav-surface { border-top-color:transparent; }
+.slm-live-nav-organizer::before { content:""; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,var(--slm-border) calc(50% - 40px),transparent calc(50% - 40px),transparent calc(50% + 40px),var(--slm-border) calc(50% + 40px)); pointer-events:none; }
+.slm-premium-page .slm-live-nav-organizer { min-height:96px; padding-top:40px; }
+.slm-live-nav-organizer button[data-tab=groups] { display:flex; flex-direction:row; align-items:center; justify-content:center; gap:5px; padding-bottom:6px; }
+.slm-live-nav-organizer button[data-tab=groups] ion-icon { font-size:20px; }
+.slm-live-nav-organizer button[data-tab=groups][aria-current=page] { background:transparent; border-color:transparent; }
+.slm-premium-page .slm-live-nav .slm-live-create { z-index:2; }
+.slm-premium-live.slm-accounts { padding-bottom:48px !important; }
+.slm-premium-live .slm-match-participation { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; padding:10px 12px; }
+.slm-match-participation > h2 { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+.slm-match-participation > p { margin:0; font-size:.78rem; }
+.slm-match-participation > p:last-child { flex:1 0 100%; font-size:.68rem; color:var(--slm-text-secondary); }
+.slm-match-participation .slm-actions { margin:0; flex:1 1 auto; justify-content:flex-end; }
+.slm-match-participation ion-button { margin:0; font-size:.72rem; }

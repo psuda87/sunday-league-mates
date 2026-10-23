@@ -1,3 +1,5 @@
+import { usePhotoPicker } from '../live/usePhotoPicker';
+import { useAndroidShell, useBackAction, useScreenHistory } from '../ui/backNavigation';
 import LiveGroups from '../live/Groups';
 import LiveMatches from '../live/Matches';
 import GroupFinance from '../live/Finance';
@@ -30,8 +32,17 @@ export default function Accounts() {
   const [manager] = useState(() => new SessionManager(tokenStore, accountRequest));
   const auth = useSyncExternalStore(manager.subscribe, manager.getSnapshot);
   const session = auth.session;
+  const photoPicker = usePhotoPicker(manager,auth.phase,session?.user_id);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [screen, setScreen] = useState<'profile' | 'admin' | 'events' | 'notifications' | 'settlements' | 'players' | 'groups' | 'legacy-events' | 'legacy-finance'>('events');
+  const {screen, navigate:setScreen, back:backScreen, reset:resetScreens} = useScreenHistory<'profile' | 'admin' | 'events' | 'notifications' | 'settlements' | 'players' | 'groups' | 'legacy-events' | 'legacy-finance'>('events');
+  const keyboardOpen = useAndroidShell();
+  const contentRef = useRef<HTMLIonContentElement>(null);
+  useEffect(()=>{void contentRef.current?.scrollToTop(0);},[screen]);
+  useBackAction(10, true, backScreen);
+  useBackAction(25, screen === 'profile', () => {
+    const opened = Array.from(document.querySelectorAll<HTMLDetailsElement>('.slm-live-profile details[open]')).pop();
+    if (opened) opened.open = false; else backScreen();
+  });
   const [canCreate, setCanCreate] = useState(false);
   const [createRequest, setCreateRequest] = useState(0);
   const [eventTarget, setEventTarget] = useState<string | null>(null);
@@ -89,7 +100,7 @@ export default function Accounts() {
     } else if (notification.event_id) {
       setEventTarget(notification.event_id); setScreen('legacy-events');
     } else setScreen('notifications');
-  },[manager]);
+  },[manager,setScreen]);
   useEffect(() => { void push.start(); return () => { void push.stop(); }; },[push]);
   useEffect(() => {
     if (auth.phase === 'ready' && session && !session.must_change_password) void push.resume();
@@ -114,6 +125,7 @@ export default function Accounts() {
     return () => { alive = false; };
   },[pendingNotification,auth.phase,session,openNotification,failed]);
   useEffect(() => { void manager.refresh(); }, [manager]);
+  useEffect(() => { if (auth.phase === 'signed_out') resetScreens(); }, [auth.phase, resetScreens]);
   useEffect(() => {
     if (auth.phase !== 'ready') { setProfile(null); setAccounts([]); clearSecrets(); }
   }, [auth.phase, clearSecrets]);
@@ -178,7 +190,7 @@ export default function Accounts() {
   </form>;
 
   return <IonPage className="slm-premium-page">
-    <IonContent><main className="slm-accounts slm-premium-live">
+    <IonContent ref={contentRef}><main className="slm-accounts slm-premium-live">{photoPicker.input}
     {!(auth.phase === 'ready' && session && !session.must_change_password && ['events','players','groups','profile','settlements'].includes(screen)) && <div className="slm-shell-header slm-floating-brand"><img className="slm-logo slm-crest slm-floating-crest" src="/assets/branding/slm-logo-primary-transparent.png" alt="Sunday League Mates" width="450" height="505" />
       {auth.phase === 'ready' && session && !session.must_change_password && <IonButton fill="clear" aria-label={`Powiadomienia${unread ? `, nieprzeczytane: ${unread}` : ''}`} onClick={() => setScreen('notifications')}><IonIcon icon={notificationsOutline} aria-hidden="true" /> {unread ? `(${unread})` : ''}</IonButton>}</div>}
 
@@ -207,7 +219,7 @@ export default function Accounts() {
           <h1>Zmień hasło tymczasowe</h1><p>Przed korzystaniem z grupy ustaw własne hasło.</p>{passwordForm}
         </section> : screen === 'players' ? <Players players={[]} unavailable action={<IonButton fill="clear" aria-label={`Powiadomienia${unread ? `, nieprzeczytane: ${unread}` : ''}`} onClick={() => setScreen('notifications')}><IonIcon icon={notificationsOutline} aria-hidden="true" />{unread ? `(${unread})` : ''}</IonButton>} /> : screen === 'groups' ? <LiveGroups manager={manager} userId={session.user_id} /> : screen === 'settlements' ? <><GroupFinance manager={manager} /><IonButton fill="clear" onClick={() => setScreen('legacy-finance')}>Rozliczenia historyczne</IonButton></> : screen === 'legacy-finance' ? <Settlements manager={manager} session={session} /> : screen === 'notifications' ? <Notifications manager={manager} push={push} pushStatus={pushStatus}
           onOpen={openNotification} onRefresh={() => setNotificationVersion(v => v+1)} /> :
-          screen === 'events' ? <LiveMatches createRequest={createRequest} key={eventsViewVersion} manager={manager} initialEventId={eventTarget} userId={session.user_id} onLegacy={() => setScreen('legacy-events')} /> : screen === 'legacy-events' ? <Events allowCreate={false} manager={manager} session={session} initialEventId={eventTarget} headerAction={<IonButton fill="clear" aria-label={`Powiadomienia${unread ? `, nieprzeczytane: ${unread}` : ''}`} onClick={() => setScreen('notifications')}><IonIcon icon={notificationsOutline} aria-hidden="true" />{unread ? `(${unread})` : ''}</IonButton>} /> : screen === 'profile' || session.role !== 'admin' ? <LiveProfile profile={profile} accountActions={<>        <nav className="slm-profile-links" aria-label="Konto">
+          screen === 'events' ? <LiveMatches createRequest={createRequest} key={eventsViewVersion} manager={manager} initialEventId={eventTarget} userId={session.user_id} onLegacy={() => setScreen('legacy-events')} /> : screen === 'legacy-events' ? <Events allowCreate={false} manager={manager} session={session} initialEventId={eventTarget} headerAction={<IonButton fill="clear" aria-label={`Powiadomienia${unread ? `, nieprzeczytane: ${unread}` : ''}`} onClick={() => setScreen('notifications')}><IonIcon icon={notificationsOutline} aria-hidden="true" />{unread ? `(${unread})` : ''}</IonButton>} /> : screen === 'profile' || session.role !== 'admin' ? <LiveProfile onChoosePhoto={photoPicker.choose} pendingPhoto={photoPicker.file} onPhotoConsumed={photoPicker.consumed} key={session.user_id} manager={manager} profile={profile} accountActions={<>        <nav className="slm-profile-links" aria-label="Konto">
           {!session.must_change_password && <IonButton fill="outline"
             onClick={() => { setScreen('settlements'); setTemporary(null); }}>Rozliczenia</IonButton>}
           {!session.must_change_password && <IonButton fill="outline"
@@ -299,6 +311,6 @@ export default function Accounts() {
         </>}
       </>}
     </main></IonContent>
-    {auth.phase === 'ready' && session && !session.must_change_password && <IonFooter><BottomNav canCreate={canCreate} onCreate={() => { setScreen('events'); setEventTarget(null); setCreateRequest(v => v + 1); }} active={screen} onSelect={value => { setScreen(value); setTemporary(null); if (value === 'events') { setCreateRequest(0); setEventTarget(null); setEventsViewVersion(v => v + 1); } }} /></IonFooter>}
+    {auth.phase === 'ready' && session && !session.must_change_password && <IonFooter hidden={keyboardOpen}><BottomNav canCreate={canCreate} onCreate={() => { setScreen('events'); setEventTarget(null); setCreateRequest(v => v + 1); }} active={screen} onSelect={value => { setScreen(value); setTemporary(null); if (value === 'events') { setCreateRequest(0); setEventTarget(null); setEventsViewVersion(v => v + 1); } }} /></IonFooter>}
   </IonPage>;
 }

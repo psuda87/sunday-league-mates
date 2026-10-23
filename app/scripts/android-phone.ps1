@@ -31,7 +31,7 @@ function Resolve-PhoneDevice {
 Push-Location $phoneApp
 try {
     $phoneBranch = (& git branch --show-current).Trim()
-    if ($phoneBranch -notin @('feat/integration','chore/android-phone-readiness','feat/premium318-live')) { throw 'Requires an approved local integration/readiness branch; no automatic checkout' }
+    if ($phoneBranch -notin @('feat/integration','chore/android-phone-readiness','feat/premium318-live','feat/premium319-android','feat/premium320-visual-parity')) { throw 'Requires an approved local integration/readiness branch; no automatic checkout' }
     if (-not (Test-Path -LiteralPath $phoneAdb)) { throw "Missing Android platform-tools: $phoneAdb" }
     switch ($Action) {
         'Check' {
