@@ -1,4 +1,7 @@
-﻿# Lokalne dane telefonu — 2026-10-23 21:48:38 Europe/Warsaw
+﻿# Dane testowe GOTOWE — 2026-10-23 21:49:44 Europe/Warsaw
+
+chore/local-phone-fixtures:14fikcyjnych zawodników,3grupy,12meczów(4historyczne),35wpłat(3oczekujące). Zaproszenia przyjęte, konto telefonu adminem tylko TESTEspaña i zwykłym członkiem TESTLiga; globalna rola member. SQL potwierdził1własny zaległy mecz,17zł pozostało. Narzędzie zakończone, dane trwałe, bez zapisanych haseł/tokenów. Syntax/lint/API/idempotencja/odczytowa weryfikacja PASS. Nie zmieniano APK/migracji/Edge/polityk; bez resetu/usuwania istniejących danych/push/merge. Następny krok: ręczny odbiór scenariuszy telefonu z docs/ANDROID_LOCAL_TEST_DATA.md. Historia docs/ODPOWIEDZI_CODEX.txt.
+# Lokalne dane telefonu — 2026-10-23 21:48:38 Europe/Warsaw
 
 Branch chore/local-phone-fixtures, worktree .worktrees/premium318-live. Dodano14fikcyjnych zwykłych kont,3grupyTEST,11meczów i26wpłat(2pending), rzeczywisteAPI. Syntax/lint/odczytowa kontrola danych i ochrona przed duplikowaniem PASS. Dane trwałe, bez resetu i usuwania istniejących danych; migracje/Edge/runtimeAPK bez zmian. Dotychczasowe konto ma2zaproszenia; adminTESTEspaña i własny przykład17zł oczekują na dobrowolne przyjęcie. Brak push/merge/zdalnych zmian. Następny krok: przyjąć zaproszenia na telefonie i zweryfikować transfer grupowy/finanse. Raport docs/ANDROID_LOCAL_TEST_DATA.md; historia docs/ODPOWIEDZI_CODEX.txt.
 ## Potwierdzenie użytkownika — 2026-10-23 21:40:32 Europe/Warsaw

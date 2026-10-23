@@ -16,16 +16,15 @@ Zmiany dotyczą lokalnych danych i skryptu, nie APK ani schematu.
   po dobrowolnym dołączeniu konto telefonu pozostaje zwykłym członkiem.
 - `TEST · Rywale — prywatność`: grupa bez zaproszenia telefonu, prywatny mecz
   z ograniczonym widokiem i publiczny mecz umożliwiający zapis outsidera.
-- 8 przyszłych/odwołanych meczów i 3 nowe historyczne fixture.
-- 26 fikcyjnych wpłat: przyjęte, częściowe i 2 oczekujące. Historia obejmuje
+- 8 przyszłych/odwołanych meczów i 4 nowe historyczne fixture — łącznie 12.
+- 35 fikcyjnych wpłat: przyjęte, częściowe i 3 oczekujące. Historia obejmuje
   naliczone/otrzymane nadwyżki oraz zaległości wygenerowanych zawodników.
 
-Po przyjęciu zaproszenia do Españi skrypt tworzy jeszcze jeden historyczny fixture
+Po przyjęciu zaproszenia do Españi skrypt utworzył dodatkowy historyczny fixture
 z udziałem konta telefonu: należność 27 zł, fikcyjna wpłata 10 zł, do zapłaty 17 zł.
 To jeden zaległy mecz; nie przygotowujemy drugiej zaległości istniejącemu kontu.
-Następnie przekazuje mu administrację wyłącznie tej nowej grupy, przez istniejącą
-operację transferu. Globalna rola konta bez zmian. Stan wykonania transferu i
-końcowe liczby są w dopiskach poniżej.
+Następnie przekazał mu administrację wyłącznie tej nowej grupy, przez istniejącą
+operację transferu. Globalna rola konta pozostała `member`.
 
 ## Na telefonie
 
@@ -67,7 +66,10 @@ Skrypt nie zawiera automatycznego cleanupu — dane mają pozostać do ręcznego
 ## Weryfikacja
 
 - `node --check` i ESLint narzędzia: PASS.
-- Utworzenie przez rzeczywisty lokalny backend: PASS do etapu zaproszeń.
+- Utworzenie przez rzeczywisty lokalny backend: PASS, manifest `complete`.
 - Ponowne uruchomienie przy istniejącym manifeście: PASS, brak duplikowania.
-- Odbiór telefonu i transfer po przyjęciu zaproszenia: oczekuje na użytkownika.
+- Backend potwierdził dobrowolne przyjęcie obu zaproszeń; transfer Españi: PASS.
+- Odczyt SQL: admin Españi, członek (bez admina) Ligi, globalna rola member: PASS.
+- Odczyt SQL własnych finansów Españi: saldo -1700 groszy, pozostało 1700 groszy,
+  dokładnie jeden zaległy mecz fixture: PASS. Odbiór wizualny kwoty pozostaje ręczny.
 - Nie przebudowywano APK: runtime aplikacji niezmieniony; dane pobiera obecne API.
