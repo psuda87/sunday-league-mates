@@ -1,3 +1,4 @@
+import { accountAction } from '../support/navigation';
 describe('Rozliczenia — przygotowany interfejs z kontrolowanym API', () => {
   const input = (label: string, value: string) => cy.get('ion-input').filter((_, el) =>
     (el as unknown as { label: string }).label === label).find('input').clear({log:false}).type(value,{log:false});
@@ -28,7 +29,7 @@ describe('Rozliczenia — przygotowany interfejs z kontrolowanym API', () => {
         req.reply({ payment_id: req.body.request_id, status: 'pending' });
       } else req.reply({ ok: true });
     });
-    login(); cy.contains('ion-button', 'Rozliczenia').click(); cy.contains('ion-button','Rozliczenia historyczne').click();
+    login(); accountAction('Rozliczenia'); cy.contains('ion-button','Rozliczenia historyczne').click();
     cy.contains('Zapisy i dodawanie gości zablokowane').should('be.visible');
     cy.contains('Gość: Gość fixture').should('be.visible');
     cy.contains('.slm-balance', '-54,00').should('be.visible');
@@ -65,7 +66,7 @@ describe('Rozliczenia — przygotowany interfejs z kontrolowanym API', () => {
         approvals++; approved = true; req.reply({ event_id: eid, version: 2 });
       } else req.reply({ ok: true });
     });
-    login(); cy.contains('ion-button', 'Mecze').click(); cy.contains('ion-button', 'Wydarzenia i rozliczenia historyczne').click(); cy.contains('button', 'Historia').click(); cy.get('button[aria-label^="Otwórz szczegóły meczu"]').first().click(); cy.contains('[role=tab]', 'Rozliczenie').click();
+    login(); cy.contains('nav.slm-bottom-nav button','Mecze').click(); cy.contains('ion-button', 'Wydarzenia i rozliczenia historyczne').click(); cy.contains('button', 'Historia').click(); cy.get('button[aria-label^="Otwórz szczegóły meczu"]').first().click(); cy.contains('[role=tab]', 'Rozliczenie').click();
     cy.contains('Wstępne — nie tworzy zaległości ani blokady').should('be.visible');
     input('Powód decyzji / korekty', 'Odbiór fixture');
     cy.on('window:confirm', () => true); cy.contains('ion-button', 'Zatwierdź rozliczenie').click();

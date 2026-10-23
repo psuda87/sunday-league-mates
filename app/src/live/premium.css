@@ -1,0 +1,38 @@
+/* Live presentation of the approved Premium 3.18 components. No demo scope. */
+.slm-premium-live { width:100%; max-width:680px; margin-inline:auto; }
+.slm-live-signin { max-width:480px; width:100%; margin:0 auto 24px; }
+.slm-live-profile { max-width:580px; margin-inline:auto; }
+.slm-live-profile > .slm-call { display:block; width:max-content; margin:0 auto 16px; }
+.slm-live-profile .slm-ultimate-summary > p { text-align:center; font-size:.75rem; }
+.slm-live-profile .slm-identity-settings { margin-block:14px; }
+.slm-live-profile .slm-identity-settings > summary { min-height:48px; padding:12px; cursor:pointer; color:var(--slm-gold); }
+.slm-live-profile .slm-panel h1 { font-size:1.15rem; }
+.slm-profile-links { display:grid; gap:8px; padding:12px; }
+.slm-profile-links ion-button { margin:0; }
+.slm-premium-live .slm-panel { border-radius:16px; background:linear-gradient(145deg,var(--slm-card-top),var(--slm-panel)); }
+.slm-premium-live input:not([type=checkbox]),.slm-premium-live select,.slm-premium-live textarea { box-sizing:border-box; width:100%; min-width:0; min-height:46px; border:1px solid var(--slm-border); border-radius:10px; padding:10px 12px; background:var(--ion-background-color); color:var(--ion-text-color); font:inherit; scroll-margin-block:100px; }
+.slm-premium-live input[type=checkbox] { width:20px; height:20px; accent-color:var(--ion-color-primary); }
+.slm-premium-live label { min-width:0; }
+.slm-premium-live .slm-group-card { display:block; width:100%; text-align:left; margin-bottom:10px; padding:16px; border:1px solid var(--slm-border); border-radius:14px; color:var(--slm-text); background:linear-gradient(130deg,var(--slm-card-top),var(--slm-panel)); }
+.slm-premium-live .slm-group-card strong { color:var(--slm-gold); font-size:1rem; }
+.slm-premium-live .slm-group-card p { margin-bottom:0; }
+.slm-live-tools { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:8px 0 12px; }
+.slm-live-tools ion-button { margin:0; font-size:.75rem; }
+.slm-live-label { display:flex; align-items:center; gap:6px; margin:12px 4px 5px; color:var(--slm-gold); font-size:.75rem; overflow-wrap:anywhere; }
+.slm-live-empty { padding:24px 18px; text-align:center; border:1px dashed var(--slm-border); border-radius:16px; margin:16px 0; color:var(--slm-text-secondary); }
+.slm-live-empty h2 { color:var(--slm-gold); font-size:1.1rem; }
+.slm-live-groups > details { margin-block:12px; border:1px solid var(--slm-border); border-radius:14px; background:var(--slm-panel); padding:12px; }
+.slm-live-groups > details > summary { min-height:44px; display:flex; align-items:center; cursor:pointer; color:var(--slm-gold); font-weight:650; }
+.slm-live-groups > details .slm-panel { margin-bottom:0; }
+.slm-live-nav { position:relative; isolation:isolate; }
+.slm-live-nav-surface { position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,var(--slm-card-bottom),var(--ion-background-color)); border-top:1px solid var(--slm-border); }
+.slm-premium-page .slm-live-nav-organizer { padding-top:24px; }
+.slm-live-nav-organizer .slm-live-nav-surface { mask:radial-gradient(circle 34px at 50% 8px,transparent 33px,#000 34px); }
+.slm-premium-page .slm-live-nav .slm-live-create { position:absolute; top:-20px; left:calc(50% - 28px); width:56px; height:56px; min-height:56px; border-radius:50%; border:1px solid var(--slm-gold); color:var(--slm-gold-edge); background:linear-gradient(145deg,var(--slm-button-bottom),var(--slm-premium-burgundy)); box-shadow:0 5px 14px var(--slm-shadow),inset 0 1px 2px var(--slm-gold); }
+.slm-live-create ion-icon { font-size:30px; }
+.slm-live-nav-organizer button[data-tab=groups] { align-self:end; }
+.slm-live-nav button:focus-visible,.slm-premium-live summary:focus-visible { outline:2px solid var(--slm-gold); outline-offset:2px; }
+.slm-premium-page ion-footer { overflow:visible; padding-top:20px; background:var(--ion-background-color); }
+.slm-premium-live .slm-finance-tiles { margin-block:12px; }
+.slm-premium-live .slm-finance-tiles p { margin:0; }
+@media (max-width:380px) { .slm-premium-live.slm-accounts { padding-inline:10px; } .slm-live-tools { gap:3px; } }

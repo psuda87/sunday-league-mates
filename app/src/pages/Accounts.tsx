@@ -3,6 +3,7 @@ import LiveMatches from '../live/Matches';
 import GroupFinance from '../live/Finance';
 import { AccountHeading, PasswordField, SignInFields } from '../account-ui/Fields';
 import Players from '../ui/Players';
+import LiveProfile from '../live/Profile';
 import { notificationsOutline } from 'ionicons/icons';
 import AppearanceSettings from '../ui/AppearanceSettings';
 import BottomNav from '../ui/BottomNav';
@@ -18,6 +19,7 @@ import type { ManagedAccount, Profile } from '../auth/api';
 import { SessionManager } from '../auth/sessionManager';
 import { tokenStore } from '../auth/tokenStore';
 import './Accounts.css';
+import '../live/premium.css';
 import Events from './Events';
 import Settlements from './Settlements';
 import Notifications from './Notifications';
@@ -30,6 +32,8 @@ export default function Accounts() {
   const session = auth.session;
   const [profile, setProfile] = useState<Profile | null>(null);
   const [screen, setScreen] = useState<'profile' | 'admin' | 'events' | 'notifications' | 'settlements' | 'players' | 'groups' | 'legacy-events' | 'legacy-finance'>('events');
+  const [canCreate, setCanCreate] = useState(false);
+  const [createRequest, setCreateRequest] = useState(0);
   const [eventTarget, setEventTarget] = useState<string | null>(null);
   const [eventsViewVersion, setEventsViewVersion] = useState(0);
   const [pendingNotification, setPendingNotification] = useState<string | null>(null);
@@ -142,6 +146,15 @@ export default function Accounts() {
     }, Math.max(5000, (session.expires_in - 60) * 1000));
     return () => window.clearTimeout(timer);
   }, [session, manager]);
+  useEffect(() => {
+    if (auth.phase !== 'ready' || !session || session.must_change_password) { setCanCreate(false); return; }
+    let alive = true;
+    setCanCreate(false);
+    manager.call<{ groups: { organizer: boolean; admin_id: string }[] }>('groups_list')
+      .then(result => { if (alive) setCanCreate(result.groups.some(group => group.organizer || group.admin_id === session.user_id)); })
+      .catch(() => { if (alive) setCanCreate(false); });
+    return () => { alive = false; };
+  }, [manager, auth.phase, session, screen]);
   async function loadAccounts(page = offset) {
     const rows = await manager.call<ManagedAccount[]>('list_accounts', { offset: page });
     setAccounts(rows); setOffset(page);
@@ -164,9 +177,9 @@ export default function Accounts() {
     <IonButton type="submit" expand="block" disabled={busy}>Zmień hasło</IonButton>
   </form>;
 
-  return <IonPage>
-    <IonContent><main className="slm-accounts">
-    {!(auth.phase === 'ready' && session && !session.must_change_password && (screen === 'events' || screen === 'players')) && <div className="slm-shell-header slm-floating-brand"><img className="slm-logo slm-crest slm-floating-crest" src="/assets/branding/slm-logo-primary-transparent.png" alt="Sunday League Mates" width="450" height="505" />
+  return <IonPage className="slm-premium-page">
+    <IonContent><main className="slm-accounts slm-premium-live">
+    {!(auth.phase === 'ready' && session && !session.must_change_password && ['events','players','groups','profile','settlements'].includes(screen)) && <div className="slm-shell-header slm-floating-brand"><img className="slm-logo slm-crest slm-floating-crest" src="/assets/branding/slm-logo-primary-transparent.png" alt="Sunday League Mates" width="450" height="505" />
       {auth.phase === 'ready' && session && !session.must_change_password && <IonButton fill="clear" aria-label={`Powiadomienia${unread ? `, nieprzeczytane: ${unread}` : ''}`} onClick={() => setScreen('notifications')}><IonIcon icon={notificationsOutline} aria-hidden="true" /> {unread ? `(${unread})` : ''}</IonButton>}</div>}
 
       {error && <p role="alert" className="slm-error">⚠ {error}</p>}
@@ -179,7 +192,7 @@ export default function Accounts() {
           <h1>Potwierdź dostęp do konta</h1><p>Chronione dane będą dostępne po sprawdzeniu sesji.</p>
           <IonButton disabled={busy} onClick={() => void perform(() => manager.refresh())}>Spróbuj ponownie</IonButton>
           <IonButton fill="outline" disabled={busy} onClick={() => void perform(logout)}>Wyloguj się</IonButton>
-        </section> : !session ? <section className="slm-panel">
+        </section> : !session ? <section className="slm-account-panel slm-live-signin">
         <AccountHeading title="Zaloguj się">Zaloguj się e-mailem albo zachowanym loginem lub telefonem konta legacy.</AccountHeading>
         <form className="slm-form" onSubmit={event => {
           event.preventDefault(); void perform(async () => {
@@ -190,28 +203,27 @@ export default function Accounts() {
           <IonButton expand="block" type="submit" disabled={busy}>Zaloguj się</IonButton>
         </form><p className="slm-muted">Rejestracja e-mail jest obecnie niedostępna. Nie pamiętasz hasła istniejącego konta? Skontaktuj się z administratorem aplikacji.</p>
       </section> : <>
-        <nav className="slm-actions" aria-label="Konto">
-          {!session.must_change_password && <IonButton fill={screen === 'settlements' ? 'solid' : 'outline'}
+        {session.must_change_password ? <section className="slm-panel">
+          <h1>Zmień hasło tymczasowe</h1><p>Przed korzystaniem z grupy ustaw własne hasło.</p>{passwordForm}
+        </section> : screen === 'players' ? <Players players={[]} unavailable action={<IonButton fill="clear" aria-label={`Powiadomienia${unread ? `, nieprzeczytane: ${unread}` : ''}`} onClick={() => setScreen('notifications')}><IonIcon icon={notificationsOutline} aria-hidden="true" />{unread ? `(${unread})` : ''}</IonButton>} /> : screen === 'groups' ? <LiveGroups manager={manager} userId={session.user_id} /> : screen === 'settlements' ? <><GroupFinance manager={manager} /><IonButton fill="clear" onClick={() => setScreen('legacy-finance')}>Rozliczenia historyczne</IonButton></> : screen === 'legacy-finance' ? <Settlements manager={manager} session={session} /> : screen === 'notifications' ? <Notifications manager={manager} push={push} pushStatus={pushStatus}
+          onOpen={openNotification} onRefresh={() => setNotificationVersion(v => v+1)} /> :
+          screen === 'events' ? <LiveMatches createRequest={createRequest} key={eventsViewVersion} manager={manager} initialEventId={eventTarget} userId={session.user_id} onLegacy={() => setScreen('legacy-events')} /> : screen === 'legacy-events' ? <Events allowCreate={false} manager={manager} session={session} initialEventId={eventTarget} headerAction={<IonButton fill="clear" aria-label={`Powiadomienia${unread ? `, nieprzeczytane: ${unread}` : ''}`} onClick={() => setScreen('notifications')}><IonIcon icon={notificationsOutline} aria-hidden="true" />{unread ? `(${unread})` : ''}</IonButton>} /> : screen === 'profile' || session.role !== 'admin' ? <LiveProfile profile={profile} accountActions={<>        <nav className="slm-profile-links" aria-label="Konto">
+          {!session.must_change_password && <IonButton fill="outline"
             onClick={() => { setScreen('settlements'); setTemporary(null); }}>Rozliczenia</IonButton>}
-          {!session.must_change_password && <IonButton fill={screen === 'notifications' ? 'solid' : 'outline'}
+          {!session.must_change_password && <IonButton fill="outline"
             onClick={() => { setScreen('notifications'); setTemporary(null); }}>Powiadomienia{unread !== null && unread>0 ? ` (${unread})` : ''}</IonButton>}
-          {!session.must_change_password && <IonButton fill={screen === 'events' ? 'solid' : 'outline'}
+          {!session.must_change_password && <IonButton fill="outline"
             onClick={() => { setScreen('events'); setEventTarget(null); setEventsViewVersion(v => v + 1); setTemporary(null); }}>Mecze</IonButton>}
-          {!session.must_change_password && <IonButton fill={screen === 'profile' ? 'solid' : 'outline'}
+          {!session.must_change_password && <IonButton fill="outline"
             onClick={() => { setScreen('profile'); setTemporary(null); }}>Mój profil</IonButton>}
-          {!session.must_change_password && session.role === 'admin' && <IonButton fill={screen === 'admin' ? 'solid' : 'outline'}
+          {!session.must_change_password && session.role === 'admin' && <IonButton fill="outline"
             disabled={busy} onClick={() => { setScreen('admin'); setTemporary(null); void perform(() => loadAccounts(0)); }}>Zarządzaj kontami</IonButton>}
           <IonButton fill="clear" disabled={busy} onClick={() => {
             void perform(async () => { try { await logout(); }
               finally { setProfile(null); setAccounts([]); clearSecrets(); } });
           }}>Wyloguj się</IonButton>
         </nav>
-        {!session.must_change_password && screen === 'profile' && <AppearanceSettings />}
-        {session.must_change_password ? <section className="slm-panel">
-          <h1>Zmień hasło tymczasowe</h1><p>Przed korzystaniem z grupy ustaw własne hasło.</p>{passwordForm}
-        </section> : screen === 'players' ? <Players players={[]} unavailable action={<IonButton fill="clear" aria-label={`Powiadomienia${unread ? `, nieprzeczytane: ${unread}` : ''}`} onClick={() => setScreen('notifications')}><IonIcon icon={notificationsOutline} aria-hidden="true" />{unread ? `(${unread})` : ''}</IonButton>} /> : screen === 'groups' ? <LiveGroups manager={manager} userId={session.user_id} /> : screen === 'settlements' ? <><GroupFinance manager={manager} /><IonButton fill="clear" onClick={() => setScreen('legacy-finance')}>Rozliczenia historyczne</IonButton></> : screen === 'legacy-finance' ? <Settlements manager={manager} session={session} /> : screen === 'notifications' ? <Notifications manager={manager} push={push} pushStatus={pushStatus}
-          onOpen={openNotification} onRefresh={() => setNotificationVersion(v => v+1)} /> :
-          screen === 'events' ? <LiveMatches key={eventsViewVersion} manager={manager} initialEventId={eventTarget} userId={session.user_id} onLegacy={() => setScreen('legacy-events')} /> : screen === 'legacy-events' ? <Events allowCreate={false} manager={manager} session={session} initialEventId={eventTarget} headerAction={<IonButton fill="clear" aria-label={`Powiadomienia${unread ? `, nieprzeczytane: ${unread}` : ''}`} onClick={() => setScreen('notifications')}><IonIcon icon={notificationsOutline} aria-hidden="true" />{unread ? `(${unread})` : ''}</IonButton>} /> : screen === 'profile' || session.role !== 'admin' ? <>
+</>} appearance={<AppearanceSettings />}>
           <section className="slm-panel">
             <h1>{profile?.display_name || 'Mój profil'}</h1>
             {profile?.phone && <a className="slm-call" href={`tel:${profile.phone}`}>Zadzwoń</a>}
@@ -250,7 +262,7 @@ export default function Accounts() {
             </form>
           </section>
           <section className="slm-panel"><h2>Zmień hasło</h2>{passwordForm}</section>
-        </> : <>
+        </LiveProfile> : <>
           {temporary && <section className="slm-panel" role="status"><h2>Hasło tymczasowe</h2>
             <p>Przekaż je ręcznie zawodnikowi. Po zamknięciu nie będzie można go odczytać.</p>
             <p className="slm-temporary">{temporary}</p><IonButton onClick={() => setTemporary(null)}>Ukryj hasło</IonButton>
@@ -287,6 +299,6 @@ export default function Accounts() {
         </>}
       </>}
     </main></IonContent>
-    {auth.phase === 'ready' && session && !session.must_change_password && <IonFooter><BottomNav active={screen} onSelect={value => { setScreen(value); setTemporary(null); if (value === 'events') { setEventTarget(null); setEventsViewVersion(v => v + 1); } }} /></IonFooter>}
+    {auth.phase === 'ready' && session && !session.must_change_password && <IonFooter><BottomNav canCreate={canCreate} onCreate={() => { setScreen('events'); setEventTarget(null); setCreateRequest(v => v + 1); }} active={screen} onSelect={value => { setScreen(value); setTemporary(null); if (value === 'events') { setCreateRequest(0); setEventTarget(null); setEventsViewVersion(v => v + 1); } }} /></IonFooter>}
   </IonPage>;
 }

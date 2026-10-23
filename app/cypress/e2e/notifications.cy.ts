@@ -1,3 +1,4 @@
+import { accountAction } from '../support/navigation';
 describe('Centrum powiadomień z kontrolowanym API (przygotowane)', () => {
   it('działa bez Firebase, pokazuje licznik i otwiera mecz z własnego rekordu', () => {
     const id = crypto.randomUUID(), eventId = crypto.randomUUID();
@@ -24,7 +25,7 @@ describe('Centrum powiadomień z kontrolowanym API (przygotowane)', () => {
     });
     const input = (label: string,value: string) => cy.get('ion-input').filter((_,el) => (el as unknown as { label: string }).label===label).find('input').type(value, {log:false});
     cy.visit('/'); input('E-mail, login lub numer telefonu','Fixture'); input('Hasło',crypto.randomUUID()); cy.contains('ion-button','Zaloguj się').click();
-    cy.contains('ion-button','Powiadomienia (1)').click(); cy.contains('Centrum powiadomień').should('be.visible');
+    accountAction('Powiadomienia (1)'); cy.contains('Centrum powiadomień').should('be.visible');
     cy.contains('Historia i licznik w aplikacji działają niezależnie').should('be.visible');
     cy.contains('ion-button','Otwórz mecz').click(); cy.contains('Boisko fixture').should('be.visible');
     cy.contains('ion-button','Powiadomienia (1)').should('not.exist');

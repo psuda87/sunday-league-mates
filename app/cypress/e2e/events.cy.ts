@@ -14,7 +14,7 @@ describe('Wydarzenia — interfejs z kontrolowanym API', () => {
       else req.reply({ ok: true });
     });
     cy.visit('/'); input('E-mail, login lub numer telefonu', 'Fixture'); input('Hasło', crypto.randomUUID()); cy.contains('ion-button', 'Zaloguj się').click();
-    cy.contains('ion-button', 'Mecze').click(); cy.contains('ion-button', 'Wydarzenia i rozliczenia historyczne').click();
+    cy.contains('nav.slm-bottom-nav button','Mecze').click(); cy.contains('ion-button', 'Wydarzenia i rozliczenia historyczne').click();
     cy.contains('ion-button','Utwórz mecz').should('not.exist');
     cy.contains('ion-button','Lista meczów').should('be.visible');
   });
@@ -37,7 +37,7 @@ describe('Wydarzenia — interfejs z kontrolowanym API', () => {
       else req.reply({ ok: true });
     });
     cy.visit('/'); input('E-mail, login lub numer telefonu', 'Fixture'); input('Hasło', crypto.randomUUID()); cy.contains('ion-button', 'Zaloguj się').click();
-    cy.contains('ion-button', 'Mecze').click(); cy.contains('ion-button', 'Wydarzenia i rozliczenia historyczne').click(); cy.get('button[aria-label^="Otwórz szczegóły meczu"]').first().click();
+    cy.contains('nav.slm-bottom-nav button','Mecze').click(); cy.contains('ion-button', 'Wydarzenia i rozliczenia historyczne').click(); cy.get('button[aria-label^="Otwórz szczegóły meczu"]').first().click();
     cy.contains('[role=tab]', 'Informacje').click();
     cy.contains('Podział należności uwzględnia decyzje o opłacie i zastępstwa.').should('be.visible'); cy.contains('[role=tab]', 'Uczestnicy').click(); cy.contains('Bez automatycznego awansu').should('be.visible');
     cy.get('a[href="tel:+12025550150"]').first().should('contain', 'Zadzwoń do zapraszającego');

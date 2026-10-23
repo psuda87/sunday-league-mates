@@ -50,7 +50,7 @@ def rpc(index, action, body, finance=False, expected=None, rollback=False):
 
 try:
     branch = subprocess.check_output(["git", "branch", "--show-current"], text=True).strip()
-    assert branch == "feat/integration", "Requires feat/integration"
+    assert branch in ("feat/integration", "feat/premium318-live"), "Requires approved local integration branch"
     context_host = subprocess.check_output(["docker","context","inspect","--format","{{.Endpoints.docker.Host}}"],text=True).strip()
     docker_host = os.environ.get("DOCKER_HOST") or context_host
     assert docker_host.startswith(("npipe://", "unix://")), "Only a local Docker socket is allowed"
@@ -114,6 +114,12 @@ try:
         rpc(owner,"approve",dict(event_id=match,expected_version=v,reason="Fixture approval"),finance=True)
         return match
     pending_newer=rpc(0,"create",body)["event_id"]
+    check(rpc(0,"detail",dict(event_id=event))["event"]["id"] == event,
+          "summary preserves first requested match with multiple rows")
+    check(rpc(0,"detail",dict(event_id=pending_newer))["event"]["id"] == pending_newer,
+          "summary preserves second requested match with multiple rows")
+    check(sql(f"select slm_private.match_summary('00000000-0000-0000-0000-000000000000','{users[0]}') is null") == "t",
+          "unknown summary never falls back to a different match")
     rpc(2,"join",dict(event_id=pending_newer))
     debt_a=ended(0,a);debt_b=ended(1,b)
     check(sql(f"select slm_private.registration_allowed('{users[2]}',1)")=="f","one unpaid match in each group causes global paid block")

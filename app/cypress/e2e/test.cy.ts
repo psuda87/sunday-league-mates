@@ -1,3 +1,4 @@
+import { accountAction, openProfile } from '../support/navigation';
 describe('Minimalny moduł kont — UI z kontrolowanym API', () => {
   const input = (label: string, value: string) => cy.get('ion-input').filter((_, el) => (el as unknown as {label: string}).label === label).find('input').clear({ log: false }).type(value, { log: false });
   const submit = (text: string) => cy.contains('ion-button', text).click();
@@ -26,10 +27,10 @@ describe('Minimalny moduł kont — UI z kontrolowanym API', () => {
     input('Hasło',temporary); submit('Zaloguj się'); cy.contains('h1','Zmień hasło tymczasowe').should('be.visible');
     cy.contains('Mój profil').should('not.exist'); cy.contains('Zarządzaj kontami').should('not.exist');
     input('Hasło tymczasowe',temporary); const next = crypto.randomUUID(); input('Nowe hasło',next); input('Powtórz nowe hasło',next); submit('Zmień hasło');
-    cy.contains('ion-button', 'Mój profil').click(); cy.contains('h1','Fikcyjny').should('be.visible'); cy.get('a[href="tel:+12025550112"]').should('contain','Zadzwoń');
+    openProfile(); cy.contains('h2','Fikcyjny').should('be.visible'); cy.get('a[href="tel:+12025550112"]').should('contain','Zadzwoń');
     cy.contains('Zarządzaj kontami').should('not.exist');
     cy.window().then(win => { expect(win.localStorage.length).to.eq(1); invalid = true; });
-    submit('Zapisz profil'); cy.contains('h1','Zaloguj się').should('be.visible');
+    cy.contains('summary','Edytuj profil i dane konta').click(); submit('Zapisz profil'); cy.contains('h1','Zaloguj się').should('be.visible');
   });
   it('administrator widzi tworzenie kont i akcję resetu', () => {
     const session = {access_token:crypto.randomUUID(),refresh_token:crypto.randomUUID(),expires_in:3600,user_id:crypto.randomUUID(),role:'admin',must_change_password:false};
@@ -44,7 +45,7 @@ describe('Minimalny moduł kont — UI z kontrolowanym API', () => {
       else req.reply({ok:true});
     });
     cy.visit('/'); input('E-mail, login lub numer telefonu','Fikcyjny'); input('Hasło',crypto.randomUUID()); submit('Zaloguj się');
-    submit('Zarządzaj kontami'); cy.contains('h1','Utwórz konto zawodnika').should('be.visible'); cy.contains('Resetuj hasło').should('be.visible');
+    accountAction('Zarządzaj kontami'); cy.contains('h1','Utwórz konto zawodnika').should('be.visible'); cy.contains('Resetuj hasło').should('be.visible');
   });
   it('po ponownym otwarciu sprawdza zapisany refresh; offline ukrywa dane, logout usuwa zapis', () => {
     const key='slm.auth.hjtcyybkxebvdropchac.refresh.v1';
@@ -64,14 +65,14 @@ describe('Minimalny moduł kont — UI z kontrolowanym API', () => {
       else req.reply({ok:true});
     });
     cy.visit('/'); input('E-mail, login lub numer telefonu','Fikcyjny'); input('Hasło',crypto.randomUUID()); submit('Zaloguj się');
-    cy.contains('ion-button', 'Mój profil').click(); cy.contains('h1','Fikcyjny').should('be.visible');
+    openProfile(); cy.contains('h2','Fikcyjny').should('be.visible');
     cy.then(()=>{allowRefresh=()=>undefined;});cy.reload();
-    cy.contains('Sprawdzanie sesji').should('be.visible');cy.contains('h1','Fikcyjny').should('not.exist');
-    cy.then(()=>{allowRefresh?.();allowRefresh=null;});cy.contains('ion-button', 'Mój profil').click();cy.contains('h1','Fikcyjny').should('be.visible');
+    cy.contains('Sprawdzanie sesji').should('be.visible');cy.contains('h2','Fikcyjny').should('not.exist');
+    cy.then(()=>{allowRefresh?.();allowRefresh=null;});openProfile();cy.contains('h2','Fikcyjny').should('be.visible');
     cy.then(()=>{online=false;});cy.reload();cy.contains('h1','Potwierdź dostęp do konta').should('be.visible');
-    cy.contains('h1','Fikcyjny').should('not.exist');cy.window().then(win=>expect(win.localStorage.getItem(key)!==null).to.eq(true));
-    cy.then(()=>{online=true;});submit('Spróbuj ponownie');cy.contains('ion-button', 'Mój profil').click();cy.contains('h1','Fikcyjny').should('be.visible');
-    submit('Wyloguj się');cy.contains('h1','Zaloguj się').should('be.visible');cy.reload();cy.contains('h1','Zaloguj się').should('be.visible');
+    cy.contains('h2','Fikcyjny').should('not.exist');cy.window().then(win=>expect(win.localStorage.getItem(key)!==null).to.eq(true));
+    cy.then(()=>{online=true;});submit('Spróbuj ponownie');openProfile();cy.contains('h2','Fikcyjny').should('be.visible');
+    accountAction('Wyloguj się');cy.contains('h1','Zaloguj się').should('be.visible');cy.reload();cy.contains('h1','Zaloguj się').should('be.visible');
     cy.window().then(win=>expect(win.localStorage.getItem(key)).to.eq(null));
   });
   it('odrzuca zapisaną sesję po resecie bez pokazania profilu',()=>{

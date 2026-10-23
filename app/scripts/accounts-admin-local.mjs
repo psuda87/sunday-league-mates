@@ -6,7 +6,7 @@ if(!localDocker.startsWith('npipe://')&&!localDocker.startsWith('unix://'))throw
 let output; try { output=execFileSync(process.platform==='win32'?'cmd':'npx',process.platform==='win32'?['/c','npx','--yes','--package=supabase@2.121.0','supabase','status','-o','json']:['--yes','--package=supabase@2.121.0','supabase','status','-o','json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}); } catch { throw new Error('BLOCKED: local Supabase status unavailable; no keys logged'); }
 const keys=JSON.parse(output.slice(output.indexOf('{')));
 if(keys.API_URL!==url)throw Error('Only exact local API URL is allowed');
-export function assertBranch(){if(execFileSync('git',['branch','--show-current'],{encoding:'utf8'}).trim()!=='feat/integration')throw Error('Requires feat/integration');}
+export function assertBranch(){if(!['feat/integration','feat/premium318-live'].includes(execFileSync('git',['branch','--show-current'],{encoding:'utf8'}).trim()))throw Error('Requires feat/integration');}
 export async function management(path){
  if(path!=='/config/auth')throw Error('No Management API allowed');
  const c=JSON.parse(execFileSync('docker',['inspect','supabase_auth_sunday-league-mates'],{encoding:'utf8'}))[0];

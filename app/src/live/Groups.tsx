@@ -17,7 +17,7 @@ export default function Groups({manager,userId}:{manager:SessionManager;userId:s
  useEffect(()=>{let live=true;Promise.all([manager.call<{groups:Group[]}>('groups_list'),manager.call<{requests:Request[]}>('groups_inbox')]).then(([a,b])=>{if(!Array.isArray(a.groups)||!Array.isArray(b.requests))throw new Error('Serwer zwrócił nieprawidłową listę grup.');if(live){setGroups(a.groups);setInbox(b.requests);}}).catch(e=>{if(live)setInitialError(e instanceof Error?e.message:'Nie udało się pobrać grup.');});return()=>{live=false;};},[manager]);
  const admin=detail?.group.admin_id===userId;
  async function decide(request:Request,accept:boolean){await mutate('groups_decide',{id:request.id,accept});await refresh();if(detail)await open(detail.group.id);}
- return <><MatchHeader title="Grupy" onBack={detail?()=>setDetail(null):undefined} backLabel="Wróć do grup"/>
+ return <div className="slm-groups slm-live-groups"><MatchHeader title="Grupy" onBack={detail?()=>setDetail(null):undefined} backLabel="Wróć do grup"/>
  {(error||initialError)&&<p role="alert" className="slm-error">⚠ {error||initialError}</p>}{busy&&<IonSpinner/>}
  <IonButton disabled={busy} fill="outline" onClick={()=>void run(async()=>{await refresh();if(detail)await open(detail.group.id);})}>Odśwież grupy</IonButton>
  {!groups&&!initialError&&<p role="status">Wczytywanie grup…</p>}
@@ -33,5 +33,5 @@ export default function Groups({manager,userId}:{manager:SessionManager;userId:s
  <section className="slm-panel"><h2>Zaproszenia</h2>{!inbox.length&&<p>Brak oczekujących zaproszeń.</p>}{inbox.map(r=><article key={r.id}><strong>{r.group_name}</strong><IonButton disabled={busy} onClick={()=>void run(()=>decide(r,true))}>Dołącz</IonButton><IonButton disabled={busy} onClick={()=>void run(()=>decide(r,false))}>Odrzuć</IonButton></article>)}</section>
  <section className="slm-panel"><h2>Znajdź grupę</h2><form className="slm-form" onSubmit={e=>{e.preventDefault();void run(async()=>setFound((await manager.call<{groups:Group[]}>('groups_search',{query})).groups));}}><label>Nazwa grupy<input required minLength={2} maxLength={64} value={query} onChange={e=>setQuery(e.target.value)}/></label><IonButton type="submit" disabled={busy}>Szukaj</IonButton></form>{found.map(g=><article key={g.id}><h3>{g.name}</h3><p>{g.description}</p><IonButton disabled={busy||groups?.some(own=>own.id===g.id)} onClick={()=>void run(async()=>{await mutate('groups_join',{group_id:g.id});await refresh();})}>Poproś o dołączenie</IonButton></article>)}</section>
  <section className="slm-panel"><h2>Utwórz grupę</h2><form className="slm-form" onSubmit={e=>{e.preventDefault();void run(async()=>{const g=await mutate<{group_id:string}>('groups_create',{name,description});setName('');setDescription('');await refresh();await open(g.group_id);});}}><label>Nazwa<input required maxLength={64} value={name} onChange={e=>setName(e.target.value)}/></label><label>Opis<textarea maxLength={180} value={description} onChange={e=>setDescription(e.target.value)}/></label><IonButton type="submit" disabled={busy}>Utwórz grupę</IonButton></form></section></>}
- </>;
+ </div>;
 }
