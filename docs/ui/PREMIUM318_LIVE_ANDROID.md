@@ -124,3 +124,5 @@ Odczyt `firstInstallTime` i `lastUpdateTime` po instalacji: 23.10.2026 21:38:01
 nie deklarujemy zachowania poprzedniej sesji na podstawie samego `install -r`.
 XML dostępności przetworzono wyłącznie w pamięci, bez zapisu prywatnych danych;
 usunięto wyłącznie własny tymczasowy plik diagnostyczny poza danymi aplikacji.
+
+[2026-10-23 21:40:32 Europe/Warsaw] Ręczny odbiór nowego APK na POCO: użytkownik potwierdził poprawne logowanie lokalnym kontem i widoczność nowego profilu Premium/Ultimate z inicjałami, statystykami niedostępnymi oraz rozwijanymi sekcjami edycji/ustawień. PASS ręczny dla logowania i przejścia do Profil. Pełny odbiór pozostałych zakładek, klawiatury i lifecycle nowej wersji nadal niepotwierdzony. Bez zmian kodu/bazy/instalacji/push/merge. Raport docs/ui/PREMIUM318_LIVE_ANDROID.md; historia docs/ODPOWIEDZI_CODEX.txt.

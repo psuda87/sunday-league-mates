@@ -1,4 +1,11 @@
-﻿# Aktualizacja POCO — 2026-10-23 21:39:28 Europe/Warsaw
+﻿# Lokalne dane telefonu — 2026-10-23 21:48:38 Europe/Warsaw
+
+Branch chore/local-phone-fixtures, worktree .worktrees/premium318-live. Dodano14fikcyjnych zwykłych kont,3grupyTEST,11meczów i26wpłat(2pending), rzeczywisteAPI. Syntax/lint/odczytowa kontrola danych i ochrona przed duplikowaniem PASS. Dane trwałe, bez resetu i usuwania istniejących danych; migracje/Edge/runtimeAPK bez zmian. Dotychczasowe konto ma2zaproszenia; adminTESTEspaña i własny przykład17zł oczekują na dobrowolne przyjęcie. Brak push/merge/zdalnych zmian. Następny krok: przyjąć zaproszenia na telefonie i zweryfikować transfer grupowy/finanse. Raport docs/ANDROID_LOCAL_TEST_DATA.md; historia docs/ODPOWIEDZI_CODEX.txt.
+## Potwierdzenie użytkownika — 2026-10-23 21:40:32 Europe/Warsaw
+
+feat/premium318-live: na nowym APK logowanie lokalne i przejście do nowego profilu Ultimate potwierdzone ręcznie PASS. Odbiór pozostałych zakładek i lifecycle nowego APK nadal otwarty. Brak zmian kodu/migracji/Edge/push. Następny krok: ręczne sprawdzenie pozostałej nawigacji i sesji. Wyniki poniżej są chronologiczne.
+
+# Aktualizacja POCO — 2026-10-23 21:39:28 Europe/Warsaw
 
 feat/premium318-live: nowe APK z96755b8 zainstalowane (install -r Success) i uruchomione; hash telefonu zgodny. Backend lokalny30migracji PASS, reverse54321. Logcat PID:0sprawdzanych markerów fatal/WebView/JS. Nie wykonywano uninstall/clear-data. Ekran logowania: użytkownik proszony o login i odbiór profilu/nawigacji; sesja/chroniona nawigacja nowego APK jeszcze NOT TESTED. firstInstallTime zmienił się względem wcześniejszego odczytu; przyczyna nieustalona, nie deklarujemy zachowania poprzedniej sesji. Testy automatyczne/build i naprawa lokalnego SQL zgodnie z raportem poniżej. Bez push/merge/deploy. Następny krok: potwierdzenie użytkownika na telefonie. Raport docs/ui/PREMIUM318_LIVE_ANDROID.md, historia docs/ODPOWIEDZI_CODEX.txt.
 # Premium3.18 live / fizyczny Android — 2026-10-23 21:36:57 Europe/Warsaw
