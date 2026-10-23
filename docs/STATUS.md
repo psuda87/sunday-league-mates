@@ -1,3 +1,11 @@
+# Premium3.18 live / fizyczny Android — 2026-10-23 21:36:57 Europe/Warsaw
+
+Branch feat/premium318-live; worktree .worktrees/premium318-live; kod96755b8 od feat/integration13cf1a8.
+Przeniesiono profil Ultimate na realnych danych, układ nawigacji/warunkowy plus, formularze i style live grup/meczów/finansów. Brak fixture w runtime. Auth/sesja i istniejące operacje zachowane; funkcje bez backendu jawnie niedostępne.
+Lokalnie zastosowano osobno zatwierdzoną migrację20261023193156 (filtr match_summary); historia30. Zdalne migracje/Edge Functions/Firebase/deploy: brak zmian.
+Automatyczne: TS/lint PASS, Vitest196/196, Cypress16/16, real browser/API1/1, SQL/RLS58/58, HTTP20/20, web build/cap sync/debug APK i1JUnit PASS, weryfikacja43plików/podpisu/appId/release guard PASS.
+Urządzenie: aktualizacja OCZEKUJE na autoryzację RSA (ADB unauthorized). Nowa sesja/nawigacja/logcat telefonu NOT TESTED. Nie usuwano danych aplikacji/bazy. Lokalny commit, bez push/merge.
+Następny krok: użytkownik autoryzuje USB; install -r, start, logi i odbiór profilu. Raport docs/ui/PREMIUM318_LIVE_ANDROID.md, historia docs/ODPOWIEDZI_CODEX.txt. Wcześniejsze wpisy poniżej są historyczne.
 # Aktualny stan Sunday League Mates
 
 19.10.2026 ? branch roboczy `feat/integration`, worktree `I:\slm\sunday-league-mates-integration`.

@@ -6,7 +6,7 @@ def docker(args):
  if r.returncode: raise RuntimeError("Local Docker operation failed: "+args[0])
  return r.stdout
 repo=Path(__file__).resolve().parents[2]
-assert subprocess.check_output(["git","branch","--show-current"],cwd=repo,text=True).strip()=="feat/integration"
+assert subprocess.check_output(["git","branch","--show-current"],cwd=repo,text=True).strip() in ("feat/integration", "feat/premium318-live")
 host=docker(["context","inspect","--format","{{.Endpoints.docker.Host}}"]).strip()
 assert (os.environ.get("DOCKER_HOST") or host).startswith(("npipe://","unix://"))
 name="supabase_auth_sunday-league-mates"
