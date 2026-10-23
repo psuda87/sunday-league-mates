@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { Dispatch } from 'react';
 import { IonAlert, IonIcon } from '@ionic/react';
 import { peopleOutline, shieldCheckmarkOutline, calendarOutline } from 'ionicons/icons';
+import { useFrozenBack } from '../native/frozenDemoAndroid';
 import MatchHeader from '../ui/MatchHeader';
 import { DemoAvatar } from './Identity';
 import type { Action, World } from './data';
@@ -55,6 +56,9 @@ export default function Groups({world,dispatch,onPlayer}:Props) {
  useEffect(()=>{const listener=()=>{if(window.location.hash.startsWith('#group/')){setSelected(window.location.hash.slice(7));setView('detail');}else if(window.location.hash==='#groups')setView('mine');};window.addEventListener('hashchange',listener);return()=>window.removeEventListener('hashchange',listener);},[]);
  const open=(id:string)=>{setSelected(id);setView('detail');window.history.replaceState(null,'',`#group/${id}`);void document.querySelector('ion-content')?.scrollToTop(0);};
  const home=()=>{setView('mine');window.history.replaceState(null,'','#groups');void document.querySelector('ion-content')?.scrollToTop(0);};
+ // FROZEN_ANDROID_BEGIN
+ useFrozenBack(()=>{if(view==='mine')return false;home();return true;},()=>document.querySelector<HTMLElement>('.slm-groups'),20);
+ // FROZEN_ANDROID_END
  const mine=world.groupState.groups.filter(g=>membership(world,g.id));
  return <section className="slm-groups" aria-label="Grupy demonstracyjne"><MatchHeader title={view==='mine'?'Moje grupy':view==='find'?'Znajdź grupę':view==='create'?'Nowa grupa':'Grupa'} onBack={view==='mine'?undefined:home} backLabel="Wróć do moich grup"/>{world.notice&&<p className="slm-group-feedback" role="status">{world.notice}</p>}<p className="slm-groups-demo">Fikcyjne grupy · dane tylko w pamięci demo</p>
  {view==='mine'?<><div className="slm-group-actions"><button type="button" className="slm-group-primary" onClick={()=>setView('create')}>Utwórz grupę</button><button type="button" onClick={()=>setView('find')}>Znajdź grupę</button></div><div className="slm-group-list">{mine.map(g=>{const count=world.groupState.members.filter(m=>m.groupId===g.id).length,admin=groupAdmin(world,g.id),pending=world.groupState.requests.filter(r=>r.groupId===g.id&&r.status==='pending'&&r.channel==='nick'&&r.kind!=='invite'&&(admin||r.requestedBy===world.userId)).length;return <button type="button" className="slm-group-card" key={g.id} onClick={()=>open(g.id)}><IonIcon icon={peopleOutline} aria-hidden="true"/><span><strong>{g.name}</strong><small>{g.description}</small><span className="slm-group-meta">{memberCount(count)} · {admin?'Administrator':groupCanOrganize(world,g.id)?'Organizator':'Członek'}</span>{pending>0&&<span className="slm-group-pending">Oczekujące zgłoszenia: {pending}</span>}</span><span aria-hidden="true">›</span></button>;})}</div>{!mine.length&&<section className="slm-group-empty"><h2>Jeszcze nie należysz do grupy</h2><p>Utwórz własną ekipę, znajdź grupę lub przyjmij zaproszenie.</p></section>}<Invitations world={world} dispatch={dispatch}/></>:view==='create'?<NewGroup onCancel={home} onSave={(name,description,key)=>{const id=`group-${world.groupState.nextId}`;dispatch({type:'group_create',name,description,key});open(id);}}/>:view==='find'?<FindGroups world={world} dispatch={dispatch} onOpen={open}/>:<GroupDetails key={`${selected}-${world.userId}`} groupId={selected} world={world} dispatch={dispatch} onPlayer={onPlayer} onLeave={home}/>}

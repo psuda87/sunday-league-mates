@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import Groups from './Groups';
+import Groups from './GroupScreens';
 import { initialWorld, reduceWorld } from './data';
 afterEach(()=>{cleanup();window.history.replaceState(null,'','/');});
 it('shows derived counts and invitations, without exposing an all-player catalog',()=>{

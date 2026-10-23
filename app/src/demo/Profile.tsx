@@ -6,6 +6,7 @@ import MatchHeader from '../ui/MatchHeader';
 import UltimatePlayerCard from './UltimatePlayerCard';
 import type { Action, World } from './data';
 import { statistics } from './data';
+import { useFrozenBack } from '../native/frozenDemoAndroid';
 export default function DemoProfile({world,id,onBack,dispatch,personal=false,onPassword,onLogout}:{world:World;id:string;onBack?:()=>void;dispatch:Dispatch<Action>;personal?:boolean;onPassword?:()=>void;onLogout?:()=>void}) {
   const player=world.players.find(p=>p.id===id)!;
   const heading=useRef<HTMLHeadingElement>(null),field=useId(),errorId=useId();
@@ -16,6 +17,14 @@ export default function DemoProfile({world,id,onBack,dispatch,personal=false,onP
   const editNumber=()=>{setEditor(null);setNumber(String(player.jerseyNumber??''));setError('');setEditing(true);};
   useEffect(()=>{heading.current?.focus({preventScroll:true});},[]);
   const closeEditor=()=>{setEditor(null);requestAnimationFrame(()=>heading.current?.focus());};
+  // FROZEN_ANDROID_BEGIN
+  useFrozenBack(()=>{
+    if(editing){setEditing(false);return true;}
+    if(editor){closeEditor();return true;}
+    if(settings.current?.open){settings.current.open=false;return true;}
+    return false;
+  },()=>heading.current,30);
+  // FROZEN_ANDROID_END
   const stats=statistics(world,id);
   function save(event:FormEvent) {
     event.preventDefault();

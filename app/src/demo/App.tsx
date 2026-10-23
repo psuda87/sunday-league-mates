@@ -20,9 +20,10 @@ import { initialWorld, reduceWorld, registered, reserves, scenarioGame, unpaidGa
 import type { DemoPlayer, Game, Scenario } from './data';
 import { DemoPanels } from './Panels';
 import DemoProfile from './Profile';
-import Groups from './Groups';
+import Groups from './GroupScreens';
 import { canViewGroupProfile } from './groups';
 import '../pages/Accounts.css';
+import { useFrozenBack, minimizeFrozenDemo } from '../native/frozenDemoAndroid';
 type Frame={key:number;kind:'player'|'game';id:string;y:number;focus:HTMLElement|null;groupId?:string;gameId?:string};
 const matchModel=(game:Game):Match=>({id:game.id,starts_at:game.startsAt,location:game.location??'Boisko demonstracyjne',duration_minutes:game.durationMinutes??90,hourly_rate:game.costCents/100/((game.durationMinutes??90)/60),total_cost:game.costCents/100,capacity:game.capacity,status:game.status==='cancelled'?'cancelled':'scheduled',registered_count:registered(game).length,reserve_count:reserves(game).length,registration_open:game.status==='upcoming',decision_required:false,cutoff_at:'',estimated_per_person:null,settlements_active:false});
 export default function DemoApp({initialPlayer,initialTab,onAccount,onLogout}:{initialPlayer?:DemoPlayer;initialTab?:Tab;onAccount?:(view:AccountView,tab:Tab)=>void;onLogout?:()=>void}={}) {
@@ -44,6 +45,16 @@ export default function DemoApp({initialPlayer,initialTab,onAccount,onLogout}:{i
   function closeForm(){setForm(null);if(window.location.hash==='#match-create')window.history.replaceState(null,'','#home');requestAnimationFrame(()=>{void content.current?.scrollToPoint(0,formScroll.current,0);});}
   function saveEvent(input:EventInput,key:string){const original=world.games.find(g=>g.id===form);if(form==='create'?!groupCanOrganize(world,input.groupId):!original||!canEditEvent(world,original))return;if(form==='create')setFilter('upcoming');const id=form==='create'?`demo-${world.nextGameId}`:form!;dispatch(form==='create'?{type:'event_create',input,key}:{type:'event_update',gameId:id,input});setForm(null);setFrames([]);openGame(id);}
   function goHome(){setDetail(false);window.history.replaceState(null,'','#home');void content.current?.scrollToTop(0);}
+  // FROZEN_ANDROID_BEGIN
+  useFrozenBack(()=>{
+    if(form!==null)closeForm();
+    else if(latestFrames.current.length)pop();
+    else if(detail)goHome();
+    else if(tab!=='events'){setTab('events');goHome();}
+    else minimizeFrozenDemo();
+    return true;
+  },()=>content.current);
+  // FROZEN_ANDROID_END
   function openGame(id:string){setSelected(id);setTab('events');setDetail(true);window.history.replaceState(null,'','#details-b');void content.current?.scrollToTop(0);}
   async function push(kind:Frame['kind'],id:string,groupId?:string,gameId?:string){
     if(groupId&&!canViewGroupProfile(world,groupId,id))return;
