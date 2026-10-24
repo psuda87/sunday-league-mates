@@ -269,3 +269,16 @@ historycznymi opisami demo (m.in. edycją wyłącznie przez twórcę).
 Przyszła implementacja wymaga osobnego polecenia, audytu istniejącego kontraktu,
 serwerowych kontroli i testów dostępu/współbieżności. Ten TODO nie zatwierdza migracji,
 wdrożeń ani zmian logiki finansowej. B2 (rzeczywisty profil) także wymaga osobnej zgody.
+
+
+## TODO B2.2 — zdjęcia po odbiorze B2.1 (2026-10-24)
+
+Tylko plan; B2.2 nie rozpoczęty. Zachować oryginalny UI Premium 3.18.
+Wymagania właściciela: maks. 800×800 px, WebP z jakością około 75–80%,
+docelowo do 150 KB, kompresja przed wysłaniem, jedno bieżące zdjęcie na użytkownika,
+bez przechowywania oryginałów, bezpieczna podmiana oraz usunięcie plików.
+Audytować istniejącą lokalną infrastrukturę zdjęć zamiast tworzyć drugi system;
+nie przenosić automatycznie poprzednich limitów 1024 px/JPEG/2 MiB jako docelowego kontraktu.
+B2.1 nie wywołuje Storage ani operacji zdjęć. Numery/pozycje/„dobry bramkarz”
+wymagają odrębnego uzgodnienia brakujących kontraktów; nie dodano ich w tej pracy.
+Profil B2.1: docs/SLM_V1_B2_PROFILE.md. B3/grupy nie rozpoczęte.

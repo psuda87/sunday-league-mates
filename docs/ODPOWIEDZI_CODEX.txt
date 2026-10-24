@@ -1899,3 +1899,37 @@ kolejność/limit uczestników, tworzenie tylko przez adminów, edycja/odwołani
 B2 może być następnym zadaniem dopiero po wyraźnej zgodzie; nie rozpoczęto B2 ani B4.
 Brak push, merge, migracji, Edge deploy i zmian danych/produkcji.
 Raport docs/SLM_V1_B1_AUTH.md; historia docs/ODPOWIEDZI_CODEX.txt.
+
+
+[2026-10-24 21:28:02 Europe/Warsaw] SLM 1.0 — B2.1 profil zawodnika
+B2.1 przygotowany na feat/slm-v1-live; runtime 6dd71054e3f3ced39b9d78775564a5bcc05236bc,
+baza zaakceptowanego B1 164edac. Istniejące profile/save_profile, slm_profiles oraz projekcja
+slm_aliases/slm_player_profiles przez istniejący SessionManager i legacyAccountUiAdapter.
+Nowe profileAdapter/useOwnProfile i port prezentacji; brak drugiego systemu profili.
+Działa odczyt własnej nazwy, loginu/telefonu i imienia/nazwiska, zapis full_name z walidacją
+oraz ścisły read-back przed sukcesem. Login/telefon i display_as tylko odczyt/zachowanie;
+zmiana identyfikatorów wymaga ścieżki z obecnym hasłem, której nie dodawano do UI.
+Pozycji i flagi dobrego bramkarza brak w schemacie. Numer nieudostępniony przez kontrakt,
+statystyki —, zdjęcie jako istniejące inicjały; brak fikcyjnych danych własnego profilu.
+Pozostałe moduły zachowują demo. Dane profilu tylko w RAM bieżącego konta, bez world.players,
+late responses i dane poprzedniego konta odcinane; żadne role nie są edytowane.
+Bez zmian CSS, assetów, Ultimate, nav, motywów i animacji. Zmiany tylko danych/zachowania
+w App/Profile/Identity i niewizualnej logice B1App. Mignięcie wznowienia B1 pozostaje.
+PASS: TS, lint, 198 Vitest/36 plików, 21 Cypress, 22 kontrole lokalnego API/RLS,
+full build/demo/izolacja16plików/live, cap sync, Android debug/JUnit1, kontrola APK.
+RLS i API blokują obcą grupę/edycję, bezpośrednie zapisy i nadanie admina; login/telefon
+pozostają niezmienione. Dwa nowe konta i dwie grupy fixture pozostawione, bez kasowania danych.
+Wizualnie 95/96 identycznych porównań niezmienionych ekranów; znany FAIL hero A max4/255
+nietknięty. Własny profil ma celowo inne dane/inicjały/—, nie deklarujemy tożsamości pikseli treści.
+APK app/android/app/build/outputs/apk/debug/app-debug.apk, SHA256
+e422912c4d74b8524ebf5dbdb40ee31680c23c34adf440e8ecce8df703ff322f.
+POCO: install -r Success, MainActivity ok, hash instalacji zgodny, pierwsza instalacja zachowana,
+0 sprawdzanych markerów crash/JS/WebView w krótkich logach. Bez czyszczenia danych.
+NOT TESTED ręcznie: odbiór B2.1 oczekuje. Telefon: Profil → Edytuj profil → zmień imię/nazwisko
+→ Zapisz dane → potwierdzenie → restart → sprawdź wartość; Ustawienia pokazują login/telefon.
+Hasła ani prywatnych danych nie wysyłać. Sprawdzić również regresję B1 i inne konto, jeśli dostępne.
+Migracja niepotrzebna do podłączonych pól, żadnych migracji/RLS/Edge/deploy/zdalnych zmian.
+B2.2 tylko TODO w FRONTEND_HANDOFF: 800x800 WebP75–80%, do150KB, kompresja przed wysłaniem,
+jedno zdjęcie, bez oryginałów, bezpieczna podmiana/usuwanie. B2.2 i B3 nie rozpoczęto.
+Raport docs/SLM_V1_B2_PROFILE.md, dowody docs/ui/slm-v1-b2/, historia docs/ODPOWIEDZI_CODEX.txt.
+Zatrzymanie po B2.1 do odbioru. Bez push i merge.

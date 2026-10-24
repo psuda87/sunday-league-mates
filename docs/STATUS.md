@@ -1,3 +1,16 @@
+# B2.1 profil — 2026-10-24 21:28:02 Europe/Warsaw
+
+Gałąź feat/slm-v1-live; runtime 6dd7105, baza B1 164edac. Własny profil z istniejącego API:
+read + save full_name + ścisły read-back, login/telefon tylko odczyt, brak fikcyjnych statystyk/portretu.
+UI bez zmian stylu/układu; pozostałe moduły demo, mignięcie B1 zachowane. Brak migracji/Edge wdrożeń.
+PASS: TS/lint, 198 Vitest, 21 Cypress, 22 lokalne HTTP/RLS, buildy/demo isolation, sync/debug/JUnit1.
+Wizualnie 95/96 identycznych niezmienionych widoków; znany hero A max4/255 pozostaje.
+APK zainstalowany aktualizacją na POCO, start/logi/hash OK, bez czyszczenia danych.
+Odbiór ręczny B2.1 NOT TESTED — czeka na właściciela. Pozycja/flaga bramkarza brak w schemacie;
+numery/statystyki brak kontraktu, zdjęcia dopiero B2.2 (TODO). B3 nie rozpoczęty.
+Następny krok: ręczny zapis imienia/nazwiska i kontrola po restarcie. Bez push/merge/produkcji.
+Raport docs/SLM_V1_B2_PROFILE.md; historia docs/ODPOWIEDZI_CODEX.txt.
+
 # Odbiór B1 i diagnostyka — 2026-10-24 21:07:02 Europe/Warsaw
 
 Gałąź feat/slm-v1-live; runtime 7322d35.

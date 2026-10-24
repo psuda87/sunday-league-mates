@@ -2,6 +2,10 @@ const auth=(id='own')=>({access_token:'test-access',refresh_token:'test-refresh'
 const profile=(id='own',name='Testowy Zawodnik')=>({user_id:id,login:id==='own'?'Fikcyjny':'Drugi',phone:'+48000000999',full_name:name,display_as:'full_name',display_name:name});
 function login(name='Fikcyjny'){cy.get('#account-email').type(name);cy.get('input[autocomplete="current-password"]').type('Only-test-secret',{log:false});cy.get('form button[type=submit]').click();cy.get('.slm-demo-nav').should('be.visible');}
 function openProfile(){cy.contains('nav button','Profil').click();}
+function reveal(selector:string){cy.get(selector).first().then(target=>{
+ cy.get('ion-content').filter(':visible').first().then(async elements=>{const scroll=await (elements[0] as unknown as {getScrollElement:()=>Promise<HTMLElement>}).getScrollElement();scroll.scrollTop+=target[0].getBoundingClientRect().top-scroll.getBoundingClientRect().top;});
+});cy.wait(100);}
+
 describe('B2.1 original profile presentation and existing accounts contract (controlled responses)',()=>{
  beforeEach(()=>cy.viewport(390,844));
  it('reads, edits only full name, confirms read-back, restores and isolates account switch/demo',()=>{
@@ -16,12 +20,12 @@ describe('B2.1 original profile presentation and existing accounts contract (con
   openProfile();cy.contains('h2','Testowy Zawodnik').should('be.visible');cy.get('.slm-ultimate-portrait').should('have.attr','data-portrait','initials');
   cy.get('.slm-ultimate-stats dd').each(el=>expect(el.text()).eq('—'));cy.contains('button','Zmień zdjęcie').should('be.disabled');
   cy.contains('button','Edytuj profil').click();cy.get('input[readonly]').should('have.value','Fikcyjny');
-  cy.screenshot('b2-own-editor',{capture:'viewport'});
+  reveal('.slm-identity-editor');cy.screenshot('b2-own-editor',{capture:'viewport'});
   cy.get('.slm-identity-editor input').eq(1).clear().type('Zapisany Zawodnik');cy.contains('button','Zapisz dane').click();
   cy.contains('h2','Zapisany Zawodnik').should('be.visible');cy.contains('Zapisano profil i potwierdzono').should('be.visible');
   cy.then(()=>expect(writes).deep.eq([{action:'save_profile',full_name:'Zapisany Zawodnik',display_as:'full_name'}]));
   cy.reload();cy.get('.slm-demo-nav').should('be.visible');openProfile();cy.contains('h2','Zapisany Zawodnik').should('be.visible');
-  cy.contains('summary','Ustawienia aplikacji i konta').click();cy.contains('Login: Fikcyjny').should('be.visible');cy.contains('Telefon: +48000000999').should('be.visible');cy.screenshot('b2-own-settings',{capture:'viewport'});
+  cy.contains('summary','Ustawienia aplikacji i konta').click();cy.contains('Login: Fikcyjny').should('be.visible');cy.contains('Telefon: +48000000999').should('be.visible');reveal('.slm-identity-settings');cy.screenshot('b2-own-settings',{capture:'viewport'});
   cy.contains('button','Wyloguj').click();cy.contains('h1','Zaloguj się').should('be.visible');cy.contains('Zapisany Zawodnik').should('not.exist');
   login('Drugi');openProfile();cy.contains('h2','Inne Konto').should('be.visible');cy.contains('Zapisany Zawodnik').should('not.exist');
  });
