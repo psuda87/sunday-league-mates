@@ -1,3 +1,28 @@
+# B1 Auth i sesja — 2026-10-24 20:29:51 Europe/Warsaw
+
+B1 wykonany na feat/slm-v1-live; kod 7322d351e48b7dc044bf45b2345b602986cc45ea.
+Wykorzystano istniejące SessionManager, API, tokenStore/Keystore i legacyAccountUiAdapter bez zmian;
+nowe b1Port, useB1Lifecycle i B1App wiążą oryginalne AccountScreens. Tylko lokalny backend.
+Premium 3.18: CSS/assets/układ/nawigacja bez zmian; zatwierdzone napisy i walidacja loginu/telefonu.
+Zmodyfikowane oryginalne UI: account-ui/Fields.tsx, AccountScreens.tsx, demo/App.tsx, Profile.tsx.
+Nowa kompozycja B1 nie jest alternatywnym formularzem. Mecze/grupy/profil/finanse nadal jawne demo.
+PASS: TS, lint, 190 Vitest, 19 Cypress, rzeczywiste lokalne logowanie aliasem/telefonem,
+błędne dane, hasło tymczasowe/zmiana, odtworzenie sesji, logout/cofnięty refresh;
+full build/demo/izolacja/B1, cap sync, debug APK/JUnit 1. Wizualnie 103/104 porównań identyczne,
+FAIL ścisłych pikseli: znane z A hero details-320-light, max 4/255; wszystkie 16 home/profile B1 identyczne.
+APK zbudowany, install -r Success na POCO c7a559b5, uruchomiony; hash instalacji zgodny,
+pierwsza instalacja zachowana, 0 sprawdzanych krytycznych markerów krótkiego logcat.
+APK app/android/app/build/outputs/apk/debug/app-debug.apk; SHA256
+c2b8185eea1134b3c0ed9797683a0034506e408ce1874009d71aa08b763eedd0.
+NOT TESTED ręcznie B1: logowanie/wylogowanie/restart/Home/Wstecz, realne offline i naturalne wygaśnięcie.
+Checklista telefonu: dotychczasowe lokalne konto → błędne/poprawne logowanie → ewentualna wymuszona
+zmiana hasła → Home i restart → Profil/Ustawienia/Wyloguj → restart bez sesji → ponowny login i oba Wstecz.
+Nie wysyłać hasła. Dane przykładowe nie są danymi konta Auth. Ręczne potwierdzenia A nie zaliczają B1.
+Docker wznowiony wraz z istniejącym Edge; bez wdrożeń/migracji/resetu/produkcji/zmian uprawnień.
+Test pozostawił dwa nowe fikcyjne konta, nie usuwano żadnych danych. Bez push i merge.
+Raport: docs/SLM_V1_B1_AUTH.md; dowody docs/ui/slm-v1-b1/; historia docs/ODPOWIEDZI_CODEX.txt.
+Zatrzymanie po B1; B2–B6 nie rozpoczęte. Następny krok: ręczny odbiór bieżącego APK.
+
 # ETAP A ZAAKCEPTOWANY — 2026-10-24 02:08:09 Europe/Warsaw
 
 feat/slm-v1-live: właściciel wyraźnie zaakceptował cały etap A. Oryginalne Premium3.18 na POCO: ręczny PASS wyglądu, ekranowej strzałki i systemowego Wstecz. Etap A zamknięty; historyczne wpisy o oczekiwaniu na akceptację są nieaktualne. Pozostałych szczegółowych testów fizycznych nie oznaczamy jako wykonane. Następny plan: B1 Auth/sesja przez adaptery do istniejącego UI, bez przeprojektowania. Etap B nie rozpoczęty automatycznie (zakres bieżącego polecenia: wyłącznie A). Backend/migracje/produkcja bez zmian, bez push/merge. Raport docs/SLM_V1_STAGE_A.md; historia docs/ODPOWIEDZI_CODEX.txt.
