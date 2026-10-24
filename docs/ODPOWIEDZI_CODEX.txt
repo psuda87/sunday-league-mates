@@ -2036,3 +2036,40 @@ B4: rzeczywiste wydarzenia i uczestnicy po member_id/user_id, poprawne profile i
 goście bez fikcyjnego konta, server/API/RLS zgodnie z zapisanym TODO prywatności i organizatora.
 Nie rozpoczęto żadnego z tych etapów. Kod produkcyjny, CSS/UI, SQL, RLS i Supabase bez zmian.
 Bez push, merge i wdrożeń. Raport zapisany w docs/ODPOWIEDZI_CODEX.txt.
+
+
+[2026-10-24 21:58:57 Europe/Warsaw] B2.2 — przygotowanie, bez aktywacji funkcji
+B2.2 NIEUKOŃCZONE — bezpieczna część przygotowana, dalsze wdrożenie zablokowane kontraktem i decyzją UI.
+feat/slm-v1-live, baza2d293c8, aplikacja nadal odebrane B2.1/6dd7105.
+Audyt: istnieją slm_player_profiles.jersey_number (0–99, bez UNIQUE), prywatny bucket
+slm-profile-photos i metadane/commit/revision/cleanup. Aktualny bucket i API przyjmują wyłącznie
+JPEG; commit dopuszcza .jpg, profile nie udostępnia numeru. Stary zapis kontaktu zeruje numer.
+Nie użyto tego jako pozornego rozwiązania B2.2 i nie zmieniono bazy/Edge.
+Bezpieczna część: niepodłączony moduł src/profile/preparePhoto.ts + ponownie użyte czytniki
+imageDimensions.ts. Prawdziwe dekodowanie/canvas → WebP max800px, normalnie75–80%,
+redukcja rozdzielczości, twarde150000B, cel40–100KB bez dopełniania małych obrazów,
+proporcje/no-upscale, oryginał tylko w RAM/objectURL z cleanup. Walidacja numeru0–99,
+duplikaty dozwolone, bez zapytań grupowych. Brak bibliotek i zmian istniejącego UI/runtime.
+Projekt docs/proposals/B22_PROFILE_STORAGE_DRAFT.sql jest poza katalogiem migracji,
+NIE zastosowany i nieprzetestowany na bazie. Konfiguruje istniejący bucket i service-only
+zapis numeru/path commit, bez nowych tabel/polityk publicznych/UNIQUE numeru.
+Skoordynowane niezbędne zmiany Edge i walidacji/cleanup opisano w B22_BACKEND_PLAN.md.
+Nie wdrażać samego SQL przed zgodnym API. Cleanup po awarii wymaga dalszych testów/projektu.
+Picker3.18 nie ma usuwania aktualnego zdjęcia. Minimalny wyjątek do zgody: jeden przycisk
+„Usuń zdjęcie” w istniejących akcjach pickera, tylko przy własnym zdjęciu, bez CSS/modalu/ikon.
+Nie zamieniono Anuluj w usuwanie i nie dodano przycisku bez zgody z pkt1 zadania.
+PASS: TypeScript, lint,204 Vitest/37plików (6 nowych),13 Cypress (realny kodekChrome +12regresjiB1/B2.1),
+full build/demo/izolacja16plików/live,guard47+8,cap sync,Android debug/JUnit1/cache i kontrola APK.
+APK ma identyczny hash jak odebrane B2.1:
+e422912c4d74b8524ebf5dbdb40ee31680c23c34adf440e8ecce8df703ff322f.
+Ścieżka app/android/app/build/outputs/apk/debug/app-debug.apk. Nie ponawiano instalacji;
+nie ma nowego aktywnego APK B2.2. UI, mignięcie B1 i znane odstępstwo hero A nietknięte.
+NOT TESTED/nieaktywne: trwały numer, upload/podmiana/usunięcie WebP, nowa autoryzacja
+Storage i sprzątanie po awarii, restart z nowym zdjęciem/numerem na POCO. Nie udajemy uploadu.
+RLS objects/metadanych aktywne; brak polityk bezpośredniego Storage i brak prawa commit dla anon/authenticated.
+TODO B3: ostrzegać o powtórzonym numerze we własnej grupie, ale pozwalać zachować/zapisać;
+numer należy do użytkownika, bez UNIQUE. Tylko dokumentacja, B3/B4 nie rozpoczęte.
+Raport docs/SLM_V1_B2_PHOTOS.md; historia docs/ODPOWIEDZI_CODEX.txt.
+Do decyzji właściciela: opisany pakiet backendu wyłącznie lokalnie oraz minimalny przycisk usuwania.
+Zatrzymanie wynika z instrukcji zadania: przy koniecznych zmianach backendu zgłosić blokadę;
+pkt1 wymaga zgody na niezbędną zmianę wizualną. Brak push/merge/zdalnych wdrożeń/resetu.

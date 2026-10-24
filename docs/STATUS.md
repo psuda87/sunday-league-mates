@@ -1,3 +1,15 @@
+# B2.2 przygotowanie — 2026-10-24 21:58:57 Europe/Warsaw
+
+feat/slm-v1-live, baza2d293c8; runtime nadal odebrane B2.1/6dd7105.
+B2.2 BLOKADA: API/bucket JPEG-only, brak numeru w kontrakcie, brak kontroli usuwania w pickerze3.18.
+Gotowy niepodłączony kompresor WebP800px/150000B i walidacja0–99; bez zmian UI/runtime/backendu.
+Projekt SQL/config i plan API w docs/proposals (NIE zastosowane), raport docs/SLM_V1_B2_PHOTOS.md.
+PASS: TS/lint,204 Vitest,13 Cypress,buildy/guard/sync/debug/JUnit1; hash APK identyczny B2.1, bez nowej instalacji.
+Upload/numer/replace/delete/restart/nowe uprawnienia Storage NIEAKTYWNE i NOT TESTED.
+TODO B3: duplikaty numerów dozwolone, tylko ostrzeżenie. B3/B4 nie rozpoczęte.
+Migracje/Edge wdrożone: brak. Następny krok: decyzja o lokalnym pakiecie backendu i jednym przycisku Usuń zdjęcie.
+Bez push/merge/produkcji/resetu; historia docs/ODPOWIEDZI_CODEX.txt.
+
 # Kontrola B2.1 po POCO — 2026-10-24 21:39:58 Europe/Warsaw
 
 feat/slm-v1-live; runtime 6dd7105. Właściciel potwierdził zapis/nazwę własnego profilu i readonly identyfikatorów.

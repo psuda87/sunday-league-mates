@@ -282,3 +282,13 @@ nie przenosić automatycznie poprzednich limitów 1024 px/JPEG/2 MiB jako docelo
 B2.1 nie wywołuje Storage ani operacji zdjęć. Numery/pozycje/„dobry bramkarz”
 wymagają odrębnego uzgodnienia brakujących kontraktów; nie dodano ich w tej pracy.
 Profil B2.1: docs/SLM_V1_B2_PROFILE.md. B3/grupy nie rozpoczęte.
+
+
+## TODO B3 — numery zawodników, decyzja 2026-10-24 (bez implementacji)
+
+Numer jest własnością użytkownika, nie grupy. Zakres0–99. Duplikaty są dozwolone;
+nie dodawać UNIQUE do jersey_number. Po podłączeniu rzeczywistych grup ostrzegać,
+gdy inny członek grupy ma już taki numer, ale pozwalać go zachować i zapisać.
+Sprawdzanie musi respektować widoczność członkostw; nie ujawniać osób spoza dozwolonego
+kontekstu. W B2.2 nie dodano żadnego sprawdzania duplikatów ani integracji grup.
+B2.2 ma blokadę kontraktu i minimalnej kontrolki usuwania — docs/SLM_V1_B2_PHOTOS.md.
