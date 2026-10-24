@@ -30,12 +30,16 @@ export function useOwnProfile(manager:SessionManager,userId:string|null,selectio
   finally {if(ticket===generation.current){flight.current=false;setSaving(false);}}
  }
  return {...current,photo,saveNumber,saving:current.phase==='ready'&&saving,reload:()=>setRevision(v=>v+1),
-  async save(fullName){
+  async save(fullName,number){
    const auth=manager.getSnapshot();
    if(flight.current||!adapter||!current.profile||current.phase!=='ready'||auth.phase!=='ready'||auth.session?.user_id!==userId)return false;
    const ticket=generation.current;flight.current=true;setSaving(true);
    try {
-    const profile=await adapter.save(fullName,current.profile.display_as);
+    if(number!==undefined&&(!Number.isInteger(number)||number<0||number>99))throw new Error('invalid_number');
+    let profile=await adapter.save(fullName,current.profile.display_as);
+    if(ticket!==generation.current)return false;
+    if(number!==undefined&&number!==profile?.jersey_number)profile=await adapter.saveNumber(number);
+    if(profile?.full_name!==fullName.trim())throw new Error('profile_readback_mismatch');
     if(ticket!==generation.current)return false;
     if(!profile)throw new Error('profile_missing');
     setState({owner:userId,phase:'ready',profile,notice:'Zapisano profil i potwierdzono dane na serwerze.'});return true;

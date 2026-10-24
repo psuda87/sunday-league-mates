@@ -16,7 +16,7 @@ export default function DemoProfile({world,id,onBack,dispatch,personal=false,onP
   const own=world.userId===id;
   const [editor,setEditor]=useState<'identity'|'portrait'|null>(null);
   const settings=useRef<HTMLDetailsElement>(null);
-  const editNumber=()=>{setEditor(null);setNumber(String((live?profile?.jersey_number:player.jerseyNumber)??''));setError('');setEditing(true);};
+  const editNumber=()=>{if(live){setEditing(false);setEditor('identity');return;}setEditor(null);setNumber(String((live?profile?.jersey_number:player.jerseyNumber)??''));setError('');setEditing(true);};
   useEffect(()=>{heading.current?.focus({preventScroll:true});},[]);
   const closeEditor=()=>{setEditor(null);requestAnimationFrame(()=>heading.current?.focus());};
   // FROZEN_ANDROID_BEGIN
@@ -32,16 +32,15 @@ export default function DemoProfile({world,id,onBack,dispatch,personal=false,onP
     event.preventDefault();
     if(!own)return;
     if(!/^[0-9]{1,2}$/.test(number.trim())){setError('Wpisz pełny numer od 0 do 99.');return;}
-    if(live){if(live.saveNumber)void live.saveNumber(Number(number.trim())).then(ok=>{if(ok)setEditing(false);});return;}
     dispatch({type:'jersey',playerId:id,number:Number(number.trim())});setEditing(false);
   }
   return <div className="slm-players-screen slm-ultimate-profile"><MatchHeader title={personal?"Mój profil":"Zawodnicy"} backLabel="Wróć do poprzedniego widoku" onBack={onBack}/><p className="slm-players-demo">{live?live.phase==='loading'?'Wczytywanie profilu…':live.phase==='ready'?'Profil Supabase · statystyki niedostępne':live.notice:'Dane przykładowe · fikcyjne portrety i statystyki'}</p>
     <UltimatePlayerCard key={id} name={live?profile?.display_name??'—':player.name} portrait={live?(live.photo?.image?{src:live.photo.image}:undefined):player.portrait} jerseyNumber={live?profile?.jersey_number??undefined:player.jerseyNumber} headingRef={heading} portraitDescription={live?'Zdjęcie profilowe':undefined} onEditNumber={own&&(!live||live.phase==='ready'&&!!live.saveNumber)?editNumber:undefined}/>
-    {editing&&own&&<form className="slm-number-form" onSubmit={save} noValidate aria-label={live?"Edycja własnego numeru koszulki":"Edycja numeru demonstracyjnego"}>
+    {editing&&own&&!live&&<form className="slm-number-form" onSubmit={save} noValidate aria-label={live?"Edycja własnego numeru koszulki":"Edycja numeru demonstracyjnego"}>
       <label htmlFor={field}>{live?'Twój numer koszulki (0–99)':'Twój numer koszulki · demo (0–99)'}</label>
       <input id={field} autoFocus inputMode="numeric" autoComplete="off" value={number} onChange={e=>setNumber(e.target.value)} aria-invalid={!!error} aria-describedby={error?errorId:undefined}/>
       {error&&<p id={errorId} role="alert">{error}</p>}
-      <div><button type="submit" disabled={live?.saving}>Zapisz numer</button><button type="button" onClick={()=>setEditing(false)}>Anuluj</button></div>
+      <div><button type="submit">Zapisz numer</button><button type="button" onClick={()=>setEditing(false)}>Anuluj</button></div>
     </form>}
     <section className="slm-player-stats slm-ultimate-summary" aria-label={live?"Statystyki zawodnika · niedostępne":"Cztery podstawowe statystyki demonstracyjne"}><dl className="slm-ultimate-stats">{[[stats.played,'Mecze'],[player.demoTotals.goals,'Bramki'],[player.demoTotals.assists,'Asysty'],[player.demoTotals.mvp,'MVP']].map(([value,label])=><div key={label}><dt>{label}</dt><dd>{live?'—':value}</dd></div>)}</dl></section>
     {personal&&own&&<div className="slm-my-identity">

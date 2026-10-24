@@ -69,7 +69,7 @@ it('binds original own-profile controls only; identifiers/photo/number are read-
  fireEvent.click(screen.getByRole('button',{name:'Edytuj profil'}));
  expect(screen.getByLabelText('Login / pseudonim')).toHaveAttribute('readonly');
  fireEvent.change(screen.getByLabelText('Imię i nazwisko · opcjonalnie'),{target:{value:'Nowe Dane'}});
- fireEvent.click(screen.getByRole('button',{name:'Zapisz dane'}));await waitFor(()=>expect(save).toHaveBeenCalledWith('Nowe Dane'));
+ fireEvent.click(screen.getByRole('button',{name:'Zapisz dane'}));await waitFor(()=>expect(save).toHaveBeenCalledWith('Nowe Dane',undefined));
  expect(dispatch).not.toHaveBeenCalled();
  expect(world.players[0].name).not.toBe('Testowy Zawodnik');
 });
@@ -77,4 +77,19 @@ it('binds original own-profile controls only; identifiers/photo/number are read-
 it('rejects a successful HTTP response if read-back does not confirm the submitted value',async()=>{
  const auth=manager(async()=>profile());await auth.signIn('Fikcyjny','only-test-password');
  await expect(profileAdapter(auth,'own').save('Niepotwierdzony Zapis','full_name')).rejects.toThrow('profile_readback_mismatch');
+});
+
+it('saves name and jersey using existing operations and confirms both, preserving the photo binding',async()=>{
+ let stored={...profile(),jersey_number:27};
+ const request=vi.fn(async(action:string,values?:Record<string,unknown>)=>{
+  if(action==='save_profile')stored={...stored,full_name:String(values!.full_name),display_name:String(values!.full_name)};
+  if(action==='save_jersey_number')stored={...stored,jersey_number:Number(values!.jersey_number)};
+  if(action==='profile_photo_get')return {image_data_url:null,revision:null,cleanup_pending:false};
+  return {...stored};
+ });
+ const auth=manager(request);await auth.signIn('Fikcyjny','only-test-password');
+ const {result}=renderHook(()=>useOwnProfile(auth,'own'));await waitFor(()=>expect(result.current.phase).toBe('ready'));
+ await act(async()=>{expect(await result.current.save('Nowe Dane',0)).toBe(true);});
+ expect(result.current.profile).toMatchObject({full_name:'Nowe Dane',jersey_number:0});expect(result.current.photo?.phase).toBe('ready');
+ expect(request.mock.calls.filter(([action])=>action.startsWith('save_')).map(([action])=>action)).toEqual(['save_profile','save_jersey_number']);
 });

@@ -7,7 +7,7 @@ export interface PersonalProfileData {
 export interface PersonalProfileBinding {
  phase:'loading'|'ready'|'missing'|'error';profile:PersonalProfileData|null;
  photo?:PersonalPhotoBinding;saveNumber?:(number:number)=>Promise<boolean>;
- saving:boolean;notice:string;reload:()=>void;save:(fullName:string)=>Promise<boolean>;
+ saving:boolean;notice:string;reload:()=>void;save:(fullName:string,number?:number)=>Promise<boolean>;
 }
 
 export interface PersonalPhotoBinding {

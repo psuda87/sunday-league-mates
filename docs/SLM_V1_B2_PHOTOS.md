@@ -1,3 +1,48 @@
+# Ostatnia poprawka B2.2 — zakończona lokalnie
+
+2026-10-24 22:30:09 Europe/Warsaw — ostatnia poprawka formularza B2.2
+Gałąź feat/slm-v1-live; baza899b631/c5eaf2c i późniejsze lokalne zmiany zachowane.
+Numer koszulki jest polem pod imieniem i nazwiskiem w istniejącym Edytuj profil:
+klawiatura numeryczna, walidacja0–99, Zapisz dane zapisuje oba pola, Anuluj odrzuca oba szkice.
+Usunięto osobny przycisk i dodatkowy panel w prawdziwym profilu. Kliknięcie istniejącego
+numeru na karcie otwiera ten sam formularz; projektu Ultimate nie zmieniono.
+Izolowane demo i pozostałe ekrany bez zmian. Żaden odebrany mechanizm nie został wyłączony.
+Wykorzystano dotychczasowe adapter.save oraz adapter.saveNumber, bez nowego API/SQL/Storage.
+Odczyt potwierdza zapis obu pól. Dwie operacje API nie stanowią jednej transakcji;
+przy częściowym błędzie nie ma fałszywego sukcesu, wymagany ponowny odczyt profilu.
+Pusty numer bez wcześniej ustawionego numeru pozostaje pusty; kasowanie istniejącego numeru
+nie jest nową operacją — formularz wymaga wartości0–99. Duplikaty nadal dozwolone.
+PASS: TypeScript, lint, frozen guard46+9 z dokładną allowlistą zatwierdzonej zmiany formularza;
+8 ukierunkowanych Vitest oraz1 Cypress: zapis/anulowanie pól, walidacja100/0/99,
+zapis imienia/nazwiska, numer po restarcie, upload/podmiana/delete, powrót z galerii i logout.
+Nie uruchamiano pełnego Cypress ani pełnego Vitest. Build live, cap sync, Android debug,
+JUnit istniejący1 z cache i weryfikacja APK PASS. APK zainstalowany aktualizacją -r na POCO,
+start Status ok; zgodność sumy pliku na telefonie potwierdzona; crash/uncaughtJS/WebView errors=0.
+SHA2563ad4d62c29c942d73a9f5e68347f0f1b96bd0f483405b8500dbde82c9af604d3.
+B1/B2 pozostają podłączone do rzeczywistego Supabase; wcześniejszy odbiór fizyczny zachowany.
+Nowego formularza nie oznaczamy jako ręcznie przetestowanego: zalecany krótki test POCO
+Edytuj profil → zmień nazwę/numer → Anuluj → ponów i Zapisz dane → restart/karta.
+Status: lokalny zakres B2.2 zakończony, ostatnia poprawka gotowa do krótkiego odbioru ręcznego.
+Zdalnie pozostaje osobno zatwierdzony pakiet B2.2: SQL/RPC, accounts i konfiguracja prywatnego
+Storage WebP/150KB, po sprawdzeniu faktycznego stanu zdalnego. Teraz go nie odczytywano/zmieniano.
+Bez zdalnych migracji/Storage, push, merge, nowych etapów B3/B4 i dodatkowych zadań.
+
+Poprzednie wpisy stanowią historię.
+
+# Aktualizacja odbioru — PASS
+
+2026-10-24 22:23:51 Europe/Warsaw — odbiór B2.2 na POCO
+Właściciel po zainstalowaniu poprawki galerii potwierdził: „wszystko działa poprawnie”.
+PASS ręczny: pozostanie w panelu po wyborze obrazu, podgląd, zatwierdzenie zdjęcia,
+zachowanie po restarcie, podmiana i usunięcie zdjęcia. Numer0–99 potwierdzony wcześniej.
+B2.2 funkcjonalnie odebrane lokalnie; kod899b631, feat/slm-v1-live.
+Pole numeru pozostaje do osobnych zapowiedzianych instrukcji; brak dodatkowych zmian UI.
+Bez zmian kodu, ponownego builda lub instalacji; nie powtarzano testów automatycznych.
+B3/B4 nie rozpoczęte. Bez push/merge i wdrożeń zdalnych.
+Poprzednie wpisy poniżej zachowują historyczny stan przed potwierdzeniem.
+
+---
+
 # B2.2 — implementacja lokalna i poprawka galerii
 
 2026-10-24 22:20:25 Europe/Warsaw · feat/slm-v1-live · kod **899b631** (baza przygotowania75e8267).
