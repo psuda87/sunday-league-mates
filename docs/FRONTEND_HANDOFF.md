@@ -229,3 +229,43 @@ więc nie oznaczamy go jako zaliczony. Duże chunki Ionic nadal ostrzeżeniem.
 Nie wykonano Android/iOS, prawdziwej klawiatury, e-mail/deep linków na urządzeniu,
 pełnego audytu WCAG/czytnika ani rzeczywistego SQL/produkcji. Nie zweryfikowano
 statusu automatycznego Vercel. Nie uruchomiono ręcznego deploy ani kolejnego etapu.
+
+
+## TODO B4 — decyzje właściciela z 2026-10-24, bez implementacji
+
+Ten wpis aktualizuje przyszłe wymagania wydarzeń; nie zmienia obecnego demo ani
+zamrożonego Premium 3.18 z d0f9fa9. B4 nie został rozpoczęty. Nie projektowano ekranów,
+nie zmieniano API/RLS/migracji. Poniższe decyzje mają pierwszeństwo przed sprzecznymi
+historycznymi opisami demo (m.in. edycją wyłącznie przez twórcę).
+
+### Prywatne wydarzenia
+
+- Kafelek jest widoczny również zalogowanym osobom spoza grupy.
+- Bez uprawnień nie można wejść w szczegóły prywatnego wydarzenia ani odczytać
+  uczestników, telefonów, rozliczeń i innych prywatnych danych.
+- Można wysłać prośbę o dołączenie; administrator może ją zaakceptować lub odrzucić.
+- Widoczność kafelka i granica prywatnych danych muszą być egzekwowane również przez
+  Supabase RLS/API, w tym przy bezpośrednich żądaniach poza UI. Samo ukrycie przycisku
+  nie stanowi zabezpieczenia.
+
+### Organizator i uczestnicy
+
+- Własne wydarzenia mają czytelne, dyskretne oznaczenie organizatora.
+- Zapisany organizator jest na szczycie listy uczestników.
+- Niezapisany organizator jest w osobnym kafelku nad listą i nie zajmuje miejsca
+  w limicie uczestników.
+- Organizator wydarzenia i administrator grupy to odrębne pojęcia, nawet gdy
+  początkowo organizatorem może być tylko administrator.
+
+### Uprawnienia i zarządzanie
+
+- W SLM 1.0 nowe wydarzenia tworzą wyłącznie administratorzy grupy.
+- Organizator oraz uprawnieni administratorzy mogą zarządzać wydarzeniem.
+- Zarządzanie obejmuje edycję oraz odwołanie z zachowaniem historii i rozliczeń.
+- Usunięcie błędnie utworzonego wydarzenia jest możliwe wyłącznie przy braku zapisów
+  i powiązanych rozliczeń; weryfikacja warunków musi być odporna na równoległy zapis.
+- Zachować możliwość przyszłego rozszerzenia uprawnień do tworzenia wydarzeń.
+
+Przyszła implementacja wymaga osobnego polecenia, audytu istniejącego kontraktu,
+serwerowych kontroli i testów dostępu/współbieżności. Ten TODO nie zatwierdza migracji,
+wdrożeń ani zmian logiki finansowej. B2 (rzeczywisty profil) także wymaga osobnej zgody.

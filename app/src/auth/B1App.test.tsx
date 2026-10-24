@@ -1,12 +1,17 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { useEffect } from 'react';
 import B1App from './B1App';
 import { SessionManager } from './sessionManager';
 import { AccountError } from './api';
 import type { Session } from './api';
 import { b1Port } from './b1Port';
-vi.mock('../demo/App',()=>({default:({onLogout,onAccount}:{onLogout:()=>void;onAccount:(view:string)=>void})=><div>Chroniony świat demo<button onClick={onLogout}>Wyloguj</button><button onClick={()=>onAccount('password')}>Hasło konta</button></div>}));
-afterEach(cleanup);
+const worldLifecycle=vi.hoisted(()=>({mounts:0,unmounts:0}));
+vi.mock('../demo/App',()=>({default:function MockWorld({onLogout,onAccount}:{onLogout:()=>void;onAccount:(view:string)=>void}){
+ useEffect(()=>{worldLifecycle.mounts++;return()=>{worldLifecycle.unmounts++;};},[]);
+ return <div>Chroniony świat demo<button onClick={onLogout}>Wyloguj</button><button onClick={()=>onAccount('password')}>Hasło konta</button></div>;
+}}));
+afterEach(()=>{cleanup();vi.restoreAllMocks();worldLifecycle.mounts=0;worldLifecycle.unmounts=0;});
 const session=(temporary=false):Session=>({access_token:'access-test',refresh_token:'refresh-test',user_id:'fictional-test',role:'member',expires_in:3600,must_change_password:temporary});
 function setup(request:(action:string,values?:Record<string,unknown>,session?:Session|null)=>Promise<unknown>,token:string|null=null){
  const store={read:async()=>token,write:async(value:string)=>{token=value;},clear:async()=>{token=null;}};
@@ -49,6 +54,24 @@ describe('B1 existing Auth into frozen account UI',()=>{
   mode='expired';fireEvent.click(screen.getByRole('button',{name:'Spróbuj ponownie'}));
   await screen.findByRole('heading',{name:'Sesja wygasła'});expect(peek()).toBeNull();expect(screen.queryByText('Chroniony świat demo')).toBeNull();
   fireEvent.click(screen.getByRole('button',{name:'Wróć do logowania'}));await screen.findByRole('heading',{name:'Zaloguj się'});
+ });
+ it('diagnoses resume: hides/unmounts world, shows checking, refreshes then remounts without login',async()=>{
+  let visibility:DocumentVisibilityState='visible';
+  vi.spyOn(document,'visibilityState','get').mockImplementation(()=>visibility);
+  let finishRefresh!:(value:Session)=>void;
+  const request=vi.fn().mockResolvedValueOnce(session()).mockImplementationOnce(()=>new Promise<Session>(resolve=>{finishRefresh=resolve;}));
+  const {manager}=setup(request,'saved-test-refresh');render(<B1App manager={manager}/>);
+  await screen.findByText('Chroniony świat demo');expect(worldLifecycle.mounts).toBe(1);
+  visibility='hidden';fireEvent(document,new Event('visibilitychange'));
+  await screen.findByRole('heading',{name:'Sprawdzanie sesji'});
+  expect(screen.queryByText('Chroniony świat demo')).toBeNull();expect(worldLifecycle.unmounts).toBe(1);
+  expect(request).toHaveBeenCalledTimes(1);expect(screen.queryByRole('heading',{name:'Zaloguj się'})).toBeNull();
+  visibility='visible';fireEvent(document,new Event('visibilitychange'));
+  await waitFor(()=>expect(request).toHaveBeenCalledTimes(2));
+  expect(manager.getSnapshot().phase).toBe('checking');expect(screen.queryByText('Chroniony świat demo')).toBeNull();
+  await act(async()=>{finishRefresh(session());});
+  await screen.findByText('Chroniony świat demo');expect(worldLifecycle.mounts).toBe(2);
+  expect(manager.getSnapshot().phase).toBe('ready');expect(screen.queryByRole('heading',{name:'Zaloguj się'})).toBeNull();
  });
  it('does not implement registration/recovery/profile or authorize callback URL',async()=>{
   const request=vi.fn();const {manager}=setup(request);const port=b1Port(manager);

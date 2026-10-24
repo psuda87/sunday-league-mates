@@ -1,3 +1,13 @@
+# Odbiór B1 i diagnostyka — 2026-10-24 21:07:02 Europe/Warsaw
+
+Gałąź feat/slm-v1-live; runtime 7322d35.
+B1 funkcjonalnie odebrany na POCO: login, jawne demo, tło/restart, logout i oba Wstecz PASS ręczny.
+Mignięcie odtworzone testem: checking i remount po serwerowej walidacji. Bez zmiany runtime/UI;
+191 Vitest, TS/lint, guard i build Android PASS; hash APK identyczny, bez nowej instalacji.
+Nowy test B1App.test.tsx, raport SLM_V1_B1_AUTH.md i TODO B4 w FRONTEND_HANDOFF.md.
+Migracje/Edge wdrożone w tej pracy: brak. Otwarte: kosmetyczne mignięcie; fizyczne offline/naturalne
+wygaśnięcie nadal niepotwierdzone. Następny krok B2 tylko po odrębnej zgodzie. Bez push/merge.
+
 # B1 Auth i sesja — 2026-10-24 20:29:51 Europe/Warsaw
 
 B1 wykonany na feat/slm-v1-live; kod 7322d351e48b7dc044bf45b2345b602986cc45ea.

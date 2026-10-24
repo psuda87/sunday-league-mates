@@ -136,3 +136,80 @@ SHA256: `c2b8185eea1134b3c0ed9797683a0034506e408ce1874009d71aa08b763eedd0`.
 
 Po odłączeniu USB może być potrzebne ponowne `adb -s c7a559b5 reverse tcp:54321 tcp:54321`.
 Zatrzymanie po B1; dalsze integracje wymagają kolejnej decyzji. Bez push i merge.
+
+
+## Odbiór fizyczny B1 i diagnostyka wznowienia — 2026-10-24
+
+Ten wpis zastępuje wcześniejszy status oczekiwania na ręczny odbiór wymienionych
+poniżej scenariuszy; starsze wyniki zachowano jako historię. Baza kodu B1: 7322d35,
+HEAD dokumentacji przed pracą: cfc8c1c, gałąź feat/slm-v1-live, stan początkowy czysty.
+
+Właściciel potwierdził na POCO X3 NFC / Android 12 — **PASS ręczny**:
+logowanie na konto testowe, oznaczenie „Dane przykładowe”, zachowanie sesji po
+minimalizacji/powrocie, zachowanie sesji po całkowitym zamknięciu i ponownym starcie,
+trwałe wylogowanie po restarcie oraz ekranowy i systemowy Wstecz.
+Nie zaliczamy na tej podstawie niewymienionych testów: fizycznego offline,
+naturalnego wygaśnięcia ani wymuszonej zmiany hasła na telefonie.
+
+### Przyczyna krótkiego mignięcia
+
+Odtworzony testem przebieg obecnego kontrolera:
+
+1. `visibilitychange` do hidden lub Capacitor `appStateChange` do inactive wywołuje
+   `SessionManager.suspend()`: phase=checking, publiczna session=null.
+2. `B1App` wymaga ready do zamontowania `WorldApp`, więc odmontowuje świat i pokazuje
+   istniejący `AccountScreens` w stanie „Sprawdzanie sesji”.
+3. Powrót przez visibility/App lifecycle wywołuje `refresh()`; bramka nadal ukrywa świat
+   do odpowiedzi serwera i bezpiecznego zapisu obróconego refresh tokenu.
+4. Dopiero ready montuje świat ponownie. To jest rzeczywisty remount, a nie tylko
+   zwykły render. Udana weryfikacja nie przechodzi przez ekran logowania.
+
+Nowy test steruje visibility i opóźnioną odpowiedzią wyłącznie przez kontrolowaną
+Promise (bez sztucznego timera w aplikacji): potwierdza mount=1, unmount=1, checking,
+brak świata/logowania w trakcie weryfikacji, następnie mount=2 i ready.
+Jest to deterministyczne odtworzenie przyczyny w kontrolerze, nie pomiar klatek lub
+czasu mignięcia fizycznego WebView. Nie wykonano nowego nagrania ani śladu lifecycle telefonu.
+Obecność obu źródeł zdarzeń (visibility oraz Capacitor) może wywołać kolejne retry;
+SessionManager scala równoległe refresh. Nie stwierdzono utraty sesji ani nie przypisano
+bez pomiaru konkretnej kolejności natywnych zdarzeń urządzeniu.
+
+### Decyzja o poprawce
+
+**Nie zmieniono kodu produkcyjnego.** Usunięcie checking/refresh lub pozostawienie
+chronionych danych widocznych do końca walidacji osłabiłoby istniejącą bramkę dostępu.
+Samo ograniczenie zdublowanych retry nie usuwa podstawowego przejścia checking/remount.
+Nie dodano opóźnienia, ekranu, CSS ani obejścia. Nie poprawiano znanego hero z A.
+
+Pełne usunięcie mignięcia wymaga osobnego projektu cyklu życia prezentacji: stabilnej
+powłoki bez prywatnych danych, zachowania bezpiecznego stanu nawigacji i odłączenia
+chronionej zawartości od powłoki na czas weryfikacji. Nie wolno zachować widocznych
+niezweryfikowanych danych. Ryzyka: ujawnienie poprzedniego konta/starego dostępu,
+nieprawidłowe przywrócenie ramki i regresja zamrożonego UI. To większa zmiana niż
+niewielka poprawka B1; nie została zaimplementowana ani zatwierdzona tym raportem.
+
+Zmiany tej pracy: tylko test `app/src/auth/B1App.test.tsx` oraz dokumentacja
+`SLM_V1_B1_AUTH.md`, `FRONTEND_HANDOFF.md` (istniejący plan/TODO), `STATUS.md`
+i `ODPOWIEDZI_CODEX.txt`. Oryginalne UI, runtime Auth, CSS, assets i nawigacja bez zmian.
+
+### Zamknięcie i dalszy zakres
+
+**B1 można formalnie zamknąć funkcjonalnie**, z odnotowaną drobną obserwacją UX przy
+bezpiecznej ponownej walidacji. Nie deklarujemy usunięcia mignięcia.
+Nie ma obowiązku ponownego odbioru telefonu, ponieważ zachowanie aplikacji nie zostało
+zmienione; przyszła poprawka wznowienia wymagałaby nowego testu fizycznego.
+Decyzje B4 zapisano wyłącznie w TODO w `docs/FRONTEND_HANDOFF.md`.
+Można planować rozpoczęcie B2, ale implementacja rzeczywistego profilu wymaga
+kolejnej wyraźnej zgody właściciela. B2 nie rozpoczęto.
+Bez push/merge, migracji, Edge deploy, resetu danych i zmian produkcji.
+
+### Kontrole po diagnostyce
+
+PASS: TypeScript, lint, **191/191 Vitest (35 plików)**, w tym nowy test wznowienia;
+guard frozen UI, build B1, synchronizacja Capacitor, Android assembleDebug oraz
+JUnit (istniejący 1 test, 0 błędów, wynik Gradle UP-TO-DATE), kontrola zasobów APK.
+APK ma identyczny hash jak wersja zainstalowana i odebrana przez właściciela:
+`c2b8185eea1134b3c0ed9797683a0034506e408ce1874009d71aa08b763eedd0`.
+Nie wykonywano ponownej instalacji, nowych testów fizycznych ani nowej sesji Cypress/
+pomiarów wizualnych: brak zmiany runtime/UI. Historyczny wynik 19 Cypress i odstępstwo
+hero z A pozostają odrębnie opisane powyżej. Istniejące ostrzeżenia dużego chunka/flatDir
+nie blokują kompilacji. `git diff 7322d35` potwierdza brak zmian runtime Auth/UI.

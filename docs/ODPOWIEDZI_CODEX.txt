@@ -1880,3 +1880,22 @@ Zatrzymanie po B1; B2–B6 nie rozpoczęte. Następny krok: ręczny odbiór bie�
 
 [2026-10-24 20:30:51 Europe/Warsaw] Uzupełnienie B1
 Na prośbę właściciela przypomniano fikcyjny identyfikator wcześniejszego lokalnego konta testowego (odczyt tylko wskazanego konta z manifestu). Nie odczytywano ani nie resetowano hasła. Ręczny odbiór B1 nadal oczekuje. APK zainstalowany; zakres B2–B6 nie rozpoczęty. Raport: docs/SLM_V1_B1_AUTH.md; historia: docs/ODPOWIEDZI_CODEX.txt.
+
+
+[2026-10-24 21:07:02 Europe/Warsaw] Odbiór B1 i diagnostyka wznowienia
+B1 można formalnie zamknąć funkcjonalnie: właściciel potwierdził na POCO logowanie,
+oznaczenie danych przykładowych, sesję po tle i pełnym restarcie, trwałe wylogowanie oraz oba Wstecz.
+Mignięcie: suspend → checking/session=null → odmontowanie świata → serwerowy refresh → ready/remount.
+Nowy test potwierdza tę sekwencję, bez chwilowego ekranu logowania. Nie mierzono klatek telefonu.
+Nie zmieniono runtime/UI. Pełne wygładzenie wymaga oddzielenia stabilnej, pozbawionej danych
+powłoki od chronionej zawartości; zachowano weryfikację dostępu, bez maskującego opóźnienia/ekranu.
+Zmieniono wyłącznie app/src/auth/B1App.test.tsx i dokumentację: SLM_V1_B1_AUTH.md,
+FRONTEND_HANDOFF.md, STATUS.md, ODPOWIEDZI_CODEX.txt. Premium 3.18 i znane hero A nietknięte.
+PASS: TypeScript, lint, 191 Vitest, guard UI, build B1/cap sync/Android debug/JUnit 1 i kontrola APK.
+Hash APK identyczny z odebranym B1; bez nowej instalacji. Ponowny test telefonu nie jest wymagany.
+Decyzje B4 zapisano wyłącznie jako TODO w istniejącym docs/FRONTEND_HANDOFF.md:
+prywatny kafelek i prośby/uprawnienia/RLS, organizator niezależny od admina,
+kolejność/limit uczestników, tworzenie tylko przez adminów, edycja/odwołanie/warunkowe usunięcie.
+B2 może być następnym zadaniem dopiero po wyraźnej zgodzie; nie rozpoczęto B2 ani B4.
+Brak push, merge, migracji, Edge deploy i zmian danych/produkcji.
+Raport docs/SLM_V1_B1_AUTH.md; historia docs/ODPOWIEDZI_CODEX.txt.
