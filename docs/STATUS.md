@@ -1,3 +1,18 @@
+# ETAP A ZAAKCEPTOWANY — 2026-10-24 02:08:09 Europe/Warsaw
+
+feat/slm-v1-live: właściciel wyraźnie zaakceptował cały etap A. Oryginalne Premium3.18 na POCO: ręczny PASS wyglądu, ekranowej strzałki i systemowego Wstecz. Etap A zamknięty; historyczne wpisy o oczekiwaniu na akceptację są nieaktualne. Pozostałych szczegółowych testów fizycznych nie oznaczamy jako wykonane. Następny plan: B1 Auth/sesja przez adaptery do istniejącego UI, bez przeprojektowania. Etap B nie rozpoczęty automatycznie (zakres bieżącego polecenia: wyłącznie A). Backend/migracje/produkcja bez zmian, bez push/merge. Raport docs/SLM_V1_STAGE_A.md; historia docs/ODPOWIEDZI_CODEX.txt.
+# Systemowy Wstecz potwierdzony — 2026-10-24 02:07:00 Europe/Warsaw
+
+feat/slm-v1-live: PASS ręczny użytkownika dla wyglądu Premium3.18, ekranowej strzałki i systemowego Wstecz Androida. Pozostałe fizyczne testy bez nowych potwierdzeń. Etap B nie rozpoczęty; następny krok na polecenie użytkownika. Bez zmian kodu/backendu/instalacji/push/merge. Raport docs/SLM_V1_STAGE_A.md; historia docs/ODPOWIEDZI_CODEX.txt.
+
+# Odbiór wyglądu etapu A — 2026-10-24 02:06:16 Europe/Warsaw
+
+feat/slm-v1-live: użytkownik potwierdził poprawny wygląd Premium3.18 i ekranową strzałkę Wstecz — PASS ręczny. Systemowy Wstecz Androida i pełny fizyczny zestaw regresji pozostają niepotwierdzone. Akceptacja wyglądu zapisana, etap B nie został rozpoczęty; następny krok wyłącznie po poleceniu użytkownika: Auth/sesja w oryginalnym UI. Bez zmian kodu/backendu/instalacji/push/merge. Raport docs/SLM_V1_STAGE_A.md; historia docs/ODPOWIEDZI_CODEX.txt.
+
+# Etap A zainstalowany — 2026-10-24 01:46:54 Europe/Warsaw
+
+feat/slm-v1-live: POCO połączony, install -r Success, MainActivity uruchomiona, hash APK zgodny, pierwsza instalacja zachowana. Logi PID:0sprawdzanych krytycznych markerów. Bez czyszczenia danych i zmian backendu. Ręczny odbiór UI/Wstecz/motywów oczekuje; nie rozpoczynać etapu B. Raport docs/SLM_V1_STAGE_A.md; historia docs/ODPOWIEDZI_CODEX.txt.
+
 # Frozen Premium 3.18 — etap A — 2026-10-24 01:39:16 Europe/Warsaw
 
 Gałąź feat/slm-v1-live, nowy worktree .worktrees/slm-v1-live; baza dokładnie d0f9fa9, implementacja1c4afb5. Oryginalny UI/demo zachowany; bez live UI3.19/3.20 i bez etapuB. Tylko moduły Windows, niewizualny Wstecz, adjustResize i pakowanie dist-demo. CSS/assets/Ultimate/Teams/nav niezmienione.

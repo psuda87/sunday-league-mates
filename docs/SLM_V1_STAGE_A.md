@@ -73,3 +73,19 @@ Odbiór: sprawdź Mecze → szczegóły → uczestnicy/Składy/Rozliczenie → k
 **Blokery:** brak urządzenia ADB i akceptacji fizycznego wyglądu. Kod/APK gotowe do odbioru. Etap B nie został rozpoczęty; wcześniejsza zgoda na integrację nie zastępuje nowego punktu kontrolnego.
 
 **ETAP A ZAKOŃCZONY — OCZEKUJĘ NA AKCEPTACJĘ UI PREMIUM 3.18 NA TELEFONIE.**
+
+## Aktualizacja instalacji — 2026-10-24 01:46:54 Europe/Warsaw
+
+[2026-10-24 01:46:54 Europe/Warsaw] Na polecenie „spróbuj teraz” ponowiono instalację etapu A. POCO c7a559b5 dostępny jako device. Weryfikacja APK PASS; adb install -r Success i start MainActivity PASS. SHA256 telefonu zgodne b424136a9df449203bfe364032f0ee675f2e96b528a3a9c9b55d2210386a8db4. firstInstallTime zachowane2026-10-23 21:38:01; lastUpdateTime2026-10-24 01:46:35. Proces działa,0sprawdzanych markerów FATAL/Uncaught/ERR/WebView w logach PID. Nie usuwano danych, nie zmieniano backendu, brak push/merge. Właściciel ma sprawdzić oryginalny wygląd demo, boisko, Ultimate, motywy i systemowy Wstecz; fizyczny odbiór oczekuje. Etap B nadal wstrzymany do wyraźnej akceptacji. Historia docs/ODPOWIEDZI_CODEX.txt.
+
+## Ręczny odbiór wyglądu — 2026-10-24 02:06:16 Europe/Warsaw
+
+[2026-10-24 02:06:16 Europe/Warsaw] Ręczny odbiór etapu A: użytkownik potwierdził „interfejs wygląda dobrze” oraz poprawne działanie ekranowej strzałki Wstecz. PASS ręczny dla wyglądu Premium3.18 i ekranowego powrotu. Systemowy przycisk/gest Androida, pełny zestaw motywów, klawiatura/safearea i lifecycle nie zostały tą wiadomością potwierdzone. Akceptacja wyglądu zapisana; etapu B nie rozpoczęto i nie wykonano zmian kodu/backendu/instalacji/push/merge. Następny krok po poleceniu użytkownika: etap B od Auth/sesji, z zachowaniem zamrożonego UI i porównaniem wizualnym. Raport docs/SLM_V1_STAGE_A.md; historia docs/ODPOWIEDZI_CODEX.txt.
+
+## Potwierdzenie systemowego Wstecz — 2026-10-24 02:07:00 Europe/Warsaw
+
+[2026-10-24 02:07:00 Europe/Warsaw] Użytkownik potwierdził również działanie systemowego Wstecz Androida na POCO — PASS ręczny. Wcześniejsze potwierdzenia wyglądu Premium3.18 i ekranowej strzałki pozostają PASS. Nie oznacza to pełnego testu klawiatury, wszystkich motywów, safearea ani lifecycle. Etap B nie rozpoczęty; brak zmian kodu/backendu/instalacji/push/merge. Raport docs/SLM_V1_STAGE_A.md; historia docs/ODPOWIEDZI_CODEX.txt.
+
+## ETAP A ZAAKCEPTOWANY — 2026-10-24 02:08:09 Europe/Warsaw
+
+[2026-10-24 02:08:09 Europe/Warsaw] Właściciel jednoznacznie zaakceptował cały ETAP A. Etap A zamknięty i zaakceptowany; wcześniejsze ręczne PASS: wygląd oryginalnego Premium3.18, ekranowa strzałka i systemowe Wstecz Androida. Akceptacja nie zmienia niewykonanych szczegółowych testów w PASS. Kolejny planowany zakres: B1 Auth/sesja jako adaptery do istniejącego UI, bez zmiany wyglądu. Nie rozpoczęto automatycznie etapu B, zgodnie z poleceniem wykonania wyłącznie A. Brak zmian kodu/backendu/instalacji/push/merge. Raport docs/SLM_V1_STAGE_A.md; historia docs/ODPOWIEDZI_CODEX.txt.
