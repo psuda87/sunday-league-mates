@@ -1,3 +1,13 @@
+# Kontrola B2.1 po POCO — 2026-10-24 21:39:58 Europe/Warsaw
+
+feat/slm-v1-live; runtime 6dd7105. Właściciel potwierdził zapis/nazwę własnego profilu i readonly identyfikatorów.
+B2.1 można zamknąć. Uczestnicy/profile z wydarzeń to izolowane, oznaczone demo p01/p02, nie pomyłka Auth UUID.
+Numer istnieje w slm_player_profiles.jersey_number (0–99), nie jest podłączony do obecnego API profilu.
+Przyszła integracja ma zachować numer przy zmianach kontaktu; B2.1 go nie zmienia.
+PASS w tej kontroli: 13 ukierunkowanych testów i guard UI; lokalne metadane tylko odczytane.
+Brak zmian runtime/UI/migracji/Edge, brak instalacji, push i merge. B2.2/B3/B4 nie rozpoczęte.
+Następny krok wyłącznie po decyzji właściciela; szczegóły docs/ODPOWIEDZI_CODEX.txt.
+
 # B2.1 profil — 2026-10-24 21:28:02 Europe/Warsaw
 
 Gałąź feat/slm-v1-live; runtime 6dd7105, baza B1 164edac. Własny profil z istniejącego API:

@@ -1933,3 +1933,106 @@ B2.2 tylko TODO w FRONTEND_HANDOFF: 800x800 WebP75–80%, do150KB, kompresja prz
 jedno zdjęcie, bez oryginałów, bezpieczna podmiana/usuwanie. B2.2 i B3 nie rozpoczęto.
 Raport docs/SLM_V1_B2_PROFILE.md, dowody docs/ui/slm-v1-b2/, historia docs/ODPOWIEDZI_CODEX.txt.
 Zatrzymanie po B2.1 do odbioru. Bez push i merge.
+
+
+[2026-10-24 21:39:58 Europe/Warsaw]
+KONTROLA B2.1 PO TESTACH NA POCO — wyłącznie audyt i dokumentacja
+Gałąź feat/slm-v1-live; runtime 6dd7105, HEAD przed kontrolą 4a554bd.
+Git początkowo czysty, 6dd7105 jest przodkiem HEAD, app/src identyczne z 6dd7105.
+
+ODBIÓR RĘCZNY (informacja właściciela, POCO Android 12): zmiana imienia/nazwiska
+oraz widoczność zapisanej wartości w swoim profilu PASS. Login/pseudonim i telefon
+readonly, numer niedostępny — zgodnie z zakresem B2.1. Rozbieżności z uczestnikami
+oraz profilem otwieranym z wydarzenia potwierdzają granicę live/demo opisaną poniżej.
+Nie dopisujemy ręcznego restartu po edycji, przełączenia konta ani innych scenariuszy,
+których właściciel w tym odbiorze nie wymienił; wcześniejsze testy automatyczne są osobnym dowodem.
+Kafelki grup: zanotowana przyszła uwaga wizualna, bez zmian ani projektowania teraz.
+
+1. ŹRÓDŁA DANYCH
+- Własna zakładka Profil: auth/B1App.tsx przekazuje auth.session.user_id do useOwnProfile.
+  profileAdapter używa istniejącego API profile/save_profile, wybiera pola kontraktu
+  i sprawdza, czy user_id odpowiedzi zgadza się z UUID zalogowanego konta.
+  Backend składa slm_profiles z aliasem loginu/telefonu (slm_aliases lub istniejący
+  model slm_player_profiles dla kont e-mail). Pełna nazwa zależy też od display_as.
+- Uczestnicy wydarzeń: demo/data.ts initialWorld(), game.entries i world.players;
+  personName/PlayerLink w demo/Panels.tsx wyszukują po entry.playerId. To fikcyjne p01/p02…,
+  a nie UUID kont Supabase. world.userId='p01' to użytkownik SYMULACJI, nie konto Auth.
+- Karta otwarta z wydarzenia: onPlayer(entry.playerId) → ramka frame.id z gameId →
+  DemoProfile(world,id=frame.id), BEZ personalProfile. Odczyt z world.players.
+  Ten sam komponent Ultimate służy prezentacji różnych danych; nie dowodzi wspólnej tożsamości.
+- B2.1 nie przekazuje realnego profilu do world.players, initialPlayer ani uczestników.
+  initialAccountWorld bez initialPlayer pozostawia pierwotny świat demo. Nazwa realnego
+  konta nie może automatycznie zastąpić fikcyjnego zawodnika tylko dlatego, że nazywa się podobnie.
+
+2. OCENA ROZBIEŻNOŚCI
+Nie stwierdzono błędu identyfikacji konta ani wyświetlania profilu innego rzeczywistego
+użytkownika jako własnego. Z wydarzenia otwiera się inna, jawnie demonstracyjna osoba.
+Brak aktualizacji nazw uczestników po zapisie własnego profilu jest zamierzoną izolacją B2.1,
+nie utratą zapisu. Testy adaptera obejmują odrzucenie cudzego user_id, spóźnione odpowiedzi,
+zmianę konta i brak modyfikacji świata demo. Nie należy teraz kopiować nazwy konta do p01
+ani łączyć rekordów po nazwie/loginie/telefonie: to stworzyłoby fałszywe powiązanie.
+
+3. OZNACZENIA DEMO
+Potwierdzone w działających trasach źródłowych:
+- wydarzenia mają nazwy z „· demo”, ekran listy opis „Mecze demonstracyjne”;
+- wiersze uczestników mają status „Zapisany/Gość/Na rezerwie · demo”;
+- profil z wydarzenia ma „Dane przykładowe · fikcyjne portrety i statystyki”;
+- globalna etykieta poza własnym profilem: „Dane przykładowe · wszystkie operacje tylko w pamięci demo”;
+- własny profil: „Profil Supabase · statystyki niedostępne”, oddzielna etykieta
+  „Mecze i grupy: dane przykładowe · własny profil: Supabase”.
+Dane są tekstowo rozróżnione. Globalna etykieta może być poniżej pierwszego widoku telefonu;
+nie twierdzimy, że wszystkie ostrzeżenia są jednocześnie widoczne bez przewijania.
+Nie zmieniano UI ani oznaczeń w tym audycie.
+
+4. GOTOWOŚĆ ARCHITEKTURY DO B4
+Istnieją stabilne klucze: profil user_id UUID → auth.users(id), członkostwo
+slm_group_members.user_id UUID, uczestnik slm_match_entries.member_id UUID → auth.users(id).
+Potwierdzono w metadanych lokalnej bazy, bez odczytu rekordów. Participant w events/model.ts
+już rozdziela id wpisu, member_id i responsible_user_id.
+B4 może połączyć te dane adapterem bez przebudowy oryginalnego wyglądu. Nie jest to jednak
+już ukończona integracja: obecne ramki profili nadal szukają w world.players po ID demo.
+Minimalny przyszły zakres: API uczestników → member_id → autoryzowana projekcja profilu,
+aktualizacja nazw po ponownym odczycie/inwalidacji danych oraz UUID w nawigacji profilu.
+Dla własnego UUID można wykorzystać wspólne źródło własnego profilu; cudze dane wymagają
+kontroli dostępu w kontekście wydarzenia/grupy. Obecne profile jest operacją WŁASNEGO konta,
+nie endpointem do dowolnego user_id. Zakazy prywatnych wydarzeń egzekwować API/RLS.
+Gość ma member_id=NULL: responsible_user_id oznacza zapraszającego/odpowiedzialnego,
+nie tożsamość gościa. Nie wolno otwierać karty zapraszającego jako karty gościa.
+Nie mapować entry.id ani p01 na UUID konta i nie łączyć po nazwie.
+
+5. NUMER KOSZULKI
+- Demo: DemoPlayer.jerseyNumber w RAM, fixture initialWorld i akcja jersey (0–99).
+  Istnieją formularz numeru, komponent Ultimate i widok Teams korzystające z tego pola.
+- Lokalny schemat: public.slm_player_profiles.jersey_number integer, opcjonalny,
+  CHECK 0–99; istniejąca migracja 20261019170413, FK user_id do auth.users.
+- Istnieje funkcja slm_email_profile_save(...,p_number integer default null), ale
+  obecny obsługujący ją handler save_email_profile przekazuje p_number:null.
+  Samo użycie tej operacji NIE jest obsługą numeru i może skasować wcześniejszy numer.
+- Aktualny profile nie zwraca jersey_number, a save_profile zapisuje full_name/display_as.
+  W B2.1 numer celowo wyłączono i nie podstawia się numeru demo; używana przez B2.1
+  ścieżka save_profile nie dotyka numeru. Nie stwierdzono kasowania numeru przez B2.1.
+Minimalna przyszła poprawka po zgodzie: rozszerzyć istniejącą projekcję/API o numer,
+zapisywać tylko własny numer z walidacją 0–99, zachować go przy zmianie nazwy/kontaktu
+oraz sprawdzić uprawnienia i read-back. Nie tworzyć drugiej kolumny/tabeli, skoro już istnieje.
+To osobny uzgodniony zakres profilu, nie automatyczne rozszerzenie etapu zdjęć B2.2.
+
+6. KONTROLE TEJ PRACY
+PASS: 13 istniejących testów w 3 plikach (profileAdapter, demo/Profile, demo/Identity)
+oraz guard frozen UI: 47 identycznych plików, 8 wcześniej dozwolonych modułów technicznych/danych.
+Odczytano wyłącznie lokalne metadane kolumn/FK/CHECK i istniejące źródła UI/API/migracji.
+Nie wykonywano nowej edycji kont, testów zapisujących fixture, instalacji APK ani nagrań telefonu.
+Nie ponawiano historycznych 198 Vitest/21 Cypress/22 lokalnych HTTP-RLS ani builda:
+w tej pracy nie zmieniono kodu. Wyniki te pozostają udokumentowanymi wcześniejszymi kontrolami.
+
+7. WNIOSEK I NASTĘPNE ETAPY
+TAK — B2.1 można zamknąć w zatwierdzonym zakresie własnego profilu.
+NIE — nie znaleziono rzeczywistego błędu identyfikacji lub zapisu wymagającego poprawki teraz.
+Numer i niezintegrowani uczestnicy są jawnymi brakami zakresu, nie pozornie działającymi funkcjami.
+B2.2: zdjęcia zgodnie z TODO (800x800, WebP75–80%, do150KB, kompresja przed wysłaniem,
+jedno bieżące zdjęcie, brak oryginałów, bezpieczna podmiana/usuwanie i autoryzacja właściciela).
+B3: rzeczywiste grupy, członkostwa, odrębne role i autoryzowane projekcje profili przez UUID;
+uwaga wizualna o kafelkach pozostaje do osobnej decyzji, bez naruszania zamrożonego UI teraz.
+B4: rzeczywiste wydarzenia i uczestnicy po member_id/user_id, poprawne profile i odświeżanie nazw,
+goście bez fikcyjnego konta, server/API/RLS zgodnie z zapisanym TODO prywatności i organizatora.
+Nie rozpoczęto żadnego z tych etapów. Kod produkcyjny, CSS/UI, SQL, RLS i Supabase bez zmian.
+Bez push, merge i wdrożeń. Raport zapisany w docs/ODPOWIEDZI_CODEX.txt.

@@ -194,3 +194,18 @@ B2.2: wyłącznie TODO w FRONTEND_HANDOFF — WebP 75–80%, max 800×800,
 do 150 KB, kompresja przed wysłaniem, jedno bieżące zdjęcie, bez oryginałów,
 bezpieczna podmiana/usuwanie. Bez implementacji Storage/uploadu teraz.
 B2.1 zatrzymany do odbioru; nie rozpoczęto B2.2 ani B3. Bez push, merge i wdrożeń.
+
+
+## Kontrola po odbiorze na POCO — 2026-10-24 21:39:58 Europe/Warsaw
+
+Właściciel potwierdził zmianę imienia/nazwiska, widoczność zapisanej wartości,
+readonly loginu/telefonu i niedostępny numer. B2.1 można zamknąć w zatwierdzonym zakresie.
+Różnica nazw i kart z wydarzeń wynika z izolowanych fixture p01/p02, nie z pomylenia UUID
+konta Auth. Profile otwierane z wydarzeń nadal są demonstracyjne i oznaczone jako takie.
+Nie zaliczono dodatkowo ręcznego restartu po zapisie, którego ta wiadomość nie wymienia.
+Audyt numeru: slm_player_profiles.jersey_number istnieje (0–99), lecz profile go nie zwraca.
+Przyszła integracja musi zachować wartość numeru: stary save_email_profile przekazuje null.
+Nie wymaga to natychmiastowej poprawki B2.1, które tej operacji nie używa.
+13 ukierunkowanych testów i guard UI PASS. Bez zmian kodu i nowych operacji zapisu w bazie.
+Szczegółowy audyt, ścieżki UUID dla B4 i dalszy zakres: docs/ODPOWIEDZI_CODEX.txt.
+B2.2/B3/B4 nie rozpoczęto; uwaga wizualna o grupach wyłącznie zanotowana.
