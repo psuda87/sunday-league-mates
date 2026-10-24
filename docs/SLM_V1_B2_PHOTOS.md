@@ -1,3 +1,143 @@
+# B2.2 — implementacja lokalna i poprawka galerii
+
+2026-10-24 22:20:25 Europe/Warsaw · feat/slm-v1-live · kod **899b631** (baza przygotowania75e8267).
+Backend, Storage i SQL zastosowane **wyłącznie lokalnie** po zgodzie właściciela.
+Status: numer odebrany na POCO; zdjęcie wymaga ponownego testu po poprawce galerii.
+B2.2 nie jest jeszcze formalnie odebrane. Nie rozpoczęto B3/B4.
+
+## Zakres i ponowne użycie kodu
+
+- Własny numer0–99 jest zapisywany w istniejącym slm_player_profiles.jersey_number.
+  Zapis i ponowny odczyt serwera, widoczny na własnej karcie, bez fikcyjnego fallbacku.
+  Duplikaty dozwolone; ostrzeżenia grupowe pozostają TODO B3. Zapis kontaktu nie zeruje numeru.
+- Istniejący picker i formularz numeru otrzymały port danych. Własny profil nie mutuje
+  world.players ani identyfikatorów p01/p02. Pozostałe ekrany/dane nadal oznaczone demo.
+- Zdjęcie wejściowe JPEG/PNG/WebP dekoduje urządzenie. Kompresja WebP: max800px,
+  zachowanie proporcji, bez powiększania, zwykle jakość .80/.75; redukcja rozdzielczości,
+  awaryjnie .70/.65. Cel do100KB, twarde150000B; małe obrazy nie są dopełniane do40KB.
+  Oryginał tylko w RAM/objectURL, zwalniany po przygotowaniu; brak trwałego zapisu oryginału.
+- Upload, podmiana, usuwanie i read-back przez istniejące accounts/SessionManager.
+  Dodano zatwierdzony jeden przycisk „Usuń zdjęcie” w istniejących akcjach, bez nowego CSS.
+  Presety fikcyjnych portretów zachowane w oryginalnym miejscu, wyłączone w trybie prawdziwego profilu.
+- Ponownie użyto działającego lokalnie handlera accounts, profilePhotos, czytników JPEG
+  i normalizacji telefonu z wcześniejszej integracji. Nie przenoszono starszego PhotoEditor/modalnego UI.
+  app/local-backend/PROVENANCE.json zapisuje SHA256 źródeł aktualnie działającego lokalnego API.
+  Nakładka zachowuje pozostałe już istniejące kontrakty; nie podłącza B3/B4 do klienta.
+
+## Bezpieczeństwo i lokalny SQL
+
+app/local-backend/B22_LOCAL_ONLY.sql jest celowo poza automatycznymi migracjami.
+Zastosowano go do supabase_db_sunday-league-mates bez resetu. Nie ma nowych tabel,
+UNIQUE numeru, publicznego bucketa ani nowych grantów klienta. Istniejące RLS zachowane.
+
+- Prywatny slm-profile-photos: dozwolony nowy upload image/webp, limit150000B.
+  Poprzednie własne JPEG pozostają do odczytu; nie było masowej konwersji ani kasowania.
+- Backend sprawdza rzeczywiste RIFF/WebP: długość, granice i padding chunków, statyczną
+  klatkę VP8/VP8L, wymiary max800, profil ICC z limitami; odrzuca animację, obce chunki,
+  niezgodne nagłówki, nadmiar danych i przekroczenie rozmiaru. To walidacja strukturalna
+  kontenera/klatki, nie pełny dekoder strumienia entropijnego VP8. Klient dodatkowo dekoduje obraz.
+- UUID właściciela i session_id wyłącznie ze zweryfikowanej sesji; ścieżka UUID/losowyUUID.webp.
+  Żądania numeru mają ścisłą allowlistę pól. Zdjęcia odrzucają przesłane user_id/path/object_path.
+  service_role wyłącznie w lokalnym serwerze, nigdy w APK.
+- Numer i commit zdjęcia mają RPC tylko service_role, kontrolę żywej sesji i blokady SQL;
+  commit ma expected_revision/CAS i ograniczenia czasu blokowania/zapytania.
+- Aktualne zdjęcie nie jest usuwane przed commit nowego. cleanup_path umożliwia ponowienie
+  sprzątania starego obiektu. Po timeout/503 commit najpierw read-back, bez ślepego kasowania
+  potencjalnie zatwierdzonego pliku. Pewne odrzucenie usuwa nowy kandydat.
+- Awaria procesu może zostawić kandydata bez referencji: własny przegląd przy kolejnych
+  zapisach sprząta tylko pliki starsze niż24h, max100 na wywołanie, z ochroną aktualnych
+  referencji i świeżych plików. Brak gwarancji natychmiastowego cleanup po awarii procesu;
+  bez następnej operacji właściciela taki plik może pozostać. Bez publicznego dostępu.
+- Body uploadu ma osobną ograniczoną ścieżkę ?photo=upload (210000B); zwykłe akcje12000B.
+
+Lokalne odtworzenie (bez poleceń zdalnych), z katalogu app/:
+1. python scripts/prepare-b22-local.py — weryfikuje hash istniejącej lokalnej bazy źródeł
+   w sąsiednim worktree premium318-live/.cache/http-edge i przygotowuje .cache/b22-edge.
+   Nie jest samodzielnym bootstrapem pustego klona/bazy; wymaga wcześniej istniejącego lokalnego środowiska.
+2. Zastosować B22_LOCAL_ONLY.sql wyłącznie lokalnym psql do wskazanego kontenera, ON_ERROR_STOP=1.
+3. npx --yes --package=supabase@2.121.0 supabase functions serve --workdir ../.cache/b22-edge --env-file ../.cache/b22-edge/worker.env
+4. adb -s c7a559b5 reverse tcp:54321 tcp:54321.
+Nie kopiować tego lokalnego entrypointu do wdrożenia produkcyjnego. Zdalny rollout wymaga osobnej decyzji.
+
+## Błąd zgłoszony podczas odbioru POCO
+
+Pierwszy APK B2.2: numer działał, lecz wybór zdjęcia wracał do głównego ekranu i tracił plik — FAIL ręczny.
+Przyczyna potwierdzona testem: przejście do systemowej galerii wywołuje suspend/resume;
+B1 usuwa WorldApp w fazie checking i montuje go od nowa po weryfikacji sesji.
+
+Poprawka ograniczona do trwającego wyboru pliku: formularz pozostaje zamontowany **ukryty**,
+a dotychczasowy gate nadal weryfikuje sesję. Odsłonięcie dopiero po poprawnej odpowiedzi serwera.
+Offline/cofnięcie sesji/inna tożsamość usuwa kontynuację. Wybór/anulowanie kończą kontynuację.
+Zwykłe wznowienie bez pickera nadal zachowuje dotychczasowe B1; mignięcia nie maskowano.
+Nie zmieniono SessionManager ani zabezpieczonego magazynu tokenów.
+
+## Wyniki
+
+PASS automatyczne:
+- TypeScript, lint; **215 Vitest /38 plików**, w tym awarie Storage/commit/cleanup,
+  niepewny503, GC, utrzymanie ukrytego pickera i usunięcie stanu po cofnięciu sesji.
+- **38 kontroli prawdziwego lokalnego Auth/API/RLS/Storage**: 0/99, duplikaty, walidacja,
+  upload, podmiana, CAS, delete, restart/refresh, brak/cofnięcie sesji, obcy użytkownik
+  i odmowa bezpośrednich RPC/Storage. Dwa uruchomienia, łącznie4 nowe fikcyjne konta zachowane;
+  nie kasowano istniejących kont, grup ani danych.
+- **23 różne testy Cypress**: frozen9, live wizualne8, B1auth2, B2profile2, codec1, media1.
+  Końcowy test media dodatkowo odtwarza hidden/visible podczas wyboru pliku i sprawdza zachowanie panelu.
+  Początkowy test B1 wymagał dopisania nowych odczytów zdjęcia do ścisłej listy wywołań;
+  nie osłabiono kontroli Auth. Techniczne kliknięcie ukrytego inputu w Cypress jest wymuszone,
+  podobnie jak selectFile; rzeczywisty odbiór Androida pozostaje osobny.
+- build, build:demo/izolacja16plików, build live, Capacitor sync, assembleDebug,
+  testDebugUnitTest (1 istniejący test, wynik z cache), weryfikator identyfikatora/assetów APK.
+- Guard frozen3.18:46 plików bez zmian +9 dokładnie dozwolonych technicznych/danych.
+  Porównano96 zrzutów:95 identycznych pikselowo. Jedyny znany hero details320light
+  ma12335 różniących się pikseli, delta max4/255 — historyczne odstępstwo A, bez poprawiania.
+  Zrzuty i parity.json w docs/ui/slm-v1-b22, wyłącznie fikcyjne dane/syntetyczny obraz.
+
+PASS fizyczne: aktualizacja ADB -r i start obu APK; numer potwierdzony przez właściciela.
+FAIL wykryty i poprawiony w kodzie: utrata formularza po galerii w pierwszym APK.
+NOT TESTED po poprawce: pełny upload/podmiana/usunięcie/restart i oba Wstecz na fizycznym POCO;
+wysłano prośbę o ponowny test. Nie oznaczamy tego jako PASS na podstawie Cypress.
+NOT TESTED i nieautoryzowane: zdalny Supabase/Storage/Edge — nic nie wdrażano zdalnie.
+
+## APK
+
+app/android/app/build/outputs/apk/debug/app-debug.apk, pl.psuda87.slm.
+Kod899b631; APK zbudowany z tego samego drzewa tuż przed lokalnym commitem.
+SHA256 **3e81b4fb279e93915c7c0235a9683acb1f89ab8ca61305d6089fc244ee21cd55**.
+Drugi APK po poprawce galerii zainstalowano przez adb install -r i uruchomiono: Status ok/COLD.
+Potwierdzono zgodność pełnej sumy drugiego APK na telefonie z plikiem builda. W zachowanych logach procesu:0 native crash,0 uncaught JS,0 błędów sieci WebView.
+Przy końcowym odczycie proces był zamknięty przez Android PeriodicCleaner(pressure), reason13,
+a nie zgłoszony crash. Nie przerywano ponownego ręcznego testu uruchamianiem aplikacji.
+Kontynuacja pickera chroni zwykły suspend/resume; nie jest odtwarzaniem pliku po zabiciu całego procesu.
+Nie zmieniano ustawień baterii/systemu ani nie dodawano trwałego zapisu oryginału.
+Dane aplikacji zachowane, bez uninstall/clear. Lokalny backend54321 dostępny przez adb reverse.
+Do pełnego testu POCO nie jest potrzebne wdrożenie zdalne; wymagane działający Docker i USB/reverse.
+
+## Zmienione pliki UI i brak zmian wyglądu
+
+src/demo/Profile.tsx — rzeczywista projekcja zdjęcia/numeru, istniejące formularze i akcje.
+src/demo/Identity.tsx — port zapisu/kompresji, wybór pliku, zatwierdzony Usuń zdjęcie,
+nieaktywne presety demo w live, komunikaty o rzeczywistym zapisie, techniczne zdarzenia pickera.
+src/ui/UltimatePlayerCard.tsx — wyłącznie opcjonalny opis ALT zdjęcia zamiast tekstu „w pamięci demo”.
+src/ui/personalProfile.ts — wyłącznie kontrakty typów, bez elementów wizualnych.
+src/auth/B1App.tsx — niewizualna kontynuacja pickera pod istniejącym gate; bez zmiany layoutu kont.
+Pozostałe: adapter/hook profilu i nowy useOwnPhoto, URL uploadu w api.ts, testy/narzędzia,
+local-backend (SQL, ponownie użyte accounts/shared, walidator, mały syntetyczny fixture, proweniencja).
+Dokładna lista: git show --stat 899b631. CSS, motywy, ikony, assety, projekt karty i nawigacja nietknięte.
+Wyjątek wizualny: wyłącznie uzgodniony przycisk oraz rzeczywiste wartości/stan kontrolek i komunikatów;
+nie deklarujemy identycznych pikseli karty z prawdziwym zdjęciem względem fikcyjnego portretu demo.
+
+## Odbiór ręczny / następny krok
+
+1. Profil → Zmień zdjęcie → wybór testowego obrazu: pozostaje panel z podglądem.
+2. Zatwierdź zdjęcie → karta; zamknięcie/otwarcie → zdjęcie pozostaje.
+3. Podmiana, potem Usuń zdjęcie → inicjały również po restarcie.
+4. Anulowanie wyboru galerii i oba Wstecz; logout/relogin bez danych poprzedniego konta.
+Numer0–99 działa na POCO; właściciel zapowiedział osobne instrukcje poprawy pola.
+Nie zmieniamy tego pola przy okazji. Czekamy na odbiór B2.2. Bez B3/B4, push, merge i wdrożenia zdalnego.
+
+---
+## Historia: przygotowanie przed zgodą na backend
+
 # SLM 1.0 — B2.2: przygotowanie i blokady
 
 2026-10-24 · feat/slm-v1-live · baza 2d293c8; runtime nadal odebrane B2.1 (6dd7105).

@@ -1,3 +1,17 @@
+# B2.2 lokalnie — 2026-10-24 22:20:25 Europe/Warsaw
+
+feat/slm-v1-live; kod899b631. Rzeczywisty numer0–99 i własne zdjęcia WebP800px/150KB,
+prywatny Storage, CAS/read-back/delete, zachowane RLS, bez nowych tabel i bez UNIQUE numeru.
+Lokalnie zastosowano app/local-backend/B22_LOCAL_ONLY.sql i accounts overlay; zdalnie NIC.
+PASS: TS/lint,215 Vitest,23 Cypress,38 lokalnych API/Auth/RLS/Storage; buildy/demo isolation,
+Capacitor/debug/JUnit1(cache), guard UI,95/96 pikselowo; znany hero A bez zmian.
+POCO: aktualizacja -r/start PASS; numer PASS użytkownika. Pierwszy wybór zdjęcia FAIL:
+resume usuwał formularz. Poprawiono utrzymaniem ukrytego pickera do weryfikacji sesji;
+drugi APK3e81b4fb… zainstalowany. Retest zdjęcia/replace/delete/restart/Wstecz oczekuje na właściciela.
+Pole numeru pozostawione bez dodatkowych zmian — właściciel zapowiedział instrukcje.
+B2.2 czeka na odbiór; B3/B4 nie rozpoczęte, brak push/merge/resetu/produkcji.
+Raport docs/SLM_V1_B2_PHOTOS.md; historia docs/ODPOWIEDZI_CODEX.txt.
+
 # B2.2 przygotowanie — 2026-10-24 21:58:57 Europe/Warsaw
 
 feat/slm-v1-live, baza2d293c8; runtime nadal odebrane B2.1/6dd7105.

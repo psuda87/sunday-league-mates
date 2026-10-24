@@ -1,3 +1,5 @@
+# ARCHIWUM projektu: pakiet zatwierdzony i wykonany WYŁĄCZNIE LOKALNIE; aktualny raport docs/SLM_V1_B2_PHOTOS.md, SQL app/local-backend/B22_LOCAL_ONLY.sql.
+
 # B2.2 — projekt zmian, nie wdrożenie
 
 Status: BLOKADA. Nie zastosowano SQL, konfiguracji ani Edge. Runtime B2.1 bez zmian.

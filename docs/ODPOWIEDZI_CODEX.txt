@@ -2073,3 +2073,36 @@ Raport docs/SLM_V1_B2_PHOTOS.md; historia docs/ODPOWIEDZI_CODEX.txt.
 Do decyzji właściciela: opisany pakiet backendu wyłącznie lokalnie oraz minimalny przycisk usuwania.
 Zatrzymanie wynika z instrukcji zadania: przy koniecznych zmianach backendu zgłosić blokadę;
 pkt1 wymaga zgody na niezbędną zmianę wizualną. Brak push/merge/zdalnych wdrożeń/resetu.
+
+
+=== 2026-10-24 22:22:14 Europe/Warsaw — B2.2 lokalnie + poprawka powrotu z galerii ===
+Gałąź feat/slm-v1-live; kod899b631, baza75e8267. Zatwierdzony pakiet zastosowany
+wyłącznie do istniejącego lokalnego Dockera: B22_LOCAL_ONLY.sql oraz accounts overlay.
+Numer0–99 w istniejącym jersey_number, duplikaty dozwolone, zmiana kontaktu zachowuje numer.
+Zdjęcie JPEG/PNG/WebP → kompresja urządzenia WebP max800px/150000B; prywatny bucket,
+backendowa walidacja struktury/wymiarów/rozmiaru i właściciela, sesja, CAS/read-back,
+cleanup starego zdjęcia, odzyskanie niepewnego commit i ograniczony GC plików starszych24h.
+Zachowano RLS; brak nowych tabel i bezpośredniego dostępu klientów. Brak service key w APK.
+W oryginalnym pickerze dodano wyłącznie uzgodniony Usuń zdjęcie; istniejące kontrolki
+podłączono do prawdziwego profilu. CSS/assety/motywy/ikony/layout/nawigacja bez zmian.
+Ultimate zmieniono jedynie o opcjonalny opis ALT dla rzeczywistego zdjęcia.
+PASS: TS/lint,215 Vitest/38plików,23 różne Cypress,38 rzeczywistych lokalnych kontroli
+Auth/API/RLS/Storage. Buildy/demo isolation16plików, guard46+9, cap sync/debug/JUnit1(cache).
+96 porównań wizualnych:95 identycznych, znany hero A320light delta max4/255 bez poprawiania.
+APK pl.psuda87.slm zbudowano, zainstalowano -r i uruchomiono na POCO bez czyszczenia danych.
+Końcowy SHA2563e81b4fb279e93915c7c0235a9683acb1f89ab8ca61305d6089fc244ee21cd55,
+zgodny z APK na telefonie. Zachowane logi procesu:0 crash/0 uncaughtJS/0 błędów sieci WebView.
+Ręcznie właściciel: numer PASS; pole wymaga osobnych instrukcji, nie poprawiano go teraz.
+Pierwszy test zdjęcia FAIL: galeria powodowała B1 suspend/checking i usunięcie formularza.
+Poprawiono zachowanie wyłącznie trwającego pickera w ukryciu pod istniejącym gate.
+Serwerowa kontrola sesji nadal obowiązuje; offline/cofnięcie sesji usuwa kontynuację.
+Test regresji PASS; drugi poprawiony APK już zainstalowany. Zwykłe mignięcie B1 nietknięte.
+NOT TESTED po poprawce na POCO: wybór/podgląd → Zatwierdź zdjęcie → restart → podmiana
+→ Usuń zdjęcie i oba Wstecz. Wysłano prośbę o ponowienie. Nie zamykamy formalnie B2.2.
+Android zamknął proces w tle przez PeriodicCleaner(pressure), reason13; nie zgłoszono crasha.
+Poprawka chroni zwykłe wznowienie; nie odtwarza pliku po śmierci procesu i nie zapisuje oryginału na dysku.
+Zdalnie NIC nie wdrożono. Pełny test lokalny POCO możliwy przez Docker+adb reverse54321,
+bez wdrożenia zdalnego. Oryginalnych zdjęć/danych aplikacji ani bazy nie usuwano.
+TODO B3: ostrzegać o duplikacie w grupie, pozwalając go zachować. B3/B4 nie rozpoczęte.
+Raport i lista plików: docs/SLM_V1_B2_PHOTOS.md; dowody docs/ui/slm-v1-b22.
+Czekamy na odbiór B2.2 i zapowiedziane instrukcje pola numeru. Bez push/merge/produkcji.

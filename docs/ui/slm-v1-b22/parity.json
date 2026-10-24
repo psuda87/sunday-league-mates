@@ -1,0 +1,583 @@
+{
+  "pairs": 96,
+  "exact": 95,
+  "results": [
+    {
+      "variant": "demo",
+      "image": "details-320-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "details-320-light.png",
+      "different_pixels": 12335,
+      "max_channel_delta": 4
+    },
+    {
+      "variant": "demo",
+      "image": "details-360-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "details-360-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "details-390-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "details-390-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "details-430-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "details-430-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "forgot-320-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "forgot-320-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "forgot-360-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "forgot-360-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "forgot-390-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "forgot-390-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "forgot-430-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "forgot-430-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "form-320-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "form-320-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "form-360-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "form-360-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "form-390-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "form-390-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "form-430-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "form-430-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "groups-320-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "groups-320-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "groups-360-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "groups-360-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "groups-390-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "groups-390-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "groups-430-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "groups-430-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "home-320-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "home-320-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "home-360-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "home-360-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "home-390-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "home-390-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "home-430-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "home-430-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "login-320-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "login-320-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "login-360-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "login-360-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "login-390-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "login-390-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "login-430-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "login-430-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "pitch-320-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "pitch-320-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "pitch-360-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "pitch-360-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "pitch-390-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "pitch-390-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "pitch-430-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "pitch-430-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "player-320-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "player-320-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "player-360-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "player-360-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "player-390-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "player-390-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "player-430-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "player-430-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "profile-320-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "profile-320-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "profile-360-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "profile-360-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "profile-390-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "profile-390-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "profile-430-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "profile-430-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "register-320-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "register-320-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "register-360-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "register-360-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "register-390-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "register-390-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "register-430-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "register-430-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "roster-320-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "roster-320-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "roster-360-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "roster-360-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "roster-390-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "roster-390-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "roster-430-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "demo",
+      "image": "roster-430-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "live-home",
+      "image": "home-320-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "live-home",
+      "image": "home-320-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "live-home",
+      "image": "home-360-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "live-home",
+      "image": "home-360-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "live-home",
+      "image": "home-390-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "live-home",
+      "image": "home-390-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "live-home",
+      "image": "home-430-dark.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    },
+    {
+      "variant": "live-home",
+      "image": "home-430-light.png",
+      "different_pixels": 0,
+      "max_channel_delta": 0
+    }
+  ],
+  "note": "Own live profile uses real profile/photo/jersey and approved delete control; not compared to fictional portrait/stat pixels. CSS/assets/layout unchanged; card change only optional accessible image description."
+}

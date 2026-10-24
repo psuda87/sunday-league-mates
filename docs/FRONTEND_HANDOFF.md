@@ -292,3 +292,6 @@ gdy inny członek grupy ma już taki numer, ale pozwalać go zachować i zapisa�
 Sprawdzanie musi respektować widoczność członkostw; nie ujawniać osób spoza dozwolonego
 kontekstu. W B2.2 nie dodano żadnego sprawdzania duplikatów ani integracji grup.
 B2.2 ma blokadę kontraktu i minimalnej kontrolki usuwania — docs/SLM_V1_B2_PHOTOS.md.
+
+## 2026-10-24 22:20:25 Europe/Warsaw — po lokalnym B2.2
+Numer jest globalny dla użytkownika; duplikaty0–99 dozwolone. B3 ma wyłącznie ostrzegać o numerze powtórzonym w grupie i pozwalać go zachować. Bez implementacji B3 teraz. Własna tożsamość UUID nadal odseparowana od p01/p02; spięcie uczestników to B4.

@@ -1,3 +1,4 @@
+-- ARCHIWUM PROJEKTU. Lokalnie wykonano rozszerzony app/local-backend/B22_LOCAL_ONLY.sql; brak wdrożenia zdalnego.
 -- DRAFT ONLY — NOT APPLIED. Requires coordinated reviewed Edge/client changes.
 -- Existing local schema only. No new tables, no UNIQUE number constraint, no client grants.
 -- Do NOT run this alone: the current Edge accepts JPEG and cannot use this configuration.

@@ -1,0 +1,14 @@
+{
+  "checked_utc": "2026-10-24T20:21:30.720742+00:00",
+  "source_commit": "899b631",
+  "package": "pl.psuda87.slm",
+  "sha256": "3e81b4fb279e93915c7c0235a9683acb1f89ab8ca61305d6089fc244ee21cd55",
+  "installed_matches_build": true,
+  "running_at_check": false,
+  "last_exit_if_not_running": "13 (OTHER KILLS BY SYSTEM); PeriodicCleaner(4|2|pressure)",
+  "retained_process_log_errors": {
+    "native_crash": 0,
+    "uncaught_js": 0,
+    "webview_network": 0
+  }
+}
