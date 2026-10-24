@@ -8,6 +8,7 @@ import { useFrozenBack, minimizeFrozenDemo } from '../native/frozenDemoAndroid';
 import { SessionManager } from './sessionManager';
 import { accountRequest } from './api';
 import { tokenStore } from './tokenStore';
+import { useOwnProfile } from './useOwnProfile';
 import { b1Port } from './b1Port';
 import { useB1Lifecycle } from './useB1Lifecycle';
 import '../demo/palettes.css';
@@ -22,6 +23,7 @@ export default function B1App({manager:provided}:{manager?:SessionManager}){
  useB1Lifecycle(manager,auth);
  const ready=auth.phase==='ready'&&!!auth.session;
  const forced=ready&&auth.session!.must_change_password;
+ const personalProfile=useOwnProfile(manager,ready&&!forced?auth.session!.user_id:null);
  const view:AccountView|null=pending??(auth.phase==='checking'?'checking':auth.phase==='unavailable'||auth.phase==='storage_error'?'network':forced?'password':ready?requested:requested==='login'?'login':auth.message||requested==='expired'?'expired':requested==='register'||requested==='forgot'?requested:'login');
  const base=useMemo(()=>b1Port(manager),[manager]);
  const port:AccountUiPort={...base,
@@ -36,7 +38,7 @@ export default function B1App({manager:provided}:{manager?:SessionManager}){
  }
  useFrozenBack(()=>{if(!view)return false;if(ready&&!forced)setRequested(null);else if(view==='login'||forced)minimizeFrozenDemo();else navigate('login');return true;},()=>scope.current,15);
  return <>
- {ready&&!forced&&<div hidden={view!==null} className="slm-demo-world"><WorldApp liveAuth onAccount={next=>{if(next==='password')setRequested('password');}} onLogout={()=>{setRequested(null);void port.signOut();}}/></div>}
+ {ready&&!forced&&<div hidden={view!==null} className="slm-demo-world"><WorldApp liveAuth personalProfile={personalProfile} onAccount={next=>{if(next==='password')setRequested('password');}} onLogout={()=>{setRequested(null);void port.signOut();}}/></div>}
  {view&&<IonPage className="slm-demo slm-account-page"><IonContent ref={scope}><main className="slm-accounts"><div className="slm-account-shell"><header className="slm-account-brand"><span>SUNDAY LEAGUE MATES</span><img src="/assets/branding/slm-logo-primary-transparent.png" width="450" height="505" alt="Sunday League Mates"/></header>
  <AccountScreens key={view} view={view} port={port} onNavigate={navigate} loginOrPhone/>
  <details className="slm-account-appearance"><summary>Wygląd demonstracji</summary><AppearanceSettings enablePalettes/></details>

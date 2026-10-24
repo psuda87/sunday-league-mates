@@ -6,6 +6,7 @@ import { SessionManager } from './sessionManager';
 import { AccountError } from './api';
 import type { Session } from './api';
 import { b1Port } from './b1Port';
+vi.mock('./useOwnProfile',()=>({useOwnProfile:()=>undefined}));
 const worldLifecycle=vi.hoisted(()=>({mounts:0,unmounts:0}));
 vi.mock('../demo/App',()=>({default:function MockWorld({onLogout,onAccount}:{onLogout:()=>void;onAccount:(view:string)=>void}){
  useEffect(()=>{worldLifecycle.mounts++;return()=>{worldLifecycle.unmounts++;};},[]);
