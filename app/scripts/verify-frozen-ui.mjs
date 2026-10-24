@@ -2,6 +2,7 @@ import {execFileSync} from 'node:child_process';
 import {readFileSync,existsSync} from 'node:fs';
 import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
+const approved=JSON.parse(readFileSync(new URL('./b1-approved-ui.json',import.meta.url),'utf8'));
 const reference='d0f9fa9f840d2bd7f4985d00c24ee9a703f6b3e4';
 const repo=fileURLToPath(new URL('../../',import.meta.url));
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8',cwd:repo}).trim();
@@ -11,6 +12,7 @@ const paths=git('ls-tree','-r','--name-only',reference,'--','app/src/demo','app/
 let exact=0,technical=0;
 function normalize(source,path){
  let value=source.replace(/\r\n/g,'\n');
+ for(const change of approved[path]??[])if(value.includes(change.after))value=value.replace(change.after,change.before);
  if(!/\.(tsx?|css)$/.test(path))return value;
  value=value.replace(/^\s*\/\/ FROZEN_ANDROID_BEGIN\n[\s\S]*?^\s*\/\/ FROZEN_ANDROID_END\n/gm,'');
  value=value.replace(/^import \{[^\n]*\} from '[^']*native\/frozenDemoAndroid';\n/gm,'');
@@ -26,4 +28,4 @@ for(const path of paths){
  if(before.equals(after)||before.toString().replace(/\r\n/g,'\n')===after.toString().replace(/\r\n/g,'\n')){exact++;continue;}
  assert.equal(normalize(after.toString(),path),normalize(before.toString(),path),'Unauthorized frozen UI change: '+local);technical++;
 }
-console.log(`Frozen 3.18 guard PASS: ${exact} unchanged files, ${technical} technical-only modules; no CSS/assets/visual JSX changes.`);
+console.log(`Frozen 3.18 guard PASS: ${exact} unchanged files, ${technical} technical/approved B1 semantic modules; CSS/assets/layout unchanged.`);

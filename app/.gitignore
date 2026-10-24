@@ -56,3 +56,4 @@ Pods/
 # Supabase CLI local state
 /supabase/.temp/
 /supabase/.branches/
+/dist-b1/

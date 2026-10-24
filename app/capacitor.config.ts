@@ -3,7 +3,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'pl.psuda87.slm',
   appName: 'Sunday League Mates',
-  webDir: process.env.SLM_FROZEN_UI_ANDROID === '1' ? 'dist-demo' : 'dist',
+  webDir: process.env.SLM_B1_ANDROID === '1' ? 'dist-b1' : process.env.SLM_FROZEN_UI_ANDROID === '1' ? 'dist-demo' : 'dist',
   // Most natywny nie może logować argumentów SecureStorage (tokenów).
   loggingBehavior: 'none',
   android: { webContentsDebuggingEnabled: false },

@@ -1,0 +1,46 @@
+{
+  "app/src/account-ui/Fields.tsx": [
+    {
+      "before": "export function SignInFields({identifier,password,onIdentifier,onPassword,legacy=false}:{identifier:string;password:string;onIdentifier:(value:string)=>void;onPassword:(value:string)=>void;legacy?:boolean}) {\n return <>{legacy?<IonInput label=\"Login lub numer telefonu\" labelPlacement=\"stacked\" autocomplete=\"username\" required value={identifier} onIonInput={e=>onIdentifier(e.detail.value??'')}/>:<TextField id=\"account-email\" label=\"Adres e-mail\" value={identifier} onChange={onIdentifier} type=\"email\" autoComplete=\"username\" inputMode=\"email\" maxLength={254}/>}<PasswordField label=\"Hasło\" value={password} onChange={onPassword} ionic={legacy}/></>;\n",
+      "after": "export function SignInFields({identifier,password,onIdentifier,onPassword,legacy=false,loginOrPhone=false}:{identifier:string;password:string;onIdentifier:(value:string)=>void;onPassword:(value:string)=>void;legacy?:boolean;loginOrPhone?:boolean}) {\n return <>{legacy?<IonInput label=\"Login lub numer telefonu\" labelPlacement=\"stacked\" autocomplete=\"username\" required value={identifier} onIonInput={e=>onIdentifier(e.detail.value??'')}/>:<TextField id=\"account-email\" label={loginOrPhone?\"Login lub numer telefonu\":\"Adres e-mail\"} value={identifier} onChange={onIdentifier} type={loginOrPhone?\"text\":\"email\"} autoComplete=\"username\" inputMode={loginOrPhone?undefined:\"email\"} maxLength={254}/>}<PasswordField label=\"Hasło\" value={password} onChange={onPassword} ionic={legacy}/></>;\n"
+    }
+  ],
+  "app/src/account-ui/AccountScreens.tsx": [
+    {
+      "before": "export default function AccountScreens({view,port,onNavigate,profile=emptyProfile(),portraits=[],demo=false}:{view:AccountView;port:AccountUiPort;onNavigate:(view:AccountView)=>void;profile?:ProfileDraft;portraits?:CardPortrait[];demo?:boolean}) {\n",
+      "after": "export default function AccountScreens({view,port,onNavigate,profile=emptyProfile(),portraits=[],demo=false,loginOrPhone=false}:{view:AccountView;port:AccountUiPort;onNavigate:(view:AccountView)=>void;profile?:ProfileDraft;portraits?:CardPortrait[];demo?:boolean;loginOrPhone?:boolean}) {\n"
+    },
+    {
+      "before": "  if(['login','register','forgot'].includes(view))problems.push(...[emailProblem(email)].filter(Boolean));\n",
+      "after": "  if(view==='login'&&loginOrPhone&&!email.trim())problems.push('Podaj login lub numer telefonu.');\n  if((view==='login'&&!loginOrPhone)||['register','forgot'].includes(view))problems.push(...[emailProblem(email)].filter(Boolean));\n"
+    },
+    {
+      "before": "  if(view==='login')void work(()=>port.signIn(normalizeEmail(email),password));\n",
+      "after": "  if(view==='login')void work(()=>port.signIn(loginOrPhone?email.trim():normalizeEmail(email),password));\n"
+    },
+    {
+      "before": "   {view==='login'?<SignInFields identifier={email} password={password} onIdentifier={setEmail} onPassword={setPassword}/>:<>\n",
+      "after": "   {view==='login'?<SignInFields loginOrPhone={loginOrPhone} identifier={email} password={password} onIdentifier={setEmail} onPassword={setPassword}/>:<>\n"
+    }
+  ],
+  "app/src/demo/App.tsx": [
+    {
+      "before": "export default function DemoApp({initialPlayer,initialTab,onAccount,onLogout}:{initialPlayer?:DemoPlayer;initialTab?:Tab;onAccount?:(view:AccountView,tab:Tab)=>void;onLogout?:()=>void}={}) {\n",
+      "after": "export default function DemoApp({initialPlayer,initialTab,onAccount,onLogout,liveAuth=false}:{initialPlayer?:DemoPlayer;initialTab?:Tab;onAccount?:(view:AccountView,tab:Tab)=>void;onLogout?:()=>void;liveAuth?:boolean}={}) {\n"
+    },
+    {
+      "before": "      {tab==='events'?detail?gameScreen(selectedGame,goHome):<><MatchHeader/><section className=\"slm-matches-screen\" aria-label=\"Mecze demonstracyjne\"><MatchFilters value={filter} onChange={setFilter}/><div className=\"slm-match-list\">{visible.map(game=><div key={game.id} data-game={game.id}>{eventAccess(world,game)==='none'?<LockedEvent world={world} game={game}/>:<><EventLabel world={world} game={game}/><MatchHero badge={<EventPrivacy game={game}/>} minimum={game.minimum??10} key={game.id} match={matchModel(game)} compact title=\"Przykładowy mecz\" displayName={game.name} onOpen={()=>openGame(game.id)}/></>}</div>)}</div>{!visible.length&&<section className=\"slm-player-empty\">Brak meczów w tym filtrze. Zmień użytkownika lub zapisz się w demo.</section>}</section></>:tab==='groups'?<Groups key={groupsKey} world={world} dispatch={dispatch} onPlayer={(id,groupId)=>{void push('player',id,groupId);}}/>:<DemoProfile key={world.userId} world={world} id={world.userId} personal dispatch={dispatch} onPassword={()=>onAccount?.('password',tab)} onLogout={onLogout}/>}\n",
+      "after": "      {tab==='events'?detail?gameScreen(selectedGame,goHome):<><MatchHeader/><section className=\"slm-matches-screen\" aria-label=\"Mecze demonstracyjne\"><MatchFilters value={filter} onChange={setFilter}/><div className=\"slm-match-list\">{visible.map(game=><div key={game.id} data-game={game.id}>{eventAccess(world,game)==='none'?<LockedEvent world={world} game={game}/>:<><EventLabel world={world} game={game}/><MatchHero badge={<EventPrivacy game={game}/>} minimum={game.minimum??10} key={game.id} match={matchModel(game)} compact title=\"Przykładowy mecz\" displayName={game.name} onOpen={()=>openGame(game.id)}/></>}</div>)}</div>{!visible.length&&<section className=\"slm-player-empty\">Brak meczów w tym filtrze. Zmień użytkownika lub zapisz się w demo.</section>}</section></>:tab==='groups'?<Groups key={groupsKey} world={world} dispatch={dispatch} onPlayer={(id,groupId)=>{void push('player',id,groupId);}}/>:<DemoProfile key={world.userId} world={world} id={world.userId} personal liveAuth={liveAuth} dispatch={dispatch} onPassword={()=>onAccount?.('password',tab)} onLogout={onLogout}/>}\n"
+    }
+  ],
+  "app/src/demo/Profile.tsx": [
+    {
+      "before": "export default function DemoProfile({world,id,onBack,dispatch,personal=false,onPassword,onLogout}:{world:World;id:string;onBack?:()=>void;dispatch:Dispatch<Action>;personal?:boolean;onPassword?:()=>void;onLogout?:()=>void}) {\n",
+      "after": "export default function DemoProfile({world,id,onBack,dispatch,personal=false,onPassword,onLogout,liveAuth=false}:{world:World;id:string;onBack?:()=>void;dispatch:Dispatch<Action>;personal?:boolean;onPassword?:()=>void;onLogout?:()=>void;liveAuth?:boolean}) {\n"
+    },
+    {
+      "before": "      <details ref={settings} className=\"slm-identity-settings\"><summary>Ustawienia aplikacji i konta</summary><AppearanceSettings enablePalettes/><section className=\"slm-identity-account\"><h2>Konto</h2><ul>{['Dane konta','Powiadomienia'].map(label=><li key={label}><span>{label}</span><small>Niedostępne w demo</small></li>)}</ul>{onPassword&&<button type=\"button\" onClick={onPassword}>Zmiana hasła · symulator</button>}{onLogout&&<button type=\"button\" onClick={onLogout}>Wyloguj · symulator</button>}<p>Demo nie ma prawdziwej sesji. Te operacje nie są wykonywane.</p></section></details>\n",
+      "after": "      <details ref={settings} className=\"slm-identity-settings\"><summary>Ustawienia aplikacji i konta</summary><AppearanceSettings enablePalettes/><section className=\"slm-identity-account\"><h2>Konto</h2><ul>{['Dane konta','Powiadomienia'].map(label=><li key={label}><span>{label}</span><small>Niedostępne w demo</small></li>)}</ul>{onPassword&&<button type=\"button\" onClick={onPassword}>{liveAuth?'Zmiana hasła':'Zmiana hasła · symulator'}</button>}{onLogout&&<button type=\"button\" onClick={onLogout}>{liveAuth?'Wyloguj':'Wyloguj · symulator'}</button>}<p>{liveAuth?'Logowanie i hasło: Supabase. Pozostałe dane i operacje są demonstracyjne.':'Demo nie ma prawdziwej sesji. Te operacje nie są wykonywane.'}</p></section></details>\n"
+    }
+  ]
+}

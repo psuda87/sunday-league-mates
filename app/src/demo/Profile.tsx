@@ -7,7 +7,7 @@ import UltimatePlayerCard from './UltimatePlayerCard';
 import type { Action, World } from './data';
 import { statistics } from './data';
 import { useFrozenBack } from '../native/frozenDemoAndroid';
-export default function DemoProfile({world,id,onBack,dispatch,personal=false,onPassword,onLogout}:{world:World;id:string;onBack?:()=>void;dispatch:Dispatch<Action>;personal?:boolean;onPassword?:()=>void;onLogout?:()=>void}) {
+export default function DemoProfile({world,id,onBack,dispatch,personal=false,onPassword,onLogout,liveAuth=false}:{world:World;id:string;onBack?:()=>void;dispatch:Dispatch<Action>;personal?:boolean;onPassword?:()=>void;onLogout?:()=>void;liveAuth?:boolean}) {
   const player=world.players.find(p=>p.id===id)!;
   const heading=useRef<HTMLHeadingElement>(null),field=useId(),errorId=useId();
   const [editing,setEditing]=useState(false),[number,setNumber]=useState(''),[error,setError]=useState('');
@@ -45,7 +45,7 @@ export default function DemoProfile({world,id,onBack,dispatch,personal=false,onP
       <div className="slm-identity-actions slm-my-actions"><button type="button" aria-expanded={editor==='identity'} onClick={()=>{setEditing(false);setEditor(editor==='identity'?null:'identity');}}>Edytuj profil</button><button type="button" aria-expanded={editor==='portrait'} onClick={()=>{setEditing(false);setEditor(editor==='portrait'?null:'portrait');}}>Zmień zdjęcie</button><button type="button" onClick={()=>{if(settings.current){settings.current.open=!settings.current.open;if(settings.current.open)settings.current.scrollIntoView?.({block:'start',behavior:'smooth'});}}}>Ustawienia</button></div>
       {editor==='identity'&&<IdentityEditor key={id} player={player} dispatch={dispatch} onClose={closeEditor} onNumber={editNumber}/>}
       {editor==='portrait'&&<AvatarPicker key={id} player={player} dispatch={dispatch} onClose={closeEditor}/>}
-      <details ref={settings} className="slm-identity-settings"><summary>Ustawienia aplikacji i konta</summary><AppearanceSettings enablePalettes/><section className="slm-identity-account"><h2>Konto</h2><ul>{['Dane konta','Powiadomienia'].map(label=><li key={label}><span>{label}</span><small>Niedostępne w demo</small></li>)}</ul>{onPassword&&<button type="button" onClick={onPassword}>Zmiana hasła · symulator</button>}{onLogout&&<button type="button" onClick={onLogout}>Wyloguj · symulator</button>}<p>Demo nie ma prawdziwej sesji. Te operacje nie są wykonywane.</p></section></details>
+      <details ref={settings} className="slm-identity-settings"><summary>Ustawienia aplikacji i konta</summary><AppearanceSettings enablePalettes/><section className="slm-identity-account"><h2>Konto</h2><ul>{['Dane konta','Powiadomienia'].map(label=><li key={label}><span>{label}</span><small>Niedostępne w demo</small></li>)}</ul>{onPassword&&<button type="button" onClick={onPassword}>{liveAuth?'Zmiana hasła':'Zmiana hasła · symulator'}</button>}{onLogout&&<button type="button" onClick={onLogout}>{liveAuth?'Wyloguj':'Wyloguj · symulator'}</button>}<p>{liveAuth?'Logowanie i hasło: Supabase. Pozostałe dane i operacje są demonstracyjne.':'Demo nie ma prawdziwej sesji. Te operacje nie są wykonywane.'}</p></section></details>
     </div>}
   </div>;
 }
