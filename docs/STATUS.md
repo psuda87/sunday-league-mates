@@ -1,3 +1,27 @@
+# Profil — 2026-10-24 22:51:36 Europe/Warsaw
+
+feat/slm-v1-live. Własne zdjęcie cover/50%35%, maska i CSS Premium bez zmian.
+Legacy: istniejący identifiers/changeSession podłączony z obecnym hasłem i read-back.
+Konto e-mail: pseudonim readonly — brak wymaganego hasła/unikalności w istniejącym API;
+blokada backendu jawna, Auth i wszystkie B1/B2 zachowane.
+PASS TS/lint/frozen,23 Vitest,2 Cypress (kontrolowane API),build/sync/Android/APK -r/start/logi.
+Ręczna ocena kadru i ewentualnej zmiany aliasu legacy jeszcze niepotwierdzona na POCO.
+Brak migracji/RLS/Storage/Edge/produkcji/push/merge/B3/B4.
+Raport docs/SLM_V1_B2_PHOTOS.md; historia docs/ODPOWIEDZI_CODEX.txt.
+
+# B2.2 odebrane lokalnie — 2026-10-24 22:42:08 Europe/Warsaw
+
+Gałąź feat/slm-v1-live; kod d4bf855. PASS ręczny właściciela: zdjęcia, nazwa,
+numer, zapis/anulowanie, restart. Żadnych zmian kodu/CSS/Supabase w tej kontroli.
+TODO (bez implementacji): geometria contain a maska zdjęcia; edycja aliasów legacy
+istniejącym identifiers/changeSession; rozróżnienie pseudonimu/kontaktu konta e-mail.
+Telefon: obecne hasło, normalizacja i unikalność, bez SMS i bez deklaracji weryfikacji numeru.
+Diagnoza maski: oryginalny CSS zachowany; upload o innych proporcjach nie wypełnia
+obszaru maski tak jak demo sheet. Zmiana maski/kadru wymaga zgody.
+Szczegóły/TODO: docs/SLM_V1_B2_PHOTOS.md i docs/FRONTEND_HANDOFF.md.
+Bez nowych testów/builda/APK, push/merge/deploy. B3/B4 nie rozpoczęte.
+Historia: docs/ODPOWIEDZI_CODEX.txt.
+
 # Ostatnia poprawka B2.2 — zakończona lokalnie
 
 2026-10-24 22:30:09 Europe/Warsaw — ostatnia poprawka formularza B2.2

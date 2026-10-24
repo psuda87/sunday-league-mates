@@ -1,7 +1,7 @@
 import { useId, useState } from 'react';
 import type { CSSProperties, Ref } from 'react';
 export interface CardPortrait { src: string; column?: 0 | 1; row?: 0 | 1 }
-export default function UltimatePlayerCard({ name, portrait, jerseyNumber, headingRef, onEditNumber, portraitDescription }: { name: string; portrait?: CardPortrait; jerseyNumber?: number; headingRef?: Ref<HTMLHeadingElement>; onEditNumber?:()=>void; portraitDescription?:string }) {
+export default function UltimatePlayerCard({ name, portrait, jerseyNumber, headingRef, onEditNumber, portraitDescription, portraitFit }: { name: string; portrait?: CardPortrait; jerseyNumber?: number; headingRef?: Ref<HTMLHeadingElement>; onEditNumber?:()=>void; portraitDescription?:string; portraitFit?:'cover' }) {
   const title=useId();
   const shield=useId();
   const silhouette="M .5 .008 C .46 .045 .43 .035 .4 .024 C .32 .025 .22 .105 .035 .145 L .035 .79 Q .035 .875 .13 .9 L .5 .99 L .87 .9 Q .965 .875 .965 .79 L .965 .145 C .78 .105 .68 .025 .6 .024 C .57 .035 .54 .045 .5 .008 Z";
@@ -15,7 +15,7 @@ export default function UltimatePlayerCard({ name, portrait, jerseyNumber, headi
       <img className="slm-ultimate-crest" src="/assets/branding/slm-logo-primary-transparent.png" width="450" height="505" alt="Herb Sunday League Mates"/>
       {jerseyNumber!==undefined&&(onEditNumber?<button type="button" className="slm-ultimate-number slm-ultimate-number-edit" onClick={onEditNumber} aria-label={`Zmień numer koszulki, obecnie ${jerseyNumber}`}><span aria-label={`Numer koszulki ${jerseyNumber}`}>{jerseyNumber}</span><small aria-hidden="true">✎</small></button>:<span className="slm-ultimate-number" aria-label={`Numer koszulki ${jerseyNumber}`}>{jerseyNumber}</span>)}
       <div className="slm-ultimate-portrait" data-layout={sheet?'sheet':'single'} data-portrait={showPortrait?(sheet?`${portrait.column}-${portrait.row}`:'single'):'initials'}>
-        {showPortrait?<img src={portrait.src} alt={`${portraitDescription??(portrait.src.startsWith('data:image/')?'Lokalne zdjęcie w pamięci demo':'Fikcyjny portret demonstracyjny')}: ${name}`} style={{'--portrait-column':portrait.column??0,'--portrait-row':portrait.row??0} as CSSProperties} onError={()=>setFailedSource(portrait.src)}/>:<span className="slm-ultimate-initials" aria-label={`Brak zdjęcia: ${name}`}>{initials}</span>}
+        {showPortrait?<img src={portrait.src} alt={`${portraitDescription??(portrait.src.startsWith('data:image/')?'Lokalne zdjęcie w pamięci demo':'Fikcyjny portret demonstracyjny')}: ${name}`} style={{'--portrait-column':portrait.column??0,'--portrait-row':portrait.row??0,...(!sheet&&portraitFit==='cover'?{objectFit:'cover',objectPosition:'50% 35%'}:{})} as CSSProperties} onError={()=>setFailedSource(portrait.src)}/>:<span className="slm-ultimate-initials" aria-label={`Brak zdjęcia: ${name}`}>{initials}</span>}
       </div>
       <div className="slm-ultimate-nameplate"><h2 ref={headingRef} tabIndex={-1} id={title}>{parts.length>1&&<span>{parts[0]} </span>}<strong>{surname}</strong></h2></div>
       <span className="slm-ultimate-stars" aria-hidden="true">★★★★★</span>

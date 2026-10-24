@@ -295,3 +295,20 @@ B2.2 ma blokadę kontraktu i minimalnej kontrolki usuwania — docs/SLM_V1_B2_PH
 
 ## 2026-10-24 22:20:25 Europe/Warsaw — po lokalnym B2.2
 Numer jest globalny dla użytkownika; duplikaty0–99 dozwolone. B3 ma wyłącznie ostrzegać o numerze powtórzonym w grupie i pozwalać go zachować. Bez implementacji B3 teraz. Własna tożsamość UUID nadal odseparowana od p01/p02; spięcie uczestników to B4.
+
+## TODO po odbiorze B2.2 — 2026-10-24 22:42:08 Europe/Warsaw
+Wyłącznie propozycje, bez zgody na implementację:
+- Zdjęcie single/contain: maska na kontenerze3:4 nie pokrywa krawędzi każdego formatu.
+  Potwierdzić geometrię/computed mask w WebView; uzgodnić maskę lokalną/zaokrąglenie
+  powierzchni obrazu albo kadrowanie z podglądem. Bez zmiany projektu Ultimate/usuwania tła.
+- Legacy: edycja loginu/telefonu istniejącym identifiers + changeSession, obecne hasło,
+  UNIQUE/normalizacja, nowa zatwierdzona sesja i read-back; test kolizji i przerwanej operacji.
+- Konto e-mail: nickname/contact_phone nie są aliasami logowania. Rozdzielić je w kontrakcie;
+  nie używać legacy identifiers ani obiecywać globalnej unikalności bez sprawdzenia obu modeli.
+- Telefon bez SMS: potwierdzenie hasłem nie dowodzi posiadania numeru; nie oznaczać jako
+  zweryfikowany. Chronić UUID/Auth/role/sesje, nie zmieniać auth.phone/technicznego e-maila.
+B2.2 ręcznie odebrane; działające B1/B2 pozostają aktywne. B3/B4 nie rozpoczęte.
+
+## 2026-10-24 22:51:36 Europe/Warsaw — aktualizacja TODO profilu
+Wdrożono cover tylko dla rzeczywistego portretu i klienta istniejącego aliasu legacy.
+Konta e-mail nadal wymagają backendowej kontroli hasła i unikalności pseudonimu; nie implementować pozornego aliasu przez save_email_profile. Kadrowanie na POCO i legacy alias wymagają odbioru ręcznego. B3/B4 nie rozpoczęte.

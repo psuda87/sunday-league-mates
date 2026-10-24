@@ -1,3 +1,4 @@
+import UltimatePlayerCard from '../ui/UltimatePlayerCard';
 import { afterEach, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react';
 import { SessionManager } from './sessionManager';
@@ -92,4 +93,31 @@ it('saves name and jersey using existing operations and confirms both, preservin
  await act(async()=>{expect(await result.current.save('Nowe Dane',0)).toBe(true);});
  expect(result.current.profile).toMatchObject({full_name:'Nowe Dane',jersey_number:0});expect(result.current.photo?.phase).toBe('ready');
  expect(request.mock.calls.filter(([action])=>action.startsWith('save_')).map(([action])=>action)).toEqual(['save_profile','save_jersey_number']);
+});
+
+it('changes a legacy alias with current password through existing session operation and confirms profile',async()=>{
+ let stored={...profile(),email_account:false};
+ const fresh:Session={access_token:'fresh-access',refresh_token:'fresh-refresh',expires_in:3600,user_id:'own',role:'member',must_change_password:false};
+ const request=vi.fn(async(action:string,values?:Record<string,unknown>)=>{if(action==='identifiers'){stored={...stored,login:String(values!.login)};return fresh;}return stored;});
+ const auth=manager(request);await auth.signIn('Fikcyjny','only-test-password');
+ const saved=await profileAdapter(auth,'own').changeAlias('NowyLogin','only-current-test-password');
+ expect(saved?.login).toBe('NowyLogin');expect(auth.getSnapshot().session?.access_token).toBe('fresh-access');
+ expect(request.mock.calls.find(([action])=>action==='identifiers')?.[1]).toEqual({login:'NowyLogin',phone:'+48000000999',current_password:'only-current-test-password'});
+});
+it('does not send legacy identifier changes for an email account',async()=>{
+ const request=vi.fn(async(action:string)=>action==='profile'?({...profile(),email_account:true}):null);const auth=manager(request);await auth.signIn('Fikcyjny','only-test-password');
+ await expect(profileAdapter(auth,'own').changeAlias('NowyLogin','only-current-test-password')).rejects.toThrow('alias_not_supported');
+ expect(request.mock.calls.map(([action])=>action)).toEqual(['profile']);
+});
+it('leaves the existing session in place when server rejects a duplicate alias',async()=>{
+ const request=vi.fn(async(action:string)=>{if(action==='identifiers')throw new Error('identifier_taken');return {...profile(),email_account:false};});
+ const auth=manager(request);await auth.signIn('Fikcyjny','only-test-password');
+ await expect(profileAdapter(auth,'own').changeAlias('ZajetyLogin','only-current-test-password')).rejects.toThrow('identifier_taken');
+ expect(auth.getSnapshot().session?.access_token).toBe('test-access');
+});
+it('covers only a single real portrait and preserves the original demo sheet rendering',()=>{
+ const {rerender}=render(<UltimatePlayerCard name="Test" portrait={{src:'data:image/webp;base64,AA=='}} portraitFit="cover"/>);
+ expect(document.querySelector('.slm-ultimate-portrait img')).toHaveStyle({objectFit:'cover',objectPosition:'50% 35%'});
+ rerender(<UltimatePlayerCard name="Test" portrait={{src:'/assets/demo/fictional-portraits.webp',column:0,row:0}} portraitFit="cover"/>);
+ expect((document.querySelector('.slm-ultimate-portrait img') as HTMLImageElement).style.objectFit).toBe('');
 });

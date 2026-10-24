@@ -29,7 +29,15 @@ export function useOwnProfile(manager:SessionManager,userId:string|null,selectio
   catch {if(ticket===generation.current)setState(previous=>({...previous,phase:'error',profile:null,notice:'Nie udało się potwierdzić numeru. Ponów odczyt profilu.'}));return false;}
   finally {if(ticket===generation.current){flight.current=false;setSaving(false);}}
  }
- return {...current,photo,saveNumber,saving:current.phase==='ready'&&saving,reload:()=>setRevision(v=>v+1),
+ async function changeAlias(login:string,currentPassword:string){
+  const auth=manager.getSnapshot();
+  if(flight.current||!adapter||current.profile?.email_account!==false||auth.phase!=='ready'||auth.session?.user_id!==userId)return false;
+  const ticket=generation.current;flight.current=true;setSaving(true);
+  try {const profile=await adapter.changeAlias(login,currentPassword);if(ticket!==generation.current)return false;setState({owner:userId,phase:'ready',profile,notice:'Zmieniono login i potwierdzono nową sesję.'});return true;}
+  catch {if(ticket===generation.current)setState(previous=>({...previous,notice:'Nie udało się potwierdzić zmiany loginu. Sprawdź hasło i dostępność loginu; przy przerwanej operacji ponów odczyt.'}));return false;}
+  finally{if(ticket===generation.current){flight.current=false;setSaving(false);}}
+ }
+ return {...current,photo,saveNumber,changeAlias,saving:current.phase==='ready'&&saving,reload:()=>setRevision(v=>v+1),
   async save(fullName,number){
    const auth=manager.getSnapshot();
    if(flight.current||!adapter||!current.profile||current.phase!=='ready'||auth.phase!=='ready'||auth.session?.user_id!==userId)return false;

@@ -2146,3 +2146,99 @@ Zdalnie pozostaje osobno zatwierdzony pakiet B2.2: SQL/RPC, accounts i konfigura
 Storage WebP/150KB, po sprawdzeniu faktycznego stanu zdalnego. Teraz go nie odczytywano/zmieniano.
 Bez zdalnych migracji/Storage, push, merge, nowych etapów B3/B4 i dodatkowych zadań.
 Wyniki zapisane w docs/SLM_V1_B2_PHOTOS.md i docs/STATUS.md.
+
+
+=== 2026-10-24 22:42:08 Europe/Warsaw — odbiór B2.2 i trzy uwagi (wyłącznie diagnostyka)
+feat/slm-v1-live, d4bf855. Właściciel potwierdził PASS ręczny na POCO: zdjęcia,
+imię/nazwisko, numer, zapis/anulowanie i restart. Lokalny B2.2 funkcjonalnie odebrany.
+Uwagi poniżej pozostają TODO; nie wyłączono żadnej integracji B1/B2.
+
+1. Zdjęcie Ultimate: CSS variables.css i fictional-portraits.webp są bez różnic względem
+   d0f9fa9 (git diff pusty); obejrzano oryginalny arkusz czterech fikcyjnych portretów.
+   Obszar portretu ma3:4. Demo sheet: obraz200%/200%, przesunięcie wybranego portretu,
+   object-fit:fill; pojedynczy upload:100%/100%, object-fit:contain. Maska gradientowa
+   jest na zewnętrznym obszarze, nie na faktycznej powierzchni zdjęcia po contain.
+   Zdjęcie kwadratowe/poziome ma wewnętrzne marginesy: jego krawędzie mogą wypaść
+   poza strefą wygaszania maski. Demo ma też przygotowane bordowe tło pasujące do karty;
+   zwykłe zdjęcie zachowuje własne tło. Kompresja nie usuwa tła ani nie kadruje do3:4.
+   Oryginał nie ma osobnego border-radius na portrecie; obrys tarczy nie zaokrągla
+   automatycznie wewnętrznych krawędzi zdjęcia. Kod maski nie został usunięty w B2.2.
+   To potwierdzona różnica geometrii i uzasadniona przyczyna słabszego efektu, nie dowód
+   awarii mask-composite na konkretnym WebView. Prywatnego zdjęcia ani computed styles
+   telefonu nie odczytywano. TODO po zgodzie: porównać single/sheet w tym samym WebView,
+   następnie uzgodnić lokalną maskę/zaokrąglenie rzeczywistej powierzchni obrazu albo
+   kadrowanie z podglądem do3:4, bez deformacji i zmiany projektu karty. Bez automatycznego
+   usuwania tła. Nie zmieniono CSS ani przygotowania zdjęć.
+
+2. Login/pseudonim: readonly jest dotychczasowym ograniczeniem adaptera B2, nie brakiem
+   wszystkich operacji backendu. Legacy ma identifiers w accounts oraz changeSession:
+   obecne hasło weryfikuje Auth, login jest normalizowany, konflikt wstępnie sprawdzany,
+   UNIQUE(login_normalized)/UNIQUE(phone) zabezpiecza także wyścig; begin/finish zatwierdza
+   nową sesję. UUID i techniczny e-mail pozostają stałe — synchronizacja oznacza aliasy
+   i wersję sesji, nie zmianę auth.email/auth.phone ani hasła. Propozycja po zgodzie:
+   podłączyć istniejący flow przez adapter, zapisywać zweryfikowaną sesję istniejącym
+   SessionManager, odczytać profil ponownie; test starego/nowego loginu, duplikatu,
+   błędnego hasła, przerwanej operacji i starej sesji. Nie omijać operation_pending.
+   Istotne: identifiers odrzuca email_account. W tym modelu profile.login pochodzi
+   z nickname, a logowanie z e-maila Auth; save_email_profile zmienia pseudonim/kontakt,
+   nie ustanawia nowego aliasu logowania. Nie wolno nazwać edycji nickname zmianą loginu
+   ani obiecać jego unikalności jak legacy. TODO: jawnie rozdzielić typ konta i znaczenie
+   pola; ewentualne aliasy dla kont e-mail wymagają osobnej decyzji i testów kontraktu.
+
+3. Edytowalne: imię/nazwisko, zdjęcie i numer już działają; docelowo wybór display_as,
+   pseudonim/login i telefon w odpowiednim chronionym przepływie, hasło wyłącznie
+   istniejącą operacją Auth. Chronione: UUID, techniczny e-mail, typ konta, rola,
+   blokady/wersje/sesje/tokeny i hashe haseł — nigdy zwykły formularz profilu.
+   Adres logowania konta e-mail nie jest technicznym polem do dowolnej edycji; poza zakresem.
+   Telefon legacy: ponownie wykorzystać identifiers + obecne hasło, normalizację
+  9cyfr/+48/0048 do+48XXXXXXXXX, unikalność serwerową i kontrolowaną wymianę sesji.
+   Zachować historyczny zagraniczny alias przy niezmienionym numerze; nowych nie dodawać.
+   Telefon konta e-mail: istniejący save_email_profile wymaga obecnego hasła przy zmianie,
+   ale jest to kontakt, nie automatyczny alias logowania. Przed wspólnym polem trzeba
+   sprawdzić kolizje między modelami; osobne indeksy nie dowodzą globalnej unikalności.
+   Bez SMS/OTP i bez auth.phone. Hasło potwierdza uprawnienie do zmiany, nie posiadanie
+   nowego numeru; nie pokazywać numeru jako zweryfikowanego. Zachować prywatność telefonu.
+
+Zakres kontroli: wyłącznie wskazane komponenty/CSS, lokalne źródła accounts i istniejące
+kontrakty Auth/SQL. Bez zapytań do Supabase, zmiany konfiguracji, nowych testów/builda/APK,
+push, merge i wdrożeń. Nie zmieniono kodu produkcyjnego ani CSS. Nie rozpoczęto B3/B4.
+Wyniki dopisane do istniejących dokumentów, bez nowych plików raportowych.
+
+
+=== 2026-10-24 22:51:36 Europe/Warsaw — implementacja kadrowania i istniejącego aliasu legacy
+feat/slm-v1-live, baza d4bf855; wcześniejsze lokalne wpisy diagnostyczne zachowane.
+ZMIENIONO: rzeczywiste zdjęcie na Ultimate ma lokalnie object-fit:cover i object-position50%35%.
+Wypełnia oryginalny obszar3:4 bez deformacji; istniejące maski/gradienty obejmują cały obraz.
+Nie zmieniono globalnego CSS, wymiarów, projektu karty, assetów ani demo sheet/contain w izolowanym demo.
+To kadrowanie bez wykrywania twarzy; bardzo nietypowe kadry mogą wymagać przyszłego edytora.
+ZMIENIONO: jawny email_account z istniejącej odpowiedzi API steruje edycją aliasu.
+Wyłącznie legacy(email_account=false) ma edytowalny login w istniejącym formularzu;
+po zmianie pojawia się pole obecnego hasła. Hasło tylko chwilowo w RAM/formularzu,
+czyszczone po submit, bez zapisu/logów. Nieznany typ konta pozostaje readonly.
+Adapter używa istniejącego identifiers przez SessionManager.changeSession, przekazując
+niezmieniony telefon. Weryfikacja hasła, normalizacja, konflikt/UNIQUE i begin/finish
+pozostają po stronie dotychczasowego serwera. Nowa zatwierdzona sesja zapisuje się
+istniejącym magazynem, a profil jest ponownie odczytany. UUID/techniczny e-mail bez zmian.
+Zapis nazwy/numeru następuje przed zmianą aliasu; błąd aliasu nie cofa już zapisanych pól.
+Nie podmieniono ani nie wyłączono żadnej funkcji B1/B2, galerii, numeru lub zdjęć.
+BLOKADA BACKENDU: dla email_account=true obecny save_email_profile zmienia nickname,
+ale nie wymaga hasła dla samego pseudonimu i nie daje unikalności jak alias legacy.
+Nie użyto tego jako obejścia. Pole opisano jako pseudonim konta e-mail i pozostawiono
+readonly; e-mail logowania nie jest zmieniany. Obsługa zgodna z nowymi wymaganiami
+wymaga osobno zatwierdzonej zmiany kontraktu/backendu i sprawdzenia unikalności obu modeli.
+PASS: TypeScript/lint, frozen guard46+9,23 ukierunkowane Vitest profilu/sesji,2 Cypress:
+zapis/anulowanie nazwy i numeru, cover, upload/replace/delete, galeria/restart/logout oraz
+legacy hasło/konflikt/odświeżenie profilu/restart i logowanie nowym aliasem.
+Test aliasu korzystał z kontrolowanych odpowiedzi; nie jest testem nowego aliasu
+na prawdziwym koncie ani dowodem nowego wdrożenia serwera. Pełnych zestawów nie uruchamiano.
+Build live/Capacitor sync/Android debug/JUnit1(cache)/weryfikator APK PASS.
+APK zainstalowano -r na POCO bez czyszczenia danych; uruchomienie Status ok,
+zgodność sumy na telefonie potwierdzona; crash/uncaughtJS/WebView=0.
+SHA25634dbd12444f21d12806ebe81ccd005a840653a993e6c55fdec8a93f3d43d7c4f.
+POCO DO ODBIORU: zdjęcia pionowe/kwadratowe/poziome (kadrowanie i maska), restart,
+nazwa/numer i zdjęcia nadal działają. Jeśli dostępne konto legacy: login+obecne hasło,
+konflikt loginu, restart/logout/logowanie nowym loginem. Dla konta e-mail readonly jest
+jawną blokadą, nie awarią logowania; bieżący e-mail nadal służy do logowania.
+Zdalny Supabase, RLS, migracje, Storage i Edge bez zmian; bez push/merge i B3/B4.
+Dokumentacja sesji sprawdzona: https://supabase.com/docs/guides/auth/sessions .
+Raport i status zapisano w istniejących dokumentach.

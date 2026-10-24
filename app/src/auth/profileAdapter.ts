@@ -16,10 +16,18 @@ export function profileAdapter(manager:SessionManager,userId:string){
    typeof p.display_name!=='string'||!p.display_name.trim()||p.display_name.length>254||
    !['nickname','full_name'].includes(p.display_as)||(p.jersey_number!=null&&(!Number.isInteger(p.jersey_number)||p.jersey_number<0||p.jersey_number>99)))throw new Error('profile_contract_invalid');
   // Pick only the existing contract; never project roles/metadata into the UI.
-  return {jersey_number:p.jersey_number??null,user_id:userId,login:p.login,phone:p.phone,full_name:p.full_name,display_as:p.display_as,display_name:p.display_name};
+  return {...(typeof p.email_account==='boolean'?{email_account:p.email_account}:{}),jersey_number:p.jersey_number??null,user_id:userId,login:p.login,phone:p.phone,full_name:p.full_name,display_as:p.display_as,display_name:p.display_name};
  }
  return {
   read:async()=>validate(await existing.readProfile()),
+  async changeAlias(login:string,currentPassword:string){
+   const before=validate(await existing.readProfile());
+   if(!before||before.email_account!==false)throw new Error('alias_not_supported');
+   await manager.changeSession('identifiers',{login:login.trim(),phone:before.phone,current_password:currentPassword});
+   const confirmed=validate(await existing.readProfile());
+   if(!confirmed||confirmed.login!==login.trim())throw new Error('profile_readback_mismatch');
+   return confirmed;
+  },
   async saveNumber(number:number){
    if(!Number.isInteger(number)||number<0||number>99)throw new Error('invalid_number');
    validate(await manager.call('save_jersey_number',{jersey_number:number}));
