@@ -2,6 +2,7 @@ import {execFileSync} from 'node:child_process';
 import {readFileSync,existsSync} from 'node:fs';
 import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
+const photoApproved=JSON.parse(readFileSync(new URL('./b22-data-ui.json',import.meta.url),'utf8'));
 const profileApproved=JSON.parse(readFileSync(new URL('./b2-data-ui.json',import.meta.url),'utf8'));
 const approved=JSON.parse(readFileSync(new URL('./b1-approved-ui.json',import.meta.url),'utf8'));
 const reference='d0f9fa9f840d2bd7f4985d00c24ee9a703f6b3e4';
@@ -13,7 +14,7 @@ const paths=git('ls-tree','-r','--name-only',reference,'--','app/src/demo','app/
 let exact=0,technical=0;
 function normalize(source,path){
  let value=source.replace(/\r\n/g,'\n');
- for(const change of [...(profileApproved[path]??[]),...(approved[path]??[])])if(value.includes(change.after))value=value.replace(change.after,change.before);
+ for(const change of [...(photoApproved[path]??[]),...(profileApproved[path]??[]),...(approved[path]??[])])if(value.includes(change.after))value=value.replace(change.after,change.before);
  if(!/\.(tsx?|css)$/.test(path))return value;
  value=value.replace(/^\s*\/\/ FROZEN_ANDROID_BEGIN\n[\s\S]*?^\s*\/\/ FROZEN_ANDROID_END\n/gm,'');
  value=value.replace(/^import \{[^\n]*\} from '[^']*native\/frozenDemoAndroid';\n/gm,'');

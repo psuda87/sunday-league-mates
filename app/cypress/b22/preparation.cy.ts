@@ -11,6 +11,10 @@ describe('B2.2 client codec only — no Auth/Storage/upload',()=>{
    const result=await prepare(new win.File([original],'fictional-noise.png',{type:'image/png'}));
    expect(result.blob.type).eq('image/webp');expect(result.blob.size).at.most(150_000);expect(result.width).at.most(800);expect(result.height).at.most(800);expect(result.width/result.height).closeTo(4/3,.005);
    const bitmap=await win.createImageBitmap(result.blob);expect(bitmap.width).eq(result.width);expect(bitmap.height).eq(result.height);bitmap.close();
-  });
+   const bytes=new Uint8Array(await result.blob.arrayBuffer());let binary='';for(const byte of bytes)binary+=String.fromCharCode(byte);
+   const tiny=win.document.createElement('canvas');tiny.width=16;tiny.height=12;tiny.getContext('2d')!.fillRect(0,0,16,12);
+   const tinyUrl=tiny.toDataURL('image/webp',.8);
+   return {base64:win.btoa(binary),width:result.width,height:result.height,tiny:tinyUrl.split(',')[1]};
+  }).then(fixture=>{cy.writeFile('../.cache/b22-webp-fixture.json',fixture,{log:false});cy.writeFile('../.cache/b22-tiny-webp.json',{base64:fixture.tiny},{log:false});});
  });
 });

@@ -1,16 +1,17 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { useEffect } from 'react';
+import { useEffect,useState } from 'react';
 import B1App from './B1App';
 import { SessionManager } from './sessionManager';
 import { AccountError } from './api';
 import type { Session } from './api';
 import { b1Port } from './b1Port';
-vi.mock('./useOwnProfile',()=>({useOwnProfile:()=>undefined}));
+vi.mock('./useOwnProfile',()=>({useOwnProfile:(_manager:unknown,_owner:unknown,selection?:{begin:()=>void;end:()=>void})=>({photo:{beginSelection:selection?.begin,endSelection:selection?.end}})}));
 const worldLifecycle=vi.hoisted(()=>({mounts:0,unmounts:0}));
-vi.mock('../demo/App',()=>({default:function MockWorld({onLogout,onAccount}:{onLogout:()=>void;onAccount:(view:string)=>void}){
+vi.mock('../demo/App',()=>({default:function MockWorld({onLogout,onAccount,personalProfile}:{personalProfile?:{photo:{beginSelection:()=>void;endSelection:()=>void}};onLogout:()=>void;onAccount:(view:string)=>void}){
+ const [draft,setDraft]=useState(false);
  useEffect(()=>{worldLifecycle.mounts++;return()=>{worldLifecycle.unmounts++;};},[]);
- return <div>Chroniony świat demo<button onClick={onLogout}>Wyloguj</button><button onClick={()=>onAccount('password')}>Hasło konta</button></div>;
+ return <div>Chroniony świat demo{draft&&<span>Wybrany plik RAM</span>}<button onClick={()=>{setDraft(true);personalProfile?.photo.beginSelection();}}>Otwórz galerię</button><button onClick={()=>personalProfile?.photo.endSelection()}>Zakończ wybór</button><button onClick={onLogout}>Wyloguj</button><button onClick={()=>onAccount('password')}>Hasło konta</button></div>;
 }}));
 afterEach(()=>{cleanup();vi.restoreAllMocks();worldLifecycle.mounts=0;worldLifecycle.unmounts=0;});
 const session=(temporary=false):Session=>({access_token:'access-test',refresh_token:'refresh-test',user_id:'fictional-test',role:'member',expires_in:3600,must_change_password:temporary});
@@ -73,6 +74,21 @@ describe('B1 existing Auth into frozen account UI',()=>{
   await act(async()=>{finishRefresh(session());});
   await screen.findByText('Chroniony świat demo');expect(worldLifecycle.mounts).toBe(2);
   expect(manager.getSnapshot().phase).toBe('ready');expect(screen.queryByRole('heading',{name:'Zaloguj się'})).toBeNull();
+ });
+ it('keeps only a pending picker hidden through verification, then drops it on revoked session',async()=>{
+  let visibility:DocumentVisibilityState='visible';vi.spyOn(document,'visibilityState','get').mockImplementation(()=>visibility);
+  let finishRefresh!:(value:Session)=>void;
+  const request=vi.fn().mockResolvedValueOnce(session()).mockImplementationOnce(()=>new Promise<Session>(resolve=>{finishRefresh=resolve;})).mockRejectedValueOnce(new AccountError('Revoked','session_invalid'));
+  const {manager}=setup(request,'saved-test-refresh');render(<B1App manager={manager}/>);
+  await screen.findByText('Chroniony świat demo');fireEvent.click(screen.getByText('Otwórz galerię'));
+  visibility='hidden';fireEvent(document,new Event('visibilitychange'));await screen.findByRole('heading',{name:'Sprawdzanie sesji'});
+  expect(screen.getByText('Wybrany plik RAM')).not.toBeVisible();expect(worldLifecycle.unmounts).toBe(0);
+  visibility='visible';fireEvent(document,new Event('visibilitychange'));await waitFor(()=>expect(request).toHaveBeenCalledTimes(2));
+  fireEvent.click(screen.getByText('Zakończ wybór'));expect(screen.getByText('Wybrany plik RAM')).not.toBeVisible();
+  await act(async()=>{finishRefresh(session());});await waitFor(()=>expect(screen.getByText('Wybrany plik RAM')).toBeVisible());expect(worldLifecycle.mounts).toBe(1);
+  fireEvent.click(screen.getByText('Otwórz galerię'));visibility='hidden';fireEvent(document,new Event('visibilitychange'));
+  visibility='visible';fireEvent(document,new Event('visibilitychange'));await screen.findByRole('heading',{name:'Sesja wygasła'});
+  expect(screen.queryByText('Wybrany plik RAM')).toBeNull();expect(screen.queryByText('Chroniony świat demo')).toBeNull();
  });
  it('does not implement registration/recovery/profile or authorize callback URL',async()=>{
   const request=vi.fn();const {manager}=setup(request);const port=b1Port(manager);

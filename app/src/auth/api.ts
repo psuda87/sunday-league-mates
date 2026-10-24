@@ -28,7 +28,7 @@ const endpoint = import.meta.env.VITE_SLM_FUNCTION_URL ||
 export async function accountRequest<T>(action: string, values: Record<string, unknown> = {}, session?: Session | null): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(endpoint, { method: 'POST', headers: {
+    response = await fetch(action==='profile_photo_upload'?endpoint+(endpoint.includes('?')?'&':'?')+'photo=upload':endpoint, { method: 'POST', headers: {
       'Content-Type': 'application/json', ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}),
     }, body: JSON.stringify({ ...values, action }), signal: AbortSignal.timeout(20000) });
   } catch { throw new AccountError('Brak połączenia. Sprawdź internet i spróbuj ponownie.', 'network_error'); }

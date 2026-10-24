@@ -11,7 +11,7 @@ export function fitPhoto(width:number,height:number,max=800){
  const scale=Math.min(1,max/Math.max(width,height));
  return {width:Math.max(1,Math.round(width*scale)),height:Math.max(1,Math.round(height*scale))};
 }
-// Unconnected preparation utility: never uploads and never stores an original.
+// Device-side preparation only: never uploads and never persists an original.
 export async function encodePhoto(width:number,height:number,encode:(width:number,height:number,quality:number)=>Promise<Blob|null>):Promise<PreparedPhoto>{
  const seen=new Set<string>();
  let last=fitPhoto(width,height);

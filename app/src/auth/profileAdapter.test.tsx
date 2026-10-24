@@ -21,7 +21,7 @@ it('uses existing own-profile operations, preserves display preference and verif
   return {...stored,role:'admin',metadata:'not for UI'};
  });
  const auth=manager(request);await auth.signIn('Fikcyjny','only-test-password');
- const adapter=profileAdapter(auth,'own');expect(await adapter.read()).toEqual(profile());
+ const adapter=profileAdapter(auth,'own');expect(await adapter.read()).toEqual({...profile(),jersey_number:null});
  const saved=await adapter.save('  Trwała Nazwa  ','full_name');expect(saved!.display_name).toBe('Trwała Nazwa');
  expect(request.mock.calls.map(call=>call[0])).toEqual(['profile','save_profile','profile']);
  expect(request.mock.calls[1][1]).toEqual({full_name:'Trwała Nazwa',display_as:'full_name'});

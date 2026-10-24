@@ -1,10 +1,12 @@
+import { useOwnPhoto } from './useOwnPhoto';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { SessionManager } from './sessionManager';
 import { profileAdapter } from './profileAdapter';
 import type { PersonalProfileBinding,PersonalProfileData } from '../ui/personalProfile';
 
 type State={owner:string|null;phase:PersonalProfileBinding['phase'];profile:PersonalProfileData|null;notice:string};
-export function useOwnProfile(manager:SessionManager,userId:string|null):PersonalProfileBinding {
+export function useOwnProfile(manager:SessionManager,userId:string|null,selection?:{begin:()=>void;end:()=>void}):PersonalProfileBinding {
+ const photo=useOwnPhoto(manager,userId,selection);
  const [state,setState]=useState<State>({owner:null,phase:'loading',profile:null,notice:''});
  const [revision,setRevision]=useState(0),[saving,setSaving]=useState(false);
  const generation=useRef(0),flight=useRef(false);
@@ -19,7 +21,15 @@ export function useOwnProfile(manager:SessionManager,userId:string|null):Persona
  },[adapter,userId,revision]);
  // Hide a previous account synchronously, before the effect/late request can run.
  const current=state.owner===userId&&userId!==null?state:{owner:userId,phase:'loading' as const,profile:null,notice:''};
- return {...current,saving:current.phase==='ready'&&saving,reload:()=>setRevision(v=>v+1),
+ async function saveNumber(number:number){
+  const auth=manager.getSnapshot();
+  if(flight.current||!adapter||!current.profile||current.phase!=='ready'||auth.phase!=='ready'||auth.session?.user_id!==userId)return false;
+  const ticket=generation.current;flight.current=true;setSaving(true);
+  try {const profile=await adapter.saveNumber(number);if(ticket!==generation.current)return false;setState({owner:userId,phase:'ready',profile,notice:'Zapisano numer koszulki.'});return true;}
+  catch {if(ticket===generation.current)setState(previous=>({...previous,phase:'error',profile:null,notice:'Nie udało się potwierdzić numeru. Ponów odczyt profilu.'}));return false;}
+  finally {if(ticket===generation.current){flight.current=false;setSaving(false);}}
+ }
+ return {...current,photo,saveNumber,saving:current.phase==='ready'&&saving,reload:()=>setRevision(v=>v+1),
   async save(fullName){
    const auth=manager.getSnapshot();
    if(flight.current||!adapter||!current.profile||current.phase!=='ready'||auth.phase!=='ready'||auth.session?.user_id!==userId)return false;
