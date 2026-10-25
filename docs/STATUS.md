@@ -1,5 +1,15 @@
 # Aktualny stan Sunday League Mates
 
+2026-10-25 17:23 Europe/Warsaw — końcowy przegląd PR #11: sprawdzono ae397c4 względem main 1fadd977, brak konfliktów (main ancestor, GitHub mergeable=true). Brak błędów blokujących. PR oznaczono Ready for review zgodnie z wyraźnym poleceniem właściciela, bez merge.
+Domyślny LIVE i 29 migracji main zachowane; Premium B1/B2 jawny wariant lokalny; karta/CSS30772de i55 plików Premium bez regresji. Uwzględniono7/7 ręcznych PASS właściciela. Nie wykryto utraty funkcji/danych w sprawdzonym zakresie.
+Powtórzono: TS/lint/229 Vitest, source guards, diff check PASS; SQL9/9 i64/64 (w tym wcześniej pominięty późny cutoff i rzeczywisty push_claim). Security advisors0 problemów, scan367 ścieżek0 rozpoznanych sekretów. Cztery ostrzeżenia SQL nie blokują merge: push_claim ma poprawny wynik runtime; p_number jest zachowaną kompatybilną sygnaturą; v_before/v_rows to nieużywane deklaracje. Brak zmian kodu i nowych migracji. Testy tylko we własnych nowych lokalnych bazach, istniejąca baza bez zmian. Brak zdalnych migracji/deploy/Storage i brak merge. Oczekuje osobne potwierdzenie właściciela na scalenie; FCM/iOS/zdalny rollout niezweryfikowane. Szczegóły: docs/V1_CONSOLIDATION.md.
+
+---
+
+## Historia przed końcowym przeglądem
+
+# Aktualny stan Sunday League Mates
+
 2026-10-25 17:18 Europe/Warsaw — ODBIÓR RĘCZNY KONSOLIDACJI: właściciel potwierdził wszystkie siedem scenariuszy PASS (Premium Auth/sesja, profil/numer, zdjęcia, wygląd Ultimate/oba motywy, oznaczenie demo, funkcje LIVE, brak crashy/błędów uprawnień/utraty danych). Źródło: deklaracja właściciela po testach, nie nowe testy automatyczne agenta.
 PR #11 nadal draft i bez scalania. Odbiór ręczny nie jest zgodą na merge ani zdalne wdrożenie. Pozostają wcześniej opisane ostrzeżenia SQL i pominięty test późnego cutoff; nie rozpoczęto kolejnego modułu.
 

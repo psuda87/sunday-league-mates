@@ -3,6 +3,48 @@
 2026-10-25 17:04 Europe/Warsaw. Gałąź `feat/v1-consolidation` z main `1fadd977`. Implementacja `f50484f`; [draft PR #11](https://github.com/psuda87/sunday-league-mates/pull/11) otwarty bez scalania. Osobny worktree `.worktrees/v1-consolidation`; źródłowe gałęzie i katalog użytkownika zachowane.
 
 
+## Końcowy przegląd przed merge — 2026-10-25 17:23 Europe/Warsaw
+
+**Rekomendacja: PR #11 gotowy do review i rekomendowany do scalenia po osobnym potwierdzeniu właściciela. Nie znaleziono błędów blokujących. Nie wykonano merge.**
+
+Sprawdzony HEAD `ae397c41547da307edf15963e22b4fe0dae789e3`, zgodny z origin/feat/v1-consolidation. Po fetch main nadal `1fadd977d9737f371b75a59eee63ce6c50e4cb3b`; jest przodkiem HEAD. GitHub potwierdził mergeable=true. Późniejszy commit tego przeglądu zmienia wyłącznie dokumentację, nie oceniany runtime. PR oznaczono Ready for review (draft=false), zgodnie z nowym wyraźnym poleceniem właściciela; merged=false.
+
+### Integracja i wygląd
+
+- Manifest źródeł potwierdza zachowanie App/main, pages/live, BottomNav, SessionManager/tokenStore, release guard i wszystkich 29 wcześniejszych migracji main. Lockfile niezmieniony. Brak usuniętych plików względem main.
+- Premium B1/B2 pozostaje jawnym wariantem lokalnym: rzeczywiste Auth/sesja i własny profil, reszta oznaczone demo. Domyślny LIVE main nie został zastąpiony. Sprawdzono blokadę widoków chronionych, wymuszenie zmiany hasła, generacje zapytań przy zmianie konta oraz serwerowy read-back profilu/zdjęcia.
+- CSS karty jest identyczny z 30772de; UltimatePlayerCard identyczny z odebranym kodem live 5c3f13f (w tym wcześniej zaakceptowane cover dla własnego zdjęcia). Kontrola SHA 55 plików Premium PASS. Brak nowych zmian UI.
+- Uwzględniono 7/7 ręcznych PASS właściciela na POCO: Auth/sesja, profil/numer, zdjęcia, karta/oba motywy, oznaczenie demo, LIVE grupy/mecze/zapisy/goście/rozliczenia, brak crashy/błędów uprawnień/utraty danych. To wyniki właściciela, nie nowe fizyczne testy agenta.
+
+### Bezpieczeństwo i dane
+
+Sprawdzono przyrost handlera accounts, trzy dodane migracje i obsługę zdjęć. Pozostają: sesja sprawdzana na serwerze, blokada hasła tymczasowego, role z danych serwerowych zamiast user_metadata, aktualne hasło i nowa sesja przy zmianie legacy aliasu, brak zmiany technicznego e-maila. Prywatny bucket/metadata, brak bezpośredniego dostępu anon/authenticated, service-only RPC, owner UUID z sesji, limit WebP150000B/800px, ograniczony odczyt body, rate limit, CAS i sprzątanie plików. Nowe funkcje mają security invoker, pusty search_path i odebrane domyślne EXECUTE.
+
+Lokalne `db advisors --local --type security --level warn --fail-on error`: 0 problemów. Skan 367 śledzonych ścieżek: 0 rozpoznanych sekretów (bez wypisywania wartości). Zachowane deploymentEnabled=false i release guard. Nie używano zdalnej bazy, nie wdrażano SQL/Storage/Edge. Kontrole lokalne nie zastępują oddzielnej weryfikacji stanu i backupu przed ewentualnym zdalnym wdrożeniem.
+
+Nie wykryto utraty funkcji ani danych w zakresie konsolidacji: chroniony runtime i stare migracje nienaruszone, replay sprawdza zachowanie aliasów, sesji, ledger i zobowiązań, właściciel potwierdził brak utraty danych. Testy SQL używają wyłącznie własnych nowych baz; istniejącej bazy ani danych telefonu nie czyszczono. Nie jest to deklaracja wykonania backupu produkcji lub pełnego porównania wszystkich jej rekordów.
+
+### Cztery ostrzeżenia SQL — żadne nie blokuje tego merge
+
+| Ostrzeżenie | Ocena i dowód |
+|---|---|
+| slm_push_claim: niejawna konwersja inicjalizatora '[]' do JSONB | Istniejące w main. Rzeczywisty test wywołuje RPC jako service_role, odbiera poprawną tablicę z zadaniem i sprawdza ponownie uprawnienia dostarczenia. PASS; brak błędu wykonania lub regresji w PR. Jawne ::jsonb można rozważyć osobno. |
+| slm_email_profile_save: unused p_number | Celowe zachowanie sygnatury kompatybilnej z dotychczasowym API. Numer zapisuje odrębne działające RPC; edycja kontaktu/nazwy ma go nie zerować. Testy B2.2 i ręczny odbiór potwierdzają zapis. Nie zmieniać sygnatury przy okazji. |
+| group_finance_dispatch_core: unused v_before | Pozostałość deklaracji, bez wpływu na wykonanie lub decyzje uprawnień. Funkcja pochodzi z main; regresja scoped finance/FIFO PASS. |
+| group_finance_dispatch_core: unused v_rows | Jak wyżej: nieużywana deklaracja, bez wpływu na wynik. Nie osłabia RLS i nie usuwa danych. |
+
+Lokalny db lint ponownie: kod 0, te same cztery ostrzeżenia; nie przedstawiamy tego jako braku ostrzeżeń. Brak uzasadnienia dla nowej migracji wyłącznie kosmetycznej w ramach przeglądu.
+
+### Kontrole powtórzone w tym przeglądzie
+
+TypeScript PASS; lint PASS; Vitest **229/229, 39 plików** PASS; guard źródeł main/Premium PASS; diff --check PASS. Pełny replay32 z kontrolą historycznych danych **9/9 PASS**. PostgreSQL/RLS/scoped finance/równoległość/FIFO/Storage B2.2 **64/64 PASS** — tym razem także rzeczywisty późny cutoff (wcześniej był pominięty), oraz realne slm_push_claim. Własne bazy testowe usunięto, oryginalna baza nienaruszona.
+
+Nie zmieniano kodu, więc nie powtarzano buildów Androida i Cypress; ich wcześniejsze PASS dotyczą tego samego runtime f50484f, następne commity zawierają tylko dokumentację. Odbiór ręczny 7/7 pozostaje zaliczony. FCM end-to-end/iOS i zdalny rollout nadal poza zakresem; nie są potwierdzone tym przeglądem.
+
+Dokumentacja bezpieczeństwa pomocnicza: [Storage Access Control](https://supabase.com/docs/guides/storage/security/access-control); sprawdzono też aktualny changelog Supabase. Nie aktualizowano zależności ani usług.
+
+Następny krok: osobne potwierdzenie właściciela na merge PR #11. Oznaczenie Ready for review nie jest merge ani zgodą na wdrożenie i rozpoczęcie następnego modułu.
+
 ## Aktualizacja odbioru — 2026-10-25 17:18 Europe/Warsaw
 
 Właściciel potwierdził następujące wyniki ręczne po instalacji Premium na POCO i sprawdzeniu LIVE. Zastępują wcześniejsze NOT TESTED dotyczące tych konkretnych scenariuszy odbioru.
