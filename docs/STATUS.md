@@ -1,3 +1,10 @@
+# Premium — globalna nazwa profilu: blokada kontraktu
+
+2026-10-25 22:25 Europe/Warsaw — fix/premium-profile-display-name z aktualnego main edd2e92. Dokumentacyjny przegląd małego zakresu: backend ma pseudonim e-mail i zmianę loginu legacy oraz2 globalne tryby nickname/full_name, nie ma first_name ani spójnej projekcji wybranego formatu w B3. Wymagane rozszerzenie schematu/API; zgodnie z poleceniem nie implementowano obejścia UI/SQL/RLS/Auth. Sam wybór formatu nie może nadawać zgód grupowych. Gałąź/PR #14 i konfiguracja Cloud/APK nietknięte.
+PASS:21 ukierunkowanych testów adaptera profilu/grup, TypeScript i kontrakty źródeł32/55. Brak nowych testów realnego backendu/POCO/builda. Plan dokładnych zmian i potwierdzenia Akceptuję/Anuluj: docs/PREMIUM_PROFILE_NAME.md. Następny krok: osobna decyzja o rozszerzeniu kontraktu. Bez merge.
+
+---
+
 # Aktualizacja UI B3 po POCO
 
 2026-10-25 21:34 Europe/Warsaw — feat/premium-b3-groups, istniejący PR #13. Poprawiono wyłącznie kompaktowy przełącznik zgody per grupa i przycisk odświeżania (44px, ikona, stan ładowania, deduplikacja). Załadowane dane nie znikają podczas refresh, błąd zapisu zachowuje stan i kontrolkę. Backend/RLS/Auth/Ultimate/BottomNav bez zmian; brak operacji Cloud.
