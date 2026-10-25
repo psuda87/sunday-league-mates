@@ -9,7 +9,8 @@
     "previous B1/B2 data bindings and approved card CSS",
     "Owner-approved BottomNav highlight fix: shared active state, full tab area and existing plus notch; Ultimate rules unchanged",
     "B3 owner-approved real groups controllers, group-scoped privacy controls and accurate live/demo labels; Ultimate/BottomNav/CSS/assets unchanged",
-    "Shared groups selectors and avatar props accept narrow live DTOs; no fabricated World, statistics or profile fallback"
+    "Shared groups selectors and avatar props accept narrow live DTOs; no fabricated World, statistics or profile fallback",
+    "Owner-approved B3 POCO corrections: compact scoped consent switch and refresh icon; frozen card/nav/global CSS unchanged"
   ],
   "files": {
     "app/demo/main.tsx": {
@@ -113,7 +114,7 @@
       "text": true
     },
     "app/src/demo/GroupScreens.tsx": {
-      "sha256": "5dcc494d4bb05b489f52f9ffbd499a020f1d1d46f5f69670c4fe3e5bdad97caa",
+      "sha256": "044b8f48bdc06763ee19bc31e9e6af203f08a28ce9bf4a61fe4c81de124b7eed",
       "text": true
     },
     "app/src/demo/Identity.tsx": {

@@ -93,3 +93,15 @@ Ręczny odbiór B3: **NOT TESTED / oczekuje właściciela**. Wcześniejsze 7/7 k
 6. Potwierdź Ultimate/BottomNav i oba motywy. Nie wysyłaj hasła, tokenów ani prywatnych zdjęć do raportu.
 
 Następny krok: odbiór lokalnego B3, przegląd PR i osobna decyzja o merge do main. B4 oraz zdalny rollout wymagają kolejnych poleceń. Znane ograniczenia: cudze zdjęcia/statystyki niedostępne, brak testów FCM/iOS/Cloud; brak integracji wydarzeń Premium z prawdziwymi grupami.
+
+
+## Poprawki UI po odbiorze POCO — 2026-10-25 21:34 Europe/Warsaw
+
+Zakres wyłącznie dwóch kontrolek B3 w istniejącym PR #13:
+- Systemowy checkbox przejmował globalną regułę `.slm-groups input` (100% szerokości, minimum44px). Zastąpiono go kontrolowanym button role=switch, opisem i osobnym lokalnym CSS. Stan pochodzi nadal z dotychczasowego zapisu/read-back Supabase, bez optymistycznego udostępnienia i bez zmian domyślnego false/grupy/RLS. Podczas operacji kontrolka jest nieaktywna, błąd widoczny jako alert zachowuje poprzedni stan oraz możliwość ponowienia.
+- Odświeżanie to stały przycisk44×44 z istniejącą ikoną Ionicons, semantycznym złotem Light/Dark, aria-label, statusem i obrotem ikony (z respektowaniem reduced motion). Umieszczono obok opisu pod nagłówkiem, poza logo i Wstecz. Przycisk nie zmienia rozmiaru podczas pobierania. Załadowana treść pozostaje na miejscu i jest nieaktywna; pierwszy odczyt nadal chroni niegotowe profile. Równoczesne ręczne wywołania dzielą jeden Promise/cykl pobierania.
+
+Zmiany: src/demo/GroupScreens.tsx, src/groups/GroupControls.tsx + GroupControls.css, useGroups.ts; testy GroupControls.test.tsx/useGroups.test.tsx i cypress/b3/groups.cy.ts. Zaktualizowano wyłącznie hash GroupScreens i opis wyjątku w premium318-contract.json. Demo allowlista dopuszcza dokładnie dwa nowe pliki prezentacyjne bez Auth/API; build i izolacja demo PASS. Wspólne variables.css, Ultimate, BottomNav, Auth, migracje i Edge bez zmian.
+
+PASS: TS, lint,240 Vitest/41 plików (5 nowych przypadków: kontrolki, deduplikacja, zgoda po refresh/reopen i błąd widoku), build Premium, guards32/55. Rzeczywisty lokalny Auth/HTTP28 + przeglądarka1 PASS: zapis zgody, refresh, ponowne otwarcie/reload,4 szerokości320/360/390/430 × Light/Dark, kontrolki min44px i brak overflow. Dodatkowo build demo i izolacja PASS. Wizualnie sprawdzono nowe syntetyczne zrzuty Light/Dark; nie są testem ręcznym na POCO.
+Nie wykonywano żadnych operacji Supabase Cloud, migracji, deploy, instalacji APK ani nowego testu fizycznego telefonu w ramach tej poprawki. Lokalne testy użyły nowych fikcyjnych kont, bez resetu istniejących danych. Potrzebne ręczne potwierdzenie dwóch kontrolek na telefonie po aktualizacji APK. PR pozostaje draft, bez merge; techniczna rekomendacja po zielonych kontrolach i sprawdzeniu braku konfliktów, końcowa decyzja właściciela.

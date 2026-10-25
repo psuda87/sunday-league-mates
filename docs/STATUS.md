@@ -1,3 +1,10 @@
+# Aktualizacja UI B3 po POCO
+
+2026-10-25 21:34 Europe/Warsaw — feat/premium-b3-groups, istniejący PR #13. Poprawiono wyłącznie kompaktowy przełącznik zgody per grupa i przycisk odświeżania (44px, ikona, stan ładowania, deduplikacja). Załadowane dane nie znikają podczas refresh, błąd zapisu zachowuje stan i kontrolkę. Backend/RLS/Auth/Ultimate/BottomNav bez zmian; brak operacji Cloud.
+PASS: TS/lint,240 Vitest/41 plików, build Premium i demo/isolation, guards32/55, lokalny HTTP28 i real browser1 (4 szerokości ×2 motywy, zgoda po refresh/reload). Nowego testu POCO ani instalacji APK nie wykonywano. PR pozostaje do zatwierdzenia, bez merge. Szczegóły docs/PREMIUM_B3_GROUPS.md i docs/ODPOWIEDZI_CODEX.txt.
+
+---
+
 # Aktualny stan — Premium B3
 
 2026-10-25 21:05 Europe/Warsaw — feat/premium-b3-groups z main a46f5e4. Premium ma rzeczywiste grupy/członkostwo/zgody przez istniejące RPC; domyślny LIVE zachowany, mecze/finanse Premium nadal demo. Auth/profil/numer/zdjęcia bez cofnięcia integracji; CSS/Ultimate/BottomNav bez zmian.

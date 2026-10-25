@@ -1,0 +1,19 @@
+/* Wyłącznie kontrolki B3; bez zmian wspólnych kart i nawigacji. */
+.slm-group-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+.slm-group-toolbar .slm-groups-demo { margin:4px 0; }
+.slm-groups .slm-group-refresh { flex:0 0 44px; width:44px; height:44px; display:grid; place-items:center; padding:0; border:1px solid var(--slm-border); border-radius:12px; background:var(--slm-panel); color:var(--slm-gold); }
+.slm-group-refresh ion-icon { font-size:22px; }
+.slm-group-refresh[aria-busy="true"] ion-icon { animation:slm-group-refresh-spin 1s linear infinite; }
+.slm-group-consent { display:flex; align-items:center; gap:12px; margin:16px 0; padding:12px; border:1px solid var(--slm-border); border-radius:12px; background:var(--slm-panel); }
+.slm-group-consent > div { flex:1; min-width:0; }
+.slm-group-consent strong { font-size:0.85rem; }
+.slm-group-consent p { margin:6px 0 0; color:var(--slm-text-secondary); line-height:1.45; }
+.slm-groups .slm-group-consent button { position:relative; flex:0 0 48px; width:48px; height:44px; padding:0; border:0; background:transparent; }
+.slm-group-consent button::before { content:""; position:absolute; inset:8px 0; border:1px solid var(--slm-text-secondary); border-radius:16px; background:var(--ion-background-color); }
+.slm-group-consent button[aria-checked="true"]::before { background:var(--ion-color-primary); border-color:var(--slm-gold); }
+.slm-group-consent button span { position:absolute; left:4px; top:12px; width:20px; height:20px; border-radius:50%; background:var(--slm-text-secondary); transition:transform 150ms ease; }
+.slm-group-consent button[aria-checked="true"] span { transform:translateX(20px); background:var(--ion-color-primary-contrast); }
+.slm-group-consent[aria-busy="true"] { cursor:progress; }
+.slm-groups .slm-group-consent button:focus-visible,.slm-groups .slm-group-refresh:focus-visible { outline:2px solid var(--ion-color-primary); outline-offset:3px; }
+@keyframes slm-group-refresh-spin { to { transform:rotate(360deg); } }
+@media (prefers-reduced-motion:reduce) { .slm-group-refresh[aria-busy="true"] ion-icon { animation:none; } .slm-group-consent button span { transition:none; } }

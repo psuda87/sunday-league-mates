@@ -17,8 +17,8 @@ it('uses server counts and UUIDs without importing any demo world or inventing m
 it('does not render an invented member profile while a real detail request is loading',()=>{
  window.history.replaceState(null,'','/#group/group-real');
  const binding:GroupBinding={loading:true,busy:false,error:'',searching:false,finding:false,counts:{'group-real':2},pending:{},found:[],candidates:[],requestPhones:{},shareFullName:false,refresh:async()=>{},open:async()=>{},search:()=>{},findPlayers:()=>{},create:async()=>null,act:()=>{},consent:()=>{}};
- render(<GroupScreens world={groupWorld('owner',[group],[],null)} live={binding} dispatch={vi.fn()} onPlayer={vi.fn()}/>);
- expect(screen.getByText('Wczytywanie grup…')).toBeTruthy();expect(screen.queryByText('Osoba demonstracyjna')).toBeNull();
+ render(<GroupScreens world={{...groupWorld('owner',[group],[],null),players:[{id:'unrelated',name:'Other group member',nick:'Other'}]}} live={binding} dispatch={vi.fn()} onPlayer={vi.fn()}/>);
+ expect(screen.getByText('Wczytywanie członków grupy…')).toBeTruthy();expect(screen.queryByText('Osoba demonstracyjna')).toBeNull();
 });
 it('clears private group state on failed refresh and permits retry without a demo fallback',async()=>{
  let broken=false;
@@ -59,4 +59,42 @@ it('ignores late search results and updates membership only from server read-bac
  await waitFor(()=>expect(result.current.binding.busy).toBe(false));
  expect(manager.call).toHaveBeenCalledWith('groups_consent',expect.objectContaining({group_id:'group-real',share_full_name:true,request_id:expect.any(String)}));
  expect(result.current.binding.shareFullName).toBe(false); // Server read-back, never optimistic consent.
+});
+
+it('coalesces simultaneous manual refreshes into one list/inbox request pair',async()=>{
+ let hold=false,finish:(value:unknown)=>void=()=>{};
+ const manager=mock(async action=>action==='groups_list'?(hold?new Promise(resolve=>{finish=resolve;}):{groups:[group]}):{requests:[]});
+ const {result}=renderHook(()=>useGroups(manager,'owner'));await waitFor(()=>expect(result.current.binding.loading).toBe(false));
+ vi.mocked(manager.call).mockClear();hold=true;
+ let first:Promise<void>,second:Promise<void>;
+ act(()=>{first=result.current.binding.refresh();second=result.current.binding.refresh();});
+ expect(first!).toBe(second!);expect(manager.call).toHaveBeenCalledTimes(2);
+ await act(async()=>{finish({groups:[group]});await first;});
+ expect(result.current.binding.loading).toBe(false);
+});
+it('retains server consent after refresh/reopen, scopes writes and retains old value on save error',async()=>{
+ let stored=false,broken=false;
+ const manager=mock(async(action,body)=>{
+  if(action==='groups_list')return {groups:[group]};if(action==='groups_inbox')return {requests:[]};
+  if(action==='groups_detail')return {...detail,members:detail.members.map(m=>({...m,share_full_name:stored}))};
+  if(action==='groups_consent'){if(broken)throw Error('Save failed');stored=body?.share_full_name===true;return {ok:true};}
+  throw Error('Unexpected operation');
+ });
+ const {result}=renderHook(()=>useGroups(manager,'owner'));await waitFor(()=>expect(result.current.binding.loading).toBe(false));
+ await act(()=>result.current.binding.open(group.id));act(()=>result.current.binding.consent(true));
+ await waitFor(()=>expect(result.current.binding.busy).toBe(false));expect(result.current.binding.shareFullName).toBe(true);
+ await act(()=>result.current.binding.refresh());await act(()=>result.current.binding.open(group.id));expect(result.current.binding.shareFullName).toBe(true);
+ broken=true;act(()=>result.current.binding.consent(false));await waitFor(()=>expect(result.current.binding.error).toBe('Save failed'));
+ expect(result.current.binding.shareFullName).toBe(true);expect(stored).toBe(true);
+ expect(manager.call).toHaveBeenCalledWith('groups_consent',expect.objectContaining({group_id:group.id,share_full_name:true}));
+});
+
+it('keeps the saved switch visible with an accessible save error',()=>{
+ window.history.replaceState(null,'','/#group/group-real');
+ const binding:GroupBinding={loading:false,busy:false,error:'Save failed',searching:false,finding:false,counts:{'group-real':2},pending:{},found:[],candidates:[],requestPhones:{},shareFullName:true,refresh:async()=>{},open:async()=>{},search:()=>{},findPlayers:()=>{},create:async()=>null,act:()=>{},consent:()=>{}};
+ const {rerender}=render(<GroupScreens world={groupWorld('owner',[group],[],detail)} live={binding} dispatch={vi.fn()} onPlayer={vi.fn()}/>);
+ expect(screen.getByRole('alert').textContent).toBe('Save failed');
+ expect(screen.getByRole('switch',{name:'Udostępniaj imię i nazwisko'}).getAttribute('aria-checked')).toBe('true');
+ rerender(<GroupScreens world={groupWorld('owner',[group],[],detail)} live={{...binding,error:'',loading:true}} dispatch={vi.fn()} onPlayer={vi.fn()}/>);
+ expect(screen.getByRole('switch').getAttribute('aria-checked')).toBe('true');expect(screen.getByRole('switch')).toHaveProperty('disabled',true);
 });

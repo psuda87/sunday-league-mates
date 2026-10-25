@@ -40,6 +40,13 @@ export function useGroups(manager:SessionManager,userId:string){
   } catch(e){if(ticket===generation.current){setState({groups:[],inbox:[],detail:null});fail(e);}}
   finally {if(alive.current&&ticket===generation.current)setLoading(false);}
  },[manager,userId,fail]);
+ // Coalesce manual refreshes synchronously, before React disables the button.
+ const manualFlight=useRef<Promise<void>|null>(null);
+ const manualRefresh=useCallback(()=>{
+  if(manualFlight.current)return manualFlight.current;
+  const pending=refresh();manualFlight.current=pending;
+  void pending.finally(()=>{if(manualFlight.current===pending)manualFlight.current=null;});return pending;
+ },[refresh]);
  const invalidate=useCallback(()=>{generation.current++;searchEpoch.current++;candidateEpoch.current++;},[]);
  useEffect(()=>{alive.current=true;void refresh();return()=>{alive.current=false;invalidate();};},[refresh,userId,invalidate]);
  const mutate=async<T,>(action:string,body:Record<string,unknown>)=>{
@@ -60,7 +67,7 @@ export function useGroups(manager:SessionManager,userId:string){
   const ticket=++candidateEpoch.current;setCandidates([]);setFinding(query.trim().length>=2);if(query.trim().length<2)return;
   void manager.call<{players:{id:string;name:string}[]}>('groups_candidates',{group_id:id,query}).then(r=>{if(alive.current&&ticket===candidateEpoch.current)setCandidates(r.players);}).catch(e=>{if(ticket===candidateEpoch.current)fail(e);}).finally(()=>{if(alive.current&&ticket===candidateEpoch.current)setFinding(false);});
  },[manager,fail]);
- const binding:GroupBinding={loading,busy,error,searching,finding,found,candidates,search,findPlayers,refresh,
+ const binding:GroupBinding={loading,busy,error,searching,finding,found,candidates,search,findPlayers,refresh:manualRefresh,
   counts:Object.fromEntries(state.groups.map(g=>[g.id,g.member_count])),pending:Object.fromEntries(state.groups.map(g=>[g.id,g.pending_count])),
   requestPhones:Object.fromEntries((state.detail?.requests??[]).filter(r=>!!r.contact_phone).map(r=>[r.id,r.contact_phone!])),
   shareFullName:state.detail?.members.find(m=>m.user_id===userId)?.share_full_name??false,
