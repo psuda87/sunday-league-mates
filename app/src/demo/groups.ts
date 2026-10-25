@@ -1,5 +1,9 @@
 import type { DemoPlayer, World } from './data';
 
+// Shared presentation selectors accept live DTOs without demo statistics or fixtures.
+export type GroupPerson=Pick<DemoPlayer,'id'|'name'|'nick'|'portrait'|'portraitEdited'|'jerseyNumber'>;
+export type GroupWorld=Pick<World,'groupState'|'userId'|'notice'>&{players:GroupPerson[]};
+
 export interface DemoGroup {id:string;name:string;description:string;adminId:string;creationKey?:string}
 export interface Membership {groupId:string;playerId:string;joinedAt:string;organizer:boolean}
 export interface GroupRequest {
@@ -24,16 +28,16 @@ export function validGroupText(name:string,description:string) {
  return name.trim().length>0&&name.trim().length<=64&&description.trim().length<=180&&
  !Array.from(name+description).some(char=>char.codePointAt(0)!<32||char.codePointAt(0)===127||char==='<'||char==='>');
 }
-export const membership=(world:World,groupId:string,playerId=world.userId)=>world.groupState.members.find(m=>m.groupId===groupId&&m.playerId===playerId);
-export const groupAdmin=(world:World,groupId:string)=>world.groupState.groups.some(g=>g.id===groupId&&g.adminId===world.userId)&&!!membership(world,groupId);
-export const groupCanOrganize=(world:World,groupId:string,playerId=world.userId)=>!!membership(world,groupId,playerId)&&(world.groupState.groups.some(g=>g.id===groupId&&g.adminId===playerId)||membership(world,groupId,playerId)!.organizer);
-export const groupMembers=(world:World,groupId:string)=>membership(world,groupId)?world.groupState.members.filter(m=>m.groupId===groupId):[];
-export const canViewGroupProfile=(world:World,groupId:string,targetId:string)=>!!membership(world,groupId)&&!!membership(world,groupId,targetId);
-export function publicGroups(world:World,query:string) {
+export const membership=(world:GroupWorld,groupId:string,playerId=world.userId)=>world.groupState.members.find(m=>m.groupId===groupId&&m.playerId===playerId);
+export const groupAdmin=(world:GroupWorld,groupId:string)=>world.groupState.groups.some(g=>g.id===groupId&&g.adminId===world.userId)&&!!membership(world,groupId);
+export const groupCanOrganize=(world:GroupWorld,groupId:string,playerId=world.userId)=>!!membership(world,groupId,playerId)&&(world.groupState.groups.some(g=>g.id===groupId&&g.adminId===playerId)||membership(world,groupId,playerId)!.organizer);
+export const groupMembers=(world:GroupWorld,groupId:string)=>membership(world,groupId)?world.groupState.members.filter(m=>m.groupId===groupId):[];
+export const canViewGroupProfile=(world:GroupWorld,groupId:string,targetId:string)=>!!membership(world,groupId)&&!!membership(world,groupId,targetId);
+export function publicGroups(world:GroupWorld,query:string) {
  if(foldGroup(query).length<2)return [];
  return world.groupState.groups.filter(g=>foldGroup(g.name).includes(foldGroup(query))).map(g=>({id:g.id,name:g.name,description:g.description,count:world.groupState.members.filter(m=>m.groupId===g.id).length}));
 }
-export function inviteCandidates(world:World,groupId:string,query:string) {
+export function inviteCandidates(world:GroupWorld,groupId:string,query:string) {
  if(!membership(world,groupId)||foldGroup(query).length<2)return [];
  return world.players.filter(p=>!membership(world,groupId,p.id)&&(foldGroup(p.name).includes(foldGroup(query))||foldGroup(p.nick??'').includes(foldGroup(query)))).slice(0,5).map(p=>({id:p.id,name:p.name,nick:p.nick}));
 }
@@ -44,7 +48,7 @@ export function normalizeDemoContact(value:string):string|null {
  if(digits.startsWith('+48'))digits=digits.slice(3);else if(digits.startsWith('0048'))digits=digits.slice(4);
  return /^\d{9}$/.test(digits)?'+48'+digits:null;
 }
-function contactTarget(players:DemoPlayer[],phone:string) {
+function contactTarget(players:GroupPerson[],phone:string) {
  return players.find(p=>'+48'+p.id.slice(1).padStart(9,'0')===phone)?.id??null;
 }
 export function initialGroups(players:DemoPlayer[]):GroupState {

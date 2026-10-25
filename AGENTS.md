@@ -1,3 +1,10 @@
+# Aktualny zakres Premium B3 — lokalne grupy
+
+- Gałąź feat/premium-b3-groups z main a46f5e4. Domyślny LIVE zachowany; jawny wariant Premium ma rzeczywiste B1/B2/B3, wydarzenia i finanse nadal oznaczone demo. Bez B4.
+- Pełne nazwisko: właściciel i administrator grupy; inni członkowie tylko po zgodzie per grupa (potwierdzone przez właściciela). Telefon tylko wspólnym zaakceptowanym członkom; administratorowi także przy dobrowolnej oczekującej prośbie.
+- Zatwierdzono zastosowanie B2.2/B3 wyłącznie lokalnie, bez resetu. Cloud ma niezgodny starszy schemat; zakaz zdalnych migracji/Storage/deploy bez odrębnej zgody. Źródła app/supabase, nie .cache.
+- Po odbiorze B3 przygotowany PR wymaga osobnej zgody na merge; nie stosować historycznej autonomicznej zgody z poprawki BottomNav do B3. Szczegóły docs/PREMIUM_B3_GROUPS.md.
+
 # Aktualna konsolidacja SLM 1.0 i stała zasada modułów
 
 - Bieżący zakres: feat/v1-consolidation z main; zachować wszystkie migracje i zabezpieczenia main. Zakaz zdalnych migracji, wdrożeń aplikacji, nadpisania zaakceptowanego UI i merge do main bez osobnego potwierdzenia właściciela.

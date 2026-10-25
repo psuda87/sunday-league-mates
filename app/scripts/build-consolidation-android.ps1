@@ -2,13 +2,19 @@
 param([ValidateSet('live','premium')][string]$Variant='live')
 $ErrorActionPreference='Stop'
 $consolidationApp=Split-Path $PSScriptRoot -Parent
-function Invoke-Consolidation([string]$File,[string[]]$Arguments){ & $File @Arguments; if($LASTEXITCODE -ne 0){throw "Consolidation command failed: $File"} }
+function Invoke-Consolidation([string]$File,[string[]]$Arguments){
+ # Windows PowerShell can treat redirected native warnings as ErrorRecords.
+ # The process exit code, rather than stderr alone, determines build failure.
+ $ErrorActionPreference='Continue'
+ & $File @Arguments
+ if($LASTEXITCODE -ne 0){throw "Consolidation command failed: $File"}
+}
 Push-Location $consolidationApp
 $consolidationNames=@('JAVA_HOME','ANDROID_HOME','SLM_B1_ANDROID','SLM_V1_LIVE_LOCAL','SLM_LOCAL_ANDROID')
 $consolidationSaved=@{}
 foreach($name in $consolidationNames){$consolidationSaved[$name]=[Environment]::GetEnvironmentVariable($name,'Process')}
 try {
- if((& git branch --show-current).Trim() -ne 'feat/v1-consolidation'){throw 'Requires feat/v1-consolidation'}
+ if((& git branch --show-current).Trim() -notin @('feat/v1-consolidation','feat/premium-b3-groups')){throw 'Requires reviewed consolidation/B3 branch'}
  $env:JAVA_HOME='C:\Program Files\Android\Android Studio\jbr'
  if(-not $env:ANDROID_HOME){$env:ANDROID_HOME=Join-Path $env:LOCALAPPDATA 'Android\Sdk'}
  $env:SLM_LOCAL_ANDROID='1'

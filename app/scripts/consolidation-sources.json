@@ -1,5 +1,5 @@
 {
-  "main": "1fadd977d9737f371b75a59eee63ce6c50e4cb3b",
+  "main": "a46f5e42c1e996b8e4cac16e443b21e5dedc7dd1",
   "premium318": "d0f9fa9f840d2bd7f4985d00c24ee9a703f6b3e4",
   "live": "5c3f13fe0cbe3d0f8e14b7c980189b25cf7bb94f",
   "accepted_card": "30772dee1b0049c74e6682d47ab4d4848252855f",
@@ -32,7 +32,10 @@
     "app/supabase/migrations/20261019174004_slm_v2_legacy_cost_column.sql": "7b666a9a7af1a9d5762bc78382c2886fa1ae09dced35edfd2bf4f8efbdabb9c0",
     "app/supabase/migrations/20261019175037_slm_v2_final_scope_hardening.sql": "ffb35c12cc187c0a0ac03a24067b6418d6fac2837b9663bffd41ab517dea5e3f",
     "app/supabase/migrations/20261019175309_slm_v2_own_event_filter.sql": "4abdf21e34e11d15a86bc9d5376f4295c4c049bc0d9b93d517e5e9f3eb3c1abb",
-    "app/supabase/migrations/20261019175940_slm_v2_legacy_payment_dto.sql": "4d061536b3c2868e3faf0aecef3e942767fd89f218c6c893900dcf9cb3b6a082"
+    "app/supabase/migrations/20261019175940_slm_v2_legacy_payment_dto.sql": "4d061536b3c2868e3faf0aecef3e942767fd89f218c6c893900dcf9cb3b6a082",
+    "app/supabase/migrations/20261023193156_slm_match_summary_filter.sql": "01d858851c603d1f7009b2f9677252dae04999ddc141dc8025871a5736185c1a",
+    "app/supabase/migrations/20261023200138_profile_photos_private.sql": "e3c2799c9560254780c9478629b6d97216f4941b375ce500b18e9202fd360376",
+    "app/supabase/migrations/20261025160000_slm_v1_profile_b22.sql": "ec598912adda44f0027b285ca2f0573e8587779d5717ea8015f37ac1711fcf80"
   },
   "hash_policy": "SHA256 with CRLF normalized to LF; no SQL edits permitted",
   "main_runtime": {
