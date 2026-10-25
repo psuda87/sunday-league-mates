@@ -1920,3 +1920,38 @@ Podgląd: app/card-preview.html i src/card-preview.tsx, oryginalny komponent, Te
 /test-portrait.jpg pozostaje lokalnym plikiem testowym i nie jest dodawany do commita.
 Inne istniejące lokalne zmiany App.tsx/demo/Android/config/assets pozostają nietknięte.
 Potwierdzenie wizualne użytkownika PASS; git diff --check. Bez ponownego builda/testów.
+
+
+=== 2026-10-25 15:39:45 Europe/Warsaw — zabezpieczenie i publikacja całej lokalnej pracy
+Polecenie właściciela: wypchnąć wszystko, poprawnie oznaczyć i nie utracić danych.
+Przed zmianami zapisano kopię16 zmienionych/nieśledzonych plików (ZIP, SHA256 i manifest
+usunięć) dla4 worktree oraz kompletny repository-all-refs.bundle; git bundle verify PASS.
+Katalog lokalny, ignorowany przez Git: I:\slm\sunday-league-mates\.cache\checkpoints\pre-push-20261025-153406
+Fetch origin PASS. Przejrzano lokalne zmiany,5 materiałów graficznych i raporty historyczne.
+Skan166 tekstowych blobów nieopublikowanej historii nie wykazał kluczy prywatnych,
+PAT/JWT/kluczy AWS ani haseł w adresach PostgreSQL. Dodatkowe dopasowania to etykiety
+formularza i fikcyjne hasła testów, nie dane rzeczywistych kont.
+PASS TypeScript oraz build:demo i kontrola izolacji15plików — bez produkcyjnego Auth/API
+w artefakcie demonstracyjnym. Nie ponawiano pełnych testów ani instalacji telefonu.
+Commity feat/ui-beta:30772de zatwierdzony wygląd/podgląd,34cb3c8 zachowane lokalne źródła
+Android/formatowanie i rename Groups→GroupScreens,1024cd6 dostarczone grafiki i testowy
+portret,32c364b archiwalne raporty Androida z jawnym oznaczeniem historycznego stanu.
+Pierwszy atomowy push PASS;5 gałęzi zweryfikowano przez git ls-remote i ustawiono upstream:
+ - feat/ui-beta 32c364b
+ - feat/slm-v1-live 5c3f13f
+ - feat/premium318-live 4b14e0c
+ - feat/premium319-android ac4954c
+ - chore/local-phone-fixtures ac4954c
+Pozostałe lokalne gałęzie były już identyczne z origin. Main pozostał bez zmian.
+Dodajemy opisane tagi checkpoint/2026-10-25-{ui-beta,slm-v1-live,premium318-live,
+premium319-android,local-phone-fixtures}; to checkpointy historii, nie deklaracje release.
+Ostatni commit dokumentacji i tagi są publikowane osobnym atomowym push; końcowy
+wynik/referencje zostaną ponownie sprawdzone bez przepisywania historii.
+Pliki .env/sekrety/cache/node_modules/APK i dane Docker/Storage nie są publikowane.
+Nie resetowano baz, nie usuwano zdjęć/danych telefonu, nie kopiowano danych Storage do Git.
+Przesłane źródła/grafiki obejmują portret testowy podglądu, nie zdjęcia kont z prywatnego bucketa.
+Lokalne dane środowisk pozostają na dysku; bundle/ZIP nie zastępują backupu bazy Dockera.
+Nie wykonano merge, force push, zdalnych migracji ani ręcznych wdrożeń. Istniejący
+automatyczny preview Vercel może zareagować na zwykły push feat/ui-beta, zgodnie z wcześniejszą konfiguracją.
+Zatwierdzone korekty wyglądu są na feat/ui-beta; działająca integracja B1/B2 na feat/slm-v1-live.
+Nie łączono ich automatycznie. Historia publikacji: docs/ODPOWIEDZI_CODEX.txt.
