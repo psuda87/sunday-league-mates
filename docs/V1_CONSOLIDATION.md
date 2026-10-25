@@ -1,6 +1,6 @@
 # SLM 1.0 — pierwszy PR konsolidacyjny
 
-2026-10-25 17:04 Europe/Warsaw. Gałąź `feat/v1-consolidation` z main `1fadd977`. Osobny worktree `.worktrees/v1-consolidation`; źródłowe gałęzie i katalog użytkownika zachowane.
+2026-10-25 17:04 Europe/Warsaw. Gałąź `feat/v1-consolidation` z main `1fadd977`. Implementacja `f50484f`; [draft PR #11](https://github.com/psuda87/sunday-league-mates/pull/11) otwarty bez scalania. Osobny worktree `.worktrees/v1-consolidation`; źródłowe gałęzie i katalog użytkownika zachowane.
 
 ## Zakres i rozstrzygnięcia
 
