@@ -9,7 +9,7 @@ const allowed = new Set([
   'src/demo/accountState.ts', 'src/demo/AccountDemo.tsx', 'src/account-ui/model.ts', 'src/account-ui/Fields.tsx', 'src/account-ui/AccountScreens.tsx', 'src/account-ui/account.css', 'src/ui/UltimatePlayerCard.tsx',
   'src/demo/palettes.css',
   'src/demo/eventAccess.ts', 'src/demo/EventAccessView.tsx', 'src/demo/eventAccess.css',
-  'src/demo/groups.ts', 'src/demo/Groups.tsx',
+  'src/demo/groups.ts', 'src/demo/GroupScreens.tsx',
   'src/demo/eventDraft.ts', 'src/demo/EventForm.tsx', 'src/demo/DemoBottomNav.tsx',
   'src/demo/Identity.tsx', 'src/demo/portraits.ts', 'src/demo/Finance.tsx', 'src/demo/Teams.tsx', 'src/demo/UltimatePlayerCard.tsx', 'src/demo/App.tsx', 'src/demo/data.ts', 'src/demo/Panels.tsx', 'src/demo/Profile.tsx', 'demo/index.html', 'demo/main.tsx', 'src/ui/Demo.tsx', 'src/ui/MatchHero.tsx',
   'src/ui/Players.tsx', 'src/ui/MatchHeader.tsx', 'src/ui/ParticipantGroup.tsx', 'src/ui/MatchFilters.tsx', 'src/ui/MatchCapacityProgress.tsx', 'src/ui/capacity.ts', 'src/ui/BottomNav.tsx',

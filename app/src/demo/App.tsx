@@ -20,7 +20,7 @@ import { initialWorld, reduceWorld, registered, reserves, scenarioGame, unpaidGa
 import type { DemoPlayer, Game, Scenario } from './data';
 import { DemoPanels } from './Panels';
 import DemoProfile from './Profile';
-import Groups from './Groups';
+import Groups from './GroupScreens';
 import { canViewGroupProfile } from './groups';
 import '../pages/Accounts.css';
 type Frame={key:number;kind:'player'|'game';id:string;y:number;focus:HTMLElement|null;groupId?:string;gameId?:string};
