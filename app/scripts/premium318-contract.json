@@ -6,7 +6,8 @@
     "main BottomNav group navigation retained",
     "main legacy email/login/phone label retained",
     "Windows GroupScreens alias",
-    "previous B1/B2 data bindings and approved card CSS"
+    "previous B1/B2 data bindings and approved card CSS",
+    "Owner-approved BottomNav highlight fix: shared active state, full tab area and existing plus notch; Ultimate rules unchanged"
   ],
   "files": {
     "app/demo/main.tsx": {
@@ -170,7 +171,7 @@
       "text": true
     },
     "app/src/theme/variables.css": {
-      "sha256": "4996ef1a2721b9396ee77035b481020824de42d8990f4c9d70b6ff547846d5e4",
+      "sha256": "3b27fbe3c761b6640068f6f95ce2708d63c97bdf164a8df38a7bb2718f599c78",
       "text": true
     },
     "app/src/ui/AppearanceSettings.tsx": {
