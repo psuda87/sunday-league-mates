@@ -1,4 +1,5 @@
 import { isPhoneIdentifier, normalizeLoginPhone, normalizePhoneUpdate } from '../_shared/phone.ts';
+import { PhotoError, profilePhoto, readAccountBody } from './profilePhotos.ts';
 export interface Environment { url: string; anon: string; service: string; origins: string[]; emailSignupEnabled?: boolean }
 type Row = Record<string, unknown>;
 class ApiError extends Error {
@@ -117,10 +118,10 @@ export function createHandler(env: Environment) {
     return sessionPayload(session);
   }
   async function profile(id: string) {
-    const [a, profiles] = await Promise.all([alias(id), db(`slm_profiles?user_id=eq.${id}`)]);
+    const [a, profiles, players] = await Promise.all([alias(id), db(`slm_profiles?user_id=eq.${id}`), db(`slm_player_profiles?user_id=eq.${id}&select=jersey_number`)]);
     const p = profiles[0];
     if (!p) throw unauthorized();
-    return { user_id: id, login: a.login, phone: a.phone, email_account: a.email_account === true, full_name: p.full_name,
+    return { user_id: id, jersey_number: players[0]?.jersey_number ?? null, login: a.login, phone: a.phone, email_account: a.email_account === true, full_name: p.full_name,
       display_as: p.display_as, display_name: displayName(a.login, p.full_name, p.display_as) };
   }
   async function verifyPassword(ctx: Row, pwd: string) {
@@ -142,8 +143,16 @@ export function createHandler(env: Environment) {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers });
     if (request.method !== 'POST') return respond({ error: 'Niedozwolona metoda.' }, 405);
     try {
-      const text = await request.text();
-      if (new TextEncoder().encode(text).length > 12000) throw new ApiError(413, 'too_large', 'Za duże żądanie.');
+      const uploadRequest=new URL(request.url).searchParams.get('photo')==='upload';
+      let uploadContext:Awaited<ReturnType<typeof context>>|undefined;
+      if(uploadRequest) {
+        const authorization=request.headers.get('authorization')??'';
+        if(!authorization.startsWith('Bearer '))throw unauthorized();
+        uploadContext=await context(authorization.slice(7));
+        if(uploadContext.must_change_password)throw new ApiError(403,'password_required','Najpierw zmień hasło tymczasowe.');
+        await rate('photo:'+uploadContext.id,10);
+      }
+      const text = await readAccountBody(request,uploadRequest?210000:12000);
       let parsed: unknown;
       try { parsed = JSON.parse(text); }
       catch { throw new ApiError(400, 'invalid_input', 'Nieprawidłowe żądanie.'); }
@@ -151,6 +160,7 @@ export function createHandler(env: Environment) {
         throw new ApiError(400, 'invalid_input', 'Nieprawidłowe żądanie.');
       const body = parsed as Row;
       const action = field(body, 'action', 40);
+      if(uploadRequest&&action!=='profile_photo_upload')throw new ApiError(400,'invalid_input','Nieprawidłowe żądanie.');
       await rate('global', 300);
       if (action === 'signup' || action === 'resend_verification' || action === 'recover_email') {
         await rate('email-flow', 12);
@@ -233,10 +243,14 @@ export function createHandler(env: Environment) {
         await call('/auth/v1/logout?scope=local', 'POST', undefined, token).catch(() => undefined);
         return respond({ ok: true });
       }
-      const ctx = await context(token);
+      const ctx = uploadContext ?? await context(token);
       if (action === 'status') return respond({ must_change_password: ctx.must_change_password, role: ctx.role, user_id: ctx.id });
       if (ctx.must_change_password && action !== 'password')
         throw new ApiError(403, 'password_required', 'Najpierw zmień hasło tymczasowe.');
+      if (['profile_photo_get','profile_photo_upload','profile_photo_delete'].includes(action)) {
+        if(!uploadRequest)await rate('photo:'+ctx.id,action==='profile_photo_get'?60:10);
+        return respond(await profilePhoto(env,ctx,action,body));
+      }
       if (action === 'finance_groups') {
         await rate('scoped:' + ctx.id, 90);
         const result = await call('/rest/v1/rpc/slm_finance_groups', 'POST', { p_user: ctx.id, p_session: ctx.sid }, undefined, true);
@@ -419,6 +433,12 @@ export function createHandler(env: Environment) {
           p_nickname: nickname, p_phone: phone, p_number: null });
         return respond(await profile(ctx.id));
       }
+      if (action === 'save_jersey_number') {
+        if(Object.keys(body).some(key=>!['action','jersey_number'].includes(key))||!Number.isInteger(body.jersey_number)||Number(body.jersey_number)<0||Number(body.jersey_number)>99)throw new ApiError(400,'invalid_number','Wpisz pełny numer od 0 do 99.');
+        await rate('number:'+ctx.id,20);
+        await db('rpc/slm_profile_number_save','POST',{p_user:ctx.id,p_session:ctx.sid,p_number:body.jersey_number});
+        return respond(await profile(ctx.id));
+      }
       if (action === 'profile') return respond(await profile(ctx.id));
       if (action === 'save_profile') {
         const name = field(body, 'full_name', 100).trim();
@@ -496,7 +516,7 @@ export function createHandler(env: Environment) {
       }
       throw new ApiError(400, 'invalid_action', 'Nieznana operacja.');
     } catch (error) {
-      if (error instanceof ApiError) return respond({ error: error.message, code: error.code }, error.status);
+      if (error instanceof ApiError || error instanceof PhotoError) return respond({ error: error.message, code: error.code }, error.status);
       return respond({ error: 'Nie udało się wykonać operacji. Spróbuj ponownie.', code: 'server_error' }, 500);
     }
   };

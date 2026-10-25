@@ -1,5 +1,42 @@
 # Aktualny stan Sunday League Mates
 
+2026-10-25 17:23 Europe/Warsaw — końcowy przegląd PR #11: sprawdzono ae397c4 względem main 1fadd977, brak konfliktów (main ancestor, GitHub mergeable=true). Brak błędów blokujących. PR oznaczono Ready for review zgodnie z wyraźnym poleceniem właściciela, bez merge.
+Domyślny LIVE i 29 migracji main zachowane; Premium B1/B2 jawny wariant lokalny; karta/CSS30772de i55 plików Premium bez regresji. Uwzględniono7/7 ręcznych PASS właściciela. Nie wykryto utraty funkcji/danych w sprawdzonym zakresie.
+Powtórzono: TS/lint/229 Vitest, source guards, diff check PASS; SQL9/9 i64/64 (w tym wcześniej pominięty późny cutoff i rzeczywisty push_claim). Security advisors0 problemów, scan367 ścieżek0 rozpoznanych sekretów. Cztery ostrzeżenia SQL nie blokują merge: push_claim ma poprawny wynik runtime; p_number jest zachowaną kompatybilną sygnaturą; v_before/v_rows to nieużywane deklaracje. Brak zmian kodu i nowych migracji. Testy tylko we własnych nowych lokalnych bazach, istniejąca baza bez zmian. Brak zdalnych migracji/deploy/Storage i brak merge. Oczekuje osobne potwierdzenie właściciela na scalenie; FCM/iOS/zdalny rollout niezweryfikowane. Szczegóły: docs/V1_CONSOLIDATION.md.
+
+---
+
+## Historia przed końcowym przeglądem
+
+# Aktualny stan Sunday League Mates
+
+2026-10-25 17:18 Europe/Warsaw — ODBIÓR RĘCZNY KONSOLIDACJI: właściciel potwierdził wszystkie siedem scenariuszy PASS (Premium Auth/sesja, profil/numer, zdjęcia, wygląd Ultimate/oba motywy, oznaczenie demo, funkcje LIVE, brak crashy/błędów uprawnień/utraty danych). Źródło: deklaracja właściciela po testach, nie nowe testy automatyczne agenta.
+PR #11 nadal draft i bez scalania. Odbiór ręczny nie jest zgodą na merge ani zdalne wdrożenie. Pozostają wcześniej opisane ostrzeżenia SQL i pominięty test późnego cutoff; nie rozpoczęto kolejnego modułu.
+
+---
+
+## Historia konsolidacji i stan wcześniejszy
+
+# Aktualny stan Sunday League Mates
+
+2026-10-25 17:15 Europe/Warsaw — POCO ponownie widoczne przez ADB; reverse54321 przywrócone, backend HTTP204. Aplikacja ponownie uruchomiona bez czyszczenia danych/logout. Potwierdzenie sesji na ekranie oczekuje na użytkownika.
+
+2026-10-25 17:14 Europe/Warsaw — backend lokalny odpowiada, ale ADB nie widzi POCO. Przywrócenie reverse i ponowienie sesji czeka na ponowne podłączenie USB; bez logout/resetu danych.
+
+2026-10-25 17:10 Europe/Warsaw — Premium B1/B2 konsolidacji zainstalowane na POCO przez install -r i uruchomione. Lokalny API/reverse działają; brak sprawdzanych markerów crasha/transportu w logcat procesu. Bez czyszczenia danych. Odbiór ręczny wyglądu, sesji i profilu oczekuje na właściciela. PR #11 nadal draft, bez merge. Poniższy raport budowy jest historyczny względem tej instalacji.
+
+2026-10-25 17:04 Europe/Warsaw — feat/v1-consolidation, baza main 1fadd977, izolowany worktree .worktrees/v1-consolidation.
+Domyślny LIVE main zachowany. Premium B1/B2 to jawny wariant lokalny: realne Auth/własny profil, poza tym oznaczone demo. Karta/CSS z 30772de, wzorzec Premium d0f9fa9. 29 migracji main nienaruszone; 3 wcześniej zatwierdzone lokalne SQL przeniesione do historii (32), bez zależności od cudzej .cache. Lokalny Edge uruchomiony z kanonicznych źródeł; brak migracji/resetu istniejącej i zdalnej bazy, brak wdrożeń zdalnych.
+PASS: TS/lint/diff, 229 Vitest, SQL9+63, HTTP B1 9/profil22/zdjęcia38/scoped20, realny browser LIVE1, Cypress B1/B2 6, kodek1, Premium smoke8 rozmiarów/motywów; build main/demo/oba lokalne APK, native unit i weryfikacja zasobów. Release local prawidłowo zablokowany. CORS na 5193 prawidłowo odrzucił test; 5174 PASS bez zmiany zabezpieczeń. Lint SQL kod0 z czterema istniejącymi ostrzeżeniami, jawnie w raporcie. Późny cutoff i fizyczny odbiór konsolidacji NOT TESTED. ADB device potwierdzone, nowego APK nie instalowano; instrukcja install -r w raporcie.
+Skan wzorców sekretów bez potwierdzonego sekretu; marker PEM w niezmienionym parserze FCM nie jest kluczem. Brak zmian zdalnych Supabase/Storage, bez B3/B4, Maps i nowych metod Auth. AGENTS.md zawiera nową zasadę moduł→testy→akceptacja→PR→osobno potwierdzony merge main przed następnym modułem.
+Szczegóły, SHA APK, pozostałe demo, rozstrzygnięcia i instrukcje odbioru: docs/V1_CONSOLIDATION.md. Zrzuty tylko fikcyjnych danych: docs/ui/v1-consolidation. Gałąź wypchnięta; [draft PR #11](https://github.com/psuda87/sunday-league-mates/pull/11) otwarty bez scalania, implementacja `f50484f`. Następny krok: odbiór POCO i review. Main nadal `1fadd977`.
+
+---
+
+## Stan historyczny przed konsolidacją
+
+# Aktualny stan Sunday League Mates
+
 19.10.2026 ? branch roboczy `feat/integration`, worktree `I:\slm\sunday-league-mates-integration`.
 Rdze? integracji: `0ec5200`; dokumentacja i ?r?d?a grafik: `309d57c`. Oba commity wypushowano. [PR #2](https://github.com/psuda87/sunday-league-mates/pull/2) scalono standardowym merge `c28b09d77a6a203954c10060d1e87aa105cfeef2` do main. Lokalny main zsynchronizowano fast-forward bez prze??czania worktree. Bez wdro?enia aplikacji i zdalnej bazy.
 

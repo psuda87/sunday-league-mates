@@ -6,7 +6,7 @@ import { accountMessage, emailProblem, emptyProfile, normalizeEmail, passwordPro
 import type { AccountUiPort, AccountView, ProfileDraft } from './model';
 import UltimatePlayerCard from '../ui/UltimatePlayerCard';
 import type { CardPortrait } from '../ui/UltimatePlayerCard';
-export default function AccountScreens({view,port,onNavigate,profile=emptyProfile(),portraits=[],demo=false}:{view:AccountView;port:AccountUiPort;onNavigate:(view:AccountView)=>void;profile?:ProfileDraft;portraits?:CardPortrait[];demo?:boolean}) {
+export default function AccountScreens({view,port,onNavigate,profile=emptyProfile(),portraits=[],demo=false,loginOrPhone=false}:{view:AccountView;port:AccountUiPort;onNavigate:(view:AccountView)=>void;profile?:ProfileDraft;portraits?:CardPortrait[];demo?:boolean;loginOrPhone?:boolean}) {
  const [email,setEmail]=useState(''),[password,setPassword]=useState(''),[confirmation,setConfirmation]=useState(''),[current,setCurrent]=useState('');
  const [draft,setDraft]=useState(profile),[number,setNumber]=useState(profile.jerseyNumber===undefined?'':String(profile.jerseyNumber)),[consent,setConsent]=useState(false);
  const [busy,setBusy]=useState(false),[errors,setErrors]=useState<string[]>([]),[notice,setNotice]=useState(''),[cooldown,setCooldown]=useState(0);
@@ -21,14 +21,15 @@ export default function AccountScreens({view,port,onNavigate,profile=emptyProfil
  const profileValue=()=>({...draft,nickname:draft.nickname.trim(),fullName:draft.fullName.trim(),jerseyNumber:number===''?undefined:Number(number)});
  function submit(event:FormEvent){event.preventDefault();if(flight.current)return;
   const problems:string[]=[];
-  if(['login','register','forgot'].includes(view))problems.push(...[emailProblem(email)].filter(Boolean));
+  if(view==='login'&&loginOrPhone&&!email.trim())problems.push('Podaj login lub numer telefonu.');
+  if((view==='login'&&!loginOrPhone)||['register','forgot'].includes(view))problems.push(...[emailProblem(email)].filter(Boolean));
   if(view==='login'&&!password)problems.push('Podaj hasło.');
   if(['register','reset','password'].includes(view)){const problem=passwordProblem(password);if(problem)problems.push(problem);if(password!==confirmation)problems.push('Hasła muszą być takie same.');}
   if(view==='register'||view==='first-profile')problems.push(...profileProblems(profileValue()));
   if(view==='register'&&!consent)problems.push('Akceptacja regulaminu i polityki prywatności jest wymagana.');
   if(view==='password'&&!current)problems.push('Podaj obecne hasło.');
   if(problems.length){setErrors(problems);requestAnimationFrame(()=>errorBox.current?.focus());return;}
-  if(view==='login')void work(()=>port.signIn(normalizeEmail(email),password));
+  if(view==='login')void work(()=>port.signIn(loginOrPhone?email.trim():normalizeEmail(email),password));
   if(view==='register')void work(()=>port.signUp(profileValue(),normalizeEmail(email),password));
   if(view==='forgot')void work(()=>port.requestPasswordReset(normalizeEmail(email)),demo?'Symulacja: jeśli konto kwalifikuje się do odzyskania, Auth wysłałby instrukcję. W demo nie wysyłamy wiadomości.':'Jeśli konto kwalifikuje się do odzyskania, otrzymasz instrukcję. Sprawdź skrzynkę i spam.');
   if(view==='reset'||view==='password')void work(()=>port.updatePassword(password,view==='password'?current:undefined));
@@ -44,7 +45,7 @@ export default function AccountScreens({view,port,onNavigate,profile=emptyProfil
   {busy&&<p role="status"><IonSpinner/> Trwa operacja…</p>}
   {view==='first-profile'&&<div className="slm-account-profile-preview slm-ultimate-profile"><UltimatePlayerCard name={draft.nickname.trim()||'Nowy zawodnik'} jerseyNumber={number!==''&&/^\d{1,2}$/.test(number)?Number(number):undefined} portrait={draft.portrait}/><dl className="slm-ultimate-stats">{['Mecze','Gole','Asysty','MVP'].map(label=><div key={label}><dt>{label}</dt><dd>0</dd></div>)}</dl><p>Gwiazdki są dekoracją. Zdjęcie i numer są opcjonalne; nie należysz jeszcze do żadnej grupy.</p></div>}
   {submitLabels[view]&&<form noValidate onSubmit={submit} aria-label={titles[view]} aria-busy={busy}>
-   {view==='login'?<SignInFields identifier={email} password={password} onIdentifier={setEmail} onPassword={setPassword}/>:<>
+   {view==='login'?<SignInFields loginOrPhone={loginOrPhone} identifier={email} password={password} onIdentifier={setEmail} onPassword={setPassword}/>:<>
     {(view==='register'||view==='first-profile')&&profileFields}
     {(view==='register'||view==='forgot')&&<TextField id="account-email" label="Adres e-mail" type="email" autoComplete="email" inputMode="email" value={email} onChange={setEmail} maxLength={254}/>}
     {view==='password'&&<PasswordField label="Obecne hasło" value={current} onChange={setCurrent}/>}

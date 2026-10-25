@@ -1,13 +1,15 @@
 // No mocked responses. Run only via scripts/test-live-ui-local.mjs.
 describe('Rzeczywista przeglądarka i lokalny Supabase',()=>{
  it('loguje e-mailem, tworzy grupę i mecz, zapisuje siebie i gościa do rezerwy, otwiera finanse i wylogowuje',()=>{
-  cy.intercept('**/functions/v1/accounts',req=>{if(!req.url.startsWith('http://127.0.0.1:54321/'))throw new Error('Remote API forbidden in local integration test');req.continue();});
+  cy.intercept('**/functions/v1/accounts',req=>{if(!req.url.startsWith('http://127.0.0.1:54321/'))throw new Error('Remote API forbidden in local integration test');if(req.body?.action==='login')req.alias='liveLogin';req.continue();});
   cy.visit('/');
   cy.env(['slm_email','slm_password'],{log:false}).then(values=>{
    cy.get('ion-input').filter((_,el)=>(el as unknown as {label:string}).label==='E-mail, login lub numer telefonu').find('input').type(String(values.slm_email),{log:false});
    cy.get('input[type="password"]').type(String(values.slm_password),{log:false});
   });
   cy.contains('ion-button','Zaloguj się').click();
+  cy.wait('@liveLogin').its('response.statusCode').should('eq',200);
+  cy.get('[role=alert]').should('not.exist');
   cy.contains('nav[aria-label="Główna nawigacja"] button','Grupy').click();
   cy.contains('section','Utwórz grupę').within(()=>{cy.contains('label','Nazwa').find('input').type('Live fixture group');cy.contains('ion-button','Utwórz grupę').click();});
   cy.contains('h2','Live fixture group').should('be.visible');

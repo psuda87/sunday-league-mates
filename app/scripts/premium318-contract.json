@@ -1,0 +1,233 @@
+{
+  "frozen_reference": "d0f9fa9",
+  "data_reference": "5c3f13f",
+  "card_reference": "30772de",
+  "exceptions": [
+    "main BottomNav group navigation retained",
+    "main legacy email/login/phone label retained",
+    "Windows GroupScreens alias",
+    "previous B1/B2 data bindings and approved card CSS"
+  ],
+  "files": {
+    "app/demo/main.tsx": {
+      "sha256": "dcd41a7c57bf20e310c0abc49ec97d047172d5957fa8be7670c6078d627df352",
+      "text": true
+    },
+    "app/public/assets/branding/espana-dark-texture.jpg": {
+      "sha256": "c9cc115d9b09c04849332183a7f6644e95eb83b8972486a0d29ce924be599775",
+      "text": false
+    },
+    "app/public/assets/branding/slm-app-icon-192.png": {
+      "sha256": "c23c65fad401ecbafa34f0333d0b29dc9d2db1d777df4e8829ceda5ef4a229ff",
+      "text": false
+    },
+    "app/public/assets/branding/slm-app-icon-512.png": {
+      "sha256": "ed78c291b237e19939593c4494232a0f4a4f52da419fa12195ed92e82b43e9aa",
+      "text": false
+    },
+    "app/public/assets/branding/slm-app-icon.png": {
+      "sha256": "816d21b478f89aed570cb6f995291c3158d7b88a56ab8887a8e41aebe891d813",
+      "text": false
+    },
+    "app/public/assets/branding/slm-crest-espana.svg": {
+      "sha256": "f45e3f13c05cf2bba52d9fdb97b2cd632e34b0b2ed4fe260a114ab58708a407a",
+      "text": true
+    },
+    "app/public/assets/branding/slm-favicon-64.png": {
+      "sha256": "58c6ff1ce6af1a058eb6a87fdbe20ae1a5e066180c3436abf0934ffb431fe1b3",
+      "text": false
+    },
+    "app/public/assets/branding/slm-favicon-source.png": {
+      "sha256": "b574522a7705cafcad40e251ead6660270ed113c07241337c29bec24ce9242e4",
+      "text": false
+    },
+    "app/public/assets/branding/slm-logo-header-transparent.png": {
+      "sha256": "aea4749541b7969944baca3a118bcc5aee98cf3aa240122e35588537b5e9c974",
+      "text": false
+    },
+    "app/public/assets/branding/slm-logo-header.png": {
+      "sha256": "a444f819b10488e3c605a56f7e1ae3b67dcb166f4451c4332bc9789c1bdd3247",
+      "text": false
+    },
+    "app/public/assets/branding/slm-logo-primary-transparent.png": {
+      "sha256": "c92da441e305e733a1b8a56d49f3fa4fbf2346c779fe6c33b25daaacbd6778dc",
+      "text": false
+    },
+    "app/public/assets/branding/slm-logo-primary.png": {
+      "sha256": "36d8237ee7ac0cc4fe2bc57b2d5f22c57c25b600f459d27684167a2f89782637",
+      "text": false
+    },
+    "app/public/assets/branding/stadium-bg-card.jpg": {
+      "sha256": "2ed47bad7f6774da348d4dc15491078cff38542354a6befe5b0358ff90409de0",
+      "text": false
+    },
+    "app/public/assets/branding/stadium-bg-main.jpg": {
+      "sha256": "5657795f77243d23eb2974627193b3592472eb31d28f8ebb3c87c80a8e2b119e",
+      "text": false
+    },
+    "app/public/assets/demo/fictional-portraits.webp": {
+      "sha256": "94777ea97968f6c05b6611a45c98e0d9c1bf044b33c7b5db8d9404863e039ec2",
+      "text": false
+    },
+    "app/src/account-ui/AccountScreens.tsx": {
+      "sha256": "32a36235bdb06f7ae2ee7ac0e4868859fb11be128a492d49d41b666a89111cde",
+      "text": true
+    },
+    "app/src/account-ui/Fields.tsx": {
+      "sha256": "6a707c14f303441892894572b9eba7c438073fc6059e0ec9269e961628126d96",
+      "text": true
+    },
+    "app/src/account-ui/account.css": {
+      "sha256": "812e6d108248ecd591a726426bd59c80cf26b5c0517f0068fc417c152f048546",
+      "text": true
+    },
+    "app/src/account-ui/model.ts": {
+      "sha256": "799f93912ea392642372d3dd9b8c496f32ed118f550f94dd320784418f86643f",
+      "text": true
+    },
+    "app/src/demo/AccountDemo.tsx": {
+      "sha256": "a9d32b79ff92b5b06a9aca953e7668c5864e4a9b3b4d0f26e09639ba850b2f63",
+      "text": true
+    },
+    "app/src/demo/App.tsx": {
+      "sha256": "a5c789fcc6c0ae26464970209cf8536941a21b2b4805b4b713e231f40b34066a",
+      "text": true
+    },
+    "app/src/demo/DemoBottomNav.tsx": {
+      "sha256": "b52802ef06178560215894f2d7cd57f3e3fc9a506374a4d1bc9af7902738313e",
+      "text": true
+    },
+    "app/src/demo/EventAccessView.tsx": {
+      "sha256": "95a03dbe9aa96971eb0540395ec0d6b9947a199ae06cb4953265fa4ab5686d98",
+      "text": true
+    },
+    "app/src/demo/EventForm.tsx": {
+      "sha256": "abdaefc1709754e97e7a74bc692ffcc8754cea9e5ff40597a7b081e863969973",
+      "text": true
+    },
+    "app/src/demo/Finance.tsx": {
+      "sha256": "7298ebfb514bc69c04fa474813b9b4f837e990754059f0475ca09bce0a20238f",
+      "text": true
+    },
+    "app/src/demo/GroupScreens.tsx": {
+      "sha256": "c009d50526b75db91e8f5f0f7d92d1074d63152853ca8c981a4c554c620f2795",
+      "text": true
+    },
+    "app/src/demo/Identity.tsx": {
+      "sha256": "c04375cf26c07bda207571aa2a13c3882ea60219e7cb426bd9f7d22be0daeb0d",
+      "text": true
+    },
+    "app/src/demo/Panels.tsx": {
+      "sha256": "ab286e7ff4baa423cbc3cbd9aa8d05b0f8472defd98fdc6c51bf22fafd96d799",
+      "text": true
+    },
+    "app/src/demo/Profile.tsx": {
+      "sha256": "aec0e53b8a67d1b3decd5c1e3a1fc6d08f7e935eba276128ac00fddce609470e",
+      "text": true
+    },
+    "app/src/demo/Teams.tsx": {
+      "sha256": "4b6deac973e1dc4e01e1ec7aa95e8c3c008a66dcba3844693a3b88c03200ffa8",
+      "text": true
+    },
+    "app/src/demo/UltimatePlayerCard.tsx": {
+      "sha256": "5d5eb8b8509a6553c241fef04dc4d72b755977641874b0284d8f25633dc49c7d",
+      "text": true
+    },
+    "app/src/demo/accountState.ts": {
+      "sha256": "051cf93550de025e160598de4c26546c83d8e0cc5f595ebeb8e3cea3fe1162e8",
+      "text": true
+    },
+    "app/src/demo/data.ts": {
+      "sha256": "b816f730c42ee40345a387f07a78f88afd4bf2c9666d0c6403367fef10c30344",
+      "text": true
+    },
+    "app/src/demo/eventAccess.css": {
+      "sha256": "16d1ae934842a6b2761f231b44993de3e8f71bac95877c354dfb021fa574baa0",
+      "text": true
+    },
+    "app/src/demo/eventAccess.ts": {
+      "sha256": "331c4c76df89982da289d7b3f61a413c4a7d9fa86f2cac3aec8142623a929b67",
+      "text": true
+    },
+    "app/src/demo/eventDraft.ts": {
+      "sha256": "1de73cc4f102cf7b2677405d84faf8d83da1e08b776edb469b5b0b02652d1519",
+      "text": true
+    },
+    "app/src/demo/groups.ts": {
+      "sha256": "98efb06418e36b60be8a3de06020e846622d78423b9ee23ee31cd0939b38e810",
+      "text": true
+    },
+    "app/src/demo/palettes.css": {
+      "sha256": "93293b4dc7c2a3c0d996709ba482969d45616b45f202ea298d5fad3c1e880a74",
+      "text": true
+    },
+    "app/src/demo/portraits.ts": {
+      "sha256": "8f09fbbdf04dccfa0521346cf2ddc9684e8fe46ec3c9888fc78a0214b5cf6adc",
+      "text": true
+    },
+    "app/src/pages/Accounts.css": {
+      "sha256": "dde75dc3fe7f2730486effaf019852f3b2c981b34cd158aa4ccbc6d556e4b8b0",
+      "text": true
+    },
+    "app/src/theme/variables.css": {
+      "sha256": "4996ef1a2721b9396ee77035b481020824de42d8990f4c9d70b6ff547846d5e4",
+      "text": true
+    },
+    "app/src/ui/AppearanceSettings.tsx": {
+      "sha256": "919c4797ff66928f7bebd96dc93b8612b48f180f06ee440da52ed5e1eba43d9a",
+      "text": true
+    },
+    "app/src/ui/BottomNav.tsx": {
+      "sha256": "0c169adb2d8104083cfebd577ac4dd5c80378011fb584fc12f1108bc13416eff",
+      "text": true
+    },
+    "app/src/ui/Demo.tsx": {
+      "sha256": "187d667720f58533fb2a8bb8278fa30aab4852032b32ee0ef78147053029bc00",
+      "text": true
+    },
+    "app/src/ui/MatchCapacityProgress.tsx": {
+      "sha256": "5400ee51f6ef7b3a5ca60effbb2da8020a41a2d44d4a06e3930a1737185a32fb",
+      "text": true
+    },
+    "app/src/ui/MatchFilters.tsx": {
+      "sha256": "12e502872fb7c2e3b5c0f7bbafd3a9c65c0b5765facf36162af5f090bf2c31ba",
+      "text": true
+    },
+    "app/src/ui/MatchHeader.tsx": {
+      "sha256": "99e33fc72aa24844a8128f03944f0aa286c36508b7532e30d5fdf4ea20deb148",
+      "text": true
+    },
+    "app/src/ui/MatchHero.tsx": {
+      "sha256": "98bbd8c4b80f674b87b38303606f4cd772f04676382691fb1efec1e49d701bcc",
+      "text": true
+    },
+    "app/src/ui/MatchSections.tsx": {
+      "sha256": "a824c2565a5a3a395520af601a9781eba946e64340f0c2dced5211ffee472980",
+      "text": true
+    },
+    "app/src/ui/MatchTabs.tsx": {
+      "sha256": "753df4036200f0e5374c1c4d85a41a06324df30c6087bb588c7939d90e92a52f",
+      "text": true
+    },
+    "app/src/ui/ParticipantGroup.tsx": {
+      "sha256": "20191593cc5c1794fc9837d34ddde7aeb560487da652b3e9ab8aa1daba16d397",
+      "text": true
+    },
+    "app/src/ui/Players.tsx": {
+      "sha256": "9dd0e5fccca58c750b72a0a4fa201ef6d831da56fdd71d6fa6252b3c1a9c4f32",
+      "text": true
+    },
+    "app/src/ui/UltimatePlayerCard.tsx": {
+      "sha256": "82b972215211cd247ee6eb674405e22af60a4fc4e5b5ff66233919deb6e0524a",
+      "text": true
+    },
+    "app/src/ui/capacity.ts": {
+      "sha256": "cf903b7a46c5c68b101dcf106f2cf7554bf9f39e91dd272885ebc06169ef2ec7",
+      "text": true
+    },
+    "app/src/ui/theme.ts": {
+      "sha256": "101daa919f01f10bcc40c6230354d97142a9a3c67bed95bfddca7dfa8a5b6992",
+      "text": true
+    }
+  }
+}

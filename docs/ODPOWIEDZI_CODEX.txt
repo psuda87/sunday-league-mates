@@ -530,3 +530,51 @@ Skrypty wymagają działającego lokalnego Supabase. configure-auth zachowuje st
 kontenery jako stopped backup, nie zmienia bazy. Nie kopiować env do rozmowy/Git.
 JDK21 do builda Android znajduje się w Android Studio jbr; domyślny java na PATH
 jest17 i nie należy go mylić z użytym JDK21. Nie zmieniano globalnego JAVA_HOME.
+
+
+=== Pierwszy etap konsolidacji ===
+2026-10-25 17:04 Europe/Warsaw — feat/v1-consolidation, baza main 1fadd977, izolowany worktree .worktrees/v1-consolidation.
+Domyślny LIVE main zachowany. Premium B1/B2 to jawny wariant lokalny: realne Auth/własny profil, poza tym oznaczone demo. Karta/CSS z 30772de, wzorzec Premium d0f9fa9. 29 migracji main nienaruszone; 3 wcześniej zatwierdzone lokalne SQL przeniesione do historii (32), bez zależności od cudzej .cache. Lokalny Edge uruchomiony z kanonicznych źródeł; brak migracji/resetu istniejącej i zdalnej bazy, brak wdrożeń zdalnych.
+PASS: TS/lint/diff, 229 Vitest, SQL9+63, HTTP B1 9/profil22/zdjęcia38/scoped20, realny browser LIVE1, Cypress B1/B2 6, kodek1, Premium smoke8 rozmiarów/motywów; build main/demo/oba lokalne APK, native unit i weryfikacja zasobów. Release local prawidłowo zablokowany. CORS na 5193 prawidłowo odrzucił test; 5174 PASS bez zmiany zabezpieczeń. Lint SQL kod0 z czterema istniejącymi ostrzeżeniami, jawnie w raporcie. Późny cutoff i fizyczny odbiór konsolidacji NOT TESTED. ADB device potwierdzone, nowego APK nie instalowano; instrukcja install -r w raporcie.
+Skan wzorców sekretów bez potwierdzonego sekretu; marker PEM w niezmienionym parserze FCM nie jest kluczem. Brak zmian zdalnych Supabase/Storage, bez B3/B4, Maps i nowych metod Auth. AGENTS.md zawiera nową zasadę moduł→testy→akceptacja→PR→osobno potwierdzony merge main przed następnym modułem.
+Szczegóły, SHA APK, pozostałe demo, rozstrzygnięcia i instrukcje odbioru: docs/V1_CONSOLIDATION.md. Zrzuty tylko fikcyjnych danych: docs/ui/v1-consolidation. Następny krok: push gałęzi integracyjnej i PR do main bez scalania, odbiór POCO oraz review. Stan PR zostanie dopisany poniżej.
+
+
+=== 2026-10-25 17:06 Europe/Warsaw — zakończenie i PR ===
+Wypchnięto feat/v1-consolidation; implementacja f50484f6c15a2dec7acddfd71f97fc729fc98f0b. Draft PR #11 do main: https://github.com/psuda87/sunday-league-mates/pull/11 — otwarty, bez scalania. Main nadal 1fadd977, źródłowy worktree feat/ui-beta czysty i bez zmian. Domyślny LIVE zachowany; Premium B1/B2 i zaakceptowana karta 30772de jako jawny wariant lokalny. Rzeczywiste Auth/profil/zdjęcia/numer zachowane, pozostałe ekrany Premium oznaczone demo. Żadnych wdrożeń zdalnych ani resetów.
+Kontrole i ograniczenia w docs/V1_CONSOLIDATION.md; TS/lint/229 Vitest, SQL i HTTP, przeglądarka LIVE oraz build obu APK PASS. Pozostają znane ostrzeżenia SQL, późny cutoff i ręczny odbiór nowego APK na POCO. APK przygotowane, nie instalowano; instrukcja install -r bez czyszczenia danych w raporcie. Zasada modułów zapisana w AGENTS.md. Zatrzymano pracę przed merge i dalszymi modułami.
+Zrzut Premium: https://github.com/psuda87/sunday-league-mates/blob/feat/v1-consolidation/docs/ui/v1-consolidation/profile-390-dark.png
+
+
+=== 2026-10-25 17:10 Europe/Warsaw — uruchomienie na POCO ===
+Na polecenie właściciela zainstalowano Premium B1/B2 z konsolidacji, źródło implementacji f50484f (gałąź feat/v1-consolidation). SHA256 APK 60e89dbd56bf675368050a7360adefc12daffd6bc762c515f4c4ebf2eacb6da5 zgodny z manifestem.
+ADB c7a559b5 device, install -r Success bez uninstall/clear, uruchomienie pl.psuda87.slm/.MainActivity Status ok. Proces aktywny i aplikacja na pierwszym planie. Lokalne API HTTP 204 (OPTIONS), reverse tcp:54321 aktywny. W ostatnich 700 wpisach logcat procesu: 0 markerów crasha i 0 sprawdzanych błędów transportu WebView. To kontrola startu, nie pełny test funkcjonalny ani potwierdzenie zalogowania.
+Do odbioru ręcznego: karta Premium, własny profil i zdjęcie/numer, sesja i oba przyciski Wstecz. Pozostałe ekrany tego wariantu są oznaczonym demo. Nie zmieniano danych aplikacji/bazy ani zdalnego Supabase. PR #11 pozostaje draft bez scalania.
+
+
+=== 2026-10-25 17:14 Europe/Warsaw — diagnostyka braku połączenia ===
+Lokalny Docker i accounts API odpowiadają (OPTIONS HTTP 204). ADB nie widzi żadnego urządzenia; c7a559b5 not found, adb reconnect: no devices/emulators found. Nie można odtworzyć reverse tcp:54321 ani wznowić aplikacji przez ADB do czasu ponownego podłączenia telefonu. Nie wylogowano użytkownika ani nie czyszczono danych. Wymagane: podłączyć ponownie USB, odblokować telefon i zaakceptować ewentualną autoryzację debugowania.
+
+
+=== 2026-10-25 17:15 Europe/Warsaw — ponowne podłączenie POCO ===
+ADB c7a559b5 device. Przywrócono reverse tcp:54321; lokalne API OPTIONS HTTP 204. Ponownie uruchomiono aplikację przez force-stop/am start bez czyszczenia danych i bez logout, aby wykonała własne przywrócenie sesji. Start Status ok. Próba HOME przez input została odrzucona przez Android INJECT_EVENTS; nie zmieniano zabezpieczeń ani nie ponawiano wstrzykiwania klawiszy. Poprawność zalogowania/interfejsu wymaga potwierdzenia użytkownika.
+
+
+=== 2026-10-25 17:18 Europe/Warsaw — odbiór ręczny konsolidacji ===
+2026-10-25 17:18 Europe/Warsaw — ODBIÓR RĘCZNY KONSOLIDACJI: właściciel potwierdził wszystkie siedem scenariuszy PASS (Premium Auth/sesja, profil/numer, zdjęcia, wygląd Ultimate/oba motywy, oznaczenie demo, funkcje LIVE, brak crashy/błędów uprawnień/utraty danych). Źródło: deklaracja właściciela po testach, nie nowe testy automatyczne agenta.
+PR #11 nadal draft i bez scalania. Odbiór ręczny nie jest zgodą na merge ani zdalne wdrożenie. Pozostają wcześniej opisane ostrzeżenia SQL i pominięty test późnego cutoff; nie rozpoczęto kolejnego modułu.
+- PASS — Premium: logowanie i zachowanie sesji po restarcie.
+- PASS — Profil: zmiana imienia i numeru zawodnika.
+- PASS — Zdjęcie: dodanie, podmiana i usunięcie.
+- PASS — Karta Ultimate: wygląd, kadrowanie, motyw jasny/ciemny.
+- PASS — Premium: pozostałe ekrany wyraźnie oznaczone jako demo.
+- PASS — LIVE: grupy, mecze, zapis, goście i rozliczenia.
+- PASS — Brak crashy, błędów uprawnień i utraty danych.
+Wyniki zapisano także w docs/STATUS.md i docs/V1_CONSOLIDATION.md. Bez zmian kodu, brak potrzeby powtarzania testów/builda. Wcześniejsze lokalne zapisy instalacji i przywrócenia USB również zachowano. Automatyczna kontrola zatwierdzania odrzuciła zmianę PR #11 z draft na ready: wskazała brak osobnej zgody i ryzyko powiadomienia recenzentów. Nie ponawiano operacji; PR pozostaje draft. Następny krok wymaga decyzji właściciela w sprawie review/merge, bez automatycznego scalania.
+
+
+=== Końcowy przegląd PR #11 przed merge ===
+2026-10-25 17:23 Europe/Warsaw — końcowy przegląd PR #11: sprawdzono ae397c4 względem main 1fadd977, brak konfliktów (main ancestor, GitHub mergeable=true). Brak błędów blokujących. PR oznaczono Ready for review zgodnie z wyraźnym poleceniem właściciela, bez merge.
+Domyślny LIVE i 29 migracji main zachowane; Premium B1/B2 jawny wariant lokalny; karta/CSS30772de i55 plików Premium bez regresji. Uwzględniono7/7 ręcznych PASS właściciela. Nie wykryto utraty funkcji/danych w sprawdzonym zakresie.
+Powtórzono: TS/lint/229 Vitest, source guards, diff check PASS; SQL9/9 i64/64 (w tym wcześniej pominięty późny cutoff i rzeczywisty push_claim). Security advisors0 problemów, scan367 ścieżek0 rozpoznanych sekretów. Cztery ostrzeżenia SQL nie blokują merge: push_claim ma poprawny wynik runtime; p_number jest zachowaną kompatybilną sygnaturą; v_before/v_rows to nieużywane deklaracje. Brak zmian kodu i nowych migracji. Testy tylko we własnych nowych lokalnych bazach, istniejąca baza bez zmian. Brak zdalnych migracji/deploy/Storage i brak merge. Oczekuje osobne potwierdzenie właściciela na scalenie; FCM/iOS/zdalny rollout niezweryfikowane. Szczegóły: docs/V1_CONSOLIDATION.md.
+Rekomendacja: scalić dopiero po osobnym potwierdzeniu właściciela. Ready for review zostało wykonane, nie uruchamiano merge. Nie rozpoczynano kolejnych modułów.
