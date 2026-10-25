@@ -175,3 +175,7 @@ GoogleService-Info.plist
 *service-account*.json
 *.p8
 *.p12
+
+# Consolidation local Android variants
+app/dist-b1/
+app/dist-live-local/

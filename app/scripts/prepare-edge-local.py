@@ -2,12 +2,12 @@
 from pathlib import Path
 import subprocess,secrets
 repo=Path(__file__).resolve().parents[2]
-assert subprocess.check_output(["git","branch","--show-current"],cwd=repo,text=True).strip()=="feat/integration"
+assert subprocess.check_output(["git","branch","--show-current"],cwd=repo,text=True).strip()in ("feat/integration","feat/v1-consolidation")
 local=repo/".cache/http-edge"
 (local/"supabase/functions").mkdir(parents=True,exist_ok=True)
-files=subprocess.check_output(["git","ls-files","app/supabase/functions"],cwd=repo,text=True).splitlines()
-for name in files:
- source=repo/name
+sources=repo/"app/supabase/functions"
+for source in sorted(sources.rglob("*.ts")):
+ assert source.resolve().is_relative_to(sources.resolve()), "Only checked-out local sources allowed"
  if source.suffix!=".ts":continue
  relative=source.relative_to(repo/"app/supabase/functions")
  dest=local/"supabase/functions"/relative

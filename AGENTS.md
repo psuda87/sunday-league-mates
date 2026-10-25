@@ -1,3 +1,12 @@
+# Aktualna konsolidacja SLM 1.0 i stała zasada modułów
+
+- Bieżący zakres: feat/v1-consolidation z main; zachować wszystkie migracje i zabezpieczenia main. Zakaz zdalnych migracji, wdrożeń aplikacji, nadpisania zaakceptowanego UI i merge do main bez osobnego potwierdzenia właściciela.
+- Po ukończeniu, testach i akceptacji każdego kolejnego modułu przygotowujemy Pull Request i integrujemy moduł z main przed rozpoczęciem następnego modułu. To zasada kolejności pracy, a nie zgoda na automatyczne scalanie: każdy merge wymaga wyraźnego potwierdzenia użytkownika.
+- Niejednoznaczny konflikt integracyjny wymaga zatrzymania zależnej pracy i przedstawienia rozwiązań. Historyczne instrukcje poniżej nie uchylają bieżących ograniczeń.
+
+- Decyzja właściciela: domyślny LIVE i routing main pozostają; Premium B1/B2 to jawny lokalny wariant testowy app/b1 (prawdziwe Auth i własny profil, pozostałe ekrany oznaczone demo). Nie przełączać domyślnej aplikacji na demo. Premium d0f9fa9 i karta 30772de pozostają wzorcem.
+- Kanoniczny backend: app/supabase. Lokalne przygotowanie używa źródeł tej samej gałęzi, nie innych worktree/.cache. Bez stosowania migracji do istniejącej lub zdalnej bazy bez odrębnej zgody.
+
 # Instrukcje pracy nad Sunday League Mates
 
 - Aktualne zadanie 19.10.2026: u?ytkownik autoryzowa? audyt wszystkich worktree, zabezpieczenie warto?ciowych zmian, zwyk?y push feat/integration i PR do main. Standardowy merge przez PR tylko po udanych kontrolach, bez krytycznych regresji i nierozstrzygni?tych decyzji. Zachowaj ga??zie i lokalne pliki; bez force push, reset?w, produkcyjnych migracji/deploy ani automatycznej publikacji aplikacji. To polecenie zast?puje historyczne zakazy commit/push/merge dotycz?ce wcze?niejszych etap?w.

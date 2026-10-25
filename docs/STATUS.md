@@ -1,5 +1,17 @@
 # Aktualny stan Sunday League Mates
 
+2026-10-25 17:04 Europe/Warsaw — feat/v1-consolidation, baza main 1fadd977, izolowany worktree .worktrees/v1-consolidation.
+Domyślny LIVE main zachowany. Premium B1/B2 to jawny wariant lokalny: realne Auth/własny profil, poza tym oznaczone demo. Karta/CSS z 30772de, wzorzec Premium d0f9fa9. 29 migracji main nienaruszone; 3 wcześniej zatwierdzone lokalne SQL przeniesione do historii (32), bez zależności od cudzej .cache. Lokalny Edge uruchomiony z kanonicznych źródeł; brak migracji/resetu istniejącej i zdalnej bazy, brak wdrożeń zdalnych.
+PASS: TS/lint/diff, 229 Vitest, SQL9+63, HTTP B1 9/profil22/zdjęcia38/scoped20, realny browser LIVE1, Cypress B1/B2 6, kodek1, Premium smoke8 rozmiarów/motywów; build main/demo/oba lokalne APK, native unit i weryfikacja zasobów. Release local prawidłowo zablokowany. CORS na 5193 prawidłowo odrzucił test; 5174 PASS bez zmiany zabezpieczeń. Lint SQL kod0 z czterema istniejącymi ostrzeżeniami, jawnie w raporcie. Późny cutoff i fizyczny odbiór konsolidacji NOT TESTED. ADB device potwierdzone, nowego APK nie instalowano; instrukcja install -r w raporcie.
+Skan wzorców sekretów bez potwierdzonego sekretu; marker PEM w niezmienionym parserze FCM nie jest kluczem. Brak zmian zdalnych Supabase/Storage, bez B3/B4, Maps i nowych metod Auth. AGENTS.md zawiera nową zasadę moduł→testy→akceptacja→PR→osobno potwierdzony merge main przed następnym modułem.
+Szczegóły, SHA APK, pozostałe demo, rozstrzygnięcia i instrukcje odbioru: docs/V1_CONSOLIDATION.md. Zrzuty tylko fikcyjnych danych: docs/ui/v1-consolidation. Następny krok: push gałęzi integracyjnej i PR do main bez scalania, odbiór POCO oraz review. Stan PR zostanie dopisany poniżej.
+
+---
+
+## Stan historyczny przed konsolidacją
+
+# Aktualny stan Sunday League Mates
+
 19.10.2026 ? branch roboczy `feat/integration`, worktree `I:\slm\sunday-league-mates-integration`.
 Rdze? integracji: `0ec5200`; dokumentacja i ?r?d?a grafik: `309d57c`. Oba commity wypushowano. [PR #2](https://github.com/psuda87/sunday-league-mates/pull/2) scalono standardowym merge `c28b09d77a6a203954c10060d1e87aa105cfeef2` do main. Lokalny main zsynchronizowano fast-forward bez prze??czania worktree. Bez wdro?enia aplikacji i zdalnej bazy.
 

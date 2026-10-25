@@ -10,6 +10,7 @@ import { demoPortraits } from './portraits';
 import type { DemoPlayer } from './data';
 import './palettes.css';
 import '../pages/Accounts.css';
+import { useFrozenBack, minimizeFrozenDemo } from '../native/frozenDemoAndroid';
 type View=AccountView|'browse';
 export default function AccountDemo() {
  const initial=accountRoute(window.location.hash);
@@ -20,6 +21,15 @@ export default function AccountDemo() {
  const show=(next:View)=>{setView(next);window.history.replaceState(null,'',next==='browse'?'#home':`#account/${next}`);};
  function leave(next:AccountView='login'){epoch.current++;setAuthorized(false);setSeed(undefined);pending.current=null;verified.current=false;recovery.current=false;setDraft(emptyProfile());show(next);}
  function navigate(next:AccountView){if(next==='first-profile'&&!verified.current){show('invalid-link');return;}if(next==='login'){leave();return;}epoch.current++;show(next);}
+ // FROZEN_ANDROID_BEGIN
+ useFrozenBack(()=>{
+   if(view==='browse')return false;
+   if(authorized)show('browse');
+   else if(view==='login')minimizeFrozenDemo();
+   else navigate('login');
+   return true;
+ },()=>accountContent.current,15);
+ // FROZEN_ANDROID_END
  async function wait(){const ticket=epoch.current;await new Promise(resolve=>setTimeout(resolve,280));if(ticket!==epoch.current)throw new AccountUiFailure('link');if(outcome==='network')throw new AccountUiFailure('network');if(outcome==='unavailable')throw new AccountUiFailure('integration');}
  const port:AccountUiPort={
   async signIn(){await wait();if(outcome==='credentials')throw new AccountUiFailure('credentials');if(outcome==='pending'){pending.current=emptyProfile();setDraft(emptyProfile());show('verify');return;}if(actor==='new'){pending.current={...emptyProfile(),nickname:'Nowy zawodnik'};verified.current=true;setDraft(pending.current);show('first-profile');return;}setSeed(undefined);setAuthorized(true);show('browse');},

@@ -50,7 +50,7 @@ def rpc(index, action, body, finance=False, expected=None, rollback=False):
 
 try:
     branch = subprocess.check_output(["git", "branch", "--show-current"], text=True).strip()
-    assert branch == "feat/integration", "Requires feat/integration"
+    assert branch in ("feat/integration","feat/v1-consolidation"), "Requires reviewed integration/consolidation branch"
     context_host = subprocess.check_output(["docker","context","inspect","--format","{{.Endpoints.docker.Host}}"],text=True).strip()
     docker_host = os.environ.get("DOCKER_HOST") or context_host
     assert docker_host.startswith(("npipe://", "unix://")), "Only a local Docker socket is allowed"
@@ -62,6 +62,13 @@ try:
     assert dump.returncode == 0
     restored = command(["psql", "-X", "-q", "-U", "supabase_admin", "-d", DB, "-v", "ON_ERROR_STOP=1"], dump.stdout)
     if restored.returncode: raise RuntimeError(restored.stderr.decode())
+    # Rebuild only the newly-created scratch application schema from checked-out migrations.
+    # A schema-only clone has no bucket rows and is not a reproducible baseline by itself.
+    assert created and DB.startswith("slm_backend_test_")
+    sql("drop schema public cascade; drop schema slm_private cascade; drop schema if exists slm_auth_proof_private cascade; create schema public; grant usage on schema public to anon,authenticated,service_role; grant all on schema public to postgres,service_role;")
+    migrations=sorted((Path(__file__).parents[1]/"supabase/migrations").glob("*.sql"))
+    for migration in migrations:sql(migration.read_text(encoding="utf-8"))
+    check(len(migrations)==32,"complete checked-out schema replayed in scratch DB")
     for file in ("settlements.sql", "notifications.sql", "integration-contracts.sql"):
         sql((Path(__file__).parents[1] / "supabase" / "tests" / file).read_text(encoding="utf-8"))
         check(True, file)
@@ -248,6 +255,19 @@ try:
     check(sql(f"select role from public.slm_roles where user_id='{fresh}'")=="member","email metadata cannot grant admin")
     check(sql(f"select count(*) from public.slm_aliases where user_id='{fresh}'")=="0","email account has no invented phone or login alias")
     check(sql(f"select count(*) from public.slm_group_members where user_id='{fresh}'")=="0","email account does not join groups automatically")
+    # Consolidated B2.2: schema/privileges remain private after a full fresh replay.
+    check(sql("select (not public and file_size_limit=150000 and allowed_mime_types=array['image/webp']) from storage.buckets where id='slm-profile-photos'")=="t","B2.2 private bucket WebP and size limit")
+    check(sql("select relrowsecurity from pg_class where oid='public.slm_profile_photos'::regclass")=="t","B2.2 photo metadata RLS enabled")
+    check(sql("select has_table_privilege('authenticated','public.slm_profile_photos','select') or has_table_privilege('anon','public.slm_profile_photos','select')")=="f","B2.2 clients cannot read photo metadata directly")
+    check(sql("select has_function_privilege('authenticated','public.slm_profile_number_save(uuid,uuid,integer)','execute') or has_function_privilege('anon','public.slm_profile_photo_commit(uuid,uuid,uuid,text)','execute')")=="f","B2.2 mutation RPCs stay service-only")
+    check(sql("select position('shared_profile' in pg_get_expr(polqual,polrelid))>0 from pg_policy where polrelid='public.slm_profiles'::regclass and polname='members_read_profiles'")=="t","main shared-group profile RLS preserved")
+    sql("select public.slm_profile_number_save("+literal(users[0])+","+literal(sessions[0])+",27)")
+    sql("select public.slm_profile_number_save("+literal(users[1])+","+literal(sessions[1])+",27)")
+    check(sql("select count(*) from public.slm_player_profiles where jersey_number=27 and user_id in ("+literal(users[0])+","+literal(users[1])+")")=="2","B2.2 duplicate jerseys allowed using live session gates")
+    sql("select public.slm_profile_number_save("+literal(users[0])+","+literal(sessions[0])+",100)",expected="invalid_number")
+    check(True,"B2.2 server rejects jersey outside 0-99")
+    sql("select public.slm_profile_photo_commit("+literal(users[0])+","+literal(str(uuid.uuid4()))+",null,null)",expected="session_invalid")
+    check(True,"B2.2 photo commit rejects an unapproved session")
     print(f"RESULT {passed} PASS; v2 real PostgreSQL tests")
 finally:
     if created:
