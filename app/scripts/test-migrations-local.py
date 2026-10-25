@@ -47,7 +47,7 @@ def rpc(index, action, body, finance=False, expected=None, rollback=False):
 
 try:
     branch = subprocess.check_output(["git", "branch", "--show-current"], text=True).strip()
-    assert branch in ("feat/integration","feat/v1-consolidation"), "Requires reviewed integration/consolidation branch"
+    assert branch in ("feat/integration","feat/v1-consolidation","feat/premium-b3-groups"), "Requires reviewed integration/consolidation branch"
     context_host = subprocess.check_output(["docker","context","inspect","--format","{{.Endpoints.docker.Host}}"],text=True).strip()
     docker_host = os.environ.get("DOCKER_HOST") or context_host
     assert docker_host.startswith(("npipe://", "unix://")), "Only a local Docker socket is allowed"
@@ -82,6 +82,7 @@ try:
     before=sql("select coalesce(jsonb_agg(to_jsonb(l) order by l.id),'[]') from public.slm_finance_ledger l")
     aliases=sql("select jsonb_agg(to_jsonb(a) order by user_id) from public.slm_aliases a")
     dues=sql(f"select outstanding_cents from slm_private.finance_dues('{users[1]}') where event_id='{past}'")
+    sql(f"update public.slm_profiles set full_name='Fictional HiddenSurname',display_as='full_name' where user_id='{users[1]}'")
     for p in new:sql(p.read_text(encoding="utf-8"))
     check(before==sql("select coalesce(jsonb_agg(to_jsonb(l) order by l.id),'[]') from public.slm_finance_ledger l"),"new migrations preserve every historical ledger row exactly")
     check(aliases==sql("select jsonb_agg(to_jsonb(a) order by user_id) from public.slm_aliases a"),"new migrations preserve legacy aliases and technical email")
@@ -97,6 +98,9 @@ try:
     scoped_finance(0,"record_payment",dict(group_id=group,user_id=users[1],request_id=str(uuid.uuid4()),amount_cents=100,reason="Fixture legacy group repayment"))
     check(int(sql(f"select outstanding_cents from slm_private.group_dues('{users[1]}') where event_id='{past}'"))==int(dues)-100,"new general group payment reduces historical debt through scoped FIFO")
     check(before==sql("select coalesce(jsonb_agg(to_jsonb(l) order by l.id),'[]') from public.slm_finance_ledger l"),"historical repayment does not rewrite original ledger")
+    legacy_detail=rpc(0,"detail",dict(event_id=past))
+    check("HiddenSurname" not in json.dumps(legacy_detail),"B3 legacy event API does not bypass hidden surname projection")
+    check("HiddenSurname" not in sql(f"select slm_private.finance_account('{users[1]}',0)"),"B3 legacy finance labels do not bypass hidden surname projection")
     print(f"RESULT {passed} PASS; replayed {len(migrations)} migrations with fictional legacy data")
 finally:
     if created:

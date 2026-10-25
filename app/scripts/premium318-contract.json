@@ -7,7 +7,9 @@
     "main legacy email/login/phone label retained",
     "Windows GroupScreens alias",
     "previous B1/B2 data bindings and approved card CSS",
-    "Owner-approved BottomNav highlight fix: shared active state, full tab area and existing plus notch; Ultimate rules unchanged"
+    "Owner-approved BottomNav highlight fix: shared active state, full tab area and existing plus notch; Ultimate rules unchanged",
+    "B3 owner-approved real groups controllers, group-scoped privacy controls and accurate live/demo labels; Ultimate/BottomNav/CSS/assets unchanged",
+    "Shared groups selectors and avatar props accept narrow live DTOs; no fabricated World, statistics or profile fallback"
   ],
   "files": {
     "app/demo/main.tsx": {
@@ -91,7 +93,7 @@
       "text": true
     },
     "app/src/demo/App.tsx": {
-      "sha256": "a5c789fcc6c0ae26464970209cf8536941a21b2b4805b4b713e231f40b34066a",
+      "sha256": "07d83da5673573d2a9972314783ad5d205dd708d2c1c6ca365c955a080f50b32",
       "text": true
     },
     "app/src/demo/DemoBottomNav.tsx": {
@@ -111,11 +113,11 @@
       "text": true
     },
     "app/src/demo/GroupScreens.tsx": {
-      "sha256": "c009d50526b75db91e8f5f0f7d92d1074d63152853ca8c981a4c554c620f2795",
+      "sha256": "5dcc494d4bb05b489f52f9ffbd499a020f1d1d46f5f69670c4fe3e5bdad97caa",
       "text": true
     },
     "app/src/demo/Identity.tsx": {
-      "sha256": "c04375cf26c07bda207571aa2a13c3882ea60219e7cb426bd9f7d22be0daeb0d",
+      "sha256": "94c1ca572be636e36abd6ba1af165a91b8a98151f65482e12c9a03dcecba206f",
       "text": true
     },
     "app/src/demo/Panels.tsx": {
@@ -123,7 +125,7 @@
       "text": true
     },
     "app/src/demo/Profile.tsx": {
-      "sha256": "aec0e53b8a67d1b3decd5c1e3a1fc6d08f7e935eba276128ac00fddce609470e",
+      "sha256": "8836de763da62f01de28dc2455bdfa714808ccaaa4611c9e483204fa9b2f9382",
       "text": true
     },
     "app/src/demo/Teams.tsx": {
@@ -155,7 +157,7 @@
       "text": true
     },
     "app/src/demo/groups.ts": {
-      "sha256": "98efb06418e36b60be8a3de06020e846622d78423b9ee23ee31cd0939b38e810",
+      "sha256": "b2458d12dbe27df69af4fef6692adb1c9b7d4a695789ab82c87e0b9d360024f4",
       "text": true
     },
     "app/src/demo/palettes.css": {

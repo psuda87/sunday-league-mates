@@ -272,7 +272,7 @@ export function createHandler(env: Environment) {
           if (typeof body[key] === 'string' && body[key].trim()) body[key] = normalizePhone(body[key]);
         }
         const allowed = prefix === 'groups_'
-          ? ['name','description','query','group_id','user_id','phone','id','request_id','accept','organizer']
+          ? ['name','description','query','group_id','user_id','phone','id','request_id','accept','organizer','share_full_name']
           : prefix === 'matches_'
           ? ['event_id','guest_name','guest_phone','list','participant_id','user_id','name','group_id','date','time','starts_at','location','address','duration_minutes','capacity','cost_cents','visibility','expected_version','absent','reason','request_id','offset']
           : ['group_id','event_id','user_id','participant_id','payment_id','request_id','amount_cents','expected_amount_cents','expected_version','reason','payable','absent'];
@@ -301,6 +301,11 @@ export function createHandler(env: Environment) {
             already_approved: [409, 'Rozliczenie jest ju? zatwierdzone.'],
             reason_required: [400, 'Podaj pow?d decyzji (do 500 znak?w).'],
           };
+          if(prefix==='groups_'){
+            const messages:Record<string,string>={session_invalid:'Sesja wygasła. Zaloguj się ponownie.',forbidden:'Brak uprawnień do tej operacji.',not_found:'Grupa lub profil nie istnieje albo nie masz dostępu.',request_processed:'Zgłoszenie zostało już rozpatrzone. Odśwież grupę.',already_member:'Ta osoba już należy do grupy.',idempotency_conflict:'Identyfikator dotyczy innej operacji. Odśwież dane.',group_archived:'Grupa jest zarchiwizowana.'};
+            if(messages[code]&&errors[code])throw new ApiError(errors[code][0],code,messages[code]);
+          }
+          if (code === 'invalid_group' || code === 'invalid_input' || code === 'request_required') throw new ApiError(400, code, 'Sprawdź nazwę, opis i wymagane pola.');
           if (errors[code]) throw new ApiError(errors[code][0], code, errors[code][1]);
           if (r.data?.code === '22P02' || r.data?.code === '23514' || r.data?.code === '23502')
             throw new ApiError(400, 'invalid_input', 'Sprawd? wymagane pola i poprawno?? danych.');

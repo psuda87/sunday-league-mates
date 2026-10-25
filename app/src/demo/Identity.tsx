@@ -6,7 +6,7 @@ import type { Action, DemoPlayer } from './data';
 import { normalizeDemoName, validDemoName } from './data';
 import type { DemoPortrait } from './portraits';
 import { demoPortraits, readDemoPortrait } from './portraits';
-export function DemoAvatar({player}:{player:DemoPlayer}) {
+export function DemoAvatar({player}:{player:Pick<DemoPlayer,'name'|'portrait'|'portraitEdited'>}) {
  const p=player.portrait;
  return player.portraitEdited&&p?<span className="slm-custom-avatar" data-layout={p.column===undefined?'single':'sheet'}><img src={p.src} alt="" style={{'--portrait-column':p.column??0,'--portrait-row':p.row??0} as CSSProperties}/></span>:<>{player.name.split(' ').slice(0,2).map(s=>s[0]).join('')}</>;
 }

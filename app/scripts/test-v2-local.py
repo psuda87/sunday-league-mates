@@ -50,7 +50,7 @@ def rpc(index, action, body, finance=False, expected=None, rollback=False):
 
 try:
     branch = subprocess.check_output(["git", "branch", "--show-current"], text=True).strip()
-    assert branch in ("feat/integration","feat/v1-consolidation"), "Requires reviewed integration/consolidation branch"
+    assert branch in ("feat/integration","feat/v1-consolidation","feat/premium-b3-groups"), "Requires reviewed integration/consolidation branch"
     context_host = subprocess.check_output(["docker","context","inspect","--format","{{.Endpoints.docker.Host}}"],text=True).strip()
     docker_host = os.environ.get("DOCKER_HOST") or context_host
     assert docker_host.startswith(("npipe://", "unix://")), "Only a local Docker socket is allowed"
@@ -68,7 +68,7 @@ try:
     sql("drop schema public cascade; drop schema slm_private cascade; drop schema if exists slm_auth_proof_private cascade; create schema public; grant usage on schema public to anon,authenticated,service_role; grant all on schema public to postgres,service_role;")
     migrations=sorted((Path(__file__).parents[1]/"supabase/migrations").glob("*.sql"))
     for migration in migrations:sql(migration.read_text(encoding="utf-8"))
-    check(len(migrations)==32,"complete checked-out schema replayed in scratch DB")
+    check(len(migrations)==34,"complete checked-out schema replayed in scratch DB")
     for file in ("settlements.sql", "notifications.sql", "integration-contracts.sql"):
         sql((Path(__file__).parents[1] / "supabase" / "tests" / file).read_text(encoding="utf-8"))
         check(True, file)
@@ -268,6 +268,91 @@ try:
     check(True,"B2.2 server rejects jersey outside 0-99")
     sql("select public.slm_profile_photo_commit("+literal(users[0])+","+literal(str(uuid.uuid4()))+",null,null)",expected="session_invalid")
     check(True,"B2.2 photo commit rejects an unapproved session")
+    fallback_id=str(uuid.uuid4())
+    sql(f"insert into auth.users(id,aud,role,email) values('{fallback_id}','authenticated','authenticated','{fallback_id}@fixture.invalid');insert into public.slm_profiles(user_id,full_name,display_as) values('{fallback_id}','Marek HiddenSurname','full_name');")
+    check(sql(f"select slm_private.public_player_name('{fallback_id}')")=="Marek","B3 missing nickname falls back only to explicit first-name projection")
+    # B3: four independent actors, two new groups; no existing database or real contacts.
+    ledger_before=sql("select coalesce(jsonb_agg(to_jsonb(l) order by id),'[]') from public.slm_group_ledger l")
+    b3body=dict(name="B3 privacy alpha",description="Public description",request_id=str(uuid.uuid4()))
+    ga=rpc(6,"groups:create",b3body)["group_id"]
+    check(rpc(6,"groups:create",b3body)["group_id"]==ga,"B3 create retry is idempotent")
+    gb=rpc(9,"groups:create",dict(name="B3 privacy beta"))["group_id"]
+    check(sql(f"select count(*) from public.slm_group_members where group_id='{ga}'")=="1" and sql(f"select admin_id from public.slm_groups where id='{ga}'")==users[6],"B3 atomic creator membership and group admin")
+    public=rpc(8,"groups:search",dict(query="B3 privacy"))["groups"]
+    check(len(public)==2 and all(set(row)=={"id","name","description","member_count"} for row in public),"B3 search returns only public projection and actual counts")
+    check(not rpc(8,"groups:list",{})["groups"],"B3 search does not create membership")
+    rpc(6,"groups:invite",dict(group_id=ga,user_id=users[7]))
+    invite=next(r for r in rpc(7,"groups:inbox",{})["requests"] if r["group_id"]==ga)
+    rpc(7,"groups:detail",dict(group_id=ga),expected="not_found");check(True,"B3 invitation alone grants no private access")
+    rpc(7,"groups:decide",dict(id=invite["id"],accept=True))
+    sql(f"update public.slm_profiles set full_name='Adam PrivateSurname',display_as='full_name' where user_id='{users[8]}'")
+    rpc(8,"groups:join",dict(group_id=ga))
+    request=next(r for r in rpc(6,"groups:detail",dict(group_id=ga))["requests"] if r["kind"]=="join" and r["target_id"]==users[8])
+    check(bool(request["contact_phone"]),"B3 admin sees voluntarily requesting user's phone")
+    check(not any(r.get("contact_phone") for r in rpc(7,"groups:detail",dict(group_id=ga))["requests"]),"B3 ordinary member cannot see applicant phone")
+    rpc(8,"groups:profile",dict(group_id=ga,user_id=users[7]),expected="not_found");check(True,"B3 pending applicant cannot read member profile")
+    def raw_profile(viewer,target):
+        claims=json.dumps(dict(sub=users[viewer],session_id=sessions[viewer],role="authenticated"))
+        return sql("begin;set local role authenticated;select set_config('request.jwt.claims',"+literal(claims)+",true);select count(*) from public.slm_profiles where user_id="+literal(users[target])+";rollback;").splitlines()[-1]
+    check(raw_profile(7,8)=="0" and raw_profile(6,8)=="1","B3 raw RLS hides pending private profile from member but permits group admin")
+    rpc(6,"groups:decide",dict(id=request["id"],accept=True))
+    rpc(6,"groups:decide",dict(id=request["id"],accept=True),expected="request_processed");check(True,"B3 repeated acceptance cannot duplicate membership")
+    projection=rpc(7,"groups:profile",dict(group_id=ga,user_id=users[8]))
+    check(projection["full_name"] is None and projection["contact_phone"] and projection["nickname"]!="Adam PrivateSurname","B3 accepted member sees phone and public nickname without surname consent")
+    check(rpc(6,"groups:profile",dict(group_id=ga,user_id=users[8]))["full_name"]=="Adam PrivateSurname","B3 group admin sees allowed management profile")
+    check(raw_profile(7,8)=="0","B3 direct REST-equivalent RLS cannot bypass private surname")
+    check("PrivateSurname" not in sql(f"select slm_private.player_name('{users[8]}')"),"B3 unscoped participant label never reveals hidden surname")
+    rpc(8,"groups:consent",dict(group_id=ga,share_full_name=True))
+    check(rpc(7,"groups:profile",dict(group_id=ga,user_id=users[8]))["full_name"]=="Adam PrivateSurname" and raw_profile(7,8)=="1","B3 explicit group consent permits surname in projection and RLS")
+    rpc(8,"groups:consent",dict(group_id=ga,share_full_name=False))
+    check(raw_profile(7,8)=="0" and rpc(7,"groups:profile",dict(group_id=ga,user_id=users[8]))["full_name"] is None,"B3 withdrawing consent immediately hides surname")
+    rpc(8,"groups:consent",dict(group_id=ga,share_full_name=True,user_id=users[7]),expected="invalid_input");check(True,"B3 cannot change another member's consent")
+    rpc(7,"groups:permission",dict(group_id=ga,user_id=users[7],organizer=True),expected="forbidden");check(True,"B3 member cannot grant own permissions")
+    rpc(9,"groups:detail",dict(group_id=ga),expected="not_found")
+    rpc(9,"groups:profile",dict(group_id=ga,user_id=users[8]),expected="not_found");check(True,"B3 foreign group admin has no profile or member access")
+    rpc(6,"groups:remove",dict(group_id=ga,user_id=users[6]),expected="forbidden");check(True,"B3 cannot remove current group admin")
+    candidates=rpc(6,"groups:candidates",dict(group_id=ga,query="Fixture"))["players"]
+    check(all(set(row)=={"id","name"} for row in candidates),"B3 candidate search never returns private profile fields")
+    known=rpc(6,"groups:phone",dict(group_id=ga,phone='+48000000004'))
+    unknown=rpc(6,"groups:phone",dict(group_id=ga,phone='+48000000999'))
+    check(known==unknown=={"accepted":True},"B3 phone lookup acknowledgements do not enumerate users")
+    check(all(r.get("target_id")!=users[4] for r in rpc(6,"groups:detail",dict(group_id=ga))["requests"] if r["kind"]=="invite"),"B3 private invitation target stays undisclosed")
+    for actor in (7,8):
+        before_phone=len([r for r in rpc(actor,"groups:detail",dict(group_id=ga))["requests"] if r["kind"]=="proposal"])
+        for phone in ('+48000000004','+48000000999'):
+            rpc(actor,"groups:phone",dict(group_id=ga,phone=phone))
+            rpc(actor,"groups:phone",dict(group_id=ga,phone=phone))
+        after_phone=len([r for r in rpc(actor,"groups:detail",dict(group_id=ga))["requests"] if r["kind"]=="proposal"])
+        check(after_phone-before_phone==2,"B3 repeated phone proposals give equal opaque counts for known/unknown users, actor "+str(actor))
+    private_invites=sql(f"select id from public.slm_group_requests where group_id='{ga}' and actor_id='{users[6]}' and private and kind='invite' limit 1")
+    check(private_invites not in json.dumps(rpc(6,"groups:detail",dict(group_id=ga))),"B3 sender cannot infer private invitation status from request metadata")
+
+    check(sql("select has_function_privilege('authenticated','public.slm_groups_dispatch(uuid,uuid,text,jsonb)','execute') or has_function_privilege('anon','public.slm_groups_dispatch(uuid,uuid,text,jsonb)','execute')")=="f","B3 group RPC cannot be called directly by client roles")
+    check(sql("select has_function_privilege('authenticated','slm_private.group_profile(uuid,uuid,uuid)','execute')")=="f","B3 arbitrary viewer helper is not client callable")
+    sql("begin;set local role authenticated;update public.slm_group_members set share_full_name=true;rollback;",expected="permission denied");check(True,"B3 direct membership or consent writes denied")
+    rpc(5,"groups:join",dict(group_id=ga));racing=next(r for r in rpc(6,"groups:detail",dict(group_id=ga))["requests"] if r["kind"]=="join" and r["target_id"]==users[5])
+    def decide_b3(accept):
+        try:rpc(6,"groups:decide",dict(id=racing["id"],accept=accept));return "committed"
+        except RuntimeError as e:
+            if "request_processed" in str(e):return "processed"
+            raise
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:decisions=list(pool.map(decide_b3,[True,False]))
+    check(sorted(decisions)==["committed","processed"],"B3 concurrent accept/reject has one winner")
+    check(int(sql(f"select count(*) from public.slm_group_members where group_id='{ga}' and user_id='{users[5]}'"))<=1,"B3 concurrent decisions never duplicate member")
+    rpc(6,"groups:remove",dict(group_id=ga,user_id=users[8]))
+    rpc(8,"groups:detail",dict(group_id=ga),expected="not_found")
+    check(raw_profile(8,7)=="0","B3 membership revocation removes API and direct RLS access")
+    rpc(8,"groups:join",dict(group_id=ga));out=next(r for r in rpc(8,"groups:inbox",{})["outgoing"] if r["group_id"]==ga and r["state"]=="pending")
+    rpc(8,"groups:cancel_request",dict(id=out["id"]))
+    check(sql(f"select state from public.slm_group_requests where id='{out['id']}'")=="cancelled","B3 user can cancel own pending join request")
+    rpc(8,"groups:join",dict(group_id=ga));rejected=next(r for r in rpc(6,"groups:detail",dict(group_id=ga))["requests"] if r["target_id"]==users[8] and r["state"]=="pending")
+    rpc(6,"groups:decide",dict(id=rejected["id"],accept=False))
+    check(sql(f"select count(*) from public.slm_group_members where group_id='{ga}' and user_id='{users[8]}'")=="0","B3 rejection does not grant membership")
+    rpc(6,"groups:leave",dict(group_id=ga))
+    check(sql(f"select admin_id from public.slm_groups where id='{ga}'")==users[7],"B3 leaving admin transfers role to oldest eligible member")
+    rpc(9,"groups:leave",dict(group_id=gb))
+    check(sql(f"select archived from public.slm_groups where id='{gb}'")=="t","B3 last member archives group without deleting history")
+    check(ledger_before==sql("select coalesce(jsonb_agg(to_jsonb(l) order by id),'[]') from public.slm_group_ledger l"),"B3 membership operations preserve every historical ledger row")
     print(f"RESULT {passed} PASS; v2 real PostgreSQL tests")
 finally:
     if created:

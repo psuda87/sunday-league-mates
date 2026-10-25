@@ -1,3 +1,15 @@
+# Aktualny stan — Premium B3
+
+2026-10-25 21:05 Europe/Warsaw — feat/premium-b3-groups z main a46f5e4. Premium ma rzeczywiste grupy/członkostwo/zgody przez istniejące RPC; domyślny LIVE zachowany, mecze/finanse Premium nadal demo. Auth/profil/numer/zdjęcia bez cofnięcia integracji; CSS/Ultimate/BottomNav bez zmian.
+Lokalnie za zgodą zastosowano wersjonowane B2.2 i dwie migracje B3 (20261025190022/20261025193229), bez resetu. Lokalny Edge z bieżących źródeł. Cloud tylko odczyt: ACTIVE_HEALTHY, 7 migracji wobec34 lokalnie; wdrożenie B3 do Cloud wymaga osobnego przygotowania i zgody, niczego zdalnie nie zastosowano.
+PASS: TS/lint,235 Vitest, SQL102+31, replay11/34 migracje, B3 HTTP28 i real browser1 (4 szerokości ×2 motywy), LIVE HTTP20/browser1, Cypress LIVE13 i B1/B2/B22 6, cztery buildy, guards32/55, sync/Android. Natywny unit:1 test szablonowy, nie test Keystore. Lokalne advisors0 WARN/ERROR; cztery znane SQL warnings. Cloud: istniejący Auth WARN i9 INFO, starsza polityka profili niezgodna z B3.
+APK premium zainstalowano aktualizacją na POCO i uruchomiono; bez czyszczenia danych. Ręczny odbiór B3 NOT TESTED. Znane ograniczenia: cudze zdjęcia/statystyki niedostępne; Premium wydarzenia nadal demo; FCM/iOS/Cloud niezbadane end-to-end.
+Następny krok: lokalny odbiór grup na POCO i przegląd PR bez automatycznego merge. Raport/checklista: docs/PREMIUM_B3_GROUPS.md; odpowiedzi: docs/ODPOWIEDZI_CODEX.txt.
+
+---
+
+## Historia przed B3
+
 # Aktualny stan Sunday League Mates
 
 2026-10-25 17:35 Europe/Warsaw — fix/bottom-nav-highlight z main2c3e3f2. Naprawiono wyłącznie aktywny stan i obszar przycisków BottomNav, zachowując + oraz wygląd Premium/kartę Ultimate. TS/lint, 8 jednostkowych testów nawigacji, 8 konfiguracji Cypress (4 szerokości ×2 motywy ×3 warianty paska), build main/Premium, cap sync i source guards PASS. Android assembleDebug PASS. Backend/Auth/SQL/dane bez zmian. Poprawka zakończona; [PR #12](https://github.com/psuda87/sunday-league-mates/pull/12) zawiera wynik scalania i commit main (źródło aktualnego statusu). Użytkownik autoryzował squash merge po zielonych kontrolach, bez wdrożenia. Szczegóły: docs/ODPOWIEDZI_CODEX.txt; zrzuty: docs/ui/bottom-nav.
