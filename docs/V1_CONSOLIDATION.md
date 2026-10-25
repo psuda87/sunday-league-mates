@@ -2,6 +2,21 @@
 
 2026-10-25 17:04 Europe/Warsaw. Gałąź `feat/v1-consolidation` z main `1fadd977`. Implementacja `f50484f`; [draft PR #11](https://github.com/psuda87/sunday-league-mates/pull/11) otwarty bez scalania. Osobny worktree `.worktrees/v1-consolidation`; źródłowe gałęzie i katalog użytkownika zachowane.
 
+
+## Aktualizacja odbioru — 2026-10-25 17:18 Europe/Warsaw
+
+Właściciel potwierdził następujące wyniki ręczne po instalacji Premium na POCO i sprawdzeniu LIVE. Zastępują wcześniejsze NOT TESTED dotyczące tych konkretnych scenariuszy odbioru.
+
+- PASS — Premium: logowanie i zachowanie sesji po restarcie.
+- PASS — Profil: zmiana imienia i numeru zawodnika.
+- PASS — Zdjęcie: dodanie, podmiana i usunięcie.
+- PASS — Karta Ultimate: wygląd, kadrowanie, motyw jasny/ciemny.
+- PASS — Premium: pozostałe ekrany wyraźnie oznaczone jako demo.
+- PASS — LIVE: grupy, mecze, zapis, goście i rozliczenia.
+- PASS — Brak crashy, błędów uprawnień i utraty danych.
+
+PR #11 pozostaje draftem i bez merge. Próba oznaczenia jako gotowy do review została odrzucona przez automatyczną kontrolę zatwierdzania: brak osobnej zgody na zmianę stanu oraz możliwe powiadomienie recenzentów. Nie ponawiano operacji. Brak nowych zmian runtime, zdalnego rollout i testów automatycznych; wcześniejsze ograniczenia SQL/FCM/iOS pozostają.
+
 ## Zakres i rozstrzygnięcia
 
 - Zgodnie z decyzją właściciela domyślny LIVE main pozostaje. `src/main.tsx`, `App.tsx`, `pages/*`, `live/*`, BottomNav, SessionManager, tokenStore i release guard Androida bez zmian. Nie zastąpiono prawdziwych grup/meczów/finansów demo.

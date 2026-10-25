@@ -544,3 +544,30 @@ Szczegóły, SHA APK, pozostałe demo, rozstrzygnięcia i instrukcje odbioru: do
 Wypchnięto feat/v1-consolidation; implementacja f50484f6c15a2dec7acddfd71f97fc729fc98f0b. Draft PR #11 do main: https://github.com/psuda87/sunday-league-mates/pull/11 — otwarty, bez scalania. Main nadal 1fadd977, źródłowy worktree feat/ui-beta czysty i bez zmian. Domyślny LIVE zachowany; Premium B1/B2 i zaakceptowana karta 30772de jako jawny wariant lokalny. Rzeczywiste Auth/profil/zdjęcia/numer zachowane, pozostałe ekrany Premium oznaczone demo. Żadnych wdrożeń zdalnych ani resetów.
 Kontrole i ograniczenia w docs/V1_CONSOLIDATION.md; TS/lint/229 Vitest, SQL i HTTP, przeglądarka LIVE oraz build obu APK PASS. Pozostają znane ostrzeżenia SQL, późny cutoff i ręczny odbiór nowego APK na POCO. APK przygotowane, nie instalowano; instrukcja install -r bez czyszczenia danych w raporcie. Zasada modułów zapisana w AGENTS.md. Zatrzymano pracę przed merge i dalszymi modułami.
 Zrzut Premium: https://github.com/psuda87/sunday-league-mates/blob/feat/v1-consolidation/docs/ui/v1-consolidation/profile-390-dark.png
+
+
+=== 2026-10-25 17:10 Europe/Warsaw — uruchomienie na POCO ===
+Na polecenie właściciela zainstalowano Premium B1/B2 z konsolidacji, źródło implementacji f50484f (gałąź feat/v1-consolidation). SHA256 APK 60e89dbd56bf675368050a7360adefc12daffd6bc762c515f4c4ebf2eacb6da5 zgodny z manifestem.
+ADB c7a559b5 device, install -r Success bez uninstall/clear, uruchomienie pl.psuda87.slm/.MainActivity Status ok. Proces aktywny i aplikacja na pierwszym planie. Lokalne API HTTP 204 (OPTIONS), reverse tcp:54321 aktywny. W ostatnich 700 wpisach logcat procesu: 0 markerów crasha i 0 sprawdzanych błędów transportu WebView. To kontrola startu, nie pełny test funkcjonalny ani potwierdzenie zalogowania.
+Do odbioru ręcznego: karta Premium, własny profil i zdjęcie/numer, sesja i oba przyciski Wstecz. Pozostałe ekrany tego wariantu są oznaczonym demo. Nie zmieniano danych aplikacji/bazy ani zdalnego Supabase. PR #11 pozostaje draft bez scalania.
+
+
+=== 2026-10-25 17:14 Europe/Warsaw — diagnostyka braku połączenia ===
+Lokalny Docker i accounts API odpowiadają (OPTIONS HTTP 204). ADB nie widzi żadnego urządzenia; c7a559b5 not found, adb reconnect: no devices/emulators found. Nie można odtworzyć reverse tcp:54321 ani wznowić aplikacji przez ADB do czasu ponownego podłączenia telefonu. Nie wylogowano użytkownika ani nie czyszczono danych. Wymagane: podłączyć ponownie USB, odblokować telefon i zaakceptować ewentualną autoryzację debugowania.
+
+
+=== 2026-10-25 17:15 Europe/Warsaw — ponowne podłączenie POCO ===
+ADB c7a559b5 device. Przywrócono reverse tcp:54321; lokalne API OPTIONS HTTP 204. Ponownie uruchomiono aplikację przez force-stop/am start bez czyszczenia danych i bez logout, aby wykonała własne przywrócenie sesji. Start Status ok. Próba HOME przez input została odrzucona przez Android INJECT_EVENTS; nie zmieniano zabezpieczeń ani nie ponawiano wstrzykiwania klawiszy. Poprawność zalogowania/interfejsu wymaga potwierdzenia użytkownika.
+
+
+=== 2026-10-25 17:18 Europe/Warsaw — odbiór ręczny konsolidacji ===
+2026-10-25 17:18 Europe/Warsaw — ODBIÓR RĘCZNY KONSOLIDACJI: właściciel potwierdził wszystkie siedem scenariuszy PASS (Premium Auth/sesja, profil/numer, zdjęcia, wygląd Ultimate/oba motywy, oznaczenie demo, funkcje LIVE, brak crashy/błędów uprawnień/utraty danych). Źródło: deklaracja właściciela po testach, nie nowe testy automatyczne agenta.
+PR #11 nadal draft i bez scalania. Odbiór ręczny nie jest zgodą na merge ani zdalne wdrożenie. Pozostają wcześniej opisane ostrzeżenia SQL i pominięty test późnego cutoff; nie rozpoczęto kolejnego modułu.
+- PASS — Premium: logowanie i zachowanie sesji po restarcie.
+- PASS — Profil: zmiana imienia i numeru zawodnika.
+- PASS — Zdjęcie: dodanie, podmiana i usunięcie.
+- PASS — Karta Ultimate: wygląd, kadrowanie, motyw jasny/ciemny.
+- PASS — Premium: pozostałe ekrany wyraźnie oznaczone jako demo.
+- PASS — LIVE: grupy, mecze, zapis, goście i rozliczenia.
+- PASS — Brak crashy, błędów uprawnień i utraty danych.
+Wyniki zapisano także w docs/STATUS.md i docs/V1_CONSOLIDATION.md. Bez zmian kodu, brak potrzeby powtarzania testów/builda. Wcześniejsze lokalne zapisy instalacji i przywrócenia USB również zachowano. Automatyczna kontrola zatwierdzania odrzuciła zmianę PR #11 z draft na ready: wskazała brak osobnej zgody i ryzyko powiadomienia recenzentów. Nie ponawiano operacji; PR pozostaje draft. Następny krok wymaga decyzji właściciela w sprawie review/merge, bez automatycznego scalania.

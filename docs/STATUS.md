@@ -1,5 +1,20 @@
 # Aktualny stan Sunday League Mates
 
+2026-10-25 17:18 Europe/Warsaw — ODBIÓR RĘCZNY KONSOLIDACJI: właściciel potwierdził wszystkie siedem scenariuszy PASS (Premium Auth/sesja, profil/numer, zdjęcia, wygląd Ultimate/oba motywy, oznaczenie demo, funkcje LIVE, brak crashy/błędów uprawnień/utraty danych). Źródło: deklaracja właściciela po testach, nie nowe testy automatyczne agenta.
+PR #11 nadal draft i bez scalania. Odbiór ręczny nie jest zgodą na merge ani zdalne wdrożenie. Pozostają wcześniej opisane ostrzeżenia SQL i pominięty test późnego cutoff; nie rozpoczęto kolejnego modułu.
+
+---
+
+## Historia konsolidacji i stan wcześniejszy
+
+# Aktualny stan Sunday League Mates
+
+2026-10-25 17:15 Europe/Warsaw — POCO ponownie widoczne przez ADB; reverse54321 przywrócone, backend HTTP204. Aplikacja ponownie uruchomiona bez czyszczenia danych/logout. Potwierdzenie sesji na ekranie oczekuje na użytkownika.
+
+2026-10-25 17:14 Europe/Warsaw — backend lokalny odpowiada, ale ADB nie widzi POCO. Przywrócenie reverse i ponowienie sesji czeka na ponowne podłączenie USB; bez logout/resetu danych.
+
+2026-10-25 17:10 Europe/Warsaw — Premium B1/B2 konsolidacji zainstalowane na POCO przez install -r i uruchomione. Lokalny API/reverse działają; brak sprawdzanych markerów crasha/transportu w logcat procesu. Bez czyszczenia danych. Odbiór ręczny wyglądu, sesji i profilu oczekuje na właściciela. PR #11 nadal draft, bez merge. Poniższy raport budowy jest historyczny względem tej instalacji.
+
 2026-10-25 17:04 Europe/Warsaw — feat/v1-consolidation, baza main 1fadd977, izolowany worktree .worktrees/v1-consolidation.
 Domyślny LIVE main zachowany. Premium B1/B2 to jawny wariant lokalny: realne Auth/własny profil, poza tym oznaczone demo. Karta/CSS z 30772de, wzorzec Premium d0f9fa9. 29 migracji main nienaruszone; 3 wcześniej zatwierdzone lokalne SQL przeniesione do historii (32), bez zależności od cudzej .cache. Lokalny Edge uruchomiony z kanonicznych źródeł; brak migracji/resetu istniejącej i zdalnej bazy, brak wdrożeń zdalnych.
 PASS: TS/lint/diff, 229 Vitest, SQL9+63, HTTP B1 9/profil22/zdjęcia38/scoped20, realny browser LIVE1, Cypress B1/B2 6, kodek1, Premium smoke8 rozmiarów/motywów; build main/demo/oba lokalne APK, native unit i weryfikacja zasobów. Release local prawidłowo zablokowany. CORS na 5193 prawidłowo odrzucił test; 5174 PASS bez zmiany zabezpieczeń. Lint SQL kod0 z czterema istniejącymi ostrzeżeniami, jawnie w raporcie. Późny cutoff i fizyczny odbiór konsolidacji NOT TESTED. ADB device potwierdzone, nowego APK nie instalowano; instrukcja install -r w raporcie.
