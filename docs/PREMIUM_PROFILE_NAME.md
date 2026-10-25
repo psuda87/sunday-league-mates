@@ -34,3 +34,5 @@ Wymagane testy przyszłej zmiany:3 tryby/persistencja/restart, puste i wieloczł
 - Nie zmieniono Auth, Edge, SQL/RLS, danych, APK/config, CSS/Ultimate/BottomNav ani żadnych plików gałęzi audytu Cloud. Nie wykonywano żadnych operacji Supabase Cloud ani lokalnych migracji. B1/B2/B3 pozostają w dotychczasowym stanie.
 - **PASS:**21 istniejących testów w2 plikach (profileAdapter.test.tsx i groups/useGroups.test.tsx), TypeScript, source guards32/55, git diff --check. Testy w pamięci z kontrolowanym API, nie test rzeczywistego Supabase ani POCO. Nie powtarzano pełnych buildów/lint/Cypress/SQL, ponieważ aplikacja nie została zmieniona.
 - PR dokumentacyjny do przeglądu potrzebnego kontraktu, bez merge. Dalsza implementacja wymaga osobnego polecenia dopuszczającego migrację/kontrakt; nie jest częścią tej poprawki.
+
+Draft PR #15: https://github.com/psuda87/sunday-league-mates/pull/15; przegląd911c381, dokumentacja bez zmian aplikacji i bez merge.
