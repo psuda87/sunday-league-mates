@@ -1842,3 +1842,81 @@ zachowane bajtowo. Bez sekretów/.env/artefaktów i zmian backendu/config Vercel
 Dokumenty: docs/ui/PREMIUM318_FINAL_UI.md i docs/FRONTEND_HANDOFF.md.
 Zapis raportu w osobnym commicie; jego końcowy SHA i potwierdzenie zwykłego
 pusha feat/ui-beta zostaną podane w odpowiedzi. Bez merge/migracji/deploy i3.19.
+[2026-10-23 19:51:58 Europe/Warsaw] Test fizycznego Androida
+Właściwe repo potwierdzone. Instrukcja/zweryfikowany APK z istniejącego worktree chore/android-phone-readiness. APK nie zainstalowano: telefon odrzucił instalację INSTALL_FAILED_USER_RESTRICTED (Install canceled by user). Start i lifecycle NOT TESTED. ADB, Android12/API31, obecność WebView, podpis/pakiet i zgodność 43 plików APK PASS. Silnik lokalnego Dockera niedostępny mimo uruchomienia Docker Desktop. Reverse usunięto po próbie. Użytkownik musi odblokować telefon, sprawdzić Instalacja przez USB i zaakceptować monit następnej instalacji; sprawdzić komunikat Docker Desktop. Bez kont produkcyjnych, migracji, push/merge/deploy. Szczegóły: docs/ANDROID_PHONE_TEST_REPORT.md. Raport końcowy: docs/ODPOWIEDZI_CODEX.txt.
+
+[2026-10-23 19:55:03 Europe/Warsaw] Na prośbę użytkownika ponowiono adb install -r zweryfikowanego APK. Telefon nadal autoryzowany, wynik ponownie INSTALL_FAILED_USER_RESTRICTED: Install canceled by user. APK nie zainstalowano. Wymagane sprawdzenie opcji Instalacja przez USB i komunikatu telefonu, bez obchodzenia zabezpieczeń. Raport: docs/ODPOWIEDZI_CODEX.txt.
+
+[2026-10-23 19:55:29 Europe/Warsaw] Aktualny APK debug pl.psuda87.slm (izolowane fixture UI) zbudowany, lecz NIE zainstalowany: MIUI/Android zwrócił INSTALL_FAILED_USER_RESTRICTED: Install canceled by user. PASS: repo/ADB, pakiet, build pełny/demo, izolacja, lint, Gradle. Vitest 183 PASS/1 FAIL przez przeszłą datę fixture; poprawiono konflikt nazw Groups/groups na Windows. NOT TESTED: start, logi, crashe, lifecycle, Cypress i backend/Auth. Na telefonie: odblokuj ekran, sprawdź Instalacja przez USB, potwierdź gotowość ponowienia i zaakceptuj monit Zainstaluj; potem Mecze/Grupy/Profil, Wstecz, klawiatura, Home/powrót i ponowne otwarcie. Bez push/merge/produkcji. Szczegóły docs/ANDROID_PHONE_TEST_REPORT.md; zapis odpowiedzi docs/ODPOWIEDZI_CODEX.txt.
+
+[2026-10-23 19:55:58 Europe/Warsaw] Użytkownik potwierdził włączenie opcji telefonu. Ponowiono standardowe adb install -r oraz install --no-streaming -r. Oba tryby zwróciły INSTALL_FAILED_USER_RESTRICTED: Install canceled by user; transfer APK w drugim trybie udany. Instalacja nadal BLOCKED, start NOT TESTED. Potrzebna treść komunikatu na ekranie telefonu lub potwierdzenie, że monit w ogóle się nie pojawia. Bez zmiany zabezpieczeń/produkcji/push. Raport: docs/ODPOWIEDZI_CODEX.txt.
+
+[2026-10-23 19:56:36 Europe/Warsaw] Ponowna instalacja adb install -r: SUCCESS. Start MainActivity: Status ok, COLD, 2296 ms. Home/powrót oraz force-stop/ponowny start wykonane; wyniki am start ok. Backend nadal BLOCKED: brak pipe dockerDesktopLinuxEngine. Brak logowania i testów chronionej sesji. Raport: docs/ODPOWIEDZI_CODEX.txt. Bez push/merge/migracji.
+
+Korekta ostatniego wpisu: Home przez input keyevent został odrzucony przez Android (INJECT_EVENTS); test tła/powrotu NIE został wykonany i wymaga ręcznego Home. Force-stop i zimny restart PASS (1299 ms); proces działa. Bieżący logcat ograniczony do PID SLM: 0 markerów FATAL i 0 sprawdzanych markerów błędów WebView/JS; nie stanowi pełnego odbioru renderowania. Nie zmieniano zabezpieczeń telefonu.
+
+[2026-10-23 19:58:51 Europe/Warsaw] Docker 29.8.2 działa. Początkowo accounts Edge niedostępna; uruchomiono istniejący lokalny helper backend (sesja terminala pozostawiona aktywna). Ponowny check PASS: PostgreSQL, zgodność 29 istniejących migracji, Auth, native CORS, chronione Edge i worker. Ustawiono adb reverse tcp:54321. Nie utworzono kont, nie resetowano bazy, brak zdalnych migracji/deploy/push. Następny krok: interaktywne utworzenie fikcyjnego konta przez app/scripts/android-phone-fixture.ps1 w worktree sunday-league-mates-integration. Hasło wyłącznie w ukrytym prompt, nie w raporcie. Test logowania telefonu nadal NOT TESTED. Raport: docs/ODPOWIEDZI_CODEX.txt.
+
+[2026-10-23 20:05:23 Europe/Warsaw] Ręczny odbiór sesji Android — potwierdzenie użytkownika
+PASS (ręcznie): po minimalizacji sesja zachowana; po zamknięciu aplikacji z tła i ponownym otwarciu użytkownik pozostaje zalogowany; po wylogowaniu pozostaje wylogowany; ponowne logowanie działa. Użytkownik akceptuje zachowanie sesji po ponownym uruchomieniu. To potwierdzenie zachowania UI, nie osobny dowód testu Keystore/offline/wygaśnięcia lub RLS.
+Konto utworzone android-phone-fixture.ps1 ma zwykłą rolę, bez globalnego administratora. Po utworzeniu własnej grupy zostaje administratorem tej grupy, bez uprawnień do cudzych grup/finansów. Nie sprawdzano indywidualnych członkostw konta w bazie.
+Brak zmian kodu, migracji, Edge Functions, push/merge/deploy. Następny krok: ręczne testy fikcyjnej grupy i uprawnień; testy offline/wygaśnięcia nadal NOT TESTED. Bieżący branch raportów: feat/ui-beta; testowane APK z chore/android-phone-readiness.
+Raport końcowy: docs/ODPOWIEDZI_CODEX.txt.
+
+[2026-10-23 20:55:37 Europe/Warsaw] Przywrócenie połączenia Android: telefon obecny w ADB, ale reverse --list był pusty. Backend check PASS (PostgreSQL, 29 istniejących migracji, Auth, CORS, Edge, worker). Przywrócono adb reverse tcp:54321 tcp:54321; force-stop i ponowny start SLM Status ok, COLD 1470 ms. Nie usuwano danych ani zapisanej sesji. Potwierdzenie odzyskania dostępu w UI przez użytkownika oczekiwane. Bez zmian kodu/migracji/Edge/push. Następny krok: potwierdzenie ekranu; po odłączeniu USB ponownie ustawić reverse. Raport: docs/ODPOWIEDZI_CODEX.txt.
+
+[2026-10-23 21:17:23 Europe/Warsaw] Audyt UI/APK zakończony, feat/ui-beta (dokumenty); readiness ae9fac7 czyste. Najpełniejsze zatwierdzone UI: ui-beta d0f9fa9/Premium3.18, pełne ekrany w demo. Live backend: integration 13cf1a8 = main 1fadd97 w app; readiness dodaje helpery. Zainstalowany APK hash zgodny ze starym buildem 13cf1a8; brak kompletnej integracji ekranów, nie wykazano problemu cache. Nie budowano ponownie starego live i nie instalowano demo. Wymagana zgoda na ręczną integrację prezentacji z prawdziwymi DTO/SessionManager na osobnej gałęzi, bez nowych kontraktów backendu i fikcyjnych danych. Plan/ograniczenia: docs/ANDROID_UI_VERSION_AUDIT.md. Bez merge/cherry-pick/push/reset; lokalne zmiany zachowane. Raport końcowy: docs/ODPOWIEDZI_CODEX.txt.
+
+
+=== 2026-10-24 23:28:32 Europe/Warsaw — niezależny lokalny podgląd UltimatePlayerCard
+Bieżący checkout feat/ui-beta, lokalne zmiany użytkownika zachowane; App.tsx nietknięty.
+Dodano wyłącznie app/card-preview.html i app/src/card-preview.tsx: oryginalna karta,
+/test-portrait.jpg (plik istnieje), Test Zawodnik, numer27; istniejące style i theme bootstrap.
+Bez App/Auth/API/Supabase/Dockera, bez zmian CSS/komponentu/konfiguracji produkcyjnego Vite.
+PASS npx tsc --noEmit; HTML/moduł/zdjęcie HTTP200. Nie uruchamiano testów ani builda.
+Vite HMR uruchomiony: http://127.0.0.1:5190/card-preview.html .
+Komenda z app/: npm run dev -- --host 127.0.0.1 --port 5190 --strictPort
+Bez instalacji zależności, commit/push/merge/deploy. Nie deklarujemy testu renderowania przeglądarką.
+
+
+=== 2026-10-25 13:03:17 Europe/Warsaw — wznowienie lokalnego podglądu karty
+Zweryfikowano istniejące card-preview.html/src/card-preview.tsx na feat/ui-beta. Serwer po przerwie był wyłączony; ponownie uruchomiono Vite5190, HTTP200. Kod bez nowych zmian; wcześniejszy TypeScript PASS. Adres http://127.0.0.1:5190/card-preview.html . Komenda z app/: npm run dev -- --host 127.0.0.1 --port 5190 --strictPort . Bez Auth/Supabase/Dockera, zmian App.tsx/CSS, zależności i push/merge/deploy. Podgląd gotowy do sprawdzenia w przeglądarce użytkownika.
+
+
+=== 2026-10-25 13:08:22 Europe/Warsaw — uporządkowanie CSS portretu Ultimate
+Na feat/ui-beta przeniesiono reguły slm-ultimate-portrait i slm-ultimate-nameplate do jednej sekcji na końcu app/src/theme/variables.css. Scalono powtarzające się selektory, zachowując dotychczasowe końcowe wartości maski, gradientu i dopasowania zdjęcia. Dodano komentarze ułatwiające edycję. Pozostałe reguły zachowane. Kontrola wartości deklaracji i git diff --check PASS. Bez builda/testów, zmian Auth/backendu, push/merge/deploy. Zmiany dostępne przez Vite HMR. Raport docs/ODPOWIEDZI_CODEX.txt.
+
+
+=== 2026-10-25 13:23:39 Europe/Warsaw — diagnoza górnej przerwy na karcie
+W lokalnym variables.css portret ma inset:80px 30px auto (wcześniej38px 11px auto) i nadal object-fit:contain. To przesuwa zdjęcie w dół oraz może tworzyć marginesy wewnątrz obszaru maski; ciemny pas jest zgodny z tym CSS. Nie stwierdzono uszkodzenia aplikacji; nie zmieniano ustawień użytkownika. Zalecono porównanie pierwotnego inset oraz cover z pozycją50%35%. Bez implementacji/testów/builda.
+
+
+=== 2026-10-25 13:26:18 Europe/Warsaw — doprecyzowanie tła portretu
+Obejrzano źródłowe stadium-bg-main.jpg i lokalne test-portrait.jpg bez ich modyfikacji. Stadium ma inset0 i wypełnia kartę; jego górny środek to bardzo ciemne niebo. Zielone tło należy do zdjęcia testowego, którego warstwa zaczyna się38px niżej i ma gradientową maskę. Proporcje tego konkretnego zdjęcia są bliskie3:4, więc contain nie jest tutaj główną przyczyną granicy. Poprzednia rada o inset dotyczyła zdjęcia, nie odrębnego tła stadionu. Brak zmian CSS/kodu/testów; do uzgodnienia: rozjaśnienie/kadrowanie stadionu czy rozciągnięcie obszaru fotografii ku górze. Nie zapisano kopii zdjęcia do dokumentacji.
+
+
+=== 2026-10-25 13:28:08 Europe/Warsaw — stadium na końcu CSS
+Przeniesiono3 reguły .slm-ultimate-stadium do jednego bloku na końcu app/src/theme/variables.css, obok ustawień portretu. Zachowano deklaracje i ich kolejność (w tym nadpisanie background przez background-image), bez zmiany wartości. Kontrola deklaracji i git diff --check PASS. Bez innych zmian kodu, testów/builda, push/merge/deploy.
+
+
+=== 2026-10-25 13:51:52 Europe/Warsaw — gradient podpisu z obu stron
+Na polecenie użytkownika zmieniono wyłącznie background w .slm-ultimate-nameplate: transparent0%, ink30%, ink70%, transparent100%, z komentarzem o niezależnej regulacji górnego i dolnego przejścia. Pozostałe ustawienia użytkownika zachowane. git diff --check PASS; bez builda/testów/push/merge/deploy.
+
+
+=== 2026-10-25 13:52:32 Europe/Warsaw — boczne wygaszanie podpisu
+Dodano .slm-ultimate-nameplate::before z dotychczasowym pionowym gradientem i poziomą maską transparent0/black20/black80/transparent100. Komentarze opisują wszystkie4 krawędzie. Maskowana jest tylko warstwa tła, nie tekst; istniejący z-index4 rodzica utrzymuje warstwę przed tłem karty. Pozostałe ustawienia zachowane. git diff --check PASS; bez builda/testów/push/merge/deploy.
+
+
+=== 2026-10-25 14:05:48 Europe/Warsaw — zatwierdzony lokalny wygląd karty
+Właściciel potwierdził: „teraz jest wszystko ok”, polecił zapamiętać zmiany.
+Stan feat/ui-beta zapisujemy lokalnym commitem CSS i niezależnego podglądu; bez push/merge/deploy.
+Zaakceptowane wartości w variables.css: portrait inset80px30px auto, maska pion30/80%,
+poziom35/65%, single contain. Nameplate left/right17px, bottom47px, padding-top28px;
+tło na ::before: pion20/80%, poziom20/80%; tekst h2 top-12px, strong max30px/weight750.
+Stadium: opacity .85, gradient transparent90%/ink100%, background-size auto120%,
+background-position center100%. Zachowano dokładny plik użytkownika, także jego formatowanie.
+Nie przeniesiono jeszcze tych poprawek do osobnego worktree feat/slm-v1-live ani APK.
+Podgląd: app/card-preview.html i src/card-preview.tsx, oryginalny komponent, Test Zawodnik/27.
+/test-portrait.jpg pozostaje lokalnym plikiem testowym i nie jest dodawany do commita.
+Inne istniejące lokalne zmiany App.tsx/demo/Android/config/assets pozostają nietknięte.
+Potwierdzenie wizualne użytkownika PASS; git diff --check. Bez ponownego builda/testów.
