@@ -1,7 +1,7 @@
 # Premium B3 — prawdziwe grupy w zatwierdzonym UI
 
 Stan: 2026-10-25 21:05 Europe/Warsaw; gałąź `feat/premium-b3-groups`, baza `main a46f5e4`.
-PR: w przygotowaniu; B3 wymaga odbioru i osobnej zgody na merge. B4 nie rozpoczęto.
+PR: [#13](https://github.com/psuda87/sunday-league-mates/pull/13), draft, bez scalania. Commit implementacji `7a9f41f`. B3 wymaga odbioru i osobnej zgody na merge. B4 nie rozpoczęto.
 
 ## Zakres i ponowne wykorzystanie
 

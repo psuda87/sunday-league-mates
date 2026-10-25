@@ -4,7 +4,7 @@
 Lokalnie za zgodą zastosowano wersjonowane B2.2 i dwie migracje B3 (20261025190022/20261025193229), bez resetu. Lokalny Edge z bieżących źródeł. Cloud tylko odczyt: ACTIVE_HEALTHY, 7 migracji wobec34 lokalnie; wdrożenie B3 do Cloud wymaga osobnego przygotowania i zgody, niczego zdalnie nie zastosowano.
 PASS: TS/lint,235 Vitest, SQL102+31, replay11/34 migracje, B3 HTTP28 i real browser1 (4 szerokości ×2 motywy), LIVE HTTP20/browser1, Cypress LIVE13 i B1/B2/B22 6, cztery buildy, guards32/55, sync/Android. Natywny unit:1 test szablonowy, nie test Keystore. Lokalne advisors0 WARN/ERROR; cztery znane SQL warnings. Cloud: istniejący Auth WARN i9 INFO, starsza polityka profili niezgodna z B3.
 APK premium zainstalowano aktualizacją na POCO i uruchomiono; bez czyszczenia danych. Ręczny odbiór B3 NOT TESTED. Znane ograniczenia: cudze zdjęcia/statystyki niedostępne; Premium wydarzenia nadal demo; FCM/iOS/Cloud niezbadane end-to-end.
-Następny krok: lokalny odbiór grup na POCO i przegląd PR bez automatycznego merge. Raport/checklista: docs/PREMIUM_B3_GROUPS.md; odpowiedzi: docs/ODPOWIEDZI_CODEX.txt.
+PR #13: https://github.com/psuda87/sunday-league-mates/pull/13 — draft, bez scalania; commit implementacji7a9f41f wypchnięty. Następny krok: lokalny odbiór grup na POCO i przegląd PR bez automatycznego merge. Raport/checklista: docs/PREMIUM_B3_GROUPS.md; odpowiedzi: docs/ODPOWIEDZI_CODEX.txt.
 
 ---
 
