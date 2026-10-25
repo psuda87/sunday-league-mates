@@ -1,5 +1,7 @@
 # Cloud Test — etap1: audyt zakończony, bez wdrożenia
 
+Draft PR #14: https://github.com/psuda87/sunday-league-mates/pull/14 — feat/cloud-test-preparation, audyt cf21441, bez merge i wdrożenia.
+
 2026-10-25 21:56 Europe/Warsaw — feat/cloud-test-preparation z main edd2e92 (PR #13 scalony przez właściciela). Cloud SLM Free/ACTIVE_HEALTHY:7 migracji/13 tabel wobec34/46 lokalnie, accounts v6 niezgodny z B3; members_read_profiles nadal szeroka. Tylko odczyty Cloud, żadnych migracji/Edge/Auth/Storage/RLS/zmian danych ani nowego APK.
 PASS: exact Cloud prefix+27 pending11, SQL/RLS102, historyczny replay11/34, source guards32/55 i składnia skryptów. Oryginalne fikcyjne rekordy zachowane, wszystkie własne scratch DB usunięte. Auth/CORS odczyt PASS. Cloud Advisor1 istniejący WARN (ochrona haseł wymaga Pro) i9 INFO; bez zmian planu. Prawdziwy backup/restore Cloud i testy Cloud APK/POCO NOT TESTED.
 NO-GO na wdrożenie do czasu backup/restore, zatwierdzonego okna aktualizacji, pełnego backendu i konfiguracji Cloud Test z osobnym namespace sesji (obecny Premium localhost i klucz tokenu nie są bezpiecznym wariantem Cloud). Plan/bramki/rollback/checklista/27 wersji i sumy: docs/CLOUD_TEST_READINESS.md. Następny krok tylko po osobnej zgodzie: etap2; bez automatycznego merge.

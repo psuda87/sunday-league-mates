@@ -2,6 +2,9 @@
 
 2026-10-25 21:55 Europe/Warsaw. Baza: `main edd2e924cc077c67ba804ed4acab6d3e159a15b1` (scalony PR #13). Gałąź `feat/cloud-test-preparation`, osobny worktree. Katalog IDE feat/ui-beta pozostaje czysty; lokalne raporty instalacji na gałęzi B3 i historyczne notatki w worktree main pozostawiono bez zmian. Nie wykonano etapu 2.
 
+Draft PR #14: https://github.com/psuda87/sunday-league-mates/pull/14 — feat/cloud-test-preparation, audyt cf21441, bez merge i wdrożenia.
+
+
 **Decyzja: NO-GO na wdrożenie teraz. Techniczna ścieżka migracji bez resetu jest potwierdzona lokalnie; wymaga spełnienia bramek i osobnej zgody.** W Cloud wykonano wyłącznie odczyty metadanych, agregatów, konfiguracji Auth/nazw sekretów i bezstanowe OPTIONS CORS. Bez logowania użytkowników, modyfikacji danych, migracji, resetu, ustawień, Storage, deploy lub zmiany planu.
 
 ## 1. Stan potwierdzony ponownie
