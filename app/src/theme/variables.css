@@ -3643,7 +3643,14 @@ ion-toolbar:has(.slm-shell-header) {
 .slm-demo .slm-demo-nav-admin {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: 20px;
-  padding-top: 24px;
+  padding-top: 5px;
+}
+/* Rezerwacja miejsca pod + należy do treści przycisków, nie do paska.
+   5 + 75 = dotychczasowe 24 + 56: wysokość paska pozostaje bez zmian,
+   a aktywne tło wypełnia cały obszar zakładki. */
+.slm-demo .slm-demo-nav-admin button:not(.slm-demo-create) {
+  min-height: 75px;
+  padding-top: 19px;
 }
 .slm-event-form h1:focus {
   outline: none;
@@ -3666,13 +3673,12 @@ ion-toolbar:has(.slm-shell-header) {
   align-items: flex-end;
   justify-content: center;
   padding-bottom: 6px;
+  /* To samo wycięcie co powierzchnia paska: środek 8px minus 5px insetu.
+     Maska zachowuje wolne miejsce na +, również przy aktywnej zakładce. */
+  mask: radial-gradient(circle 34px at 50% 3px, transparent 33px, #000 34px);
 }
 .slm-demo-nav-admin button[data-tab="groups"] ion-icon {
   font-size: 20px;
-}
-.slm-demo-nav-admin button[data-tab="groups"][aria-current="page"] {
-  background: transparent;
-  border-color: transparent;
 }
 .slm-demo-nav-admin .slm-demo-create {
   z-index: 2;
