@@ -1,3 +1,9 @@
+# PR16 — APK z poprawką etykiet na POCO
+
+2026-10-26 18:50 Europe/Warsaw — feat/premium-profile-name-privacy; kod69f3aa6. Premium build/cap sync/assembleDebug i weryfikacja APK PASS. Za zleceniem właściciela install-r Success na c7a559b5 bez czyszczenia danych; start Status:ok, hash zainstalowanego APK155cf3d0…603f5c9 zgodny. Podpis/kopia starej wersji sprawdzone. Backend testowy HTTP200/reverse54321→56321; bez Cloud/migracji. Log:0 crash/JS/net::ERR_, jeden systemowy komunikat WebView variations „Seed missing signature”. Następny krok: ręczna ocena odstępów pól i fokus/przewijanie przy fizycznej klawiaturze, Light/Dark. PR16 bez merge; raport docs/ODPOWIEDZI_CODEX.txt i docs/PREMIUM_PROFILE_IMPLEMENTATION.md.
+
+---
+
 # PR16 — poprawka odstępów formularza Premium
 
 2026-10-26 18:47 Europe/Warsaw — feat/premium-profile-name-privacy, baza 67b9e9c. CSS: pionowe etykiety z 7 px przerwą dla zagnieżdżonych pól; żadnych zmian logiki/backendu/kolorów/karty. PASS: TS/lint, 8 Vitest, 6 Chrome/Cypress (320/360/390 × Light/Dark, wysokości 844/380), main/Premium build, source contract55. Przed poprawką wszystkie6 konfiguracji wykazywały odstęp0 px. Nowe fikcyjne fixture/testy i zrzuty docs/ui/pr16/profile-labels-*.png. Fizyczna klawiatura i POCO z tą poprawką NOT TESTED; bez nowego APK/instalacji. Istniejące wyniki backendu pozostają historyczne. Migracje/Edge/Cloud/PR14/15 bez zmian. Aktualizacja istniejącego PR #16, bez merge. Następny krok: ręczny odbiór odstępów i fokus/przewijanie na POCO po osobno zleconej aktualizacji APK. Szczegóły docs/PREMIUM_PROFILE_IMPLEMENTATION.md i docs/ODPOWIEDZI_CODEX.txt.
