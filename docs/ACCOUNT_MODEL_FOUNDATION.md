@@ -48,3 +48,6 @@ Z root: `node app/scripts/test-account-foundation-http-local.mjs`. Z app: `node 
 4. Testy odłączenia sieci/utraty odpowiedzi end-to-end, przerwanego pełnego cutover, macierz resetu administratora i odbiór fizycznego Androida pozostają do wykonania. Idempotent retry w tej próbie jest ponowieniem tego samego żądania, nie symulacją fizycznej awarii sieci.
 
 **Status: przetestowany, nieaktywny fundament; nie gotowy nowy Auth. Draft PR, bez merge/deploy/Cloud.** Raport docs/ODPOWIEDZI_CODEX.txt. PR17 pozostawiono jako wcześniejszy audyt i plan.
+
+
+2026-10-26 19:36 Europe/Warsaw — fundament wypchnięty w2a6113b09e544666106af17051ac10ec90f92357. Utworzono Draft PR #18: https://github.com/psuda87/sunday-league-mates/pull/18. Nowy mechanizm pozostaje nieaktywny; brak merge/deploy. Raport docs/ODPOWIEDZI_CODEX.txt.
