@@ -1,5 +1,7 @@
 # PR16 — odbiór techniczny lokalny, oczekuje odbioru ręcznego
 
+PR #16: https://github.com/psuda87/sunday-league-mates/pull/16 — techniczny commit ed71f29 wypchnięty, draft bez konfliktów i merge.
+
 2026-10-26 18:33 Europe/Warsaw — feat/premium-profile-name-privacy, baza76da23a, istniejący PR #16. Odizolowany pełny Supabase slm-pr16-review/API56321 z35 migracjami; oryginalny lokalny backend34/64 konta/33 grupy/13 meczów bez zmian, Cloud/PR14/15 nietknięte.
 PASS: real Auth/Edge/PostgREST33 HTTP + real browser1, SQL fixture28/replay35,254 Vitest/43 pliki, TS/lint, main/Premium/demo isolation, guards32/35/55, cap sync/Android. Poprawki:409 consent_required zamiast503, wyścig dismiss Ionic, styl akcji ukrycia imienia, cross-platform allowlista demo z4 regresjami. Bez zmiany migracji i Auth aplikacji.
 APK6cf904ce zainstalowano za osobną zgodą install-r na c7a559b5 bez czyszczenia danych, podpis zgodny; kopia poprzedniego APK zachowana. Reverse telefonu54321→komputer56321, start ok, brak znalezionego FATAL EXCEPTION/błędu WebView. Fikcyjne konta Zawodnik/Obserwator i2 grupy odbioru; poświadczenia tylko prywatnym TEMP poza Git. Ręczny odbiór A–G/Android nadal oczekuje, PR draft bez merge. Szczegóły/checklista/rollback: docs/PREMIUM_PROFILE_IMPLEMENTATION.md; odpowiedzi docs/ODPOWIEDZI_CODEX.txt.

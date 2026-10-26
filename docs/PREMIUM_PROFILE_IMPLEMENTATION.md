@@ -255,3 +255,6 @@ Z katalogu repo: `python app/scripts/prepare-pr16-local.py`. Następnie start **
 Z app: `node scripts/test-premium-profile-http-local.mjs` (tylko56321); `SLM_PR16_BROWSER=1` dołącza Cypress przy gotowym Premium preview na5174. Browser runner przekazuje hasło przez stdin, bez video/zrzutów logowania, błędy sanowane. `node scripts/test-premium-profile-sql-local.mjs` jest osobnym testem fixture SQL. `node scripts/create-pr16-phone-fixtures-local.mjs` tworzy tylko nowe fikcyjne dane oraz nowy plik TEMP, nie resetuje wcześniejszych.
 
 **Stan przed merge:** techniczny backend/SQL/UI/build i start Androida zaliczone; wymagany odbiór ręczny właściciela. PR #16 pozostaje draft, bez automatycznego merge. Historyczny problem demo został odtworzony jako różnica platform/guardu i naprawiony z regresją. Nie ma podstaw do deklaracji gotowości Cloud ani pełnego odbioru telefonu przed odpowiedzią właściciela.
+
+
+Końcowy zapis techniczny: commit `ed71f29` wypchnięty do istniejącego [PR #16](https://github.com/psuda87/sunday-league-mates/pull/16), draft, bez konfliktów i bez merge. SHA zainstalowanego base.apk na telefonie potwierdzony jako6cf904ce…d608cd2. Ręczny odbiór nadal oczekuje; raport docs/ODPOWIEDZI_CODEX.txt.
