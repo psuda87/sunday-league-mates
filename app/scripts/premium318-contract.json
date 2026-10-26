@@ -11,7 +11,8 @@
     "B3 owner-approved real groups controllers, group-scoped privacy controls and accurate live/demo labels; Ultimate/BottomNav/CSS/assets unchanged",
     "Shared groups selectors and avatar props accept narrow live DTOs; no fabricated World, statistics or profile fallback",
     "Owner-approved B3 POCO corrections: compact scoped consent switch and refresh icon; frozen card/nav/global CSS unchanged",
-    "PR16 owner-authorized independent nickname/three global profile names and atomic privacy controls; original Ultimate/BottomNav rules unchanged"
+    "PR16 owner-authorized independent nickname/three global profile names and atomic privacy controls; original Ultimate/BottomNav rules unchanged",
+    "Owner-reported PR16 nested label/input spacing: column layout and existing 7px gap only within Premium profile editor; card/nav/colors unchanged"
   ],
   "files": {
     "app/demo/main.tsx": {
@@ -175,7 +176,7 @@
       "text": true
     },
     "app/src/theme/variables.css": {
-      "sha256": "b9e9530221fd48fd16671148b297078d296550dce6773ab665ef2ab68bcb2f70",
+      "sha256": "f62ecf67bcfcac9853a294d71b167b88a98ddac2d62f10edc4072496851cd769",
       "text": true
     },
     "app/src/ui/AppearanceSettings.tsx": {

@@ -263,3 +263,12 @@ Końcowy zapis techniczny: commit `ed71f29` wypchnięty do istniejącego [PR #16
 ### Ogólny wynik ręczny właściciela — 2026-10-26 18:37 Europe/Warsaw
 
 Po teście POCO właściciel zgłosił: „generalnie wygląda na to, że wszystko działa”. Wynik ogólnej próby ręcznej pozytywny, bez zgłoszonej usterki. Nie przekazano rozpiski poszczególnych scenariuszy, dlatego nie oznaczono całej macierzy A–G/2 konta/restart/motywy jako indywidualnie potwierdzonej ręcznie. Wcześniejsze szczegółowe testy automatyczne pozostają udokumentowane powyżej. To aktualizacja historycznego statusu „odbiór oczekuje”, bez zmiany APK6cf904ce i bez merge PR #16.
+
+
+### PR16 — odstępy etykiet formularza — 2026-10-26 18:47 Europe/Warsaw
+
+Przyczyna: PremiumIdentityEditor zagnieżdża input/select wewnątrz label, natomiast odziedziczony display:block nie zapewniał odstępu między tekstem i polem. W prawdziwym Chrome pomiar przed poprawką: 0 px i 6/6 niezaliczonych konfiguracji. Minimalna poprawka w app/src/theme/variables.css: wyłącznie .slm-premium-identity > label jako pionowy flex z gap:7px oraz ograniczenie szerokości/box-sizing pól. Bez zmian komponentów, logiki zapisu, Auth, Supabase, migracji i uprawnień; kolory, obramowania i karta Ultimate bez zmian. Manifest zamrożonego UI aktualizuje tylko hash CSS i jawny wyjątek tej naprawy.
+
+PASS: TypeScript, ESLint, 8 testów PremiumIdentityEditor, source contract 55 plików, build main i Premium. Chrome/Cypress 6/6: 320/360/390 px × Light/Dark, każda konfiguracja przy wysokości 844 i 380 px; odstęp >=6 px dla pseudonimu, imienia, pełnej nazwy, numeru oraz selektora, brak przepełnienia poziomego i fokus/przewijanie ponad footerem. Test używa oryginalnego formularza i CSS z fikcyjnym bindingiem bez sieci, nie jest E2E backendu. Build ma ostrzeżenie o dużych chunkach; bez błędu kompilacji.
+
+Zrzuty z przeglądarki: docs/ui/pr16/profile-labels-light.png oraz profile-labels-dark.png. Zmniejszony viewport symuluje zmianę dostępnej wysokości, nie testuje fizycznej klawiatury Androida. NOT TESTED: nowa poprawka na POCO/realnym IME. Nie przebudowano ani nie zainstalowano APK w tym zadaniu. Do odbioru po osobnej aktualizacji APK: Edytuj profil, fokus i przewinięcie każdego pola przy klawiaturze, oba motywy. Nie powtarzano wcześniejszego odbioru backendu, nie przypisano mu nowego PASS. Commit/push do istniejącego PR #16, bez merge i wdrożeń.

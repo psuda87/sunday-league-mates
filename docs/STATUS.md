@@ -1,3 +1,9 @@
+# PR16 — poprawka odstępów formularza Premium
+
+2026-10-26 18:47 Europe/Warsaw — feat/premium-profile-name-privacy, baza 67b9e9c. CSS: pionowe etykiety z 7 px przerwą dla zagnieżdżonych pól; żadnych zmian logiki/backendu/kolorów/karty. PASS: TS/lint, 8 Vitest, 6 Chrome/Cypress (320/360/390 × Light/Dark, wysokości 844/380), main/Premium build, source contract55. Przed poprawką wszystkie6 konfiguracji wykazywały odstęp0 px. Nowe fikcyjne fixture/testy i zrzuty docs/ui/pr16/profile-labels-*.png. Fizyczna klawiatura i POCO z tą poprawką NOT TESTED; bez nowego APK/instalacji. Istniejące wyniki backendu pozostają historyczne. Migracje/Edge/Cloud/PR14/15 bez zmian. Aktualizacja istniejącego PR #16, bez merge. Następny krok: ręczny odbiór odstępów i fokus/przewijanie na POCO po osobno zleconej aktualizacji APK. Szczegóły docs/PREMIUM_PROFILE_IMPLEMENTATION.md i docs/ODPOWIEDZI_CODEX.txt.
+
+---
+
 # PR16 — ogólny wynik ręczny POCO pozytywny
 
 2026-10-26 18:37 Europe/Warsaw — właściciel: „generalnie wygląda na to, że wszystko działa”. Nie zgłoszono usterki zainstalowanego APK6cf904ce. Zapisano pozytywną ogólną próbę ręczną; brak oddzielnych wyników pełnej checklisty, bez dopisywania indywidualnych PASS. Wcześniejsze testy techniczne pozostają zaliczone. PR #16 nadal bez merge; brak polecenia scalania. Tylko dokumentacja, bez ponawiania testów ani zmian aplikacji/Cloud/PR14/15. Szczegóły docs/ODPOWIEDZI_CODEX.txt i docs/PREMIUM_PROFILE_IMPLEMENTATION.md.
