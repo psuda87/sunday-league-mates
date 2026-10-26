@@ -1,0 +1,24 @@
+begin;
+create function pg_temp.contact_assert(ok boolean,label text) returns void language plpgsql as $$begin if ok is distinct from true then raise exception 'FAIL %',label;end if;raise notice 'PASS %',label;end$$;
+do $$declare a uuid:=gen_random_uuid();b uuid:=gen_random_uuid();begin
+ insert into auth.users(id,email,email_confirmed_at) values(a,a::text||'@slm.invalid',now()),(b,b::text||'@slm.invalid',now());
+ insert into public.slm_profiles(user_id) values(a),(b);
+ insert into public.slm_player_profiles(user_id,nickname) values(a,'ContactOne'),(b,'ContactTwo');
+ insert into public.slm_roles(user_id) values(a),(b);
+ insert into public.slm_account_security(user_id,must_change_password) values(a,false),(b,false);
+ insert into public.slm_aliases values(a,'ContactOne','contactone','+48000000881',a::text||'@slm.invalid'),(b,'ContactTwo','contacttwo','+12025550111',b::text||'@slm.invalid');
+ begin perform public.slm_model_prepare();raise exception 'foreign_contact_accepted';exception when others then if sqlerrm<>'contact_migration_required' then raise;end if;end;
+ perform pg_temp.contact_assert(not public.slm_model_ready() and not exists(select 1 from public.slm_identity_registry),'foreign legacy contact blocks entire cutover without data loss');
+ update public.slm_aliases set phone='+48000000882' where user_id=b;
+ update public.slm_player_profiles set contact_phone='+48000000883' where user_id=b;
+ begin perform public.slm_model_prepare();raise exception 'contact_conflict_accepted';exception when others then if sqlerrm<>'contact_migration_required' then raise;end if;end;
+ perform pg_temp.contact_assert(not public.slm_model_ready() and (select contact_phone='+48000000883' from public.slm_player_profiles where user_id=b),'ambiguous contact is never overwritten');
+ update public.slm_player_profiles set contact_phone=null where user_id=b;
+ perform public.slm_model_prepare();
+ perform pg_temp.contact_assert((select contact_phone='+48000000881' from public.slm_player_profiles where user_id=a),'legacy contact copied for same UUID');
+ update public.slm_player_profiles set contact_phone=null where user_id=a;
+ begin perform public.slm_model_prepare();raise exception 'activation_repeated';exception when others then if sqlerrm<>'model_already_active' then raise;end if;end;
+ perform pg_temp.contact_assert((select contact_phone is null from public.slm_player_profiles where user_id=a),'repeat cutover cannot resurrect a cleared contact');
+ perform pg_temp.contact_assert((select count(*)=2 from public.slm_roles where user_id in(a,b) and role='member'),'contact migration preserves roles');
+end$$;
+rollback;

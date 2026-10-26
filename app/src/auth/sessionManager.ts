@@ -79,12 +79,16 @@ export class SessionManager {
     void flight.finally(() => { if (this.refreshFlight === flight) this.refreshFlight = null; });
     return flight;
   };
-  signIn(identifier: string, password: string): Promise<void> {
+  signIn(identifier: string, password: string, expectedUserId?:string): Promise<void> {
     const generation = ++this.generation;
     this.refreshFlight = null;
     this.publish({ phase: 'checking', session: null, message: '' });
     const flight = (async () => { try {
       const session = await this.request<Session>('login', { identifier, password });
+      if(expectedUserId&&session.user_id!==expectedUserId){
+        await this.request('logout',{},session).catch(()=>undefined);
+        throw new AccountError('Nie potwierdzono tożsamości konta. Zaloguj się ponownie.','invalid_credentials');
+      }
       await this.accept(session, generation);
     } catch (error) {
       if (generation === this.generation) {

@@ -19,3 +19,21 @@ it('does not reopen while the previous Ionic confirmation is still dismissing',a
  act(()=>alertControl.dismiss());fireEvent.click(screen.getByRole('button',{name:'Zapisz dane'}));fireEvent.click(screen.getByRole('button',{name:'Akceptuję'}));
  await waitFor(()=>expect(b.saveIdentity).toHaveBeenCalledOnce());
 });
+
+it('candidate requires current password for canonical rename and sends one combined draft',async()=>{
+ const b=binding(true);b.profile!.account_model=true;render(<Editor binding={b} onClose={vi.fn()}/>);
+ fireEvent.change(screen.getByLabelText('Pseudonim'),{target:{value:'ChangedLogin'}});fireEvent.click(screen.getByRole('button',{name:'Zapisz dane'}));
+ expect(b.saveIdentity).not.toHaveBeenCalled();expect(screen.getByRole('alert')).toHaveTextContent('obecnego hasła');
+ fireEvent.change(screen.getByLabelText('Obecne hasło'),{target:{value:'OnlyTemporaryTest9!'}});
+ fireEvent.change(screen.getByLabelText('Telefon kontaktowy · opcjonalnie'),{target:{value:'000000999'}});
+ fireEvent.click(screen.getByRole('button',{name:'Zapisz dane'}));
+ await waitFor(()=>expect(b.saveIdentity).toHaveBeenCalledOnce());
+ expect(b.saveIdentity).toHaveBeenCalledWith(expect.objectContaining({nickname:'ChangedLogin',expected_nickname:'Publiczny',current_password:'OnlyTemporaryTest9!',contact_phone:'000000999'}));
+ expect(screen.getByLabelText('Obecne hasło')).toHaveValue('');
+});
+it('candidate contact-only change needs no password and preserves canonical nickname',async()=>{
+ const b=binding(true);b.profile!.account_model=true;render(<Editor binding={b} onClose={vi.fn()}/>);
+ fireEvent.change(screen.getByLabelText('Telefon kontaktowy · opcjonalnie'),{target:{value:'000000998'}});fireEvent.click(screen.getByRole('button',{name:'Zapisz dane'}));
+ await waitFor(()=>expect(b.saveIdentity).toHaveBeenCalledOnce());expect(screen.queryByLabelText('Obecne hasło')).toBeNull();
+ expect(b.saveIdentity).toHaveBeenCalledWith(expect.objectContaining({nickname:'Publiczny',current_password:undefined}));
+});

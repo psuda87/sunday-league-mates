@@ -51,3 +51,7 @@ Z root: `node app/scripts/test-account-foundation-http-local.mjs`. Z app: `node 
 
 
 2026-10-26 19:36 Europe/Warsaw — fundament wypchnięty w2a6113b09e544666106af17051ac10ec90f92357. Utworzono Draft PR #18: https://github.com/psuda87/sunday-league-mates/pull/18. Nowy mechanizm pozostaje nieaktywny; brak merge/deploy. Raport docs/ODPOWIEDZI_CODEX.txt.
+
+
+### Kontynuacja — 2026-10-27 00:29 Europe/Warsaw
+Bieżący stan i42 migracje opisuje [ACCOUNT_MODEL_CANDIDATE.md](ACCOUNT_MODEL_CANDIDATE.md). Powyższe wyniki38 migracji są historyczne; pełna aktywacja nadal zablokowana decyzją właściciela.

@@ -1,12 +1,11 @@
 import { isPhoneIdentifier, normalizeLoginPhone, normalizePhoneUpdate } from '../_shared/phone.ts';
 import { PhotoError, profilePhoto, readAccountBody } from './profilePhotos.ts';
-export interface Environment { url: string; anon: string; service: string; origins: string[]; emailSignupEnabled?: boolean; accountFoundationEnabled?: boolean }
+export interface Environment { url: string; anon: string; service: string; origins: string[]; emailSignupEnabled?: boolean; accountFoundationEnabled?: boolean; accountModelEnabled?: boolean }
 type Row = Record<string, unknown>;
 class ApiError extends Error {
   constructor(public status: number, public code: string, message: string) { super(message); }
 }
 const unauthorized = () => new ApiError(401, 'session_invalid', 'Sesja wygasła. Zaloguj się ponownie.');
-const credentials = () => new ApiError(401, 'invalid_credentials', 'Nieprawidłowy login, numer telefonu lub hasło.');
 export function normalizeLogin(value: string): string {
   const result = value.trim().normalize('NFC');
   if (!/^[\p{L}][\p{L}\p{N}_.-]{2,31}$/u.test(result))
@@ -37,6 +36,7 @@ export function displayName(login: string, fullName: string, mode: string) {
 }
 
 export function createHandler(env: Environment) {
+  const credentials=()=>new ApiError(401,'invalid_credentials',env.accountModelEnabled?'Nieprawidłowy pseudonim, e-mail lub hasło.':'Nieprawidłowy login, numer telefonu lub hasło.');
   async function call(path: string, method = 'GET', body?: unknown, token?: string, admin = false) {
     const headers: Record<string, string> = { apikey: admin ? env.service : env.anon,
       Authorization: `Bearer ${token ?? (admin ? env.service : env.anon)}` };
@@ -73,6 +73,11 @@ export function createHandler(env: Environment) {
     return rows[0];
   }
   async function alias(id: string) {
+    if(env.accountModelEnabled){
+      const registry=await db(`slm_identity_registry?user_id=eq.${id}`),players=await db(`slm_player_profiles?user_id=eq.${id}`);
+      if(registry.length!==1||players.length!==1)throw unauthorized();
+      return {user_id:id,technical_email:registry[0].auth_email,login:players[0].nickname,phone:players[0].contact_phone??'',email_account:!!registry[0].email_login};
+    }
     const rows = await db(`slm_aliases?user_id=eq.${id}`);
     if (rows.length === 1) return rows[0];
     const identity = await db('rpc/slm_email_identity', 'POST', { p_user: id });
@@ -122,7 +127,7 @@ export function createHandler(env: Environment) {
     const p = profiles[0];
     if (!p) throw unauthorized();
     return { user_id: id, jersey_number: players[0]?.jersey_number ?? null, login: a.login, phone: a.phone, email_account: a.email_account === true, full_name: p.full_name,
-      nickname: players[0]?.nickname || (a.login.includes('@')?'Zawodnik':a.login), first_name: p.first_name??'',
+      account_model:env.accountModelEnabled===true, nickname: players[0]?.nickname || (a.login.includes('@')?'Zawodnik':a.login), first_name: p.first_name??'',
       group_scope: await db(`slm_group_members?user_id=eq.${id}&select=group_id,share_full_name,share_first_name,slm_groups!inner(archived)&slm_groups.archived=eq.false`),
       display_as: p.display_as, display_name: p.display_as==='first_name'?(p.first_name?.trim()||players[0]?.nickname||'Zawodnik'):displayName(players[0]?.nickname||a.login, p.full_name, p.display_as) };
   }
@@ -164,6 +169,35 @@ export function createHandler(env: Environment) {
       const action = field(body, 'action', 40);
       if(uploadRequest&&action!=='profile_photo_upload')throw new ApiError(400,'invalid_input','Nieprawidłowe żądanie.');
       await rate('global', 300);
+      if(action==='account_capabilities'){const enabled=!!env.accountModelEnabled&&await db('rpc/slm_model_ready','POST',{});return respond({account_model:enabled,self_registration:enabled,email_verification:false,email_recovery:false});}
+      if(env.accountModelEnabled&&!await db('rpc/slm_model_ready','POST',{}))throw new ApiError(503,'model_inactive','Nowy model kont nie jest aktywny.');
+      if(action==='model_signup'){
+        if(!env.accountModelEnabled)throw new ApiError(503,'model_inactive','Nowy model kont nie jest aktywny.');
+        if(Object.keys(body).some(k=>!['action','nickname','password','request_id','request_secret','email','phone','full_name'].includes(k)))throw new ApiError(400,'invalid_input','Sprawdź dane rejestracji.');
+        // Never confirm a user's real email administratively. Mail delivery is NOT configured.
+        if(field(body,'email',254).trim())throw new ApiError(503,'mail_unconfigured','Dodanie e-maila czeka na potwierdzoną konfigurację wysyłki.');
+        const nickname=normalizeLogin(field(body,'nickname',48)),pwd=password(body,'password',true);
+        const requestId=field(body,'request_id',36),secret=field(body,'request_secret',64);
+        if(!/^[0-9a-f-]{36}$/i.test(requestId)||! /^[0-9a-f]{64}$/i.test(secret))throw new ApiError(400,'invalid_input','Nieprawidłowe żądanie.');
+        const phone=field(body,'phone',32).trim()?normalizePhone(field(body,'phone',32)):'';
+        const name=field(body,'full_name',100).trim();if(Array.from(name).some(c=>c.charCodeAt(0)<32||c==='<'||c==='>'))throw new ApiError(400,'invalid_input','Sprawdź dane rejestracji.');
+        await rate('public-signup',30,86400); // Hard global resource budget; never trust spoofable IP headers.
+        const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(secret)))).map(x=>x.toString(16).padStart(2,'0')).join('');
+        const job=await db('rpc/slm_model_signup_begin','POST',{p_request:requestId,p_secret_hash:hash,p_nickname:nickname,p_phone:phone,p_full_name:name});
+        let user=await db('rpc/slm_model_signup_user','POST',{p_request:requestId,p_secret_hash:hash});
+        if(!user){
+          // This is ONLY an internal random Auth address, never the optional user's email.
+          await call('/auth/v1/admin/users','POST',{email:job.auth_email,password:pwd,email_confirm:true,app_metadata:{slm_signup_request:requestId}},undefined,true);
+          user=await db('rpc/slm_model_signup_user','POST',{p_request:requestId,p_secret_hash:hash});
+          if(!user)throw new ApiError(503,'signup_incomplete','Nie potwierdzono rejestracji. Ponów to samo żądanie.');
+        }
+        const proof=await authLogin(job.auth_email,pwd),verified=await verify(proof.access_token);await rejectSession(proof);
+        if(verified.id!==user)throw credentials();
+        await db('rpc/slm_model_signup_finish','POST',{p_request:requestId,p_secret_hash:hash});
+        const canonical=await db(`slm_player_profiles?user_id=eq.${user}&select=nickname`);
+        return respond({registered:true,user_id:user,nickname:canonical[0].nickname});
+      }
+      if(env.accountModelEnabled&&['signup','resend_verification','recover_email'].includes(action))throw new ApiError(503,'mail_unconfigured','Weryfikacja i odzyskiwanie e-mail nie zostały uruchomione.');
       if (action === 'signup' || action === 'resend_verification' || action === 'recover_email') {
         await rate('email-flow', 12);
         if (!env.emailSignupEnabled) throw new ApiError(503, 'mail_unconfigured', 'Rejestracja i odzyskiwanie e-mail czekają na konfigurację poczty.');
@@ -186,7 +220,11 @@ export function createHandler(env: Environment) {
         const pwd = password(body, 'password');
         let rows: Row[] = [];
         try {
-          if (raw.includes('@')) {
+          if(env.accountModelEnabled){
+            await rate('identifier:'+raw.normalize('NFC').toLowerCase(),16);
+            const identity=await db('rpc/slm_model_resolve','POST',{p_identifier:raw});
+            if(identity)rows=[identity];
+          } else if (raw.includes('@')) {
             const email = raw.toLowerCase();
             await rate('identifier:' + email, 16);
             const identity = await db('rpc/slm_email_identity', 'POST', { p_email: email });
@@ -198,6 +236,15 @@ export function createHandler(env: Environment) {
           }
         } catch (e) { if (e instanceof ApiError && e.status === 429) throw e; }
         if (rows[0]) await rate('account:' + rows[0].user_id, 16);
+        if(env.accountModelEnabled&&rows[0]?.pending===true){
+          const pending=rows[0],fresh=await authLogin(pending.technical_email as string,pwd).catch(async()=>{await new Promise(r=>setTimeout(r,Math.max(0,350-(Date.now()-start))));throw credentials();});
+          try{
+            const verified=await verify(fresh.access_token);if(verified.id!==pending.user_id)throw credentials();
+            const id=await db('rpc/slm_model_signup_finish','POST',{p_request:pending.request_id,p_secret_hash:pending.secret_hash});
+            if(id!==verified.id)throw credentials();
+            const current=await state(id);return respond(await accept(fresh,current.security_version));
+          }catch(error){await rejectSession(fresh);throw error;}
+        }
         // Wersję odczytujemy PRZED sprawdzeniem hasła. Reset między tymi krokami
         // nie może zatwierdzić sesji uzyskanej poprzednim hasłem w nowej wersji.
         const s = rows[0] ? await state(rows[0].user_id as string) : null;
@@ -249,6 +296,24 @@ export function createHandler(env: Environment) {
       if (action === 'status') return respond({ must_change_password: ctx.must_change_password, role: ctx.role, user_id: ctx.id });
       if (ctx.must_change_password && action !== 'password')
         throw new ApiError(403, 'password_required', 'Najpierw zmień hasło tymczasowe.');
+      if(env.accountModelEnabled&&['identifiers','save_email_profile','save_premium_profile','save_profile','create_account','foundation_rename'].includes(action))throw new ApiError(426,'client_upgrade_required','Zaktualizuj aplikację, aby bezpiecznie zapisać dane konta.');
+      if(action==='model_profile'){
+        if(!env.accountModelEnabled)throw new ApiError(503,'model_inactive','Nowy model kont nie jest aktywny.');
+        const allowed=['nickname','expected_nickname','first_name','full_name','display_as','jersey_number','group_scope','accept_disclosure','request_id','contact_phone'];
+        if(Object.keys(body).some(k=>!['action','current_password',...allowed].includes(k)))throw new ApiError(400,'invalid_input','Sprawdź dane profilu.');
+        const nickname=normalizeLogin(field(body,'nickname',48)),expected=field(body,'expected_nickname',48);
+        await rate('sensitive:'+ctx.id,8);
+        if(nickname!==expected)await verifyPassword(ctx,password(body,'current_password'));
+        const clean:Row={};for(const k of allowed)clean[k]=body[k];
+        clean.nickname=nickname;clean.contact_phone=field(body,'contact_phone',32).trim()?normalizePhone(field(body,'contact_phone',32)):'';
+        const r=await call('/rest/v1/rpc/slm_model_profile_save','POST',{p_user:ctx.id,p_session:ctx.sid,p_body:clean},undefined,true);
+        if(!r.ok){
+          if(r.data?.code==='23505')throw new ApiError(409,'nickname_taken','Pseudonim lub numer kontaktowy jest zajęty.');
+          if(r.data?.message==='session_invalid')throw unauthorized();
+          throw new ApiError(409,'profile_not_saved','Nie potwierdzono zapisu. Sprawdź dane, zakres zgód i odśwież profil.');
+        }
+        return respond(await profile(ctx.id));
+      }
       if (action === 'foundation_rename') {
         if (!env.accountFoundationEnabled) throw new ApiError(503,'foundation_disabled','Nowy model kont nie jest aktywny.');
         if (Object.keys(body).some(key=>!['action','nickname','expected_nickname','current_password','request_id'].includes(key)))
@@ -517,10 +582,11 @@ export function createHandler(env: Environment) {
       await rate('admin:' + ctx.id, 20);
       if (action === 'list_accounts') {
         const offset = typeof body.offset === 'number' && Number.isInteger(body.offset) && body.offset >= 0 ? body.offset : 0;
-        const aliases = await db(`slm_aliases?order=login_normalized&limit=50&offset=${offset}`);
+        const aliases = await db(env.accountModelEnabled?`slm_identity_registry?select=user_id&order=nickname_key&limit=50&offset=${offset}`:`slm_aliases?order=login_normalized&limit=50&offset=${offset}`);
         const rows = await Promise.all(aliases.map(async (a: Row) => {
           const [p, s, roles] = await Promise.all([profile(a.user_id as string), state(a.user_id as string), db(`slm_roles?user_id=eq.${a.user_id}`)]);
-          return { ...p, role: roles[0].role, must_change_password: s.must_change_password, operation_pending: !!s.operation_id };
+          const safe=env.accountModelEnabled?{user_id:a.user_id,login:p.nickname,nickname:p.nickname,display_name:p.nickname,phone:'',full_name:'',display_as:'nickname'}:p;
+          return { ...safe, role: roles[0].role, must_change_password: s.must_change_password, operation_pending: !!s.operation_id };
         }));
         return respond(rows);
       }
@@ -542,6 +608,10 @@ export function createHandler(env: Environment) {
         return respond({ user_id: r.data.id, temporary_password: temporary });
       }
       if (action === 'reset_password') {
+        if(env.accountModelEnabled){
+          if(body.confirm_identity!==true||field(body,'reason',200).trim().length<8)throw new ApiError(400,'identity_confirmation_required','Administrator musi potwierdzić tożsamość poza samym numerem telefonu i podać powód.');
+          await verifyPassword(ctx,password(body,'current_password'));
+        }
         const target = field(body, 'user_id', 36);
         if (!/^[0-9a-f-]{36}$/i.test(target)) throw new ApiError(400, 'invalid_input', 'Nieprawidłowe konto.');
         if (target === ctx.id) throw new ApiError(400, 'self_reset', 'Własne hasło zmień w profilu.');

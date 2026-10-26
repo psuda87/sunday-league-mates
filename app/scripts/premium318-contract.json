@@ -12,7 +12,8 @@
     "Shared groups selectors and avatar props accept narrow live DTOs; no fabricated World, statistics or profile fallback",
     "Owner-approved B3 POCO corrections: compact scoped consent switch and refresh icon; frozen card/nav/global CSS unchanged",
     "PR16 owner-authorized independent nickname/three global profile names and atomic privacy controls; original Ultimate/BottomNav rules unchanged",
-    "Owner-reported PR16 nested label/input spacing: column layout and existing 7px gap only within Premium profile editor; card/nav/colors unchanged"
+    "Owner-reported PR16 nested label/input spacing: column layout and existing 7px gap only within Premium profile editor; card/nav/colors unchanged",
+    "Owner-authorized inactive account-model candidate: conditional nickname/contact/password fields and original form bindings; no card/nav/CSS/theme changes or default activation"
   ],
   "files": {
     "app/demo/main.tsx": {
@@ -76,11 +77,11 @@
       "text": false
     },
     "app/src/account-ui/AccountScreens.tsx": {
-      "sha256": "32a36235bdb06f7ae2ee7ac0e4868859fb11be128a492d49d41b666a89111cde",
+      "sha256": "8bcf82b132caf9a8d500414bc858fa3d3df0b089db8bd3718aa7f6d7c2c01de8",
       "text": true
     },
     "app/src/account-ui/Fields.tsx": {
-      "sha256": "6a707c14f303441892894572b9eba7c438073fc6059e0ec9269e961628126d96",
+      "sha256": "352edd9cc3b3535af30c9bd5da96782bfeda62a80226361443de686a73af8e6c",
       "text": true
     },
     "app/src/account-ui/account.css": {
@@ -88,7 +89,7 @@
       "text": true
     },
     "app/src/account-ui/model.ts": {
-      "sha256": "799f93912ea392642372d3dd9b8c496f32ed118f550f94dd320784418f86643f",
+      "sha256": "438456ccf18d7f536379267386488002784c871fecab2c7fa65efc12c3db579c",
       "text": true
     },
     "app/src/demo/AccountDemo.tsx": {

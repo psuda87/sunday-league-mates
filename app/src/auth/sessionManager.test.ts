@@ -97,3 +97,16 @@ describe('zapisane sesje',()=>{
     expect(manager.getSnapshot().phase).toBe('ready');
   });
 });
+
+it('rejects a reused nickname resolving to another UUID before persisting any token',async()=>{
+ const disk=memory(),wrong=session();let rejectedLogout=false;
+ const request=api(async action=>{if(action==='logout'){rejectedLogout=true;return{};}return wrong;});
+ const manager=new SessionManager(disk.store,request);
+ await expect(manager.signIn('ReusedName','EphemeralTest9!',crypto.randomUUID())).rejects.toThrow();
+ expect(disk.peek()).toBeNull();expect(manager.getSnapshot().phase).toBe('signed_out');expect(manager.getSnapshot().session).toBeNull();expect(rejectedLogout).toBe(true);
+});
+it('accepts expected registration UUID through existing secure session persistence',async()=>{
+ const disk=memory(),own=session(),manager=new SessionManager(disk.store,api(async()=>own));
+ await manager.signIn('CurrentCanonicalName','EphemeralTest9!',own.user_id);
+ expect(manager.getSnapshot().session?.user_id).toBe(own.user_id);expect(disk.peek()).toBe(own.refresh_token);
+});

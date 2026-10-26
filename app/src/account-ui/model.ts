@@ -34,3 +34,5 @@ export function accountMessage(error:unknown) {
  if(error instanceof AccountUiFailure){if(error.kind==='network')return 'Brak połączenia. Sprawdź internet i spróbuj ponownie.';if(error.kind==='credentials')return 'Nie udało się zalogować. Sprawdź dane i spróbuj ponownie.';if(error.kind==='link')return 'Link jest nieprawidłowy lub wygasł. Poproś o nowy.';if(error.kind==='integration')return 'Ta operacja wymaga podłączenia właściwego Auth. Nie wykonano zmiany.';}
  return 'Nie udało się wykonać operacji. Spróbuj ponownie później.';
 }
+
+export const nicknameProblem=(value:string)=>/^[\p{L}][\p{L}\p{N}_.-]{2,31}$/u.test(value.trim().normalize('NFC'))?'':'Pseudonim: 3–32 znaki, pierwsza litera, dalej litery, cyfry, _, . lub -.';

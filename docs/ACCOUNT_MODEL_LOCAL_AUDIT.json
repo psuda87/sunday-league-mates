@@ -1,0 +1,836 @@
+{
+  "developer": {
+    "accounts": 64,
+    "counts": {
+      "invalid_nickname_format": 53,
+      "duplicate_nickname": 46,
+      "missing_nickname": 3,
+      "personal_email_absent_expected": 3
+    },
+    "issues": [
+      {
+        "id": "acct-02b636a229e9",
+        "flags": [
+          "invalid_nickname_format"
+        ],
+        "nickname_group": "name-c90197ef9bbf"
+      },
+      {
+        "id": "acct-02e3152a22e3",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-ace57900435a"
+      },
+      {
+        "id": "acct-04b096140c4c",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-38d7aec643ba"
+      },
+      {
+        "id": "acct-0968583068a6",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-38158108f5ad"
+      },
+      {
+        "id": "acct-0a43f5f36c4c",
+        "flags": [
+          "invalid_nickname_format"
+        ],
+        "nickname_group": "name-402dbdac552e"
+      },
+      {
+        "id": "acct-0c397fd1af7e",
+        "flags": [
+          "invalid_nickname_format"
+        ],
+        "nickname_group": "name-671cd63637cb"
+      },
+      {
+        "id": "acct-0c550a26eb62",
+        "flags": [
+          "invalid_nickname_format"
+        ],
+        "nickname_group": "name-0108d37d9994"
+      },
+      {
+        "id": "acct-0f7e3ae6e876",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-ce25db03c977"
+      },
+      {
+        "id": "acct-1056bb8ca8e5",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-108360ae61ba",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-38158108f5ad"
+      },
+      {
+        "id": "acct-19f88384aab2",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-38d7aec643ba"
+      },
+      {
+        "id": "acct-20da7cff060b",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-8e061797da5d"
+      },
+      {
+        "id": "acct-20ea6820461b",
+        "flags": [
+          "invalid_nickname_format"
+        ],
+        "nickname_group": "name-ef9a3d29ea91"
+      },
+      {
+        "id": "acct-2227ce274b8e",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-2432b30a788b",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-38158108f5ad"
+      },
+      {
+        "id": "acct-3c72bcd12a58",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-38d7aec643ba"
+      },
+      {
+        "id": "acct-3ec984f31c08",
+        "flags": [
+          "invalid_nickname_format"
+        ],
+        "nickname_group": "name-350a1f475c9f"
+      },
+      {
+        "id": "acct-480c25c443d6",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-ace57900435a"
+      },
+      {
+        "id": "acct-4d7bc0fafa66",
+        "flags": [
+          "invalid_nickname_format"
+        ],
+        "nickname_group": "name-360867e59abd"
+      },
+      {
+        "id": "acct-5211aecb1e52",
+        "flags": [
+          "missing_nickname",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": null
+      },
+      {
+        "id": "acct-586b1d2c10f3",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-38d7aec643ba"
+      },
+      {
+        "id": "acct-5b8e114a298d",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-38d7aec643ba"
+      },
+      {
+        "id": "acct-5e1ae7bf6978",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-ce25db03c977"
+      },
+      {
+        "id": "acct-60aeb0f2c95b",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-38158108f5ad"
+      },
+      {
+        "id": "acct-6652c33c6a2f",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-8e061797da5d"
+      },
+      {
+        "id": "acct-67a6629b23df",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-ce25db03c977"
+      },
+      {
+        "id": "acct-74b3fb9a7e49",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-ace57900435a"
+      },
+      {
+        "id": "acct-758e9226cf05",
+        "flags": [
+          "invalid_nickname_format"
+        ],
+        "nickname_group": "name-052e37fd16e4"
+      },
+      {
+        "id": "acct-78cc6fe97b16",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-7d308fa7f020",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-38158108f5ad"
+      },
+      {
+        "id": "acct-7dd0c4d7b54d",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-38d7aec643ba"
+      },
+      {
+        "id": "acct-8289ec1c4a7d",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-ce25db03c977"
+      },
+      {
+        "id": "acct-830a56a65582",
+        "flags": [
+          "missing_nickname",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": null
+      },
+      {
+        "id": "acct-874e3a516844",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-38158108f5ad"
+      },
+      {
+        "id": "acct-8904091565f2",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-38d7aec643ba"
+      },
+      {
+        "id": "acct-8f95cd0d72c4",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-ce25db03c977"
+      },
+      {
+        "id": "acct-8fe3f14a6831",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-97865bd2a2c9",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-ce25db03c977"
+      },
+      {
+        "id": "acct-9e64e3cbf32d",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-ace57900435a"
+      },
+      {
+        "id": "acct-a20da0a10bc7",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-38158108f5ad"
+      },
+      {
+        "id": "acct-a8ce2fb36d9d",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-ce25db03c977"
+      },
+      {
+        "id": "acct-abea34624a4e",
+        "flags": [
+          "invalid_nickname_format"
+        ],
+        "nickname_group": "name-7a0e27e06d06"
+      },
+      {
+        "id": "acct-ae0c9b3f9aec",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-8e061797da5d"
+      },
+      {
+        "id": "acct-af00ed697cd7",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-ace57900435a"
+      },
+      {
+        "id": "acct-af8d372ea730",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-38d7aec643ba"
+      },
+      {
+        "id": "acct-b0bb52d4cdde",
+        "flags": [
+          "missing_nickname",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": null
+      },
+      {
+        "id": "acct-b7e650f78265",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-ace57900435a"
+      },
+      {
+        "id": "acct-b854baf7f6bf",
+        "flags": [
+          "invalid_nickname_format"
+        ],
+        "nickname_group": "name-431d847aa0cc"
+      },
+      {
+        "id": "acct-c1d62a06d15e",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-ace57900435a"
+      },
+      {
+        "id": "acct-c2f8f03bf91c",
+        "flags": [
+          "invalid_nickname_format"
+        ],
+        "nickname_group": "name-fa2a7ea97195"
+      },
+      {
+        "id": "acct-c473d66bf3c4",
+        "flags": [
+          "invalid_nickname_format"
+        ],
+        "nickname_group": "name-bf782e52312d"
+      },
+      {
+        "id": "acct-c87acd869a91",
+        "flags": [
+          "invalid_nickname_format"
+        ],
+        "nickname_group": "name-45b924a8c499"
+      },
+      {
+        "id": "acct-c96cd9258109",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-38d7aec643ba"
+      },
+      {
+        "id": "acct-d1d6446094da",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-d295ec9bad9d",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-ce25db03c977"
+      },
+      {
+        "id": "acct-d9264c59463c",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-38158108f5ad"
+      },
+      {
+        "id": "acct-d9c4fbb8d7c4",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-ace57900435a"
+      },
+      {
+        "id": "acct-e53e58a30023",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-e6401fe8378a",
+        "flags": [
+          "invalid_nickname_format"
+        ],
+        "nickname_group": "name-4405017d00e4"
+      },
+      {
+        "id": "acct-e9baa880dbf3",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-ce25db03c977"
+      },
+      {
+        "id": "acct-f393896c5317",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-38158108f5ad"
+      },
+      {
+        "id": "acct-fc5cec19b5e5",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-fecbba4d96e7",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-ace57900435a"
+      }
+    ]
+  },
+  "pr16": {
+    "accounts": 42,
+    "counts": {
+      "duplicate_nickname": 31,
+      "invalid_nickname_format": 15,
+      "missing_nickname": 9,
+      "personal_email_absent_expected": 19,
+      "operation_pending": 2
+    },
+    "issues": [
+      {
+        "id": "acct-0621347d3903",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-13808f574718",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-1ba1333ba2e0",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-c8730ccfb750"
+      },
+      {
+        "id": "acct-1eb02c4d99ca",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-1f73932114dd",
+        "flags": [
+          "missing_nickname",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": null
+      },
+      {
+        "id": "acct-221d333a4345",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": "name-6da49019f3d0"
+      },
+      {
+        "id": "acct-227831cb0b36",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-dd39a4ecd054"
+      },
+      {
+        "id": "acct-231205ed6ed8",
+        "flags": [
+          "invalid_nickname_format",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": "name-afcf7b63596b"
+      },
+      {
+        "id": "acct-25f669e29e06",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-dd39a4ecd054"
+      },
+      {
+        "id": "acct-368bec358c9d",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-3c9dec8c25cc",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": "name-aeb7dbc1c4d1"
+      },
+      {
+        "id": "acct-49bfce0c9339",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-c8730ccfb750"
+      },
+      {
+        "id": "acct-4a8c0d863126",
+        "flags": [
+          "missing_nickname",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": null
+      },
+      {
+        "id": "acct-53edc4632f74",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-552dc415d841",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-dd39a4ecd054"
+      },
+      {
+        "id": "acct-5b44512b6e96",
+        "flags": [
+          "missing_nickname",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": null
+      },
+      {
+        "id": "acct-5d792ca66458",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": "name-6da49019f3d0"
+      },
+      {
+        "id": "acct-69a1c456a801",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": "name-698d911e2a9f"
+      },
+      {
+        "id": "acct-8d00ec7d767f",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-c8730ccfb750"
+      },
+      {
+        "id": "acct-92db74788d15",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-9b2545eda198",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-9d12b21f476f",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-a36656a859d4",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-a6f74e8bd23b",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-a91df083f8ad",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-aa970ab44f4c",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-af9ecba75454",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": "name-698d911e2a9f"
+      },
+      {
+        "id": "acct-b41e89195ec2",
+        "flags": [
+          "missing_nickname",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": null
+      },
+      {
+        "id": "acct-b82d743476c5",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": "name-aeb7dbc1c4d1"
+      },
+      {
+        "id": "acct-bbcd8e40232c",
+        "flags": [
+          "missing_nickname",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": null
+      },
+      {
+        "id": "acct-befec028bb6f",
+        "flags": [
+          "missing_nickname",
+          "operation_pending",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": null
+      },
+      {
+        "id": "acct-c1289fa96adf",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-c1efb5f6cb08",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": "name-6da49019f3d0"
+      },
+      {
+        "id": "acct-ca164e3b4b81",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-db25083d3f60",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-db2babc2be96",
+        "flags": [
+          "missing_nickname",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": null
+      },
+      {
+        "id": "acct-dc1ab7d911ac",
+        "flags": [
+          "missing_nickname",
+          "operation_pending",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": null
+      },
+      {
+        "id": "acct-dcd8d5541402",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-dce76cb6af9a",
+        "flags": [
+          "missing_nickname",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": null
+      },
+      {
+        "id": "acct-e72a67aa5312",
+        "flags": [
+          "duplicate_nickname"
+        ],
+        "nickname_group": "name-1edb678499da"
+      },
+      {
+        "id": "acct-eb3ff3661330",
+        "flags": [
+          "invalid_nickname_format",
+          "duplicate_nickname",
+          "personal_email_absent_expected"
+        ],
+        "nickname_group": "name-aeb7dbc1c4d1"
+      }
+    ]
+  },
+  "foundation": {
+    "accounts": 9,
+    "counts": {
+      "personal_email_absent_expected": 6
+    },
+    "issues": []
+  }
+}
