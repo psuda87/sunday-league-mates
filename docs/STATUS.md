@@ -1,5 +1,7 @@
 # Identyfikatory konta — blokada implementacji
 
+Draft PR #17: https://github.com/psuda87/sunday-league-mates/pull/17; diagnostyka97ede53, bez merge.
+
 2026-10-26 19:01 Europe/Warsaw — edycja loginu/telefonu po PR16: audyt BLOCKED
 Nowa feat/premium-account-identifiers od main134c52b; osobny worktree. Zgodnie z warunkiem właściciela zatrzymano wdrażanie po potwierdzeniu ryzyka: dwa realne begin/finish przy kolizji loginu pozostawiają przegrywające konto operation_pending i blokują ponowny login. Konto e-mail nie ma aliasów technicznych, DTO login jest nickname, a kontakt nie służy logowaniu. Bez implementacji UI/backendu/migracji, bez APK/Cloud/PR14/15. Dotychczasowe funkcje bez zmian.
 PASS TS/lint/build/254 Vitest,28 SQL/RLS i35 replay. Realny lokalny Supabase:20 poprawnych kontroli +4 odtworzone braki/symptomy, featureReady:false. RLS/UUID/pseudonim/numer i nowe/stare sesje kontrolowane. Wyścig deterministycznie przez realne RPC z Auth, nie naturalny telefoniczny E2E. Nowe fikcyjne konta wyłącznie izolowanego slm-pr16-review pozostawiono do diagnostyki; dane odbioru PR16 nietknięte. Plan atomowej procedury i decyzja modelu e-mail w docs/ACCOUNT_IDENTIFIERS_AUDIT.md. Tworzymy Draft PR audytu, bez automatycznego merge. Raport docs/ODPOWIEDZI_CODEX.txt.

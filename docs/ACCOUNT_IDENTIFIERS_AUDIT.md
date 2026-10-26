@@ -55,3 +55,6 @@ Z katalogu repo na tej gałęzi ustaw `SLM_IDENTIFIER_STACK` na bezwzględny kat
 **Na POCO teraz niczego nie zmieniono.** Nie ma nowych pól ani nowego APK. Nie testować wyścigu istniejącym kontem. Po przyszłej naprawie: login/telefon legacy z obecnym hasłem → wylogowanie i logowanie nowymi identyfikatorami → odrzucenie starych → niezmieniony pseudonim/numer/zdjęcie/grupy; błędny format/hasło/zajęty identyfikator bez blokady konta; oba typy kont zgodnie z zatwierdzonym modelem. Wklejać wyłącznie PASS/FAIL, kroki i komunikaty, bez haseł/tokenów/danych osobowych.
 
 **Status: BLOCKED dla implementacji, Draft PR audytowy; bez merge/deploy/migracji.**
+
+
+2026-10-26 19:02 Europe/Warsaw — utworzono Draft PR #17: https://github.com/psuda87/sunday-league-mates/pull/17. Diagnostyka i raport wypchnięte w97ede5386db38b24690fb984fdb9efe811227420. Status BLOCKED implementacji, brak merge/deploy. Raport docs/ODPOWIEDZI_CODEX.txt.
