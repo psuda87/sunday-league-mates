@@ -10,6 +10,6 @@ export function legacyAccountUiAdapter(manager:SessionManager) {
   signOut:()=>manager.logout(),restoreSession:()=>manager.refresh(),
   updatePassword:(currentPassword:string,newPassword:string)=>manager.changeSession('password',{current_password:currentPassword,new_password:newPassword}),
   readProfile:()=>manager.call<Profile>('profile'),
-  saveProfile:(fullName:string,displayAs:'nickname'|'full_name')=>manager.call<Profile>('save_profile',{full_name:fullName,display_as:displayAs}),
+  saveProfile:(fullName:string,displayAs:'nickname'|'first_name'|'full_name')=>manager.call<Profile>('save_profile',{full_name:fullName,display_as:displayAs}),
  };
 }

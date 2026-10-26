@@ -6,7 +6,7 @@ import { normalizePolishPhone } from '../../supabase/functions/_shared/phone';
 import { useOperation } from './useOperation';
 export interface Group { id:string; name:string; description:string; admin_id:string; organizer:boolean }
 interface Request { id:string; group_id:string; group_name?:string; kind:string; state:string; actor_id?:string; target_id?:string }
-interface Member {user_id:string; nickname:string;organizer:boolean;contact_phone?:string|null}
+interface Member {user_id:string; nickname:string;display_name?:string;organizer:boolean;contact_phone?:string|null}
 interface Details {group:Group;members:Member[];requests:Request[]}
 export default function Groups({manager,userId}:{manager:SessionManager;userId:string}) {
  const [groups,setGroups]=useState<Group[]|null>(null),[inbox,setInbox]=useState<Request[]>([]),[detail,setDetail]=useState<Details|null>(null);
@@ -22,7 +22,7 @@ export default function Groups({manager,userId}:{manager:SessionManager;userId:s
  <IonButton disabled={busy} fill="outline" onClick={()=>void run(async()=>{await refresh();if(detail)await open(detail.group.id);})}>Odśwież grupy</IonButton>
  {!groups&&!initialError&&<p role="status">Wczytywanie grup…</p>}
  {detail?<><section className="slm-group-hero"><div><h2>{detail.group.name}</h2><p>{detail.group.description}</p><span className="slm-group-role">{admin?'Administrator grupy':'Członek grupy'}</span></div></section>
- <section className="slm-panel"><h2>Członkowie</h2>{detail.members.map(m=><article className="slm-group-person" key={m.user_id}><strong>{m.nickname}</strong>{m.contact_phone&&<a className="slm-call" href={'tel:'+m.contact_phone}>Zadzwoń</a>}<span>{m.user_id===detail.group.admin_id?'Administrator':m.organizer?'Organizator':'Członek'}</span>
+ <section className="slm-panel"><h2>Członkowie</h2>{detail.members.map(m=><article className="slm-group-person" key={m.user_id}><strong>{m.display_name??m.nickname}</strong>{m.contact_phone&&<a className="slm-call" href={'tel:'+m.contact_phone}>Zadzwoń</a>}<span>{m.user_id===detail.group.admin_id?'Administrator':m.organizer?'Organizator':'Członek'}</span>
  {admin&&m.user_id!==userId&&<div className="slm-group-actions"><button disabled={busy} onClick={()=>void run(async()=>{await mutate('groups_permission',{group_id:detail.group.id,user_id:m.user_id,organizer:!m.organizer});await open(detail.group.id);})}>{m.organizer?'Odbierz':'Nadaj'} tworzenie meczów</button>
  <button disabled={busy} onClick={()=>{if(window.confirm('Przekazać administrację temu członkowi?'))void run(async()=>{await mutate('groups_transfer',{group_id:detail.group.id,user_id:m.user_id});await open(detail.group.id);});}}>Przekaż administrację</button>
  <button disabled={busy} onClick={()=>{if(window.confirm('Usunąć członka z grupy?'))void run(async()=>{await mutate('groups_remove',{group_id:detail.group.id,user_id:m.user_id});await open(detail.group.id);});}}>Usuń członka</button></div>}</article>)}</section>

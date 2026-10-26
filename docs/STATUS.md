@@ -1,3 +1,18 @@
+# Premium profil B2/B3 — 2026-10-26 13:20:55 CET
+
+Gałąź feat/premium-profile-name-privacy z main edd2e92. Publiczny nickname
+niezależny od loginu,3 globalne display_as, jawne first_name i share_first_name,
+atomowe potwierdzone zgody w aktualnych grupach, read-back, fallback/RLS i spójne
+nazwy grup/kart/zapisów. Nowa migracja20261026120000, historyczne bez zmian.
+Supabase Cloud/sekrety/Auth sesje/APK/config nietknięte, bez merge/deploy.
+
+PASS: TS/full lint,248 Vitest, build aplikacji,35 migracji PostgreSQL replay,
+28 asercji SQL/RLS i persistence po restarcie PostgreSQL. Auth/Storage w tym
+teście to fixture, nie pełny Supabase. NOT TESTED pełne HTTP/Auth/Edge i telefon;
+CLI lokalny zablokowany EROFS. Build demo FAIL jak czysty main: frozenDemoAndroid
+poza allowlistą. Bez obchodzenia izolacji. Szczegóły/ryzyka/odbiór przed merge:
+[PREMIUM_PROFILE_IMPLEMENTATION.md](PREMIUM_PROFILE_IMPLEMENTATION.md).
+
 # Aktualizacja UI B3 po POCO
 
 2026-10-25 21:34 Europe/Warsaw — feat/premium-b3-groups, istniejący PR #13. Poprawiono wyłącznie kompaktowy przełącznik zgody per grupa i przycisk odświeżania (44px, ikona, stan ładowania, deduplikacja). Załadowane dane nie znikają podczas refresh, błąd zapisu zachowuje stan i kontrolkę. Backend/RLS/Auth/Ultimate/BottomNav bez zmian; brak operacji Cloud.

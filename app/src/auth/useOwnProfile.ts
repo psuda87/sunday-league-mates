@@ -2,7 +2,7 @@ import { useOwnPhoto } from './useOwnPhoto';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { SessionManager } from './sessionManager';
 import { profileAdapter } from './profileAdapter';
-import type { PersonalProfileBinding,PersonalProfileData } from '../ui/personalProfile';
+import type { IdentityDraft,PersonalProfileBinding,PersonalProfileData } from '../ui/personalProfile';
 
 type State={owner:string|null;phase:PersonalProfileBinding['phase'];profile:PersonalProfileData|null;notice:string};
 export function useOwnProfile(manager:SessionManager,userId:string|null,selection?:{begin:()=>void;end:()=>void}):PersonalProfileBinding {
@@ -37,7 +37,15 @@ export function useOwnProfile(manager:SessionManager,userId:string|null,selectio
   catch {if(ticket===generation.current)setState(previous=>({...previous,notice:'Nie udało się potwierdzić zmiany loginu. Sprawdź hasło i dostępność loginu; przy przerwanej operacji ponów odczyt.'}));return false;}
   finally{if(ticket===generation.current){flight.current=false;setSaving(false);}}
  }
- return {...current,photo,saveNumber,changeAlias,saving:current.phase==='ready'&&saving,reload:()=>setRevision(v=>v+1),
+ async function saveIdentity(draft:IdentityDraft){
+  const auth=manager.getSnapshot();if(flight.current||!adapter||current.phase!=='ready'||auth.phase!=='ready'||auth.session?.user_id!==userId)return false;
+  const ticket=generation.current;flight.current=true;setSaving(true);
+  try{const profile=await adapter.saveIdentity(draft);if(ticket!==generation.current)return false;setState({owner:userId,phase:'ready',profile,notice:'Zapisano i ponownie odczytano profil.'});return true;}
+  catch{if(ticket===generation.current)setState({owner:userId,phase:'error',profile:null,notice:'Nie potwierdzono zapisu. Ponów odczyt profilu.'});return false;}
+  finally{if(ticket===generation.current){flight.current=false;setSaving(false);}}
+ }
+ useEffect(()=>{const reload=()=>setRevision(v=>v+1);window.addEventListener('slm-profile-changed',reload);return()=>window.removeEventListener('slm-profile-changed',reload);},[]);
+ return {...current,photo,saveIdentity,saveNumber,changeAlias,saving:current.phase==='ready'&&saving,reload:()=>setRevision(v=>v+1),
   async save(fullName,number){
    const auth=manager.getSnapshot();
    if(flight.current||!adapter||!current.profile||current.phase!=='ready'||auth.phase!=='ready'||auth.session?.user_id!==userId)return false;

@@ -25,8 +25,8 @@ export default function PremiumGroups({manager,userId}:{manager:SessionManager;u
  {profile&&<section className="slm-players-screen slm-ultimate-profile"><MatchHeader title="Zawodnik" onBack={close} backLabel="Wróć do grupy"/>
  {profile.error?<p role="alert">{profile.error}</p>:!profile.member?<p role="status">Wczytywanie profilu…</p>:<>
  <p className="slm-players-demo">Profil grupowy · tylko dane udostępnione przez serwer</p>
- <UltimatePlayerCard name={profile.member.full_name||profile.member.nickname} jerseyNumber={profile.member.jersey_number??undefined}/>
- <p className="slm-muted">{profile.member.nickname}</p>
+ <UltimatePlayerCard name={profile.member.display_name??profile.member.nickname} jerseyNumber={profile.member.jersey_number??undefined}/>
+ <p className="slm-muted">Pseudonim: {profile.member.nickname}</p>{profile.member.full_name&&<p>Dane udostępnione: {profile.member.full_name}</p>}{!profile.member.full_name&&profile.member.first_name&&<p>Imię: {profile.member.first_name}</p>}
  {profile.member.contact_phone&&<a className="slm-call" href={'tel:'+profile.member.contact_phone}>Zadzwoń</a>}
  <section className="slm-player-stats slm-ultimate-summary" aria-label="Statystyki niedostępne"><dl className="slm-ultimate-stats">{['Mecze','Gole','Asysty','MVP'].map(label=><div key={label}><dt>{label}</dt><dd>—</dd></div>)}</dl></section>
  <p className="slm-muted">Statystyki i zdjęcia innych zawodników nie są jeszcze dostępne.</p>

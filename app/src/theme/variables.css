@@ -4060,3 +4060,6 @@ button.slm-group-card {
   background-size: auto 120%;
   background-position: center 100%;
 }
+
+/* Premium profile name selector, sharing the existing input tokens. */
+.slm-premium-identity select {width:100%;min-height:44px;padding:9px 12px;border:1px solid var(--slm-border);border-radius:9px;color:var(--slm-text);background:var(--slm-panel);font:inherit;}

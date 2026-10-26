@@ -118,11 +118,13 @@ export function createHandler(env: Environment) {
     return sessionPayload(session);
   }
   async function profile(id: string) {
-    const [a, profiles, players] = await Promise.all([alias(id), db(`slm_profiles?user_id=eq.${id}`), db(`slm_player_profiles?user_id=eq.${id}&select=jersey_number`)]);
+    const [a, profiles, players] = await Promise.all([alias(id), db(`slm_profiles?user_id=eq.${id}`), db(`slm_player_profiles?user_id=eq.${id}&select=jersey_number,nickname`)]);
     const p = profiles[0];
     if (!p) throw unauthorized();
     return { user_id: id, jersey_number: players[0]?.jersey_number ?? null, login: a.login, phone: a.phone, email_account: a.email_account === true, full_name: p.full_name,
-      display_as: p.display_as, display_name: displayName(a.login, p.full_name, p.display_as) };
+      nickname: players[0]?.nickname || (a.login.includes('@')?'Zawodnik':a.login), first_name: p.first_name??'',
+      group_scope: await db(`slm_group_members?user_id=eq.${id}&select=group_id,share_full_name,share_first_name,slm_groups!inner(archived)&slm_groups.archived=eq.false`),
+      display_as: p.display_as, display_name: p.display_as==='first_name'?(p.first_name?.trim()||players[0]?.nickname||'Zawodnik'):displayName(players[0]?.nickname||a.login, p.full_name, p.display_as) };
   }
   async function verifyPassword(ctx: Row, pwd: string) {
     const a = await alias(ctx.id as string);
@@ -272,7 +274,7 @@ export function createHandler(env: Environment) {
           if (typeof body[key] === 'string' && body[key].trim()) body[key] = normalizePhone(body[key]);
         }
         const allowed = prefix === 'groups_'
-          ? ['name','description','query','group_id','user_id','phone','id','request_id','accept','organizer','share_full_name']
+          ? ['name','description','query','group_id','user_id','phone','id','request_id','accept','organizer','share_full_name','confirm_nickname']
           : prefix === 'matches_'
           ? ['event_id','guest_name','guest_phone','list','participant_id','user_id','name','group_id','date','time','starts_at','location','address','duration_minutes','capacity','cost_cents','visibility','expected_version','absent','reason','request_id','offset']
           : ['group_id','event_id','user_id','participant_id','payment_id','request_id','amount_cents','expected_amount_cents','expected_version','reason','payable','absent'];
@@ -445,10 +447,16 @@ export function createHandler(env: Environment) {
         return respond(await profile(ctx.id));
       }
       if (action === 'profile') return respond(await profile(ctx.id));
+      if (action === 'save_premium_profile') {
+        await rate('scoped:' + ctx.id,90);
+        const r = await call('/rest/v1/rpc/slm_premium_profile_save','POST',{p_user:ctx.id,p_session:ctx.sid,p_body:body},undefined,true);
+        if(!r.ok)throw new ApiError(409,'profile_not_saved','Nie potwierdzono zapisu. Odśwież profil i sprawdź dane oraz zakres zgody.');
+        return respond(await profile(ctx.id));
+      }
       if (action === 'save_profile') {
         const name = field(body, 'full_name', 100).trim();
         const mode = field(body, 'display_as');
-        if (!['nickname', 'full_name'].includes(mode)) throw new ApiError(400, 'invalid_input', 'Wybierz nazwę wyświetlaną.');
+        if (!['nickname', 'first_name', 'full_name'].includes(mode)) throw new ApiError(400, 'invalid_input', 'Wybierz nazwę wyświetlaną.');
         await db(`slm_profiles?user_id=eq.${ctx.id}`, 'PATCH', { full_name: name, display_as: mode });
         return respond(await profile(ctx.id));
       }
