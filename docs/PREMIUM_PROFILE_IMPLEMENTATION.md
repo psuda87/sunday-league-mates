@@ -1,5 +1,7 @@
 # Premium B2/B3 — publiczny pseudonim, nazwa globalna i prywatność
 
+Aktualne wyniki Windows/Supabase/POCO znajdują się w końcowej sekcji „Odbiór techniczny”. Historyczne NOT TESTED/FAIL poniżej zachowano jako zapis poprzedniego środowiska.
+
 2026-10-26 13:20:55 CET. Baza main `edd2e924cc077c67ba804ed4acab6d3e159a15b1`.
 Gałąź `feat/premium-profile-name-privacy`. Początkowo czysty Git. PR14/15 i main
 nietknięte; analizę PREMIUM_PROFILE_NAME.md odczytano przez refs/pull/15/head.
@@ -172,3 +174,84 @@ czysty main (frozenDemoAndroid/allowlista). Pełna treść i ryzyka w tym dokume
 Końcowy SHA commita raportu będzie w odpowiedzi oraz historii gałęzi. Bez merge,
 Cloud, zdalnych migracji/deploy, konfiguracji APK, Auth/sekretów. Wymagany dalszy
 odbiór lokalny; nie deklarujemy gotowości produkcyjnej ani pełnego E2E.
+
+
+## Odbiór techniczny Windows / prawdziwy Supabase / POCO — 2026-10-26 18:33 Europe/Warsaw
+
+Baza przeglądu76da23abdb594ae40e3242d4809d74f5098472de, istniejąca feat/premium-profile-name-privacy / [Draft PR #16](https://github.com/psuda87/sunday-league-mates/pull/16). Poniższe wyniki zastępują historyczne NOT TESTED/FAIL dla obecnego środowiska; stare raporty zachowane. PR14/15 i ich gałęzie nietknięte, main bez merge. Brak odczytów lub zmian Supabase Cloud.
+
+### Środowisko i ochrona danych
+
+Utworzono osobny worktree .worktrees/profile-name-privacy-review, zachowując niezacommitowane STATUS/ODPOWIEDZI w main i B3. Docker Desktop uruchomiono bez resetu. Istniejący supabase_db_sunday-league-mates pozostał34 migracje /64 konta /33 grupy /13 meczów, jak przed testami. Niczego do niego nie stosowano i nie kopiowano jego danych.
+
+Pełny testowy projekt **slm-pr16-review**: API127.0.0.1:56321, PostgreSQL56322, prawdziwe GoTrue/PostgREST/Kong/Storage/Edge,35 kanonicznych migracji. Wyłączono niepotrzebne Studio/analytics/Realtime/mailpit/imgproxy/pooler, nie usługi wymagane do Auth/RPC. Wyłącznie świeże fikcyjne konta i grupy; dane testowe pozostawiono do odbioru. To nie jest nowy projekt Cloud ani płatna usługa.
+
+Auth testowy odpowiada ograniczeniom dotychczasowego SLM: public signup wyłączony, email login włączony, autoconfirm wyłączone, hooki blokujące mail/SMS, wymaganie current_password=true, nonce=false. CLI nie odtworzył domyślnie dwóch wymaganych flag, więc odtworzono **tylko nowy testowy kontener Auth**, zachowując jego CLI labels/healthcheck i DB; stare kopie tego testowego kontenera pozostały zatrzymane. Istniejący Auth sunday-league-mates bez zmian. Skrypt przygotowania i HTTP sprawdzają nazwę/branch/lokalny socket/port, brak fallback do Cloud. Błędy przygotowania środowiska (brak metadanych kontenera/provider disabled) nie były oznaczane jako PASS aplikacji. CLI start wypisał lokalne klucze testowe; roboczy log zredagowano, sekretów nie commitowano i nie umieszczono w raporcie.
+
+### Znalezione i poprawione regresje
+
+1. **HTTP consent_required:** niepotwierdzone cofnięcie zgody trafiało w ogólny503/service_unavailable i przełączało SessionManager w unavailable. Handler mapuje teraz ten konflikt na409/consent_required, pozostawiając działającą sesję; test regresyjny handlera + rzeczywisty scenariusz E potwierdza możliwość odczytu i ponowienia. Bez zmiany Auth, RLS czy zasad zgody.
+2. **Okno Ionic:** szybki ponowny zapis przed ionAlertDidDismiss mógł zostać skasowany przez późne zakończenie poprzedniego okna. Krótka blokada logiczna do zakończenia dismiss (bez sztucznego timeoutu) i regresja. Cypress czeka na rzeczywiste zdarzenie Ionic, nie uznaje ukrytego elementu overlay za aktywne okno.
+3. **Ukryj udostępnione imię:** nowa akcja dziedziczyła48px geometrię switcha. Styl toru ograniczono do role=switch, akcja ma własny standardowy przycisk min44px i type=button. Obejrzano syntetyczne zrzuty Light/Dark; brak przebudowy karty/nav.
+4. **Izolacja demo na Windows:** fileURLToPath zwracał backslash, a Vite slash, więc warunek startsWith omijał allowlistę. Dodano czysty normalizator ścieżek z4 regresjami Windows/Linux. Po przeglądzie dopuszczono dokładnie frozenDemoAndroid.ts (prezentacyjny transport Back/keyboard, bez Auth/API), którego brak powodował zgłoszony historyczny FAIL w środowisku Linux. Nie wyłączono guardu ani nie dopuszczono całego katalogu native; test odrzuca inne moduły native i produkcyjne Auth. Demo build i statyczna kontrola bez Auth/Supabase/Edge PASS.
+5. Narzędzia odbioru/build: guard gałęzi dopuszcza PR16, kontrola schematu oczekuje35 wersji. Manifest55 aktualizuje wyłącznie3 pliki już zmienione przez PR16 (Identity/GroupScreens/variables.css), z jawnym wyjątkiem funkcjonalnym. Oryginalny Ultimate/BottomNav i mechanizm tokenStore/sessionManager pozostają bez zmian.
+
+### Faktycznie wykonane testy
+
+| Kontrola | Wynik |
+|---|---|
+| Prawdziwy pełny lokalny Supabase |35 migracji zastosowanych do nowej instancji; bez bootstrapu auth/storage z fixture |
+| Real Auth → Edge → PostgREST/RPC | **33 PASS**: legacy i e-mail, zmiana hasła tymczasowego, login telefonem po zmianie pseudonimu, save/read-back, refresh obu kont, nowy kontroler sesji z refresh tokenu |
+| Prywatność real HTTP | A/D nickname mimo zgody, B first-only po potwierdzeniu w2 grupach, C/F full-name po dodatkowej zgodzie, E odmowa bez potwierdzenia i atomowy fallback, G zachowanie zgód; retry/duplikat/stale_scope, nowe grupy bez dziedziczenia, brak zmiany cudzego profilu przez body |
+| RLS prawdziwych JWT przez REST | owner/admin dostęp; first-only member/outsider brak raw surname; klient authenticated nie wykonuje uprzywilejowanego RPC |
+| Inne DTO | roster/match uczestnicy/finanse bez nazwiska w niedozwolonym zakresie, publiczny outsider dostaje tylko pseudonim; B3 admin exception zachowany |
+| Browser → prawdziwy backend | **1 PASS**, bez mockowania odpowiedzi. Przekierowano tylko lokalny URL54321 na izolowany56321 w cy.intercept; normalna aplikacja i cały backend rzeczywiste. Zapis, anulowanie0 mutacji, podwójny tap1 zapis, reload, dwie grupy, cofnięcie i odczyt profilu |
+| Rozmiar/motywy w przeglądarce | prywatność grupy320/360/390/430px ×Light/Dark, akcja min44px; syntetyczne zrzuty docs/ui/pr16 |
+| TypeScript / ESLint | PASS |
+| Vitest | **254 PASS /43 pliki**, w tym regresje409, Ionic i polityki demo |
+| Osobny SQL contract harness | **28 PASS**, replay35 i persistence po restarcie PostgreSQL; auth/storage tego harnessu są fixture, NIE drugi test pełnego Auth |
+| Build main / Premium / demo + isolation | PASS; znane ostrzeżenia wielkości chunków |
+| Source guards / cap sync / Android assembleDebug | PASS32 historyczne pliki/35 wersji/55 Premium; BUILD SUCCESSFUL |
+| Android unit |1 istniejący test szablonowy PASS; nie dowód testu Keystore |
+| POCO instalacja i start | PASS po osobnej zgodzie właściciela; odbiór funkcjonalny ręczny nadal oczekuje |
+
+Kod serwowanego handlera porównano z kanonicznym źródłem PR16. Nie wykonano płatnych SMS/e-mail, signup, migracji Cloud, zmian starej lokalnej bazy, resetu ani merge. Testy generowały tylko fikcyjne dane w izolowanym projekcie. Niewykonane: pełny ręczny zestaw A–G na fizycznym telefonie, iOS/FCM/Cloud, rzeczywiste upłynięcie godziny JWT. Nie utożsamiać cy.reload/real refresh z ręcznym restartem Androida.
+
+### APK / ADB / wycofanie
+
+APK: `.cache/consolidation/premium-debug.apk` w tym worktree (pełna ścieżka I:\slm\sunday-league-mates\.worktrees\profile-name-privacy-review\.cache\consolidation\premium-debug.apk).
+SHA256: **6cf904cef7ad7e0ca087932c22eea3b7e4975e2d43402b69d4228a5d6d608cd2**. pl.psuda87.slm, Sunday League Mates, świeże zasoby dokładnie zgodne z dist-b1, lokalny endpoint54321, brak markerów service key/Cloud, brak logowania mostu. Przed instalacją pobrano poprzedni base.apk do `.cache/pr16-stack/previous-installed.apk`, certyfikaty podpisu zgodne.
+Właściciel osobno zatwierdził zastąpienie kodu i przełączenie backendu, z informacją o potrzebie nowego logowania. `adb install -r` Success, bez uninstall/clear; `am start -W` Status ok, c7a559b5 device. Reverse **telefon54321 → komputer56321**. Sprawdzony log startu:0 FATAL EXCEPTION,0 wskazanych błędów połączenia/renderera WebView. Nowa izolowana baza nie zna starej sesji; dane logowania fikcyjnego Zawodnika/Obserwatora przekazano wyłącznie plikiem TEMP poza Git i raportem.
+
+Test działa dopóki lokalny Docker/Edge/USB/reverse są dostępne. W razie wycofania: force-stop aplikacji, przywrócić zgodnie podpisany previous-installed.apk przez install-r oraz reverse54321→54321 do starego backendu (po decyzji właściciela). Nie usuwać danych aplikacji ani baz; konieczność ponownego logowania jest możliwa. Stary lokalny backend nadal istnieje w oryginalnym stanie.
+
+### Krótka checklista POCO i format odpowiedzi
+
+1. Zaloguj Zawodnika z prywatnego pliku TEMP. Profil → Edytuj profil: zmień pseudonim; techniczny login/telefon i numer27 mają pozostać bez niezamierzonej zmiany.
+2. Wybierz Imię i Zapisz. Anuluj = bez zapisu ani udzielenia zgód. Ponów i Akceptuję = zapisana nazwa i jawne zgody dla obu obecnych grup.
+3. Imię→Imię i nazwisko: sprawdź osobne potwierdzenie nazwiska. Samo włączenie suwaka zgody w grupie nie zmienia globalnej nazwy; sam wybór Pseudonim nie cofa zgód.
+4. W POCO PR16 A cofnij zgodę/ukryj imię: Anuluj nic nie zmienia, Akceptuję wyłącza tylko tę zgodę i wraca globalnie do pseudonimu. B zachowuje własne zgody. Przy ponownym wyborze danych osobowych potwierdzenie musi opisywać wszystkie obecne grupy.
+5. Obserwatorem porównaj widoczność Zawodnika w A/B; outsider/admin sprawdzono automatycznie realnymi JWT, nie zgaduj prywatności z własnej karty.
+6. Zamknij i otwórz aplikację, sprawdź zapis, oba Wstecz i Light/Dark. Brak sieci nie może pokazać niepotwierdzonego sukcesu.
+
+Wklej tylko:
+```
+Logowanie: PASS/FAIL
+Pseudonim: PASS/FAIL
+Imię: PASS/FAIL
+Imię i nazwisko: PASS/FAIL
+Anulowanie: PASS/FAIL
+Cofnięcie → pseudonim: PASS/FAIL
+Dwie grupy/obserwator: PASS/FAIL
+Restart/sesja: PASS/FAIL
+Light/Dark/Wstecz: PASS/FAIL
+Przy FAIL: konto-rola, grupa A/B, kroki, oczekiwany/rzeczywisty wynik i komunikat.
+```
+Bez haseł, tokenów, prywatnych zdjęć i rzeczywistych danych osób.
+
+### Powtórzenie lokalnych kontroli
+
+Z katalogu repo: `python app/scripts/prepare-pr16-local.py`. Następnie start **wyłącznie** tego projektu: `npx --yes --package=supabase@2.121.0 supabase start --workdir .cache/pr16-stack --exclude studio,imgproxy,logflare,vector,realtime,mailpit,postgres-meta,supavisor` (wynik z kluczami przechowuj prywatnie/nie wklejaj). Potem `python app/scripts/prepare-pr16-local.py --auth-baseline` i `supabase functions serve accounts --workdir .cache/pr16-stack`. Bez resetu/db push/link. Auth helper odtwarza tylko swój kontener, jeśli potrzebne; zatrzymany poprzednik zachowuje jako kopię.
+Z app: `node scripts/test-premium-profile-http-local.mjs` (tylko56321); `SLM_PR16_BROWSER=1` dołącza Cypress przy gotowym Premium preview na5174. Browser runner przekazuje hasło przez stdin, bez video/zrzutów logowania, błędy sanowane. `node scripts/test-premium-profile-sql-local.mjs` jest osobnym testem fixture SQL. `node scripts/create-pr16-phone-fixtures-local.mjs` tworzy tylko nowe fikcyjne dane oraz nowy plik TEMP, nie resetuje wcześniejszych.
+
+**Stan przed merge:** techniczny backend/SQL/UI/build i start Androida zaliczone; wymagany odbiór ręczny właściciela. PR #16 pozostaje draft, bez automatycznego merge. Historyczny problem demo został odtworzony jako różnica platform/guardu i naprawiony z regresją. Nie ma podstaw do deklaracji gotowości Cloud ani pełnego odbioru telefonu przed odpowiedzią właściciela.

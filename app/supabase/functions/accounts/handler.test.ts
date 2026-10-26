@@ -192,3 +192,19 @@ describe('brama wielu grup', () => {
     expect(vi.mocked(fetch).mock.calls.every(([url])=>String(url).includes('slm_account_rate'))).toBe(true);
   });
 });
+
+it('returns a consent conflict instead of an outage when revocation lacks confirmation',async()=>{
+ vi.stubGlobal('crypto',webcrypto);const id=webcrypto.randomUUID(),sid=webcrypto.randomUUID();
+ const token=['synthetic',btoa(JSON.stringify({sub:id,session_id:sid})),'unsigned'].join('.');
+ vi.stubGlobal('fetch',vi.fn(async(url:string)=>{
+  const reply=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status});
+  if(url.endsWith('/auth/v1/user'))return reply({id});
+  if(url.includes('slm_account_context'))return reply({role:'member',must_change_password:false});
+  if(url.includes('slm_account_rate'))return reply(true);
+  if(url.includes('slm_groups_dispatch'))return reply({code:'P0001',message:'consent_required'},400);
+  throw Error('Unexpected request');
+ }));
+ const handler=createHandler({url:'https://example.invalid',anon:'',service:'',origins:[]});
+ const r=await handler(new Request('https://example.invalid',{method:'POST',headers:{authorization:'Bearer '+token},body:JSON.stringify({action:'groups_consent',share_full_name:false,request_id:webcrypto.randomUUID()})}));
+ expect(r.status).toBe(409);expect((await r.json()).code).toBe('consent_required');
+});

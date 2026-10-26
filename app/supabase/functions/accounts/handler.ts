@@ -295,6 +295,7 @@ export function createHandler(env: Environment) {
             event_cancelled: [409, 'Mecz zosta? odwo?any.'],
             stale_version: [409, 'Dane zmieni?y si?. Od?wie? je przed ponown? decyzj?.'],
             idempotency_conflict: [409, 'Identyfikator dotyczy innej operacji.'],
+            consent_required: [409, 'Potwierdź przejście na pseudonim, aby ukryć dane.'],
             payment_processed: [409, 'Wp?ata zosta?a ju? rozpatrzona.'],
             request_processed: [409, 'Pro?ba zosta?a ju? rozpatrzona.'],
             already_member: [409, 'Zawodnik ju? nale?y do grupy.'],
