@@ -258,3 +258,8 @@ Z app: `node scripts/test-premium-profile-http-local.mjs` (tylko56321); `SLM_PR1
 
 
 Końcowy zapis techniczny: commit `ed71f29` wypchnięty do istniejącego [PR #16](https://github.com/psuda87/sunday-league-mates/pull/16), draft, bez konfliktów i bez merge. SHA zainstalowanego base.apk na telefonie potwierdzony jako6cf904ce…d608cd2. Ręczny odbiór nadal oczekuje; raport docs/ODPOWIEDZI_CODEX.txt.
+
+
+### Ogólny wynik ręczny właściciela — 2026-10-26 18:37 Europe/Warsaw
+
+Po teście POCO właściciel zgłosił: „generalnie wygląda na to, że wszystko działa”. Wynik ogólnej próby ręcznej pozytywny, bez zgłoszonej usterki. Nie przekazano rozpiski poszczególnych scenariuszy, dlatego nie oznaczono całej macierzy A–G/2 konta/restart/motywy jako indywidualnie potwierdzonej ręcznie. Wcześniejsze szczegółowe testy automatyczne pozostają udokumentowane powyżej. To aktualizacja historycznego statusu „odbiór oczekuje”, bez zmiany APK6cf904ce i bez merge PR #16.
