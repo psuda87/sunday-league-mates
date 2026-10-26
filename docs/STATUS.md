@@ -1,3 +1,10 @@
+# PR16 — poprawka etykiet odebrana na POCO
+
+2026-10-26 18:51 Europe/Warsaw — PR16: ręczny odbiór poprawki etykiet na POCO
+Właściciel po aktualizacji APK z kodu69f3aa6 potwierdził: „ok działa jest ok”. Zapisano pozytywny ręczny odbiór poprawki odstępów formularza profilu na POCO. Nie dopisujemy oddzielnych wyników każdego pola, motywu ani scenariusza klawiatury, ponieważ odpowiedź była ogólna. Bez nowych zmian aplikacji/backendu/APK i bez ponawiania testów. PR #16 bez merge; potwierdzenie działania nie jest poleceniem scalania. Raport docs/ODPOWIEDZI_CODEX.txt.
+
+---
+
 # PR16 — APK z poprawką etykiet na POCO
 
 2026-10-26 18:50 Europe/Warsaw — feat/premium-profile-name-privacy; kod69f3aa6. Premium build/cap sync/assembleDebug i weryfikacja APK PASS. Za zleceniem właściciela install-r Success na c7a559b5 bez czyszczenia danych; start Status:ok, hash zainstalowanego APK155cf3d0…603f5c9 zgodny. Podpis/kopia starej wersji sprawdzone. Backend testowy HTTP200/reverse54321→56321; bez Cloud/migracji. Log:0 crash/JS/net::ERR_, jeden systemowy komunikat WebView variations „Seed missing signature”. Następny krok: ręczna ocena odstępów pól i fokus/przewijanie przy fizycznej klawiaturze, Light/Dark. PR16 bez merge; raport docs/ODPOWIEDZI_CODEX.txt i docs/PREMIUM_PROFILE_IMPLEMENTATION.md.
