@@ -58,3 +58,7 @@ Z katalogu repo na tej gałęzi ustaw `SLM_IDENTIFIER_STACK` na bezwzględny kat
 
 
 2026-10-26 19:02 Europe/Warsaw — utworzono Draft PR #17: https://github.com/psuda87/sunday-league-mates/pull/17. Diagnostyka i raport wypchnięte w97ede5386db38b24690fb984fdb9efe811227420. Status BLOCKED implementacji, brak merge/deploy. Raport docs/ODPOWIEDZI_CODEX.txt.
+
+
+### Aktualizacja decyzji właściciela — 2026-10-26 19:16 Europe/Warsaw
+Nowy docelowy model (pseudonim=login, telefon tylko kontakt) zastępuje wcześniejszy cel niezależnych pól. Plan: [ACCOUNT_MODEL_MIGRATION_PLAN.md](ACCOUNT_MODEL_MIGRATION_PLAN.md). Powyższy audyt pozostaje opisem historycznego stanu i diagnostyki; nie implementowano jego wcześniejszej propozycji.

@@ -1,3 +1,10 @@
+# Docelowy model kont — plan migracji
+
+2026-10-26 19:16 Europe/Warsaw — docelowy model kont: plan, bez implementacji
+Zatwierdzone: pseudonim=unikalny login, opcjonalny e-mail loginu, telefon tylko kontakt, hasło wymagane. Przygotowano docs/ACCOUNT_MODEL_MIGRATION_PLAN.md: jeden kanoniczny nickname, prywatny rejestr wewnętrznego Auth e-maila i opcjonalnego potwierdzonego e-maila użytkownika; bez usuwania technicznych adresów i bez zmiany UUID. Plan kolizji/backfill/expand/cutover, atomowy rename bez begin/finish, kompatybilność PR16/zgód i starych APK; hasło musi być usunięte z payloadu przed idempotencją SQL. Reset ma testy legacy i e-mail, lecz nie jest uniwersalnym recovery: braki listowania email/globalna rola/pending/awarie wymagają odbioru. Blokery: kolizje i format, polityka sesji, potwierdzenie e-maila/recovery, duplikaty kontaktów i cutover. Żadnych zmian aplikacji/SQL/kont/baz/Cloud/PR14/15 ani merge17. W tej pracy tylko przegląd źródeł i dokumentacja; brak nowych testów runtime. Raport docs/ODPOWIEDZI_CODEX.txt. Gałąź feat/premium-account-identifiers / Draft PR17.
+
+---
+
 # Identyfikatory konta — blokada implementacji
 
 Draft PR #17: https://github.com/psuda87/sunday-league-mates/pull/17; diagnostyka97ede53, bez merge.
