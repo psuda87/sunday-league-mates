@@ -1,6 +1,8 @@
 # Premium profil B2/B3 — 2026-10-26 13:20:55 CET
 
-Gałąź feat/premium-profile-name-privacy z main edd2e92. Publiczny nickname
+Gałąź feat/premium-profile-name-privacy z main edd2e92.
+Implementacja 1f9d460 wypchnięta; utworzenie Draft PR zablokowane przez
+GitHub API403 Forbidden. Link formularza i pełny raport poniżej. Publiczny nickname
 niezależny od loginu,3 globalne display_as, jawne first_name i share_first_name,
 atomowe potwierdzone zgody w aktualnych grupach, read-back, fallback/RLS i spójne
 nazwy grup/kart/zapisów. Nowa migracja20261026120000, historyczne bez zmian.

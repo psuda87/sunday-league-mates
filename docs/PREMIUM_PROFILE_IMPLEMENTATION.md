@@ -152,3 +152,23 @@ jest przeznaczony WYŁĄCZNIE dla tej pustej bazy, nigdy dla prawdziwego Supabas
 
 Commit i stan Draft PR zostaną dopisane po zapisie Git. Implementacja do przeglądu,
 nie potwierdzenie pełnej integracji/produkcji. Bez merge i bez zmian PR14/15.
+
+## Zapis Git i blokada Draft PR — 2026-10-26 13:23:43 CET
+
+Commit implementacji: `1f9d460d388c0256fc51a3abbfe0fa5cff09caa6`. Zwykły push nowej gałęzi do origin wykonany.
+Próba utworzenia Draft PR przez GitHub REST API POST /pulls zwróciła Forbidden
+(403); wcześniejszy odczyt GraphQL również Forbidden. Git proxy umożliwia push,
+ale nie daje tutaj dostępu do GitHub API. **Draft PR nie został utworzony.**
+Nie próbowano wydobywać tokenów ani obchodzić uprawnień. PR14/15 bez zmian.
+
+Formularz utworzenia do main:
+https://github.com/psuda87/sunday-league-mates/compare/main...feat/premium-profile-name-privacy?expand=1
+Wybrać Draft, tytuł: feat(profile): independent nickname and private global display names.
+Opis: implementacja pseudonimu i trzech trybów globalnych, atomowe zgody w aktualnym
+scope B3, PASS248 Vitest/TS/lint/build aplikacji/28 SQL RLS/35 replay/persistence,
+NOT TESTED pełny Supabase HTTP/Auth/Edge i fizyczny telefon. Demo build FAIL jak
+czysty main (frozenDemoAndroid/allowlista). Pełna treść i ryzyka w tym dokumencie.
+
+Końcowy SHA commita raportu będzie w odpowiedzi oraz historii gałęzi. Bez merge,
+Cloud, zdalnych migracji/deploy, konfiguracji APK, Auth/sekretów. Wymagany dalszy
+odbiór lokalny; nie deklarujemy gotowości produkcyjnej ani pełnego E2E.
