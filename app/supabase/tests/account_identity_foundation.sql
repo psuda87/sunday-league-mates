@@ -1,0 +1,47 @@
+-- Isolated PostgreSQL only: Auth below is a fixture, not real Auth.
+begin;
+create temporary table identity_fixture(id uuid primary key,n integer);
+insert into identity_fixture select gen_random_uuid(),n from generate_series(1,2)n;
+insert into auth.users(id,email,email_confirmed_at) select id,id::text||'@fixture.invalid',now() from identity_fixture;
+insert into auth.sessions(id,user_id) select id,id from identity_fixture;
+insert into public.slm_profiles(user_id,full_name,first_name,display_as) select id,'Given Surname','Given','first_name' from identity_fixture;
+insert into public.slm_roles(user_id) select id from identity_fixture;
+insert into public.slm_account_security(user_id,must_change_password) select id,false from identity_fixture;
+insert into public.slm_account_sessions(session_id,user_id,security_version) select id,id,1 from identity_fixture;
+insert into public.slm_player_profiles(user_id,nickname,email_account,jersey_number) select id,'Duplikat',true,27 from identity_fixture;
+create function pg_temp.identity_assert(ok boolean,label text) returns void language plpgsql as $$begin
+ if ok is distinct from true then raise exception 'FAIL %',label;end if;raise notice 'PASS %',label;end$$;
+do $$declare a uuid:=(select id from identity_fixture where n=1);b uuid:=(select id from identity_fixture where n=2);r uuid:=gen_random_uuid();orphan uuid:=gen_random_uuid();begin
+ perform pg_temp.identity_assert(not exists(select 1 from public.slm_identity_registry),'migration does not enrol accounts');
+ begin perform public.slm_identity_prepare();raise exception 'collision_accepted';exception when unique_violation then null;end;
+ perform pg_temp.identity_assert(not exists(select 1 from public.slm_identity_registry),'collision rolls back entire preparation');
+ update public.slm_player_profiles set nickname='Inny' where user_id=b;
+ perform pg_temp.identity_assert(public.slm_identity_prepare()=2,'both existing UUIDs prepared');
+ perform pg_temp.identity_assert((select email_login is not null from public.slm_identity_registry where user_id=a),'verified email routing staged');
+ perform pg_temp.identity_assert(slm_private.identity_key(U&'Z\0307OLC')=slm_private.identity_key('ŻOLC'),'NFC normalization');
+ perform pg_temp.identity_assert(slm_private.identity_key('ŻÓŁĆ')=slm_private.identity_key('żółć'),'Unicode case normalization');
+ begin perform public.slm_identity_rename(a,a,r,'Duplikat','inny');raise exception 'taken_accepted';exception when unique_violation then null;end;
+ perform pg_temp.identity_assert((select nickname='Duplikat' from public.slm_player_profiles where user_id=a),'collision preserves canonical name');
+ perform pg_temp.identity_assert(slm_private.session_valid(a,a,false),'collision preserves session');
+ perform public.slm_identity_rename(a,a,r,'Duplikat','Nowy');
+ perform public.slm_identity_rename(a,a,r,'Duplikat','Nowy');
+ perform pg_temp.identity_assert((select count(*)=1 from public.slm_v2_requests where actor_id=a and request_id=r),'retry idempotent');
+ begin perform public.slm_identity_rename(a,a,r,'Duplikat','Other');raise exception 'retry_accepted';exception when others then if sqlerrm<>'idempotency_conflict' then raise;end if;end;
+ begin perform public.slm_identity_rename(a,a,gen_random_uuid(),'Duplikat','Other');raise exception 'stale_accepted';exception when others then if sqlerrm<>'stale_identity' then raise;end if;end;
+ perform pg_temp.identity_assert((select full_name='Given Surname' and first_name='Given' and display_as='first_name' from public.slm_profiles where user_id=a),'profile display unchanged');
+ perform pg_temp.identity_assert((select jersey_number=27 from public.slm_player_profiles where user_id=a),'jersey unchanged');
+ perform pg_temp.identity_assert((select operation_id is null and security_version=1 from public.slm_account_security where user_id=a),'no pending or session version change');
+ begin update public.slm_player_profiles set nickname='Bypass' where user_id=a;raise exception 'bypass_accepted';exception when others then if sqlerrm<>'identity_update_required' then raise;end if;end;
+ perform pg_temp.identity_assert(not has_function_privilege('authenticated','public.slm_identity_rename(uuid,uuid,uuid,text,text)','execute'),'authenticated cannot invoke privileged rename');
+ perform pg_temp.identity_assert(not has_function_privilege('anon','public.slm_identity_prepare()','execute'),'anonymous cannot prepare');
+ perform pg_temp.identity_assert(not has_table_privilege('authenticated','public.slm_identity_registry','select'),'registry private');
+ insert into auth.users(id,email,email_confirmed_at) values(orphan,orphan::text||'@fixture.invalid',now());
+ insert into public.slm_profiles(user_id) values(orphan);
+ insert into public.slm_player_profiles(user_id,nickname,email_account) values(orphan,'Orphan',true);
+ begin perform public.slm_identity_prepare();raise exception 'orphan_activated';exception when others then if sqlerrm<>'identity_preflight_required' then raise;end if;end;
+ perform pg_temp.identity_assert(not exists(select 1 from public.slm_account_security where user_id=orphan),'preflight never provisions missing security');
+ perform pg_temp.identity_assert(not exists(select 1 from public.slm_identity_registry where user_id=orphan),'preflight never registers invalid account');
+ perform pg_temp.identity_assert(not has_function_privilege('authenticated','slm_private.identity_auth(uuid)','execute'),'Auth projection service only');
+ perform pg_temp.identity_assert((select bool_and(not (body::text ~* 'password|secret')) from public.slm_v2_requests where action='identity_foundation'),'ledger contains no secrets');
+end$$;
+rollback;

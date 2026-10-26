@@ -1,6 +1,6 @@
 import { isPhoneIdentifier, normalizeLoginPhone, normalizePhoneUpdate } from '../_shared/phone.ts';
 import { PhotoError, profilePhoto, readAccountBody } from './profilePhotos.ts';
-export interface Environment { url: string; anon: string; service: string; origins: string[]; emailSignupEnabled?: boolean }
+export interface Environment { url: string; anon: string; service: string; origins: string[]; emailSignupEnabled?: boolean; accountFoundationEnabled?: boolean }
 type Row = Record<string, unknown>;
 class ApiError extends Error {
   constructor(public status: number, public code: string, message: string) { super(message); }
@@ -249,6 +249,30 @@ export function createHandler(env: Environment) {
       if (action === 'status') return respond({ must_change_password: ctx.must_change_password, role: ctx.role, user_id: ctx.id });
       if (ctx.must_change_password && action !== 'password')
         throw new ApiError(403, 'password_required', 'Najpierw zmień hasło tymczasowe.');
+      if (action === 'foundation_rename') {
+        if (!env.accountFoundationEnabled) throw new ApiError(503,'foundation_disabled','Nowy model kont nie jest aktywny.');
+        if (Object.keys(body).some(key=>!['action','nickname','expected_nickname','current_password','request_id'].includes(key)))
+          throw new ApiError(400,'invalid_input','Sprawdź dane formularza.');
+        const nickname=normalizeLogin(field(body,'nickname',48));
+        const expected=field(body,'expected_nickname',48), requestId=field(body,'request_id',36);
+        if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(requestId))
+          throw new ApiError(400,'invalid_input','Nieprawidłowe żądanie.');
+        await rate('sensitive:'+ctx.id,8);
+        await verifyPassword(ctx,password(body,'current_password'));
+        // Explicit scalar allowlist: passwords can NEVER reach RPC/idempotency SQL.
+        const r=await call('/rest/v1/rpc/slm_identity_rename','POST',{
+          p_user:ctx.id,p_session:ctx.sid,p_request:requestId,p_expected:expected,p_nickname:nickname
+        },undefined,true);
+        if(!r.ok){
+          if(r.data?.code==='23505')throw new ApiError(409,'nickname_taken','Pseudonim jest już zajęty.');
+          if(r.data?.message==='session_invalid')throw unauthorized();
+          if(r.data?.message==='invalid_nickname')throw new ApiError(400,'invalid_nickname','Sprawdź format pseudonimu.');
+          if(['stale_identity','idempotency_conflict','identity_not_prepared'].includes(r.data?.message))
+            throw new ApiError(409,r.data.message,'Odśwież profil. Nie potwierdzono zmiany pseudonimu.');
+          throw new ApiError(503,'service_unavailable','Nie potwierdzono zmiany pseudonimu.');
+        }
+        return respond(r.data);
+      }
       if (['profile_photo_get','profile_photo_upload','profile_photo_delete'].includes(action)) {
         if(!uploadRequest)await rate('photo:'+ctx.id,action==='profile_photo_get'?60:10);
         return respond(await profilePhoto(env,ctx,action,body));

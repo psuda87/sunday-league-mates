@@ -1,3 +1,11 @@
+# Model kont — etap1, nieaktywny fundament
+
+2026-10-26 19:35 Europe/Warsaw — model kont etap1: nieaktywny fundament
+feat/account-model-foundation z main134c52b, osobny worktree. Nowe3 migracje, kanoniczny nickname + pochodny unikalny rejestr/RLS, jawny preflight bez nadpisywania, atomowy rename z aktualnym hasłem i CAS/idempotencją, bez begin/finish/pending/zmiany sesji i bez haseł w SQL. Feature gate domyślnie false, brak UI i przełączenia resolvera/telefonu/rejestracji. Dotychczasowy main/UI i wcześniejsze35 migracji zachowane, PR17 niezmieniony.
+PASS TS/lint/build,259 Vitest/44 pliki,47 SQL/RLS/replay38,25 real HTTP/Auth/Edge/PostgREST w NOWYM lokalnym slm-account-foundation57321. Rzeczywiste wyścigi dwóch ownerów i jednego ownera, rollback błędnego hasła/kolizji, sesje/refresh, UUID/profil/numer/grupy/zgody, IDOR i ledger bez sekretów sprawdzone. Chronione źródła/runtime i55 Premium PASS, auto deployment false. Konta fikcyjne pozostawiono; istniejące bazy/POCO/Cloud nietknięte. Bez APK/testu fizycznego/merge. Szczegóły i blokery cutover docs/ACCOUNT_MODEL_FOUNDATION.md; raport docs/ODPOWIEDZI_CODEX.txt. Następny bezpieczny etap: mapowanie konfliktów oraz przygotowanie wspólnego resolvera i transakcyjnego zapisu profilu przed jakąkolwiek aktywacją.
+
+---
+
 # PR16 — poprawka etykiet odebrana na POCO
 
 2026-10-26 18:51 Europe/Warsaw — PR16: ręczny odbiór poprawki etykiet na POCO
