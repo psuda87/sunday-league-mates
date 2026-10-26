@@ -14,7 +14,7 @@ $consolidationNames=@('JAVA_HOME','ANDROID_HOME','SLM_B1_ANDROID','SLM_V1_LIVE_L
 $consolidationSaved=@{}
 foreach($name in $consolidationNames){$consolidationSaved[$name]=[Environment]::GetEnvironmentVariable($name,'Process')}
 try {
- if((& git branch --show-current).Trim() -notin @('feat/v1-consolidation','feat/premium-b3-groups')){throw 'Requires reviewed consolidation/B3 branch'}
+ if((& git branch --show-current).Trim() -notin @('feat/v1-consolidation','feat/premium-b3-groups','feat/premium-profile-name-privacy')){throw 'Requires reviewed consolidation/B3 branch'}
  $env:JAVA_HOME='C:\Program Files\Android\Android Studio\jbr'
  if(-not $env:ANDROID_HOME){$env:ANDROID_HOME=Join-Path $env:LOCALAPPDATA 'Android\Sdk'}
  $env:SLM_LOCAL_ANDROID='1'

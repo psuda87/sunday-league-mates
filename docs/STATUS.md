@@ -1,3 +1,57 @@
+# PR16 — poprawka etykiet odebrana na POCO
+
+2026-10-26 18:51 Europe/Warsaw — PR16: ręczny odbiór poprawki etykiet na POCO
+Właściciel po aktualizacji APK z kodu69f3aa6 potwierdził: „ok działa jest ok”. Zapisano pozytywny ręczny odbiór poprawki odstępów formularza profilu na POCO. Nie dopisujemy oddzielnych wyników każdego pola, motywu ani scenariusza klawiatury, ponieważ odpowiedź była ogólna. Bez nowych zmian aplikacji/backendu/APK i bez ponawiania testów. PR #16 bez merge; potwierdzenie działania nie jest poleceniem scalania. Raport docs/ODPOWIEDZI_CODEX.txt.
+
+---
+
+# PR16 — APK z poprawką etykiet na POCO
+
+2026-10-26 18:50 Europe/Warsaw — feat/premium-profile-name-privacy; kod69f3aa6. Premium build/cap sync/assembleDebug i weryfikacja APK PASS. Za zleceniem właściciela install-r Success na c7a559b5 bez czyszczenia danych; start Status:ok, hash zainstalowanego APK155cf3d0…603f5c9 zgodny. Podpis/kopia starej wersji sprawdzone. Backend testowy HTTP200/reverse54321→56321; bez Cloud/migracji. Log:0 crash/JS/net::ERR_, jeden systemowy komunikat WebView variations „Seed missing signature”. Następny krok: ręczna ocena odstępów pól i fokus/przewijanie przy fizycznej klawiaturze, Light/Dark. PR16 bez merge; raport docs/ODPOWIEDZI_CODEX.txt i docs/PREMIUM_PROFILE_IMPLEMENTATION.md.
+
+---
+
+# PR16 — poprawka odstępów formularza Premium
+
+2026-10-26 18:47 Europe/Warsaw — feat/premium-profile-name-privacy, baza 67b9e9c. CSS: pionowe etykiety z 7 px przerwą dla zagnieżdżonych pól; żadnych zmian logiki/backendu/kolorów/karty. PASS: TS/lint, 8 Vitest, 6 Chrome/Cypress (320/360/390 × Light/Dark, wysokości 844/380), main/Premium build, source contract55. Przed poprawką wszystkie6 konfiguracji wykazywały odstęp0 px. Nowe fikcyjne fixture/testy i zrzuty docs/ui/pr16/profile-labels-*.png. Fizyczna klawiatura i POCO z tą poprawką NOT TESTED; bez nowego APK/instalacji. Istniejące wyniki backendu pozostają historyczne. Migracje/Edge/Cloud/PR14/15 bez zmian. Aktualizacja istniejącego PR #16, bez merge. Następny krok: ręczny odbiór odstępów i fokus/przewijanie na POCO po osobno zleconej aktualizacji APK. Szczegóły docs/PREMIUM_PROFILE_IMPLEMENTATION.md i docs/ODPOWIEDZI_CODEX.txt.
+
+---
+
+# PR16 — ogólny wynik ręczny POCO pozytywny
+
+2026-10-26 18:37 Europe/Warsaw — właściciel: „generalnie wygląda na to, że wszystko działa”. Nie zgłoszono usterki zainstalowanego APK6cf904ce. Zapisano pozytywną ogólną próbę ręczną; brak oddzielnych wyników pełnej checklisty, bez dopisywania indywidualnych PASS. Wcześniejsze testy techniczne pozostają zaliczone. PR #16 nadal bez merge; brak polecenia scalania. Tylko dokumentacja, bez ponawiania testów ani zmian aplikacji/Cloud/PR14/15. Szczegóły docs/ODPOWIEDZI_CODEX.txt i docs/PREMIUM_PROFILE_IMPLEMENTATION.md.
+
+---
+
+## Historia odbioru technicznego
+
+# PR16 — odbiór techniczny lokalny, oczekuje odbioru ręcznego
+
+PR #16: https://github.com/psuda87/sunday-league-mates/pull/16 — techniczny commit ed71f29 wypchnięty, draft bez konfliktów i merge.
+
+2026-10-26 18:33 Europe/Warsaw — feat/premium-profile-name-privacy, baza76da23a, istniejący PR #16. Odizolowany pełny Supabase slm-pr16-review/API56321 z35 migracjami; oryginalny lokalny backend34/64 konta/33 grupy/13 meczów bez zmian, Cloud/PR14/15 nietknięte.
+PASS: real Auth/Edge/PostgREST33 HTTP + real browser1, SQL fixture28/replay35,254 Vitest/43 pliki, TS/lint, main/Premium/demo isolation, guards32/35/55, cap sync/Android. Poprawki:409 consent_required zamiast503, wyścig dismiss Ionic, styl akcji ukrycia imienia, cross-platform allowlista demo z4 regresjami. Bez zmiany migracji i Auth aplikacji.
+APK6cf904ce zainstalowano za osobną zgodą install-r na c7a559b5 bez czyszczenia danych, podpis zgodny; kopia poprzedniego APK zachowana. Reverse telefonu54321→komputer56321, start ok, brak znalezionego FATAL EXCEPTION/błędu WebView. Fikcyjne konta Zawodnik/Obserwator i2 grupy odbioru; poświadczenia tylko prywatnym TEMP poza Git. Ręczny odbiór A–G/Android nadal oczekuje, PR draft bez merge. Szczegóły/checklista/rollback: docs/PREMIUM_PROFILE_IMPLEMENTATION.md; odpowiedzi docs/ODPOWIEDZI_CODEX.txt.
+
+---
+
+# Premium profil B2/B3 — 2026-10-26 13:20:55 CET
+
+Gałąź feat/premium-profile-name-privacy z main edd2e92.
+Implementacja 1f9d460 wypchnięta; utworzenie Draft PR zablokowane przez
+GitHub API403 Forbidden. Link formularza i pełny raport poniżej. Publiczny nickname
+niezależny od loginu,3 globalne display_as, jawne first_name i share_first_name,
+atomowe potwierdzone zgody w aktualnych grupach, read-back, fallback/RLS i spójne
+nazwy grup/kart/zapisów. Nowa migracja20261026120000, historyczne bez zmian.
+Supabase Cloud/sekrety/Auth sesje/APK/config nietknięte, bez merge/deploy.
+
+PASS: TS/full lint,248 Vitest, build aplikacji,35 migracji PostgreSQL replay,
+28 asercji SQL/RLS i persistence po restarcie PostgreSQL. Auth/Storage w tym
+teście to fixture, nie pełny Supabase. NOT TESTED pełne HTTP/Auth/Edge i telefon;
+CLI lokalny zablokowany EROFS. Build demo FAIL jak czysty main: frozenDemoAndroid
+poza allowlistą. Bez obchodzenia izolacji. Szczegóły/ryzyka/odbiór przed merge:
+[PREMIUM_PROFILE_IMPLEMENTATION.md](PREMIUM_PROFILE_IMPLEMENTATION.md).
+
 # Aktualizacja UI B3 po POCO
 
 2026-10-25 21:34 Europe/Warsaw — feat/premium-b3-groups, istniejący PR #13. Poprawiono wyłącznie kompaktowy przełącznik zgody per grupa i przycisk odświeżania (44px, ikona, stan ładowania, deduplikacja). Załadowane dane nie znikają podczas refresh, błąd zapisu zachowuje stan i kontrolkę. Backend/RLS/Auth/Ultimate/BottomNav bez zmian; brak operacji Cloud.

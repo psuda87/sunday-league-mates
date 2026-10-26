@@ -12,7 +12,7 @@ export interface Profile {
   login: string;
   phone: string;
   full_name: string;
-  display_as: 'nickname' | 'full_name';
+  display_as: 'nickname' | 'first_name' | 'full_name';
   display_name: string;
 }
 export interface ManagedAccount extends Profile {

@@ -1,11 +1,14 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import {forbiddenDemoModule} from './scripts/demoModulePolicy';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const app = fileURLToPath(new URL('.', import.meta.url));
 // Explicit allowlist: accidentally importing App/Auth/Edge fails the build.
 const allowed = new Set([
+  'src/profile/PremiumIdentityEditor.tsx',
+  'src/native/frozenDemoAndroid.ts', // Reviewed presentation-only native back/keyboard transport; no Auth/API.
   'src/demo/accountState.ts', 'src/demo/AccountDemo.tsx', 'src/account-ui/model.ts', 'src/account-ui/Fields.tsx', 'src/account-ui/AccountScreens.tsx', 'src/account-ui/account.css', 'src/ui/UltimatePlayerCard.tsx',
   'src/demo/palettes.css',
   'src/demo/eventAccess.ts', 'src/demo/EventAccessView.tsx', 'src/demo/eventAccess.css',
@@ -28,9 +31,8 @@ export default defineConfig({
       for (const output of Object.values(bundle)) {
         if (output.type !== 'chunk') continue;
         for (const raw of Object.keys(output.modules)) {
-          const id = raw.split('?')[0];
-          if (id.startsWith(app) && !id.includes('/node_modules/') && !allowed.has(id.slice(app.length)))
-            this.error(`Non-demo module in demo bundle: ${id.slice(app.length)}`);
+          const forbidden=forbiddenDemoModule(raw,app,allowed);
+          if(forbidden)this.error(`Non-demo module in demo bundle: ${forbidden}`);
         }
       }
       this.emitFile({type:'asset',fileName:'assets/demo/fictional-portraits.webp',source:readFileSync(new URL('./public/assets/demo/fictional-portraits.webp',import.meta.url))});

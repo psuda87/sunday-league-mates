@@ -1,0 +1,5 @@
+// Credentials via stdin only; no login screenshots, videos or raw failures.
+import cypress from 'cypress';
+let input='';for await(const chunk of process.stdin)input+=chunk;const env=JSON.parse(input);input='';
+const clean=value=>{let s=String(value??'');for(const v of Object.values(env))s=s.split(v).join('[REDACTED]');return s.replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,'[TOKEN]');};
+try{const r=await cypress.run({browser:'chrome',quiet:true,config:{baseUrl:'http://127.0.0.1:5174',video:false,screenshotOnRunFailure:false,trashAssetsBeforeRuns:false,screenshotsFolder:'../.cache/pr16-stack/browser',e2e:{specPattern:'cypress/pr16/profile.cy.ts'}},env});console.log('SLM_PR16_RESULT '+JSON.stringify({passed:r.totalPassed??0,failed:r.totalFailed??1,failures:(r.runs??[]).flatMap(x=>x.tests??[]).filter(t=>t.state==='failed').map(t=>clean(t.displayError))}));}catch{console.log('SLM_PR16_RESULT '+JSON.stringify({passed:0,failed:1,failures:['Browser failed; sensitive details suppressed']}));}

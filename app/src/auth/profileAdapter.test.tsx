@@ -121,3 +121,11 @@ it('covers only a single real portrait and preserves the original demo sheet ren
  rerender(<UltimatePlayerCard name="Test" portrait={{src:'/assets/demo/fictional-portraits.webp',column:0,row:0}} portraitFit="cover"/>);
  expect((document.querySelector('.slm-ultimate-portrait img') as HTMLImageElement).style.objectFit).toBe('');
 });
+
+it('saves a public identity with one atomic RPC and an explicit read-back, never identifiers',async()=>{
+ const confirmed={user_id:'owner',login:'technical',phone:'',full_name:'Given Secret',first_name:'Given',nickname:'Public',display_as:'first_name',display_name:'Given',jersey_number:0,group_scope:[]};
+ const manager={call:vi.fn(async()=>confirmed),changeSession:vi.fn()} as unknown as SessionManager;
+ const adapter=profileAdapter(manager,'owner');
+ await adapter.saveIdentity({nickname:'Public',first_name:'Given',full_name:'Given Secret',display_as:'first_name',jersey_number:0,group_scope:[],accept_disclosure:false,request_id:crypto.randomUUID()});
+ expect(manager.call).toHaveBeenCalledTimes(2);expect(manager.call).toHaveBeenNthCalledWith(1,'save_premium_profile',expect.objectContaining({nickname:'Public',display_as:'first_name'}));expect(manager.call).toHaveBeenNthCalledWith(2,'profile');expect(manager.changeSession).not.toHaveBeenCalled();
+});

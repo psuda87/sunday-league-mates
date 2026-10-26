@@ -4060,3 +4060,18 @@ button.slm-group-card {
   background-size: auto 120%;
   background-position: center 100%;
 }
+
+/* Premium profile name selector, sharing the existing input tokens. */
+.slm-premium-identity > label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+.slm-premium-identity > label > input,
+.slm-premium-identity > label > select {
+  display: block;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.slm-premium-identity select {width:100%;min-height:44px;padding:9px 12px;border:1px solid var(--slm-border);border-radius:9px;color:var(--slm-text);background:var(--slm-panel);font:inherit;}

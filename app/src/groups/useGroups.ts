@@ -12,7 +12,7 @@ export function groupWorld(userId:string,groups:GroupSummary[],inbox:GroupReques
  for(const request of inbox)if(!groupRows.has(request.group_id))groupRows.set(request.group_id,{id:request.group_id,name:request.group_name??'',description:'',admin_id:''});
  const players=new Map<string,GroupPerson>();
  const members=groups.filter(g=>g.id!==detail?.group.id).map(g=>({groupId:g.id,playerId:userId,organizer:g.organizer,joinedAt:''}));
- if(detail){groupRows.set(detail.group.id,detail.group);for(const m of detail.members){players.set(m.user_id,player(m.user_id,m.nickname));members.push({groupId:detail.group.id,playerId:m.user_id,organizer:m.organizer,joinedAt:m.joined_at});}}
+ if(detail){groupRows.set(detail.group.id,detail.group);for(const m of detail.members){players.set(m.user_id,player(m.user_id,m.display_name??m.nickname));members.push({groupId:detail.group.id,playerId:m.user_id,organizer:m.organizer,joinedAt:m.joined_at});}}
  const requests=new Map([...inbox,...(detail?.requests??[])].map(r=>[r.id,r]));
  for(const r of requests.values()){
   if(r.actor_id&&r.actor_name&&!players.has(r.actor_id))players.set(r.actor_id,player(r.actor_id,r.actor_name));
@@ -70,10 +70,12 @@ export function useGroups(manager:SessionManager,userId:string){
  const binding:GroupBinding={loading,busy,error,searching,finding,found,candidates,search,findPlayers,refresh:manualRefresh,
   counts:Object.fromEntries(state.groups.map(g=>[g.id,g.member_count])),pending:Object.fromEntries(state.groups.map(g=>[g.id,g.pending_count])),
   requestPhones:Object.fromEntries((state.detail?.requests??[]).filter(r=>!!r.contact_phone).map(r=>[r.id,r.contact_phone!])),
+  shareFirstName:state.detail?.members.find(m=>m.user_id===userId)?.share_first_name??false,
+  displayAs:state.detail?.members.find(m=>m.user_id===userId)?.display_as,
   shareFullName:state.detail?.members.find(m=>m.user_id===userId)?.share_full_name??false,
   open:async id=>{selected.current=id;setCandidates([]);await refresh();},
   create:async(name,description,key)=>work(async()=>{const r=await mutate<{group_id:string}>('groups_create',{name,description,request_id:key});selected.current=r.group_id;await refresh();return r.group_id;}),
-  consent:share=>{void work(async()=>{await mutate('groups_consent',{group_id:state.detail!.group.id,share_full_name:share});await refresh();});},
+  consent:(share,confirmNickname=false)=>{void work(async()=>{await mutate('groups_consent',{group_id:state.detail!.group.id,share_full_name:share,confirm_nickname:confirmNickname});window.dispatchEvent(new Event('slm-profile-changed'));await refresh();});},
   act:action=>{void work(async()=>{
    if(action.type==='group_create')return;const body:Record<string,unknown>={};let operation:string;
    if(action.type==='group_decide'||action.type==='group_cancel'){body.id=action.requestId;operation=action.type==='group_decide'?'decide':'cancel_request';if(action.type==='group_decide')body.accept=action.accept;}

@@ -10,7 +10,9 @@
     "Owner-approved BottomNav highlight fix: shared active state, full tab area and existing plus notch; Ultimate rules unchanged",
     "B3 owner-approved real groups controllers, group-scoped privacy controls and accurate live/demo labels; Ultimate/BottomNav/CSS/assets unchanged",
     "Shared groups selectors and avatar props accept narrow live DTOs; no fabricated World, statistics or profile fallback",
-    "Owner-approved B3 POCO corrections: compact scoped consent switch and refresh icon; frozen card/nav/global CSS unchanged"
+    "Owner-approved B3 POCO corrections: compact scoped consent switch and refresh icon; frozen card/nav/global CSS unchanged",
+    "PR16 owner-authorized independent nickname/three global profile names and atomic privacy controls; original Ultimate/BottomNav rules unchanged",
+    "Owner-reported PR16 nested label/input spacing: column layout and existing 7px gap only within Premium profile editor; card/nav/colors unchanged"
   ],
   "files": {
     "app/demo/main.tsx": {
@@ -114,11 +116,11 @@
       "text": true
     },
     "app/src/demo/GroupScreens.tsx": {
-      "sha256": "044b8f48bdc06763ee19bc31e9e6af203f08a28ce9bf4a61fe4c81de124b7eed",
+      "sha256": "56734655462b4c042d6cacd04cabccfdd161b6e90c3919d45ffa93b0c6b09813",
       "text": true
     },
     "app/src/demo/Identity.tsx": {
-      "sha256": "94c1ca572be636e36abd6ba1af165a91b8a98151f65482e12c9a03dcecba206f",
+      "sha256": "622060c9f9ff1ed3a9868730a78482aaa30b9b18856b9d11c46348d9fd2154de",
       "text": true
     },
     "app/src/demo/Panels.tsx": {
@@ -174,7 +176,7 @@
       "text": true
     },
     "app/src/theme/variables.css": {
-      "sha256": "3b27fbe3c761b6640068f6f95ce2708d63c97bdf164a8df38a7bb2718f599c78",
+      "sha256": "f62ecf67bcfcac9853a294d71b167b88a98ddac2d62f10edc4072496851cd769",
       "text": true
     },
     "app/src/ui/AppearanceSettings.tsx": {
