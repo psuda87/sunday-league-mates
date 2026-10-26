@@ -1,3 +1,20 @@
+# Docelowy model kont — plan migracji
+
+2026-10-26 19:16 Europe/Warsaw — docelowy model kont: plan, bez implementacji
+Zatwierdzone: pseudonim=unikalny login, opcjonalny e-mail loginu, telefon tylko kontakt, hasło wymagane. Przygotowano docs/ACCOUNT_MODEL_MIGRATION_PLAN.md: jeden kanoniczny nickname, prywatny rejestr wewnętrznego Auth e-maila i opcjonalnego potwierdzonego e-maila użytkownika; bez usuwania technicznych adresów i bez zmiany UUID. Plan kolizji/backfill/expand/cutover, atomowy rename bez begin/finish, kompatybilność PR16/zgód i starych APK; hasło musi być usunięte z payloadu przed idempotencją SQL. Reset ma testy legacy i e-mail, lecz nie jest uniwersalnym recovery: braki listowania email/globalna rola/pending/awarie wymagają odbioru. Blokery: kolizje i format, polityka sesji, potwierdzenie e-maila/recovery, duplikaty kontaktów i cutover. Żadnych zmian aplikacji/SQL/kont/baz/Cloud/PR14/15 ani merge17. W tej pracy tylko przegląd źródeł i dokumentacja; brak nowych testów runtime. Raport docs/ODPOWIEDZI_CODEX.txt. Gałąź feat/premium-account-identifiers / Draft PR17.
+
+---
+
+# Identyfikatory konta — blokada implementacji
+
+Draft PR #17: https://github.com/psuda87/sunday-league-mates/pull/17; diagnostyka97ede53, bez merge.
+
+2026-10-26 19:01 Europe/Warsaw — edycja loginu/telefonu po PR16: audyt BLOCKED
+Nowa feat/premium-account-identifiers od main134c52b; osobny worktree. Zgodnie z warunkiem właściciela zatrzymano wdrażanie po potwierdzeniu ryzyka: dwa realne begin/finish przy kolizji loginu pozostawiają przegrywające konto operation_pending i blokują ponowny login. Konto e-mail nie ma aliasów technicznych, DTO login jest nickname, a kontakt nie służy logowaniu. Bez implementacji UI/backendu/migracji, bez APK/Cloud/PR14/15. Dotychczasowe funkcje bez zmian.
+PASS TS/lint/build/254 Vitest,28 SQL/RLS i35 replay. Realny lokalny Supabase:20 poprawnych kontroli +4 odtworzone braki/symptomy, featureReady:false. RLS/UUID/pseudonim/numer i nowe/stare sesje kontrolowane. Wyścig deterministycznie przez realne RPC z Auth, nie naturalny telefoniczny E2E. Nowe fikcyjne konta wyłącznie izolowanego slm-pr16-review pozostawiono do diagnostyki; dane odbioru PR16 nietknięte. Plan atomowej procedury i decyzja modelu e-mail w docs/ACCOUNT_IDENTIFIERS_AUDIT.md. Tworzymy Draft PR audytu, bez automatycznego merge. Raport docs/ODPOWIEDZI_CODEX.txt.
+
+---
+
 # PR16 — poprawka etykiet odebrana na POCO
 
 2026-10-26 18:51 Europe/Warsaw — PR16: ręczny odbiór poprawki etykiet na POCO
