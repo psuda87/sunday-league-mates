@@ -70,3 +70,6 @@ Rejestrację ogranicza twardy globalny budżet30 prób/dobę bez ufania spoofowa
 5. **APK nie przygotowano**, ponieważ pełny Auth nie spełnia kryteriów zakończenia. Nie ma podstaw do odbioru nowego modelu na POCO ani do wdrożenia/przygotowania „czystej” bazy Cloud przez kasowanie danych. Można planować przyszłą konfigurację, ale każda operacja Cloud wymaga osobnej zgody i rozwiązania blokad.
 
 Raport docs/ODPOWIEDZI_CODEX.txt. Draft PR18, bez merge/deploy/publikacji i bez zmian PR17/14/15. Lokalne zmiany karty w root feat/ui-beta zachowane, nie przenoszone przy okazji.
+
+
+2026-10-27 00:31 Europe/Warsaw — kod2e0b0f2fcf9817db2cbdee21f7206c48ba175336 wypchnięty. Draft PR #18 zaktualizowany: https://github.com/psuda87/sunday-league-mates/pull/18, mergeable=true, draft=true, merged=false. 42 migracje;264 Vitest/70 SQL-RLS/49 real HTTP od zera+21 dodatkowych/12 browser UI PASS; main/Premium/demo build PASS. Obie testowe aktywacje wyłączone i potwierdzone API false; APK nie przygotowano. Pełna przebudowa NIEUKOŃCZONA z powodu e-mail workflows/konfiguracji, konfliktów danych i legal/anti-bot. Raport docs/ACCOUNT_MODEL_CANDIDATE.md i docs/ODPOWIEDZI_CODEX.txt; bez Cloud/merge, PR17 zachowany.

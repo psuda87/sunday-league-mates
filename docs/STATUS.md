@@ -1,5 +1,7 @@
 # Przebudowa kont — kandydat nieaktywny, blokery
 
+Kod2e0b0f2, Draft PR #18: https://github.com/psuda87/sunday-league-mates/pull/18 — bez konfliktów i merge, pełna aktywacja BLOCKED.
+
 2026-10-27 00:29 Europe/Warsaw — przebudowa kont: kandydat, aktywacja BLOCKED
 Kontynuacja feat/account-model-foundation / Draft PR18 z e81ddac; main134c52b. Resolver nickname/potwierdzonego email bez telefonu/fallbacku, rzeczywista rejestracja bez emaila z idempotencją i wznowieniem po Auth, wspólny atomowy zapis PR16+rename+kontakt z hasłem tylko dla rename, ochrona oczekiwanego UUID, minimalny admin DTO i reset z dodatkowym potwierdzeniem. Domyślne bramki false, UI opt-in bez CSS/karty/nav. Nowe4 migracje tej kontynuacji,42 łącznie; historia bez edycji. Audyt READ ONLY: developer64 kont/46 duplikatów/53 zły format/3 brak; PR16 42/31/15/9 i2 pending; fundament9 bez konfliktów. Anonimowy raport docs/ACCOUNT_MODEL_LOCAL_AUDIT.json, niczego nie nadpisano.
 PASS264 Vitest/45, TS/lint,70 SQL/RLS/replay42,49 real HTTP od pustej bazy+21 dodatkowych,12 Chrome (fixture UI), main/Premium/demo build+isolation, source guards. SQL lint4 stare warningi, brak nowych. Potwierdzony email w testach jest fixture; dostarczanie/callback/recovery NOT TESTED. Właściciel wybrał brak wysyłki i zablokowaną aktywację. Po testach58321/59321 active=false i API account_model=false/self_registration=false; backend i dane POCO/Cloud nietknięte. Fikcyjne konta zachowane, bez resetów/merge/deploy, APK nie przygotowano.
