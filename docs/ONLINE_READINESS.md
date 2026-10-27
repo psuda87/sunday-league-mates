@@ -90,6 +90,14 @@ Na POCO sprawdzić prawdziwy widget w HTTPS iframe: JavaScript/DOM storage/domow
 
 Pełne granice audytu: [SECURITY_AUDIT.md](SECURITY_AUDIT.md). Plan migracji: [CLOUD_CUTOVER_PLAN.md](CLOUD_CUTOVER_PLAN.md). Testy bezpieczeństwa nie są formalnym dowodem braku podatności; katalogi/testy nie potwierdzają uprawnień w zarządzanym Cloud.
 
+### Odtworzenie lokalne po rozdzieleniu PR
+
+Sam fundament i SQL/core HTTP uruchamiać na `feat/account-model-foundation`, według skryptów ograniczonych do tego brancha. Statyczne i jednostkowe testy infrastruktury uruchamiać na `chore/online-readiness`. Helpery poczty dopuszczają ten drugi branch **wyłącznie** przy `--readiness` / `SLM_ONLINE_LOCAL=1`; bez tych flag odmawiają przed dostępem do Dockera. `SLM_TEST_GATEWAY=1` wymaga również nowej izolacji. Nie kierują testu do istniejącego projektu60321 ani Cloud.
+
+Pełna izolacja tego zadania jest zachowana, ale teraz nieaktywna i niepusta. Nie powtarzać testu pustki/backup-preflight na niej jako dowodu nowego pustego projektu. Przy odtwarzaniu od zera helper `python app/scripts/prepare-account-email-local.py --readiness --mail --protection` przygotowuje wyłącznie62321/62322/62324, nie uruchamia stacku ani nie aktywuje SQL. Po uruchomieniu nowej izolacji i kontroli jej pustki trzeba ponownie przygotować helper (adres Mailpit), sprawdzić `--readiness --auth-baseline`, uruchomić lokalne functions serve z ignorowanym `.cache/readiness-proxy.env` i jawnie aktywować **tylko ten** testowy SQL według runnera Auth. Nie stosować tej procedury na Cloud.
+
+Lokalna bramka: z `app/` uruchomić `node scripts/serve-online-gateway-local.mjs` (62325). Z root worktree, przy `SLM_ONLINE_LOCAL=1` i `SLM_TEST_GATEWAY=1`, runner `node app/scripts/test-account-email-http-local.mjs` używa bramki. Przed tym zbudować `vite.email-local.config.ts` z tymi samymi flagami i uruchomić preview callbacku5182. Po każdym odbiorze przywrócić active=false wyłącznie dla sprawdzonego lokalnego projektu i odczytać wszystkie cztery capabilities przez bramkę. Dane/kwoty zachować; nie resetować ich dla zielonych wyników. Publiczne szablony/configi nie zawierają lokalnego fixture dostawcy.
+
 ## Decyzje podjęte samodzielnie
 
 | Problem | Wybrane rozwiązanie i uzasadnienie | Konsekwencje |
