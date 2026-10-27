@@ -1,3 +1,4 @@
+import EmailSettings from './EmailSettings';
 import { useRef,useState } from 'react';
 import { IonAlert } from '@ionic/react';
 import type { PersonalProfileBinding,IdentityDraft } from '../ui/personalProfile';
@@ -20,6 +21,7 @@ export default function PremiumIdentityEditor({binding,onClose}:{binding:Persona
  <label>Wyświetlaj mnie jako<select value={mode} disabled={binding.saving} onChange={e=>setMode(e.target.value as typeof mode)}><option value="nickname">Pseudonim</option><option value="first_name">Imię</option><option value="full_name">Imię i nazwisko</option></select></label>
  <p aria-live="polite">Podgląd dla uprawnionych: <strong>{preview||'Podaj pseudonim'}</strong>. Bez wymaganej zgody w grupie: {nick||'pseudonim'}. Administrator zachowuje dostęp B3.</p>
  <label>Numer koszulki<input inputMode="numeric" value={number} disabled={binding.saving} onChange={e=>setNumber(e.target.value)}/></label>
+ {p.account_model&&binding.requestEmail&&<EmailSettings binding={binding}/>}
  {error&&<p role="alert">{error}</p>}<div className="slm-identity-actions"><button type="submit" disabled={binding.saving||!!pending}>Zapisz dane</button><button type="button" disabled={binding.saving} onClick={onClose}>Anuluj</button></div>
  <IonAlert isOpen={!!pending} header="Udostępnienie danych" message={`${mode==='first_name'?'Aby wyświetlać się jako imię, musisz udostępnić swoje imię innym uprawnionym zawodnikom. Czy chcesz kontynuować?':'Aby wyświetlać się jako imię i nazwisko, musisz udostępnić te dane innym uprawnionym zawodnikom. Czy chcesz kontynuować?'} Zakres: wszystkie Twoje obecne grupy (${groups?.length??0}). Bez nowych grup i osób z zewnątrz.`} buttons={[{text:'Anuluj',role:'cancel',handler:()=>{closing.current=true;setPassword('');setPending(null);}},{text:'Akceptuję',handler:()=>{if(pending){closing.current=true;const draft={...pending,accept_disclosure:true};setPending(null);void save(draft);}}}]} onDidDismiss={()=>{closing.current=false;setPending(null);}}/>
  </form>;

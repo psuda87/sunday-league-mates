@@ -1,4 +1,8 @@
 {
-  "compilerOptions": { "strict": true },
-  "imports": {}
+  "compilerOptions": {
+    "strict": true
+  },
+  "imports": {
+    "nodemailer": "npm:nodemailer@10.2.1"
+  }
 }

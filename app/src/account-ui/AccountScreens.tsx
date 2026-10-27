@@ -48,7 +48,7 @@ export default function AccountScreens({view,port,onNavigate,profile=emptyProfil
   {submitLabels[view]&&<form noValidate onSubmit={submit} aria-label={titles[view]} aria-busy={busy}>
    {view==='login'?<SignInFields loginOrPhone={loginOrPhone} nicknameModel={nicknameModel} identifier={email} password={password} onIdentifier={setEmail} onPassword={setPassword}/>:<>
     {(view==='register'||view==='first-profile')&&profileFields}
-    {(view==='register'||view==='forgot')&&<TextField id="account-email" label={nicknameModel?"Adres e-mail · opcjonalnie":"Adres e-mail"} type="email" autoComplete="email" inputMode="email" value={email} onChange={setEmail} maxLength={254}/>}
+    {(view==='register'||view==='forgot')&&<TextField id="account-email" label={nicknameModel&&view==='register'?"Adres e-mail · opcjonalnie":"Adres e-mail"} type="email" autoComplete="email" inputMode="email" value={email} onChange={setEmail} maxLength={254}/>}
     {view==='password'&&<PasswordField label="Obecne hasło" value={current} onChange={setCurrent}/>}
     {['register','reset','password'].includes(view)&&<><PasswordField label={view==='register'?'Hasło':'Nowe hasło'} value={password} onChange={setPassword} newPassword/><PasswordField label={view==='register'?'Powtórz hasło':'Powtórz nowe hasło'} value={confirmation} onChange={setConfirmation} newPassword/><p className="slm-muted">Minimum 8 znaków, maksimum 72 bajty UTF-8. Użyj unikalnego hasła.</p></>}
    </>}

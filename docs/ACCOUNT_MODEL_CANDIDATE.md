@@ -73,3 +73,8 @@ Raport docs/ODPOWIEDZI_CODEX.txt. Draft PR18, bez merge/deploy/publikacji i bez 
 
 
 2026-10-27 00:31 Europe/Warsaw — kod2e0b0f2fcf9817db2cbdee21f7206c48ba175336 wypchnięty. Draft PR #18 zaktualizowany: https://github.com/psuda87/sunday-league-mates/pull/18, mergeable=true, draft=true, merged=false. 42 migracje;264 Vitest/70 SQL-RLS/49 real HTTP od zera+21 dodatkowych/12 browser UI PASS; main/Premium/demo build PASS. Obie testowe aktywacje wyłączone i potwierdzone API false; APK nie przygotowano. Pełna przebudowa NIEUKOŃCZONA z powodu e-mail workflows/konfiguracji, konfliktów danych i legal/anti-bot. Raport docs/ACCOUNT_MODEL_CANDIDATE.md i docs/ODPOWIEDZI_CODEX.txt; bez Cloud/merge, PR17 zachowany.
+
+
+## Aktualizacja 2026-10-27 08:22 Europe/Warsaw — e-mail/callback/recovery
+
+Powyższe ograniczenia implementacji e-mail opisują stan historyczny sprzed tego zadania. Dodano i przetestowano lokalnie scoped przepływ opcjonalnego aliasu oraz recovery; primary Auth niezmienny.43 migracje,280 Vitest/88 SQL/49+21 HTTP/29 SMTP z3 callbackami/9 fault-race/18 UI browser PASS. Internet SMTP i POCO NOT TESTED, aktywacja wyłączona. Aktualne granice dowodu i blokery: [ACCOUNT_EMAIL_FLOWS.md](ACCOUNT_EMAIL_FLOWS.md). Bez Cloud/merge/deploy; docs/ODPOWIEDZI_CODEX.txt.

@@ -26,3 +26,14 @@ describe('Premium profile labels: real CSS and Ionic scroll container',()=>{
   });
  }
 });
+
+describe('optional owner email fields, original Premium CSS',()=>{
+ for(const width of [320,360,390])for(const theme of ['light','dark'])it(`${width}px ${theme} email fields focus above footer`,()=>{
+  cy.viewport(width,380);cy.visit('/cypress/fixtures/profile-layout.html?candidate&mail');cy.document().then(doc=>doc.documentElement.classList.toggle('ion-palette-dark',theme==='dark'));cy.contains('button','Edytuj profil').click();
+  cy.get('section[aria-label="E-mail konta"] > label').should('have.length',2).each($label=>{
+   const label=$label[0],input=label.querySelector('input')!;const text=label.ownerDocument.createRange();text.selectNode(label.firstChild!);input.focus();input.scrollIntoView({block:'center'});
+   cy.wrap(input).should(()=>{const box=input.getBoundingClientRect();expect(box.top-text.getBoundingClientRect().bottom).to.be.at.least(6);expect(box.left).to.be.at.least(0);expect(box.right).to.be.at.most(width);expect(box.top).to.be.at.least(0);expect(box.bottom).to.be.at.most(label.ownerDocument.querySelector('ion-footer')!.getBoundingClientRect().top+1);});
+  });
+  if(width===390)cy.screenshot('email-fields-'+theme,{capture:'viewport',overwrite:true});
+ });
+});

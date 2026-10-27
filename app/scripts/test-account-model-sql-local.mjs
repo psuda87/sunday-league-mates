@@ -18,6 +18,7 @@ try{
  sql(readFileSync('supabase/tests/account_identity_foundation.sql','utf8'));
  sql(readFileSync('supabase/tests/account_model_candidate.sql','utf8'));
  sql(readFileSync('supabase/tests/account_model_contacts.sql','utf8'));
- assert.equal(assertions,70,'All profile and foundation assertions must execute');
+ sql(readFileSync('supabase/tests/account_email.sql','utf8'));
+ assert.equal(assertions,88,'All profile and foundation assertions must execute');
  console.log(`PASS: ${assertions} SQL/RLS assertions; ${files.length} migrations replayed; Auth/Storage are fixture contracts.`);
 }finally{spawnSync('docker',['rm','--force',name],{stdio:'ignore'});}

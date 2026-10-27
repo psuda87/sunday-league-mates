@@ -13,7 +13,8 @@
     "Owner-approved B3 POCO corrections: compact scoped consent switch and refresh icon; frozen card/nav/global CSS unchanged",
     "PR16 owner-authorized independent nickname/three global profile names and atomic privacy controls; original Ultimate/BottomNav rules unchanged",
     "Owner-reported PR16 nested label/input spacing: column layout and existing 7px gap only within Premium profile editor; card/nav/colors unchanged",
-    "Owner-authorized inactive account-model candidate: conditional nickname/contact/password fields and original form bindings; no card/nav/CSS/theme changes or default activation"
+    "Owner-authorized inactive account-model candidate: conditional nickname/contact/password fields and original form bindings; no card/nav/CSS/theme changes or default activation",
+    "Inactive account-model email extension: conditional owner email settings and required recovery email; no existing card/nav/CSS changes"
   ],
   "files": {
     "app/demo/main.tsx": {
@@ -77,7 +78,7 @@
       "text": false
     },
     "app/src/account-ui/AccountScreens.tsx": {
-      "sha256": "8bcf82b132caf9a8d500414bc858fa3d3df0b089db8bd3718aa7f6d7c2c01de8",
+      "sha256": "1ca227993a45f09710c35570fd83b37b71e702858810fb027405fa378a7024fa",
       "text": true
     },
     "app/src/account-ui/Fields.tsx": {

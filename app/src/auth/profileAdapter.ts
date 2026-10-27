@@ -17,7 +17,7 @@ export function profileAdapter(manager:SessionManager,userId:string){
    typeof p.display_name!=='string'||!p.display_name.trim()||p.display_name.length>254||
    !['nickname','first_name','full_name'].includes(p.display_as)||(p.jersey_number!=null&&(!Number.isInteger(p.jersey_number)||p.jersey_number<0||p.jersey_number>99)))throw new Error('profile_contract_invalid');
   // Pick only the existing contract; never project roles/metadata into the UI.
-  return {...(typeof p.account_model==='boolean'?{account_model:p.account_model}:{}),...(typeof p.email_account==='boolean'?{email_account:p.email_account}:{}),nickname:p.nickname,first_name:p.first_name,group_scope:p.group_scope,jersey_number:p.jersey_number??null,user_id:userId,login:p.login,phone:p.phone,full_name:p.full_name,display_as:p.display_as,display_name:p.display_name};
+  return {...(p.account_model?{email_login:p.email_login??null,email_pending:p.email_pending??null,email_enabled:p.email_enabled===true}:{}),...(typeof p.account_model==='boolean'?{account_model:p.account_model}:{}),...(typeof p.email_account==='boolean'?{email_account:p.email_account}:{}),nickname:p.nickname,first_name:p.first_name,group_scope:p.group_scope,jersey_number:p.jersey_number??null,user_id:userId,login:p.login,phone:p.phone,full_name:p.full_name,display_as:p.display_as,display_name:p.display_name};
  }
  return {
   async saveIdentity(draft:IdentityDraft){

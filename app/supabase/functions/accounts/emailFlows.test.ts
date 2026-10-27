@@ -1,0 +1,26 @@
+import {afterEach,expect,it,vi} from 'vitest';
+import {webcrypto} from 'node:crypto';
+import {emailFlows,EmailFlowError,emailValue,emailHash} from './emailFlows';
+import {smtpEmail} from './emailSmtp';
+afterEach(()=>vi.unstubAllGlobals());
+function setup(fail?:Error){
+ vi.stubGlobal('crypto',webcrypto);const tasks:Promise<void>[]=[];
+ const deps={rpc:vi.fn(async(name:string,_body:Record<string,unknown>)=>{void _body;return name==='slm_email_issue'?{id:webcrypto.randomUUID(),status:'created'}:name==='slm_email_recovery_begin'?webcrypto.randomUUID():null;}),lookup:vi.fn(async()=>[] as {user_id:string}[]),rate:vi.fn(async()=>undefined),updatePassword:vi.fn(async()=>{if(fail)throw fail;})};
+ const send=vi.fn(async(_to:string,_subject:string,_text:string)=>{void [_to,_subject,_text];});const flows=emailFlows({callbackUrl:'https://slm.example/email-callback.html',send,defer:t=>tasks.push(t)},deps);return {deps,send,flows,tasks};
+}
+it('verification sends a scoped random proof; SQL receives only its SHA256',async()=>{
+ const {flows,deps,send,tasks}=setup();await flows.issue(webcrypto.randomUUID(),webcrypto.randomUUID(),'verify','person@slm.test',webcrypto.randomUUID());await Promise.all(tasks);
+ const text=send.mock.calls[0] as unknown as [string,string,string];const link=new URL(text[2].match(/https:\/\/[^\s]+/)![0]);const token=new URLSearchParams(link.hash.slice(1)).get('token')!;
+ expect(token).toMatch(/^[a-f0-9]{64}$/);expect(deps.rpc.mock.calls[0][1]).toMatchObject({p_hash:await emailHash(token),p_kind:'verify'});expect(JSON.stringify(deps.rpc.mock.calls)).not.toContain(token);expect(link.search).toBe('');
+});
+it('SMTP failure never confirms the address and is recorded as failed',async()=>{const s=setup();s.send.mockRejectedValueOnce(new Error('Private error'));await s.flows.issue(webcrypto.randomUUID(),null,'verify','p@slm.test',webcrypto.randomUUID());await Promise.all(s.tasks);expect(s.deps.rpc).toHaveBeenLastCalledWith('slm_email_delivered',expect.objectContaining({p_ok:false}));});
+it('recovery acknowledges unknown and known email identically',async()=>{const s=setup();const unknown=await s.flows.recover({email:'p@slm.test'});s.deps.lookup.mockResolvedValueOnce([{user_id:webcrypto.randomUUID()}]);expect(await s.flows.recover({email:'p@slm.test'})).toEqual(unknown);await Promise.all(s.tasks);});
+it.each([new Error('unknown outcome'),new EmailFlowError(400,'password_invalid','definitive Auth rejection')])('recovery lease release depends on definitive Auth failure: %s',async error=>{const s=setup(error);await expect(s.flows.complete({id:webcrypto.randomUUID(),token:'1'.repeat(64),new_password:'TemporaryTest9!'})).rejects.toBe(error);expect(s.deps.rpc.mock.calls.some(c=>c[0]==='slm_email_recovery_release')).toBe(error instanceof EmailFlowError);expect(s.deps.rpc.mock.calls.some(c=>c[0]==='slm_email_recovery_finish')).toBe(false);});
+it('password is sent only to Auth, never an SQL RPC or ledger',async()=>{const s=setup();await s.flows.complete({id:webcrypto.randomUUID(),token:'2'.repeat(64),new_password:'TemporaryTest9!'});expect(s.deps.updatePassword).toHaveBeenCalledOnce();expect(JSON.stringify(s.deps.rpc.mock.calls)).not.toContain('TemporaryTest9!');expect(s.deps.rpc.mock.calls.map(c=>c[0])).toEqual(['slm_email_recovery_begin','slm_email_recovery_finish']);});
+it('callback rejects unknown fields and malformed proof before SQL',async()=>{const s=setup();await expect(s.flows.confirm({id:webcrypto.randomUUID(),token:'3'.repeat(64),user_id:webcrypto.randomUUID()})).rejects.toMatchObject({status:400});expect(s.deps.rpc).not.toHaveBeenCalled();});
+it('unconfigured recovery gives the same generic acknowledgement',async()=>{const s=setup();const f=emailFlows(undefined,s.deps);expect(await f.recover({email:'p@slm.test'})).toEqual({accepted:true});expect(s.deps.lookup).not.toHaveBeenCalled();});
+it('email normalization rejects header injection and oversize input',()=>{expect(emailValue(' Person@SLM.TEST ')).toBe('person@slm.test');expect(()=>emailValue('p@slm.test\r\nBcc: stolen@slm.test')).toThrow();expect(()=>emailValue('p'.repeat(255)+'@slm.test')).toThrow();for(const invalid of ['a,b@slm.test','Name<person@slm.test>','a..b@slm.test','p@-slm.test','p@slm.test;other@slm.test'])expect(()=>emailValue(invalid)).toThrow();});
+it('SMTP stays inactive by default and rejects insecure remote callback/ports',()=>{
+ expect(smtpEmail(()=>undefined,'https://backend.example',()=>{})).toBeUndefined();const config:Record<string,string>={SLM_ACCOUNT_EMAIL_ENABLED:'true',SMTP_HOST:'smtp.example.invalid',SMTP_FROM:'noreply@slm.test',SLM_EMAIL_CALLBACK_URL:'https://slm.example/email-callback.html',SMTP_PORT:'465'};
+ const get=(k:string)=>config[k];expect(smtpEmail(get,'https://backend.example',()=>{})).toBeDefined();config.SMTP_PORT='587';expect(()=>smtpEmail(get,'https://backend.example',()=>{})).toThrow();config.SMTP_PORT='465';config.SLM_EMAIL_CALLBACK_URL='http://slm.example/email-callback.html';expect(()=>smtpEmail(get,'https://backend.example',()=>{})).toThrow();
+});

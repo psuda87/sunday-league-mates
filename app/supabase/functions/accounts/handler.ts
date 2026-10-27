@@ -1,6 +1,8 @@
+import {emailFlows,emailValue,EmailFlowError} from './emailFlows.ts';
+import type {EmailTransport} from './emailFlows.ts';
 import { isPhoneIdentifier, normalizeLoginPhone, normalizePhoneUpdate } from '../_shared/phone.ts';
 import { PhotoError, profilePhoto, readAccountBody } from './profilePhotos.ts';
-export interface Environment { url: string; anon: string; service: string; origins: string[]; emailSignupEnabled?: boolean; accountFoundationEnabled?: boolean; accountModelEnabled?: boolean }
+export interface Environment { url: string; anon: string; service: string; origins: string[]; emailSignupEnabled?: boolean; accountFoundationEnabled?: boolean; accountModelEnabled?: boolean; email?:EmailTransport }
 type Row = Record<string, unknown>;
 class ApiError extends Error {
   constructor(public status: number, public code: string, message: string) { super(message); }
@@ -67,6 +69,25 @@ export function createHandler(env: Environment) {
     if (!(await rpc('rate', { p_key: hash, p_limit: limit, p_seconds: seconds })))
       throw new ApiError(429, 'rate_limited', 'Zbyt wiele prób. Spróbuj ponownie za minutę.');
   }
+  const emails=emailFlows(env.email,{
+    rate,
+    lookup:email=>db(`slm_identity_registry?email_login=eq.${encodeURIComponent(email)}&select=user_id`),
+    async rpc(name,body){
+      const r=await call('/rest/v1/rpc/'+name,'POST',body,undefined,true);
+      if(r.ok)return r.data;
+      if(r.data?.code==='23505')throw new EmailFlowError(409,'email_taken','Nie można użyć tego adresu.');
+      if(r.data?.message==='session_invalid')throw unauthorized();
+      if(r.data?.message==='recovery_busy')throw new EmailFlowError(409,'recovery_busy','Operacja trwa. Ponów za kilka minut tym samym linkiem.');
+      if(['link_invalid','email_not_available'].includes(r.data?.message))throw new EmailFlowError(410,'link_invalid','Link jest nieprawidłowy albo wygasł. Poproś o nowy.');
+      if(r.data?.message==='idempotency_conflict')throw new EmailFlowError(409,'idempotency_conflict','Odśwież formularz przed ponowieniem.');
+      throw new EmailFlowError(503,'mail_unavailable','Nie udało się potwierdzić operacji e-mail.');
+    },
+    async updatePassword(user,password){
+      const r=await call('/auth/v1/admin/users/'+user,'PUT',{password},undefined,true);
+      if(!r.ok)throw new EmailFlowError(r.status>=500?503:400,'password_not_confirmed','Nie potwierdzono zmiany hasła. Ponów tym samym linkiem.');
+      if(r.data?.id!==user)throw new EmailFlowError(503,'password_not_confirmed','Nie potwierdzono zmiany hasła.');
+    }
+  });
   async function state(id: string) {
     const rows = await db(`slm_account_security?user_id=eq.${id}`);
     if (rows.length !== 1) throw unauthorized();
@@ -126,7 +147,9 @@ export function createHandler(env: Environment) {
     const [a, profiles, players] = await Promise.all([alias(id), db(`slm_profiles?user_id=eq.${id}`), db(`slm_player_profiles?user_id=eq.${id}&select=jersey_number,nickname`)]);
     const p = profiles[0];
     if (!p) throw unauthorized();
-    return { user_id: id, jersey_number: players[0]?.jersey_number ?? null, login: a.login, phone: a.phone, email_account: a.email_account === true, full_name: p.full_name,
+    const emailState=env.accountModelEnabled?await db(`slm_identity_registry?user_id=eq.${id}&select=email_login`):[];
+    const pendingEmail=env.accountModelEnabled?await db(`slm_email_links?user_id=eq.${id}&kind=eq.verify&state=eq.pending&select=target_email,delivery,expires_at`):[];
+    return { ...(env.accountModelEnabled?{email_login:emailState[0]?.email_login??null,email_pending:pendingEmail[0]??null,email_enabled:emails.available}:{}),user_id: id, jersey_number: players[0]?.jersey_number ?? null, login: a.login, phone: a.phone, email_account: a.email_account === true, full_name: p.full_name,
       account_model:env.accountModelEnabled===true, nickname: players[0]?.nickname || (a.login.includes('@')?'Zawodnik':a.login), first_name: p.first_name??'',
       group_scope: await db(`slm_group_members?user_id=eq.${id}&select=group_id,share_full_name,share_first_name,slm_groups!inner(archived)&slm_groups.archived=eq.false`),
       display_as: p.display_as, display_name: p.display_as==='first_name'?(p.first_name?.trim()||players[0]?.nickname||'Zawodnik'):displayName(players[0]?.nickname||a.login, p.full_name, p.display_as) };
@@ -169,13 +192,21 @@ export function createHandler(env: Environment) {
       const action = field(body, 'action', 40);
       if(uploadRequest&&action!=='profile_photo_upload')throw new ApiError(400,'invalid_input','Nieprawidłowe żądanie.');
       await rate('global', 300);
-      if(action==='account_capabilities'){const enabled=!!env.accountModelEnabled&&await db('rpc/slm_model_ready','POST',{});return respond({account_model:enabled,self_registration:enabled,email_verification:false,email_recovery:false});}
+      if(action==='account_capabilities'){const enabled=!!env.accountModelEnabled&&await db('rpc/slm_model_ready','POST',{});return respond({account_model:enabled,self_registration:enabled,email_verification:enabled&&emails.available,email_recovery:enabled&&emails.available});}
       if(env.accountModelEnabled&&!await db('rpc/slm_model_ready','POST',{}))throw new ApiError(503,'model_inactive','Nowy model kont nie jest aktywny.');
+      if(['model_email_confirm','model_recovery_request','model_recovery_complete'].includes(action)){
+        if(!env.accountModelEnabled)throw new EmailFlowError(503,'model_inactive','Nowy model kont nie jest aktywny.');
+        if(action==='model_email_confirm')return respond(await emails.confirm(body));
+        if(action==='model_recovery_request')return respond(await emails.recover(body));
+        return respond(await emails.complete(body));
+      }
       if(action==='model_signup'){
         if(!env.accountModelEnabled)throw new ApiError(503,'model_inactive','Nowy model kont nie jest aktywny.');
         if(Object.keys(body).some(k=>!['action','nickname','password','request_id','request_secret','email','phone','full_name'].includes(k)))throw new ApiError(400,'invalid_input','Sprawdź dane rejestracji.');
-        // Never confirm a user's real email administratively. Mail delivery is NOT configured.
-        if(field(body,'email',254).trim())throw new ApiError(503,'mail_unconfigured','Dodanie e-maila czeka na potwierdzoną konfigurację wysyłki.');
+        // Never confirm a user's optional address administratively; only scoped delivered proof.
+        const personalEmail=field(body,'email',254).trim()?emailValue(body.email):'';
+        if(personalEmail&&!emails.available)throw new ApiError(503,'mail_unconfigured','Dodanie e-maila czeka na potwierdzoną konfigurację wysyłki.');
+        if(personalEmail&&(await db(`slm_identity_registry?email_login=eq.${encodeURIComponent(personalEmail)}&select=user_id`)).length)throw new ApiError(409,'signup_conflict','Nie można użyć tych danych. Zarejestruj się bez e-maila lub zaloguj się.');
         const nickname=normalizeLogin(field(body,'nickname',48)),pwd=password(body,'password',true);
         const requestId=field(body,'request_id',36),secret=field(body,'request_secret',64);
         if(!/^[0-9a-f-]{36}$/i.test(requestId)||! /^[0-9a-f]{64}$/i.test(secret))throw new ApiError(400,'invalid_input','Nieprawidłowe żądanie.');
@@ -183,7 +214,7 @@ export function createHandler(env: Environment) {
         const name=field(body,'full_name',100).trim();if(Array.from(name).some(c=>c.charCodeAt(0)<32||c==='<'||c==='>'))throw new ApiError(400,'invalid_input','Sprawdź dane rejestracji.');
         await rate('public-signup',30,86400); // Hard global resource budget; never trust spoofable IP headers.
         const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(secret)))).map(x=>x.toString(16).padStart(2,'0')).join('');
-        const job=await db('rpc/slm_model_signup_begin','POST',{p_request:requestId,p_secret_hash:hash,p_nickname:nickname,p_phone:phone,p_full_name:name});
+        const job=await db('rpc/slm_model_signup_begin','POST',{p_request:requestId,p_secret_hash:hash,p_nickname:nickname,p_phone:phone,p_full_name:name,p_email:personalEmail});
         let user=await db('rpc/slm_model_signup_user','POST',{p_request:requestId,p_secret_hash:hash});
         if(!user){
           // This is ONLY an internal random Auth address, never the optional user's email.
@@ -195,7 +226,8 @@ export function createHandler(env: Environment) {
         if(verified.id!==user)throw credentials();
         await db('rpc/slm_model_signup_finish','POST',{p_request:requestId,p_secret_hash:hash});
         const canonical=await db(`slm_player_profiles?user_id=eq.${user}&select=nickname`);
-        return respond({registered:true,user_id:user,nickname:canonical[0].nickname});
+        const emailStatus=personalEmail?await emails.issue(user,null,'verify',personalEmail,requestId,{request:requestId,hash}).catch(()=>({email_status:'unavailable'})):{email_status:'none'};
+        return respond({registered:true,user_id:user,nickname:canonical[0].nickname,...emailStatus});
       }
       if(env.accountModelEnabled&&['signup','resend_verification','recover_email'].includes(action))throw new ApiError(503,'mail_unconfigured','Weryfikacja i odzyskiwanie e-mail nie zostały uruchomione.');
       if (action === 'signup' || action === 'resend_verification' || action === 'recover_email') {
@@ -296,6 +328,13 @@ export function createHandler(env: Environment) {
       if (action === 'status') return respond({ must_change_password: ctx.must_change_password, role: ctx.role, user_id: ctx.id });
       if (ctx.must_change_password && action !== 'password')
         throw new ApiError(403, 'password_required', 'Najpierw zmień hasło tymczasowe.');
+      if(action==='model_email_request'){
+        if(!env.accountModelEnabled||!emails.available)throw new EmailFlowError(503,'mail_unconfigured','Obsługa e-maila nie jest skonfigurowana.');
+        if(Object.keys(body).some(k=>!['action','email','current_password','request_id'].includes(k)))throw new ApiError(400,'invalid_input','Sprawdź dane formularza.');
+        const email=emailValue(body.email);await rate('email-owner:'+ctx.id,8);await rate('mail-target:'+email,3,600);
+        await verifyPassword(ctx,password(body,'current_password'));
+        return respond(await emails.issue(ctx.id,ctx.sid,'verify',email,field(body,'request_id',36)));
+      }
       if(env.accountModelEnabled&&['identifiers','save_email_profile','save_premium_profile','save_profile','create_account','foundation_rename'].includes(action))throw new ApiError(426,'client_upgrade_required','Zaktualizuj aplikację, aby bezpiecznie zapisać dane konta.');
       if(action==='model_profile'){
         if(!env.accountModelEnabled)throw new ApiError(503,'model_inactive','Nowy model kont nie jest aktywny.');
@@ -624,7 +663,7 @@ export function createHandler(env: Environment) {
       }
       throw new ApiError(400, 'invalid_action', 'Nieznana operacja.');
     } catch (error) {
-      if (error instanceof ApiError || error instanceof PhotoError) return respond({ error: error.message, code: error.code }, error.status);
+      if (error instanceof ApiError || error instanceof PhotoError || error instanceof EmailFlowError) return respond({ error: error.message, code: error.code }, error.status);
       return respond({ error: 'Nie udało się wykonać operacji. Spróbuj ponownie.', code: 'server_error' }, 500);
     }
   };

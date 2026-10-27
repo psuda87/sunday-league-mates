@@ -16,9 +16,10 @@ NAME = 'supabase_auth_slm-account-candidate'
 args = argparse.ArgumentParser()
 args.add_argument('--auth-baseline', action='store_true')
 args.add_argument('--final', action='store_true', help='NEW isolated final replay project, never reset previous projects')
+args.add_argument('--email-regression',action='store_true',help='NEW email regression project, mail off')
 options = args.parse_args()
-PROJECT = 'slm-account-final' if options.final else 'slm-account-candidate'
-STACK = ROOT / ('.cache/account-model-final' if options.final else '.cache/account-model-stack')
+PROJECT = 'slm-email-regression' if options.email_regression else 'slm-account-final' if options.final else 'slm-account-candidate'
+STACK = ROOT / ('.cache/account-email-regression' if options.email_regression else '.cache/account-model-final' if options.final else '.cache/account-model-stack')
 NAME = 'supabase_auth_' + PROJECT
 assert subprocess.check_output(['git', 'branch', '--show-current'], cwd=ROOT, text=True).strip() == 'feat/account-model-foundation'
 host = os.environ.get('DOCKER_HOST') or subprocess.check_output(['docker', 'context', 'inspect', '--format', '{{.Endpoints.docker.Host}}'], text=True).strip()
@@ -29,7 +30,7 @@ if not options.auth_baseline:
         command = ['cmd', '/c', 'npx', '--yes', '--package=supabase@2.121.0', 'supabase', 'init', '--workdir', str(STACK)]
         subprocess.run(command, cwd=ROOT, check=True, capture_output=True)
     s = config.read_text(encoding='utf8')
-    s = re.sub(r'^project_id = .*$', f'project_id = "{PROJECT}"', s, flags=re.M).replace('5432', '5932' if options.final else '5832').replace('inspector_port = 8083', 'inspector_port = 8483' if options.final else 'inspector_port = 8383')
+    s = re.sub(r'^project_id = .*$', f'project_id = "{PROJECT}"', s, flags=re.M).replace('5432', '6132' if options.email_regression else '5932' if options.final else '5832').replace('inspector_port = 8083', 'inspector_port = 8783' if options.email_regression else 'inspector_port = 8483' if options.final else 'inspector_port = 8383')
     s = s.replace('minimum_password_length = 6', 'minimum_password_length = 8').replace('enable_confirmations = false', 'enable_confirmations = true')
     # CLI auth.email.enable_signup also selects the provider; global signup stays off.
     s = re.sub(r'(\[auth\][\s\S]*?\nenable_signup = )true', r'\g<1>false', s, count=1)

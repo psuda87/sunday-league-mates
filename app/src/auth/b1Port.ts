@@ -29,7 +29,7 @@ export function b1Port(manager:SessionManager,accountModel=false,request=account
    await translate(async()=>{result=await request('model_signup',{nickname:profile.nickname,email,password,phone:profile.phone,full_name:profile.fullName,request_id:signupAttempt!.id,request_secret:signupAttempt!.secret});});
    if(!result||!result.registered||typeof result.user_id!=='string'||typeof result.nickname!=='string')throw new AccountUiFailure('integration');
    await manager.signIn(result.nickname,password,result.user_id);signupAttempt=null;
-  }:unsupported,resendVerification:unsupported,requestPasswordReset:unsupported,
+  }:unsupported,resendVerification:unsupported,requestPasswordReset:accountModel?email=>translate(()=>request('model_recovery_request',{email})):unsupported,
   completeRedirect:unsupported,saveProfile:unsupported,
  };
 }
