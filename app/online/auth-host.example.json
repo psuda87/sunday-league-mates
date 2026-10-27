@@ -1,0 +1,9 @@
+{
+  "enabled": false,
+  "projectRef": "",
+  "apiOrigin": "https://api.example.invalid",
+  "appOrigin": "https://app.example.invalid",
+  "authOrigin": "https://auth.example.invalid",
+  "siteKey": "",
+  "parentOrigins": ["https://app.example.invalid", "https://localhost", "capacitor://localhost"]
+}

@@ -1,0 +1,10 @@
+import {createRoot} from 'react-dom/client';
+import {IonApp,setupIonicReact} from '@ionic/react';
+import '@ionic/react/css/core.css';import '@ionic/react/css/normalize.css';import '@ionic/react/css/structure.css';import '@ionic/react/css/typography.css';
+import '../src/theme/variables.css';import '../src/pages/Accounts.css';
+import EmailCallback from '../src/auth/EmailCallback';
+import {readEmailCallback} from '../src/auth/emailProof';
+import {initializeTheme} from '../src/ui/theme';
+const proof=readEmailCallback(new URL(location.href));history.replaceState(null,'',location.pathname);setupIonicReact();initializeTheme();
+const config=JSON.parse(import.meta.env.VITE_SLM_AUTH_PUBLIC_CONFIG);
+createRoot(document.getElementById('root')!).render(<IonApp><main className="slm-accounts"><EmailCallback initial={config.enabled?proof:null} appHref={config.appOrigin}/></main></IonApp>);
