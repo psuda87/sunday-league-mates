@@ -2,7 +2,9 @@
 import assert from 'node:assert/strict';
 import {execFileSync,spawnSync} from 'node:child_process';
 import {createHash,randomBytes,randomUUID} from 'node:crypto';
-assert.equal(execFileSync('git',['branch','--show-current'],{encoding:'utf8'}).trim(),'feat/account-model-foundation');
+const branch=execFileSync('git',['branch','--show-current'],{encoding:'utf8'}).trim();
+assert(branch==='feat/account-model-foundation'||branch==='chore/online-readiness'&&process.env.SLM_ONLINE_LOCAL==='1','Only foundation or explicit isolated readiness tests allowed');
+assert(process.env.SLM_TEST_GATEWAY!=='1'||process.env.SLM_ONLINE_LOCAL==='1','Gateway fixture requires the new readiness project');
 const host=process.env.DOCKER_HOST??execFileSync('docker',['context','inspect','--format','{{.Endpoints.docker.Host}}'],{encoding:'utf8'}).trim();assert(/^(npipe|unix):/.test(host));
 const readiness=process.env.SLM_ONLINE_LOCAL==='1',project=readiness?'slm-online-readiness':'slm-account-mail',stack=readiness?'.cache/online-readiness-stack':'.cache/account-email-stack',apiPort=readiness?62321:60321,mailPort=readiness?62324:60324;
 let raw;try{raw=execFileSync('cmd',['/c','npx','--yes','--package=supabase@2.121.0','supabase','status','--workdir',stack,'-o','json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']});}catch{throw Error('Local stack status unavailable; captured keys are never logged');}

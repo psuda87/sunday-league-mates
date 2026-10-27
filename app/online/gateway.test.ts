@@ -1,0 +1,11 @@
+import {afterEach,expect,it,vi} from 'vitest';
+import {webcrypto} from 'node:crypto';
+import {gateway} from './gateway';
+import {onlineGuard} from '../supabase/functions/accounts/onlineProtection';
+afterEach(()=>vi.unstubAllGlobals());
+const config={proxySecret:'a'.repeat(64),turnstileSecret:'fixture-private-key',hostnames:['auth.slm.test']};
+const body={action:'model_signup',request_id:'11111111-1111-4111-8111-111111111111',challenge_token:'fixture-proof'};
+const gatewayEnv={SLM_GATEWAY_ENABLED:'true',SLM_PROXY_SECRET:config.proxySecret,ACCOUNTS_URL:'https://abcdefghijklmnopqrst.supabase.co/functions/v1/accounts',ALLOWED_ORIGINS:'https://app.slm.test'};
+it('gateway refuses a caller-controlled CF header outside the real runtime',async()=>{const r=await gateway(new Request('https://gateway.test/accounts',{method:'POST',headers:{'Content-Type':'application/json','cf-connecting-ip':'192.0.2.1'},body:JSON.stringify(body)}),gatewayEnv);expect(r.status).toBe(403);});
+it('gateway strips forged proxy headers and emits a valid bounded proof',async()=>{vi.stubGlobal('crypto',webcrypto);const request=Object.assign(new Request('https://gateway.test/accounts',{method:'POST',headers:{'Content-Type':'application/json','cf-connecting-ip':'192.0.2.1','x-slm-client-ip':'198.51.100.99','x-slm-proxy-signature':'forged','x-forwarded-for':'198.51.100.99'},body:JSON.stringify(body)}),{cf:{}});const fetcher=vi.fn(async(url:RequestInfo|URL,input?:RequestInit)=>{const outgoing=new Request(url,input);expect(outgoing.headers.has('x-forwarded-for')).toBe(false);expect(outgoing.headers.get('x-slm-client-ip')).toBe('192.0.2.1');await onlineGuard(config).ingress(outgoing,body);return new Response('{}');});expect((await gateway(request,gatewayEnv,fetcher)).status).toBe(200);});
+it('gateway stays disabled and rejects foreign origins or unexpected targets',async()=>{expect((await gateway(new Request('https://g.test/accounts'),{})).status).toBe(503);expect((await gateway(new Request('https://g.test/accounts',{headers:{Origin:'https://evil.test'}}),gatewayEnv)).status).toBe(403);expect((await gateway(new Request('https://g.test/arbitrary'),gatewayEnv)).status).toBe(404);});

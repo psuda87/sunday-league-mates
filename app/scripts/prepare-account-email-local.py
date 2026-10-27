@@ -22,7 +22,8 @@ options = args.parse_args()
 PROJECT='slm-online-readiness' if options.readiness else 'slm-account-mail'
 STACK=ROOT/('.cache/online-readiness-stack' if options.readiness else '.cache/account-email-stack')
 NAME='supabase_auth_'+PROJECT
-assert subprocess.check_output(['git', 'branch', '--show-current'], cwd=ROOT, text=True).strip() == 'feat/account-model-foundation'
+branch = subprocess.check_output(['git', 'branch', '--show-current'], cwd=ROOT, text=True).strip()
+assert branch == 'feat/account-model-foundation' or (branch == 'chore/online-readiness' and options.readiness), 'Only foundation or explicit isolated readiness preparation allowed'
 host = os.environ.get('DOCKER_HOST') or subprocess.check_output(['docker', 'context', 'inspect', '--format', '{{.Endpoints.docker.Host}}'], text=True).strip()
 assert host.startswith(('npipe://', 'unix://'))
 if not options.auth_baseline:

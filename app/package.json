@@ -15,7 +15,9 @@
     "build:premium-local": "tsc --noEmit && vite build --config vite.b1.config.ts",
     "build:live-local": "tsc --noEmit && vite build --config vite.live-local.config.ts",
     "verify:consolidation": "node scripts/verify-consolidation.mjs && node scripts/verify-frozen-ui.mjs",
-    "check:edge": "tsc --noEmit --project tsconfig.online.json"
+    "check:edge": "tsc --noEmit --project tsconfig.online.json",
+    "build:auth-host:example": "node scripts/build-auth-host.mjs --example",
+    "build:online-candidate:example": "node scripts/build-auth-host.mjs --example --candidate"
   },
   "dependencies": {
     "@aparajita/capacitor-secure-storage": "8.0.1",

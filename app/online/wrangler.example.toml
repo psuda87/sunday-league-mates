@@ -1,0 +1,13 @@
+# Template ONLY. No deploy command or account is configured.
+name = "slm-auth-gateway"
+main = "gateway.ts"
+compatibility_date = "2026-10-27"
+workers_dev = false
+preview_urls = false
+[observability]
+enabled = false
+[vars]
+SLM_GATEWAY_ENABLED = "false"
+ACCOUNTS_URL = "https://replace-project-ref.supabase.co/functions/v1/accounts"
+ALLOWED_ORIGINS = "https://app.example.invalid,https://auth.example.invalid,https://localhost,capacitor://localhost"
+# Set SLM_PROXY_SECRET through provider secrets, never here. Free plan ONLY.

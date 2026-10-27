@@ -1,0 +1,14 @@
+import {readFileSync,writeFileSync} from 'node:fs';
+import {resolve} from 'node:path';
+import {build} from 'vite';
+import react from '@vitejs/plugin-react';
+import {authHostConfig,authHostHeaders,applicationCsp} from './auth-host-config.mjs';
+const candidate=process.argv.includes('--candidate'),example=process.argv.includes('--example'),arg=process.argv.indexOf('--config');
+if(!example&&arg<0)throw Error('Provide --config path to non-secret, owner-approved config; no deployment is performed');
+const config=authHostConfig(JSON.parse(readFileSync(example?'online/auth-host.example.json':process.argv[arg+1],'utf8')),{example});
+const root=resolve(candidate?'online/candidate':'auth-host'),out=resolve(candidate?'dist-online-candidate':'dist-auth-host');
+await build({configFile:false,root,envDir:false,envPrefix:[],publicDir:candidate?resolve('public'):false,plugins:[react(),{name:'candidate-csp',transformIndexHtml(html){return candidate?html.replace('<head>','<head><meta http-equiv="Content-Security-Policy" content="'+applicationCsp(config).replace(/frame-ancestors[^;]*/,'')+'">'):html;}}],define:{'import.meta.env.VITE_SLM_FUNCTION_URL':JSON.stringify(config.apiOrigin+'/accounts'),'import.meta.env.VITE_SLM_AUTH_PUBLIC_CONFIG':JSON.stringify(JSON.stringify(config))},build:{outDir:out,emptyOutDir:true,sourcemap:false,rollupOptions:{input:candidate?resolve(root,'index.html'):{callback:resolve(root,'email-callback.html'),challenge:resolve(root,'signup-challenge.html')}}}});
+writeFileSync(out+'/_headers',candidate?'/*\n  Cache-Control: no-store\n  Referrer-Policy: no-referrer\n  X-Content-Type-Options: nosniff\n  Content-Security-Policy: '+applicationCsp(config)+'\n':authHostHeaders(config));
+writeFileSync(out+'/404.html','<!doctype html><html lang="pl"><meta charset="utf-8"><meta name="referrer" content="no-referrer"><title>SLM</title><p>Nieprawidłowy adres.</p></html>');
+if(candidate)writeFileSync(out+'/build-mode.json',JSON.stringify({variant:'online-auth-candidate',containsDemo:true,publishApproved:false}));
+console.log(example?'PASS draft build: Auth disabled; NOT publishable':'PASS configured controlled-test build; deployment/DNS require separate approval');
