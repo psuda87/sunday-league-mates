@@ -79,3 +79,5 @@ Lokalne backend/callback sÄ… podstawÄ… do osobnego przygotowania kontrolow
 PrzyszÅ‚y odbiÃ³r: signup bez e-maila â†’ dodanie adresu â†’ odmowa przed linkiem â†’ wiadomoÅ›Ä‡/callback â†’ login do tego samego profilu â†’ zmiana adresu â†’ expired/resend â†’ recovery i odrzucenie starego hasÅ‚a/sesji â†’ reset administratora bez e-maila â†’ restart/Light/Dark/Wstecz. WklejaÄ‡ PASS/FAIL i komunikat, bez haseÅ‚/tokenÃ³w/linkÃ³w.
 
 Raport chronologiczny: `docs/ODPOWIEDZI_CODEX.txt`. PR18 Draft, bez merge/deploy.
+
+2026-10-27 17:56 Europe/Warsaw — Kod **9ab903f331bf1785fc9f2c5cc0fa6a037466d423** wypchnięty; PR18 open/Draft/mergeable, bez merge. Obie nowe aktywacje wyłączone i odczytane SQL+HTTP. Końcowy raport i decyzje zapisane w docs/ODPOWIEDZI_CODEX.txt.
