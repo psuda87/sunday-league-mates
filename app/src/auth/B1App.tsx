@@ -15,7 +15,7 @@ import { useB1Lifecycle } from './useB1Lifecycle';
 import '../demo/palettes.css';
 import '../pages/Accounts.css';
 
-export default function B1App({manager:provided,accountModel=false}:{manager?:SessionManager;accountModel?:boolean}){
+export default function B1App({manager:provided,accountModel=false,signupChallenge}:{manager?:SessionManager;accountModel?:boolean;signupChallenge?:(requestId:string)=>Promise<string>}){
  const [manager]=useState(()=>provided??new SessionManager(tokenStore,accountRequest));
  const auth=useSyncExternalStore(manager.subscribe,manager.getSnapshot);
  const [picker,setPicker]=useState<{owner:string;done:boolean}|null>(null);
@@ -36,7 +36,7 @@ export default function B1App({manager:provided,accountModel=false}:{manager?:Se
   if(picker&&(auth.phase!=='checking'&&(auth.phase!=='ready'||forced||auth.session?.user_id!==picker.owner)||ready&&picker.done))setPicker(null);
  },[auth.phase,auth.session,forced,ready,picker]);
  const view:AccountView|null=pending??(auth.phase==='checking'?'checking':auth.phase==='unavailable'||auth.phase==='storage_error'?'network':forced?'password':ready?requested:requested==='login'?'login':auth.message||requested==='expired'?'expired':requested==='register'||requested==='forgot'?requested:'login');
- const base=useMemo(()=>b1Port(manager,accountModel),[manager,accountModel]);
+ const base=useMemo(()=>b1Port(manager,accountModel,accountRequest,signupChallenge),[manager,accountModel,signupChallenge]);
  const port:AccountUiPort={...base,
   async signUp(profile,email,password){setPending('login');try{await base.signUp(profile,email,password);setRequested(null);}finally{setPending(null);}},
   async signIn(identifier,password){setPending('login');try{await base.signIn(identifier,password);setRequested(null);}finally{setPending(null);}},

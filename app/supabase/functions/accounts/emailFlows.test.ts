@@ -1,7 +1,7 @@
 import {afterEach,expect,it,vi} from 'vitest';
 import {webcrypto} from 'node:crypto';
 import {emailFlows,EmailFlowError,emailValue,emailHash} from './emailFlows';
-import {smtpEmail} from './emailSmtp';
+import {smtpEmail,smtpConfiguration} from './emailSmtp';
 afterEach(()=>vi.unstubAllGlobals());
 function setup(fail?:Error){
  vi.stubGlobal('crypto',webcrypto);const tasks:Promise<void>[]=[];
@@ -10,6 +10,7 @@ function setup(fail?:Error){
 }
 it('verification sends a scoped random proof; SQL receives only its SHA256',async()=>{
  const {flows,deps,send,tasks}=setup();await flows.issue(webcrypto.randomUUID(),webcrypto.randomUUID(),'verify','person@slm.test',webcrypto.randomUUID());await Promise.all(tasks);
+ expect(send).toHaveBeenCalledWith('person@slm.test','SLM — potwierdź adres e-mail',expect.any(String));
  const text=send.mock.calls[0] as unknown as [string,string,string];const link=new URL(text[2].match(/https:\/\/[^\s]+/)![0]);const token=new URLSearchParams(link.hash.slice(1)).get('token')!;
  expect(token).toMatch(/^[a-f0-9]{64}$/);expect(deps.rpc.mock.calls[0][1]).toMatchObject({p_hash:await emailHash(token),p_kind:'verify'});expect(JSON.stringify(deps.rpc.mock.calls)).not.toContain(token);expect(link.search).toBe('');
 });
@@ -21,6 +22,9 @@ it('callback rejects unknown fields and malformed proof before SQL',async()=>{co
 it('unconfigured recovery gives the same generic acknowledgement',async()=>{const s=setup();const f=emailFlows(undefined,s.deps);expect(await f.recover({email:'p@slm.test'})).toEqual({accepted:true});expect(s.deps.lookup).not.toHaveBeenCalled();});
 it('email normalization rejects header injection and oversize input',()=>{expect(emailValue(' Person@SLM.TEST ')).toBe('person@slm.test');expect(()=>emailValue('p@slm.test\r\nBcc: stolen@slm.test')).toThrow();expect(()=>emailValue('p'.repeat(255)+'@slm.test')).toThrow();for(const invalid of ['a,b@slm.test','Name<person@slm.test>','a..b@slm.test','p@-slm.test','p@slm.test;other@slm.test'])expect(()=>emailValue(invalid)).toThrow();});
 it('SMTP stays inactive by default and rejects insecure remote callback/ports',()=>{
- expect(smtpEmail(()=>undefined,'https://backend.example',()=>{})).toBeUndefined();const config:Record<string,string>={SLM_ACCOUNT_EMAIL_ENABLED:'true',SMTP_HOST:'smtp.example.invalid',SMTP_FROM:'noreply@slm.test',SLM_EMAIL_CALLBACK_URL:'https://slm.example/email-callback.html',SMTP_PORT:'465'};
- const get=(k:string)=>config[k];expect(smtpEmail(get,'https://backend.example',()=>{})).toBeDefined();config.SMTP_PORT='587';expect(()=>smtpEmail(get,'https://backend.example',()=>{})).toThrow();config.SMTP_PORT='465';config.SLM_EMAIL_CALLBACK_URL='http://slm.example/email-callback.html';expect(()=>smtpEmail(get,'https://backend.example',()=>{})).toThrow();
+ expect(smtpEmail(()=>undefined,'https://backend.example',()=>{})).toBeUndefined();const config:Record<string,string>={SLM_ACCOUNT_EMAIL_ENABLED:'true',SMTP_HOST:'smtp.example.com',SMTP_USER:'fixture-user',SMTP_PASSWORD:'fixture-password',SMTP_FROM:'noreply@slm.test',SLM_EMAIL_CALLBACK_URL:'https://slm.example/email-callback.html',SMTP_PORT:'465'};
+ const get=(k:string)=>config[k];expect(smtpEmail(get,'https://backend.example',()=>{})).toBeDefined();config.SMTP_PORT='587';expect(smtpEmail(get,'https://backend.example',()=>{})).toBeUndefined();config.SMTP_PORT='465';config.SLM_EMAIL_CALLBACK_URL='http://slm.example/email-callback.html';expect(smtpEmail(get,'https://backend.example',()=>{})).toBeUndefined();
 });
+
+it.each(['SMTP_USER','SMTP_PASSWORD','SMTP_HOST','SMTP_FROM','SLM_EMAIL_CALLBACK_URL'])('missing %s disables SMTP without crashing Auth',field=>{const c:Record<string,string>={SLM_ACCOUNT_EMAIL_ENABLED:'true',SMTP_HOST:'smtp.example.com',SMTP_FROM:'noreply@slm.test',SMTP_USER:'fixture',SMTP_PASSWORD:'fixture',SLM_EMAIL_CALLBACK_URL:'https://auth.example.com/email-callback.html'};delete c[field];expect(smtpConfiguration(k=>c[k],'https://backend.example.com')).toBeUndefined();});
+it('callback URL cannot contain credentials, query, wildcard or an arbitrary path',()=>{for(const url of ['https://user:pass@auth.example.com/email-callback.html','https://auth.example.com/email-callback.html?redirect=evil','https://auth.example.com/other.html']){const c:Record<string,string>={SLM_ACCOUNT_EMAIL_ENABLED:'true',SMTP_HOST:'smtp.example.com',SMTP_FROM:'noreply@slm.test',SMTP_USER:'fixture',SMTP_PASSWORD:'fixture',SLM_EMAIL_CALLBACK_URL:url};expect(smtpConfiguration(k=>c[k],'https://backend.example.com')).toBeUndefined();}});

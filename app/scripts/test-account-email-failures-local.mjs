@@ -2,15 +2,15 @@
 import assert from 'node:assert/strict';
 import {execFileSync} from 'node:child_process';
 import {randomUUID} from 'node:crypto';
-import {check,signup,mail,proof,yes,account,rpc,request,addr,password,tag,count} from './account-email-test-support.mjs';
+import {project,check,signup,mail,proof,yes,account,rpc,request,addr,password,tag,count} from './account-email-test-support.mjs';
 const a=await signup('Fault_'+tag),email=addr('failure');
 const send=()=>yes(a,'model_email_request',{email,current_password:a.password,request_id:randomUUID()});
-const c=JSON.parse(execFileSync('docker',['inspect','supabase_inbucket_slm-account-mail'],{encoding:'utf8'}))[0];assert.equal(c.Config.Labels['com.supabase.cli.project'],'slm-account-mail');
+const c=JSON.parse(execFileSync('docker',['inspect','supabase_inbucket_'+project],{encoding:'utf8'}))[0];assert.equal(c.Config.Labels['com.supabase.cli.project'],project);
 try{
- execFileSync('docker',['pause','supabase_inbucket_slm-account-mail'],{stdio:'ignore'});await send();let failed=false;
+ execFileSync('docker',['pause','supabase_inbucket_'+project],{stdio:'ignore'});await send();let failed=false;
  for(let n=0;n<50;n++){const p=await yes(a,'profile');if(p.email_pending?.delivery==='failed'){failed=true;break;}await new Promise(r=>setTimeout(r,500));}
  check(failed,'SMTP timeout exposes private failed delivery state');check((await yes(a,'profile')).email_login===null,'failed SMTP cannot activate login alias');
-}finally{execFileSync('docker',['unpause','supabase_inbucket_slm-account-mail'],{stdio:'ignore'});}
+}finally{execFileSync('docker',['unpause','supabase_inbucket_'+project],{stdio:'ignore'});}
 await send();let m=await mail(email);await yes(null,'model_email_confirm',proof(m.link));check((await yes(null,'login',{identifier:email,password:a.password})).user_id===a.id,'resend after SMTP failure restores real verified login');
 await yes(null,'model_recovery_request',{email});let reset=await mail(email,new Set([m.id]));const next1=password(),next2=password();
 const pair=await Promise.all([account(null,'model_recovery_complete',{...proof(reset.link),new_password:next1}),account(null,'model_recovery_complete',{...proof(reset.link),new_password:next2})]);

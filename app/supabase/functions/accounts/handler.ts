@@ -1,8 +1,10 @@
+import {onlineGuard,OnlineAuthError} from './onlineProtection.ts';
+import type {OnlineProtection} from './onlineProtection.ts';
 import {emailFlows,emailValue,EmailFlowError} from './emailFlows.ts';
 import type {EmailTransport} from './emailFlows.ts';
 import { isPhoneIdentifier, normalizeLoginPhone, normalizePhoneUpdate } from '../_shared/phone.ts';
 import { PhotoError, profilePhoto, readAccountBody } from './profilePhotos.ts';
-export interface Environment { url: string; anon: string; service: string; origins: string[]; emailSignupEnabled?: boolean; accountFoundationEnabled?: boolean; accountModelEnabled?: boolean; email?:EmailTransport }
+export interface Environment { url: string; anon: string; service: string; origins: string[]; emailSignupEnabled?: boolean; accountFoundationEnabled?: boolean; accountModelEnabled?: boolean; email?:EmailTransport; onlineRequired?:boolean; online?:OnlineProtection }
 type Row = Record<string, unknown>;
 class ApiError extends Error {
   constructor(public status: number, public code: string, message: string) { super(message); }
@@ -38,6 +40,7 @@ export function displayName(login: string, fullName: string, mode: string) {
 }
 
 export function createHandler(env: Environment) {
+  const protection=onlineGuard(env.online);
   const credentials=()=>new ApiError(401,'invalid_credentials',env.accountModelEnabled?'Nieprawidłowy pseudonim, e-mail lub hasło.':'Nieprawidłowy login, numer telefonu lub hasło.');
   async function call(path: string, method = 'GET', body?: unknown, token?: string, admin = false) {
     const headers: Record<string, string> = { apikey: admin ? env.service : env.anon,
@@ -175,7 +178,7 @@ export function createHandler(env: Environment) {
     try {
       const uploadRequest=new URL(request.url).searchParams.get('photo')==='upload';
       let uploadContext:Awaited<ReturnType<typeof context>>|undefined;
-      if(uploadRequest) {
+      if(uploadRequest&&!env.onlineRequired) {
         const authorization=request.headers.get('authorization')??'';
         if(!authorization.startsWith('Bearer '))throw unauthorized();
         uploadContext=await context(authorization.slice(7));
@@ -191,20 +194,24 @@ export function createHandler(env: Environment) {
       const body = parsed as Row;
       const action = field(body, 'action', 40);
       if(uploadRequest&&action!=='profile_photo_upload')throw new ApiError(400,'invalid_input','Nieprawidłowe żądanie.');
-      await rate('global', 300);
-      if(action==='account_capabilities'){const enabled=!!env.accountModelEnabled&&await db('rpc/slm_model_ready','POST',{});return respond({account_model:enabled,self_registration:enabled,email_verification:enabled&&emails.available,email_recovery:enabled&&emails.available});}
+      const ingress=env.onlineRequired?await protection.ingress(request,body):null;
+      await rate(ingress?'online:'+ingress.subject:'global',ingress?120:300);
+      if(uploadRequest&&ingress){const authorization=request.headers.get('authorization')??'';if(!authorization.startsWith('Bearer '))throw unauthorized();uploadContext=await context(authorization.slice(7));if(uploadContext.must_change_password)throw new ApiError(403,'password_required','Najpierw zmień hasło tymczasowe.');await rate('photo:'+uploadContext.id,10);}
+      if(action==='account_capabilities'){const enabled=!!env.accountModelEnabled&&await db('rpc/slm_model_ready','POST',{});return respond({account_model:enabled,self_registration:enabled&&(!env.onlineRequired||!!env.online),email_verification:enabled&&emails.available,email_recovery:enabled&&emails.available});}
       if(env.accountModelEnabled&&!await db('rpc/slm_model_ready','POST',{}))throw new ApiError(503,'model_inactive','Nowy model kont nie jest aktywny.');
       if(['model_email_confirm','model_recovery_request','model_recovery_complete'].includes(action)){
         if(!env.accountModelEnabled)throw new EmailFlowError(503,'model_inactive','Nowy model kont nie jest aktywny.');
         if(action==='model_email_confirm')return respond(await emails.confirm(body));
-        if(action==='model_recovery_request')return respond(await emails.recover(body));
+        if(action==='model_recovery_request')return respond(await emails.recover(body,ingress?.subject));
         return respond(await emails.complete(body));
       }
       if(action==='model_signup'){
         if(!env.accountModelEnabled)throw new ApiError(503,'model_inactive','Nowy model kont nie jest aktywny.');
-        if(Object.keys(body).some(k=>!['action','nickname','password','request_id','request_secret','email','phone','full_name'].includes(k)))throw new ApiError(400,'invalid_input','Sprawdź dane rejestracji.');
+        if(Object.keys(body).some(k=>!['action','nickname','password','request_id','request_secret','email','phone','full_name','challenge_token'].includes(k)))throw new ApiError(400,'invalid_input','Sprawdź dane rejestracji.');
+        if(ingress){try{await protection.challenge(body);}catch(error){await db('rpc/slm_online_metric','POST',{p_metric:'challenge_rejected'}).catch(()=>undefined);throw error;}}
         // Never confirm a user's optional address administratively; only scoped delivered proof.
         const personalEmail=field(body,'email',254).trim()?emailValue(body.email):'';
+        if(personalEmail&&ingress)await rate('mail-net-day:'+ingress.subject,20,86400);
         if(personalEmail&&!emails.available)throw new ApiError(503,'mail_unconfigured','Dodanie e-maila czeka na potwierdzoną konfigurację wysyłki.');
         if(personalEmail&&(await db(`slm_identity_registry?email_login=eq.${encodeURIComponent(personalEmail)}&select=user_id`)).length)throw new ApiError(409,'signup_conflict','Nie można użyć tych danych. Zarejestruj się bez e-maila lub zaloguj się.');
         const nickname=normalizeLogin(field(body,'nickname',48)),pwd=password(body,'password',true);
@@ -212,8 +219,9 @@ export function createHandler(env: Environment) {
         if(!/^[0-9a-f-]{36}$/i.test(requestId)||! /^[0-9a-f]{64}$/i.test(secret))throw new ApiError(400,'invalid_input','Nieprawidłowe żądanie.');
         const phone=field(body,'phone',32).trim()?normalizePhone(field(body,'phone',32)):'';
         const name=field(body,'full_name',100).trim();if(Array.from(name).some(c=>c.charCodeAt(0)<32||c==='<'||c==='>'))throw new ApiError(400,'invalid_input','Sprawdź dane rejestracji.');
-        await rate('public-signup',30,86400); // Hard global resource budget; never trust spoofable IP headers.
+        if(!ingress)await rate('public-signup',30,86400); // Hard global resource budget; never trust spoofable IP headers.
         const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(secret)))).map(x=>x.toString(16).padStart(2,'0')).join('');
+        if(ingress&&!await db('rpc/slm_signup_admit','POST',{p_request:requestId,p_capability:hash,p_subject:ingress.subject}))throw new ApiError(429,'rate_limited','Zbyt wiele prób. Spróbuj później.');
         const job=await db('rpc/slm_model_signup_begin','POST',{p_request:requestId,p_secret_hash:hash,p_nickname:nickname,p_phone:phone,p_full_name:name,p_email:personalEmail});
         let user=await db('rpc/slm_model_signup_user','POST',{p_request:requestId,p_secret_hash:hash});
         if(!user){
@@ -331,6 +339,7 @@ export function createHandler(env: Environment) {
       if(action==='model_email_request'){
         if(!env.accountModelEnabled||!emails.available)throw new EmailFlowError(503,'mail_unconfigured','Obsługa e-maila nie jest skonfigurowana.');
         if(Object.keys(body).some(k=>!['action','email','current_password','request_id'].includes(k)))throw new ApiError(400,'invalid_input','Sprawdź dane formularza.');
+        if(ingress){await rate('email-owner-day:'+ctx.id,10,86400);await rate('mail-net-day:'+ingress.subject,20,86400);}
         const email=emailValue(body.email);await rate('email-owner:'+ctx.id,8);await rate('mail-target:'+email,3,600);
         await verifyPassword(ctx,password(body,'current_password'));
         return respond(await emails.issue(ctx.id,ctx.sid,'verify',email,field(body,'request_id',36)));
@@ -663,7 +672,7 @@ export function createHandler(env: Environment) {
       }
       throw new ApiError(400, 'invalid_action', 'Nieznana operacja.');
     } catch (error) {
-      if (error instanceof ApiError || error instanceof PhotoError || error instanceof EmailFlowError) return respond({ error: error.message, code: error.code }, error.status);
+      if (error instanceof ApiError || error instanceof PhotoError || error instanceof EmailFlowError || error instanceof OnlineAuthError) return respond({ error: error.message, code: error.code }, error.status);
       return respond({ error: 'Nie udało się wykonać operacji. Spróbuj ponownie.', code: 'server_error' }, 500);
     }
   };

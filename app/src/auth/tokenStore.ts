@@ -19,12 +19,17 @@ async function nativeSetup() {
   await setup;
 }
 const storageFailure = () => new AccountError('Nie można odczytać lub zapisać sesji na tym urządzeniu. Spróbuj ponownie.', 'storage_error');
-export const tokenStore: TokenStore = {
+export function createProjectTokenStore(projectRef:string):TokenStore {
+ if(!/^[a-z]{20}$/.test(projectRef))throw new Error('Invalid project ref');
+ const webKey='slm.auth.'+projectRef+'.refresh.v1';
+ // Preserve the existing global plugin prefix; distinct per-project keys avoid races.
+ const nativeKey=projectRef==='hjtcyybkxebvdropchac'?'refresh.v1':'project.'+projectRef+'.refresh.v1';
+ return {
   async read() {
     try {
-      if (!Capacitor.isNativePlatform()) return window.localStorage.getItem(WEB_TOKEN_KEY);
+      if (!Capacitor.isNativePlatform()) return window.localStorage.getItem(webKey);
       await nativeSetup();
-      const value = await SecureStorage.get('refresh.v1', false, false);
+      const value = await SecureStorage.get(nativeKey, false, false);
       if (value === null || value === '') return null;
       if (typeof value !== 'string') throw new Error();
       return value;
@@ -32,16 +37,18 @@ export const tokenStore: TokenStore = {
   },
   async write(value) {
     try {
-      if (!Capacitor.isNativePlatform()) { window.localStorage.setItem(WEB_TOKEN_KEY, value); return; }
+      if (!Capacitor.isNativePlatform()) { window.localStorage.setItem(webKey, value); return; }
       await nativeSetup();
-      await SecureStorage.set('refresh.v1', value, false, false, KeychainAccess.whenUnlockedThisDeviceOnly);
+      await SecureStorage.set(nativeKey, value, false, false, KeychainAccess.whenUnlockedThisDeviceOnly);
     } catch { throw storageFailure(); }
   },
   async clear() {
     try {
-      if (!Capacitor.isNativePlatform()) { window.localStorage.removeItem(WEB_TOKEN_KEY); return; }
+      if (!Capacitor.isNativePlatform()) { window.localStorage.removeItem(webKey); return; }
       await nativeSetup();
-      await SecureStorage.remove('refresh.v1', false);
+      await SecureStorage.remove(nativeKey, false);
     } catch { throw storageFailure(); }
   },
 };
+}
+export const tokenStore:TokenStore=createProjectTokenStore('hjtcyybkxebvdropchac');

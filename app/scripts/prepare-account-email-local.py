@@ -15,7 +15,13 @@ STACK = ROOT / '.cache/account-email-stack'
 NAME = 'supabase_auth_slm-account-mail'
 args = argparse.ArgumentParser()
 args.add_argument('--auth-baseline', action='store_true')
+args.add_argument('--readiness',action='store_true')
+args.add_argument('--mail',action='store_true')
+args.add_argument('--protection',action='store_true')
 options = args.parse_args()
+PROJECT='slm-online-readiness' if options.readiness else 'slm-account-mail'
+STACK=ROOT/('.cache/online-readiness-stack' if options.readiness else '.cache/account-email-stack')
+NAME='supabase_auth_'+PROJECT
 assert subprocess.check_output(['git', 'branch', '--show-current'], cwd=ROOT, text=True).strip() == 'feat/account-model-foundation'
 host = os.environ.get('DOCKER_HOST') or subprocess.check_output(['docker', 'context', 'inspect', '--format', '{{.Endpoints.docker.Host}}'], text=True).strip()
 assert host.startswith(('npipe://', 'unix://'))
@@ -25,7 +31,7 @@ if not options.auth_baseline:
         command = ['cmd', '/c', 'npx', '--yes', '--package=supabase@2.121.0', 'supabase', 'init', '--workdir', str(STACK)]
         subprocess.run(command, cwd=ROOT, check=True, capture_output=True)
     s = config.read_text(encoding='utf8')
-    s = re.sub(r'^project_id = .*$', 'project_id = "slm-account-mail"', s, flags=re.M).replace('5432', '6032').replace('inspector_port = 8083', 'inspector_port = 8683')
+    s = re.sub(r'^project_id = .*$', 'project_id = "'+PROJECT+'"', s, flags=re.M).replace('5432', '6232' if options.readiness else '6032').replace('inspector_port = 8083', 'inspector_port = 8883' if options.readiness else 'inspector_port = 8683')
     s = s.replace('minimum_password_length = 6', 'minimum_password_length = 8').replace('enable_confirmations = false', 'enable_confirmations = true')
     # CLI auth.email.enable_signup also selects the provider; global signup stays off.
     s = re.sub(r'(\[auth\][\s\S]*?\nenable_signup = )true', r'\g<1>false', s, count=1)
@@ -38,20 +44,30 @@ if not options.auth_baseline:
     for name in ('migrations', 'functions'):
         shutil.copytree(ROOT / 'app/supabase' / name, STACK / 'supabase' / name, dirs_exist_ok=True)
     entry = STACK / 'supabase/functions/accounts/local-entrypoint.example.ts'
-    probe=subprocess.run(['docker','inspect','supabase_inbucket_slm-account-mail'],capture_output=True)
+    probe=subprocess.run(['docker','inspect','supabase_inbucket_'+PROJECT],capture_output=True)
     mail_ip=''
     if probe.returncode==0:
         mail=json.loads(probe.stdout)[0]
-        assert mail['Config']['Labels']['com.supabase.cli.project']=='slm-account-mail'
+        assert mail['Config']['Labels']['com.supabase.cli.project']==PROJECT
         mail_ip=next(iter(mail['NetworkSettings']['Networks'].values()))['IPAddress']
-    mail_setup = "import {smtpEmail} from './emailSmtp.ts';\ndeclare const EdgeRuntime:{waitUntil(task:Promise<unknown>):void};\nconst mailSettings:Record<string,string>={SLM_ACCOUNT_EMAIL_ENABLED:'true',SLM_EMAIL_LOCAL_TEST:'true',SMTP_HOST:'supabase_inbucket_slm-account-mail',SMTP_PORT:'1025',SMTP_FROM:'noreply@slm-mail.test',SLM_EMAIL_CALLBACK_URL:'http://127.0.0.1:5182/email-callback.html'};\n"
+    mail_setup = "import {smtpEmail} from './emailSmtp.ts';\ndeclare const EdgeRuntime:{waitUntil(task:Promise<unknown>):void};\nconst mailSettings:Record<string,string>={SLM_ACCOUNT_EMAIL_ENABLED:'true',SLM_EMAIL_LOCAL_TEST:'true',SMTP_HOST:'supabase_inbucket_'+PROJECT,SMTP_PORT:'1025',SMTP_FROM:'noreply@slm-mail.test',SLM_EMAIL_CALLBACK_URL:'http://127.0.0.1:5182/email-callback.html'};\n"
     content=entry.read_text(encoding='utf8').replace('origins: [', "email:smtpEmail(name=>mailSettings[name],url,task=>EdgeRuntime.waitUntil(task)), accountModelEnabled: true, origins: ['http://127.0.0.1:5182',")
+    mail_setup=mail_setup.replace("'supabase_inbucket_'+PROJECT","'supabase_inbucket_"+PROJECT+"'")
+    mail_setup=mail_setup.replace('supabase_inbucket_slm-account-mail','supabase_inbucket_'+PROJECT)
+    if options.readiness and not options.mail:mail_setup=mail_setup.replace("SLM_ACCOUNT_EMAIL_ENABLED:'true'","SLM_ACCOUNT_EMAIL_ENABLED:'false'")
+    if options.readiness and options.protection:
+        import secrets
+        secret_path=ROOT/'.cache/readiness-proxy-secret'
+        if not secret_path.exists():secret_path.write_text(secrets.token_hex(32),encoding='utf8')
+        proof_secret=secret_path.read_text(encoding='utf8').strip()
+        (ROOT/'.cache/readiness-proxy.env').write_text('SLM_PROXY_SECRET='+proof_secret+'\n',encoding='utf8')
+        content=content.replace('accountModelEnabled: true,',"accountModelEnabled: true,onlineRequired:true,online:{proxySecret:Deno.env.get('SLM_PROXY_SECRET')??'',turnstileSecret:'isolated-provider-fixture',hostnames:['auth.slm.test'],fetcher:async(_url,input)=>{const token=JSON.parse(String(input?.body??'{}')).response??'';return new Response(JSON.stringify({success:token.startsWith('fixture:'),hostname:'auth.slm.test',action:'slm_signup',cdata:token.slice(8),challenge_ts:new Date().toISOString()}),{headers:{'Content-Type':'application/json'}});}},")
     entry.write_text((mail_setup+content).replace("SMTP_PORT:'1025'","SMTP_PORT:'1025',SMTP_LOCAL_ADDRESS:'"+mail_ip+"'" if mail_ip else "SMTP_PORT:'1025'"),encoding='utf8')
-    print('Prepared isolated slm-account-mail API60321; no service or existing data changed.')
+    print('Prepared isolated '+PROJECT+'; no existing project changed.')
 else:
     c = json.loads(subprocess.check_output(['docker', 'inspect', NAME]))[0]
-    assert c['Name'] == '/' + NAME and c['Config']['Labels']['com.supabase.cli.project'] == 'slm-account-mail'
-    assert all('slm-account-mail' in n for n in c['NetworkSettings']['Networks'])
+    assert c['Name'] == '/' + NAME and c['Config']['Labels']['com.supabase.cli.project'] == PROJECT
+    assert all(PROJECT in n for n in c['NetworkSettings']['Networks'])
     env = dict(x.split('=', 1) for x in c['Config']['Env'])
     assert env['GOTRUE_DISABLE_SIGNUP'] == 'true' and env['GOTRUE_MAILER_AUTOCONFIRM'] == 'false'
     assert env['GOTRUE_HOOK_SEND_EMAIL_ENABLED'] == 'true' and env['GOTRUE_HOOK_SEND_SMS_ENABLED'] == 'true'

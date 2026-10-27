@@ -23,3 +23,8 @@ test('web zapisuje tylko refresh pod kluczem tego projektu i usuwa go przy logou
   const value=crypto.randomUUID();await tokenStore.write(value);expect(window.localStorage.getItem(WEB_TOKEN_KEY)===value).toBe(true);
   await tokenStore.clear();expect(window.localStorage.getItem(WEB_TOKEN_KEY)).toBeNull();
 });
+
+test('nowy projekt ma oddzielny klucz vault i nie zmienia klucza starej sesji',async()=>{
+ mocks.native.mockReturnValue(true);mocks.available.mockReturnValue(true);const {tokenStore,createProjectTokenStore}=await import('./tokenStore');const other=createProjectTokenStore('abcdefghijklmnopqrst');await other.write('fixture-new-refresh');await tokenStore.write('fixture-old-refresh');await other.clear();expect(mocks.storage.set).toHaveBeenCalledWith('project.abcdefghijklmnopqrst.refresh.v1','fixture-new-refresh',false,false,1);expect(mocks.storage.set).toHaveBeenCalledWith('refresh.v1','fixture-old-refresh',false,false,1);expect(mocks.storage.remove).toHaveBeenCalledWith('project.abcdefghijklmnopqrst.refresh.v1',false);expect(mocks.storage.setKeyPrefix).toHaveBeenCalledTimes(1);expect(localStorage.length).toBe(0);
+});
+test('nowy projekt na urządzeniu również odmawia fallbacku bez pluginu',async()=>{mocks.native.mockReturnValue(true);mocks.available.mockReturnValue(false);const {createProjectTokenStore}=await import('./tokenStore');await expect(createProjectTokenStore('abcdefghijklmnopqrst').write('fixture-refresh')).rejects.toMatchObject({code:'storage_error'});expect(localStorage.length).toBe(0);});

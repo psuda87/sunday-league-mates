@@ -1,23 +1,32 @@
+import {emailValue} from './emailFlows.ts';
 import type {EmailTransport} from './emailFlows.ts';
-// Server only; lazy import keeps SMTP out of inactive workers and all client bundles.
-export function smtpEmail(get:(name:string)=>string|undefined,backendUrl:string,defer:(task:Promise<void>)=>void):EmailTransport|undefined {
+export interface SmtpConfiguration {host:string;port:number;from:string;callbackUrl:string;local:boolean;address?:string;user:string;password:string}
+// Invalid/missing configuration disables email, never crashes unrelated legacy Auth.
+export function smtpConfiguration(get:(name:string)=>string|undefined,backendUrl:string):SmtpConfiguration|undefined {
  if(get('SLM_ACCOUNT_EMAIL_ENABLED')!=='true')return undefined;
- const local=get('SLM_EMAIL_LOCAL_TEST')==='true'&&['http://kong:8000','http://127.0.0.1:60321'].includes(backendUrl);
- const host=get('SMTP_HOST')??'',port=Number(get('SMTP_PORT')??'465'),from=get('SMTP_FROM')??'',callbackUrl=get('SLM_EMAIL_CALLBACK_URL')??'';
- const url=new URL(callbackUrl);
- if(url.username||url.password||url.search||url.hash||!url.pathname.endsWith('/email-callback.html')||!(url.protocol==='https:'||local&&url.protocol==='http:'&&url.hostname==='127.0.0.1'))throw Error('Invalid email callback configuration');
- if(!host||!from||/[\r\n]/.test(from)||!Number.isInteger(port)||port<1||port>65535||!local&&[25,587].includes(port))throw Error('Invalid SMTP configuration');
- if(local&&!['supabase_inbucket_slm-account-mail','supabase_mailpit_slm-account-mail','inbucket','mailpit'].includes(host))throw Error('Only isolated local test mail server allowed');
- // Edge Runtime's Node DNS adapter cannot resolve Docker's underscored service name.
- // Explicit IP is permitted ONLY for the isolated local Mailpit, never remote SMTP.
- const localAddress=get('SMTP_LOCAL_ADDRESS');
- if(localAddress&&(!local||!/^172\.(1[6-9]|2[0-9]|3[01])\.([0-9]{1,3})\.([0-9]{1,3})$/.test(localAddress)))throw Error('Invalid local SMTP address');
+ try{
+  const local=get('SLM_EMAIL_LOCAL_TEST')==='true'&&['http://kong:8000','http://127.0.0.1:60321','http://127.0.0.1:62321'].includes(backendUrl);
+  const host=get('SMTP_HOST')??'',port=Number(get('SMTP_PORT')??'465'),from=emailValue(get('SMTP_FROM')??''),callbackUrl=get('SLM_EMAIL_CALLBACK_URL')??'',user=get('SMTP_USER')??'',password=get('SMTP_PASSWORD')??'',address=get('SMTP_LOCAL_ADDRESS');
+  const url=new URL(callbackUrl);
+  if(url.username||url.password||url.search||url.hash||url.pathname!=='/email-callback.html'||!(url.protocol==='https:'||local&&url.protocol==='http:'&&url.hostname==='127.0.0.1'))return undefined;
+  if(!host||/[\s/:]/.test(host)||!Number.isInteger(port)||port<1||port>65535)return undefined;
+  if(local){
+   if(!['supabase_inbucket_slm-account-mail','supabase_inbucket_slm-online-readiness','inbucket','mailpit'].includes(host)||port!==1025)return undefined;
+   if(address&&!/^172\.(1[6-9]|2[0-9]|3[01])\.(25[0-5]|2[0-4]\d|1?\d?\d)\.(25[0-5]|2[0-4]\d|1?\d?\d)$/.test(address))return undefined;
+  }else if(![465,2525,2587].includes(port)||!user.trim()||!password.trim()||/[\r\n]/.test(user+password)||address||url.hostname.endsWith('.invalid')||url.hostname==='localhost'||!host.includes('.')||/^[0-9.]+$/.test(host)||host.endsWith('.invalid'))return undefined;
+  return {host,port,from,callbackUrl,local,address,user,password};
+ }catch{return undefined;}
+}
+// Server-only lazy import; inactive workers/client bundles never load SMTP.
+export function smtpEmail(get:(name:string)=>string|undefined,backendUrl:string,defer:(task:Promise<void>)=>void):EmailTransport|undefined {
+ const config=smtpConfiguration(get,backendUrl);if(!config)return undefined;
+ const {host,port,from,callbackUrl,local,address,user,password}=config;
  return {callbackUrl,defer,async send(to,subject,text){
-  if(local&&!to.endsWith('.test'))throw Error('Only synthetic test recipients allowed');
+  const recipient=emailValue(to);if(local&&!recipient.endsWith('.test'))throw Error('Synthetic local recipient required');
   const {default:nodemailer}=await import('nodemailer');
-  const transport=nodemailer.createTransport({host:localAddress??host,port,secure:!local&&port===465,requireTLS:!local,ignoreTLS:local,
-   auth:local?undefined:{user:get('SMTP_USER')??'',pass:get('SMTP_PASSWORD')??''},tls:{rejectUnauthorized:true},
+  const transport=nodemailer.createTransport({host:address??host,port,secure:!local&&port===465,requireTLS:!local,ignoreTLS:local,
+   auth:local?undefined:{user,pass:password},tls:{rejectUnauthorized:true,minVersion:'TLSv1.2'},disableFileAccess:true,disableUrlAccess:true,
    connectionTimeout:10000,greetingTimeout:10000,socketTimeout:15000,logger:false,debug:false});
-  try{const info=await transport.sendMail({from,to:{address:to,name:''},subject,text});if(!info.accepted?.length)throw Error('Delivery not accepted');}finally{transport.close();}
+  try{const info=await transport.sendMail({from:{name:'Sunday League Mates',address:from},to:{address:recipient,name:''},subject,text});if(!info.accepted?.length)throw Error('Delivery not accepted');}finally{transport.close();}
  }};
 }

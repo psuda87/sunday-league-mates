@@ -1,0 +1,1 @@
+{"extends":"./tsconfig.json","compilerOptions":{"moduleResolution":"bundler","allowImportingTsExtensions":true},"include":["src/vite-env.d.ts","online/**/*.ts","online/**/*.tsx","auth-host/**/*.ts","auth-host/**/*.tsx","supabase/functions/accounts/*.ts","supabase/functions/_shared/*.ts"],"exclude":["**/*.test.ts","**/*.test.tsx"]}

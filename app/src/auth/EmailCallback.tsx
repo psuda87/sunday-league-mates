@@ -3,7 +3,7 @@ import {accountRequest,AccountError} from './api';
 import {PasswordField,AccountHeading,TextField} from '../account-ui/Fields';
 import {passwordProblem} from '../account-ui/model';
 import type {EmailProof} from './emailProof';
-export default function EmailCallback({initial,request=accountRequest}:{initial:EmailProof|null;request?:typeof accountRequest}){
+export default function EmailCallback({initial,request=accountRequest,appHref='/'}:{appHref?:string;initial:EmailProof|null;request?:typeof accountRequest}){
  const proof=useRef(initial),flight=useRef(false),[busy,setBusy]=useState(false),[done,setDone]=useState(false),[notice,setNotice]=useState(initial?'':'Link jest nieprawidłowy albo wygasł.'),[password,setPassword]=useState(''),[repeat,setRepeat]=useState(''),[email,setEmail]=useState('');
  const recovery=initial?.kind==='recovery';
  async function complete(){if(flight.current||!proof.current)return;const p=proof.current;if(recovery&&(passwordProblem(password)||password!==repeat)){setNotice(passwordProblem(password)||'Hasła muszą być takie same.');return;}
@@ -17,6 +17,6 @@ export default function EmailCallback({initial,request=accountRequest}:{initial:
  <button className="slm-account-primary" type="button" disabled={busy} onClick={()=>void complete()}>{recovery?'Zapisz nowe hasło':'Potwierdź adres'}</button></>}
  {notice&&<p role="status">{notice}</p>}
  {!done&&!proof.current&&recovery&&<><TextField label="Potwierdzony adres e-mail" value={email} onChange={setEmail} type="email"/><button type="button" disabled={busy} onClick={()=>void resend()}>Poproś o nowy link</button></>}
- <p><a href="/">Wróć do aplikacji</a></p><p>Potwierdzenie adresu nie loguje do aplikacji. Po zmianie hasła zaloguj się ponownie.</p>
+ <p><a href={appHref}>Wróć do aplikacji</a></p><p>Potwierdzenie adresu nie loguje do aplikacji. Po zmianie hasła zaloguj się ponownie.</p>
  </section>;
 }

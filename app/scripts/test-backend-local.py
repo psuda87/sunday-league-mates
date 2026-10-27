@@ -9,7 +9,8 @@ from pathlib import Path
 import subprocess
 import uuid
 
-CONTAINER = "supabase_db_sunday-league-mates"
+READINESS=os.environ.get("SLM_SECURITY_READINESS")=="1"
+CONTAINER = "supabase_db_slm-online-readiness" if READINESS else "supabase_db_sunday-league-mates"
 DB = "slm_backend_test_" + uuid.uuid4().hex
 created = False
 passed = 0
@@ -49,7 +50,7 @@ def rpc(index, action, body, finance=False, expected=None, rollback=False):
 
 try:
     branch = subprocess.check_output(["git", "branch", "--show-current"], text=True).strip()
-    assert branch in ("feat/integration","feat/v1-consolidation","feat/premium-b3-groups"), "Requires reviewed integration/consolidation branch"
+    assert branch in ("feat/integration","feat/v1-consolidation","feat/premium-b3-groups",*( ["feat/account-model-foundation"] if READINESS else [])), "Requires reviewed integration/consolidation branch"
     context_host = subprocess.check_output(["docker","context","inspect","--format","{{.Endpoints.docker.Host}}"],text=True).strip()
     docker_host = os.environ.get("DOCKER_HOST") or context_host
     assert docker_host.startswith(("npipe://", "unix://")), "Only a local Docker socket is allowed"
