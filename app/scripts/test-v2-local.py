@@ -9,7 +9,8 @@ from pathlib import Path
 import subprocess
 import uuid
 
-CONTAINER = "supabase_db_sunday-league-mates"
+READINESS=os.environ.get("SLM_SECURITY_READINESS")=="1"
+CONTAINER = "supabase_db_slm-online-readiness" if READINESS else "supabase_db_sunday-league-mates"
 DB = "slm_backend_test_" + uuid.uuid4().hex
 created = False
 passed = 0
@@ -50,7 +51,7 @@ def rpc(index, action, body, finance=False, expected=None, rollback=False):
 
 try:
     branch = subprocess.check_output(["git", "branch", "--show-current"], text=True).strip()
-    assert branch in ("feat/integration","feat/v1-consolidation","feat/premium-b3-groups"), "Requires reviewed integration/consolidation branch"
+    assert branch in ("feat/integration","feat/v1-consolidation","feat/premium-b3-groups",*( ["feat/account-model-foundation"] if READINESS else [])), "Requires reviewed integration/consolidation branch"
     context_host = subprocess.check_output(["docker","context","inspect","--format","{{.Endpoints.docker.Host}}"],text=True).strip()
     docker_host = os.environ.get("DOCKER_HOST") or context_host
     assert docker_host.startswith(("npipe://", "unix://")), "Only a local Docker socket is allowed"
@@ -68,7 +69,7 @@ try:
     sql("drop schema public cascade; drop schema slm_private cascade; drop schema if exists slm_auth_proof_private cascade; create schema public; grant usage on schema public to anon,authenticated,service_role; grant all on schema public to postgres,service_role;")
     migrations=sorted((Path(__file__).parents[1]/"supabase/migrations").glob("*.sql"))
     for migration in migrations:sql(migration.read_text(encoding="utf-8"))
-    check(len(migrations)==34,"complete checked-out schema replayed in scratch DB")
+    check(len(migrations)==(44 if READINESS else 34),"complete checked-out schema replayed in scratch DB")
     for file in ("settlements.sql", "notifications.sql", "integration-contracts.sql"):
         sql((Path(__file__).parents[1] / "supabase" / "tests" / file).read_text(encoding="utf-8"))
         check(True, file)
@@ -270,7 +271,7 @@ try:
     check(True,"B2.2 photo commit rejects an unapproved session")
     fallback_id=str(uuid.uuid4())
     sql(f"insert into auth.users(id,aud,role,email) values('{fallback_id}','authenticated','authenticated','{fallback_id}@fixture.invalid');insert into public.slm_profiles(user_id,full_name,display_as) values('{fallback_id}','Marek HiddenSurname','full_name');")
-    check(sql(f"select slm_private.public_player_name('{fallback_id}')")=="Marek","B3 missing nickname falls back only to explicit first-name projection")
+    check(sql(f"select slm_private.public_player_name('{fallback_id}')")==("Zawodnik" if READINESS else "Marek"),"public fallback does not derive private names without permission")
     # B3: four independent actors, two new groups; no existing database or real contacts.
     ledger_before=sql("select coalesce(jsonb_agg(to_jsonb(l) order by id),'[]') from public.slm_group_ledger l")
     b3body=dict(name="B3 privacy alpha",description="Public description",request_id=str(uuid.uuid4()))
@@ -304,7 +305,7 @@ try:
     check("PrivateSurname" not in sql(f"select slm_private.player_name('{users[8]}')"),"B3 unscoped participant label never reveals hidden surname")
     rpc(8,"groups:consent",dict(group_id=ga,share_full_name=True))
     check(rpc(7,"groups:profile",dict(group_id=ga,user_id=users[8]))["full_name"]=="Adam PrivateSurname" and raw_profile(7,8)=="1","B3 explicit group consent permits surname in projection and RLS")
-    rpc(8,"groups:consent",dict(group_id=ga,share_full_name=False))
+    rpc(8,"groups:consent",dict(group_id=ga,share_full_name=False,**({"confirm_nickname":True} if READINESS else {})))
     check(raw_profile(7,8)=="0" and rpc(7,"groups:profile",dict(group_id=ga,user_id=users[8]))["full_name"] is None,"B3 withdrawing consent immediately hides surname")
     rpc(8,"groups:consent",dict(group_id=ga,share_full_name=True,user_id=users[7]),expected="invalid_input");check(True,"B3 cannot change another member's consent")
     rpc(7,"groups:permission",dict(group_id=ga,user_id=users[7],organizer=True),expected="forbidden");check(True,"B3 member cannot grant own permissions")

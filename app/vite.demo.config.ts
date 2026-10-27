@@ -8,6 +8,7 @@ const app = fileURLToPath(new URL('.', import.meta.url));
 // Explicit allowlist: accidentally importing App/Auth/Edge fails the build.
 const allowed = new Set([
   'src/profile/PremiumIdentityEditor.tsx',
+  'src/profile/EmailSettings.tsx', // Presentation-only optional binding; no Auth, HTTP or runtime account imports.
   'src/native/frozenDemoAndroid.ts', // Reviewed presentation-only native back/keyboard transport; no Auth/API.
   'src/demo/accountState.ts', 'src/demo/AccountDemo.tsx', 'src/account-ui/model.ts', 'src/account-ui/Fields.tsx', 'src/account-ui/AccountScreens.tsx', 'src/account-ui/account.css', 'src/ui/UltimatePlayerCard.tsx',
   'src/demo/palettes.css',

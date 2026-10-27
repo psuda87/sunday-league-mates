@@ -1,12 +1,13 @@
 describe('Premium profile labels: real CSS and Ionic scroll container',()=>{
- for(const width of [320,360,390])for(const theme of ['light','dark']){
-  it(`${width}px ${theme}: separate labels, focus and reduced viewport`,()=>{
-   cy.viewport(width,844);cy.visit('/cypress/fixtures/profile-layout.html');
+ for(const candidate of [false,true])for(const width of [320,360,390])for(const theme of ['light','dark']){
+  it(`${candidate?'candidate':'legacy'} ${width}px ${theme}: separate labels, focus and reduced viewport`,()=>{
+   cy.viewport(width,844);cy.visit('/cypress/fixtures/profile-layout.html'+(candidate?'?candidate':''));
    cy.document().then(doc=>doc.documentElement.classList.toggle('ion-palette-dark',theme==='dark'));
    cy.contains('button','Edytuj profil').click();
+   if(candidate)cy.contains('label','Pseudonim').find('input').clear().type('NowyTest');
    for(const height of [844,380]){
     cy.viewport(width,height);
-    cy.get('.slm-premium-identity > label').should('have.length',5).each($label=>{
+    cy.get('.slm-premium-identity > label').should('have.length',candidate?7:5).each($label=>{
      const label=$label[0],input=label.querySelector('input,select') as HTMLElement;
      const text=label.ownerDocument.createRange();text.selectNode(label.firstChild!);
      cy.wrap(input).then(()=>{input.focus();input.scrollIntoView({block:'center'});});
@@ -21,7 +22,18 @@ describe('Premium profile labels: real CSS and Ionic scroll container',()=>{
      });
     });
    }
-   if(width===390){cy.viewport(width,844);cy.get('.slm-premium-identity').then(el=>el[0].scrollIntoView({block:'start'}));cy.screenshot('profile-labels-'+theme,{capture:'viewport',overwrite:true});}
+   if(width===390){cy.viewport(width,844);cy.get('.slm-premium-identity').then(el=>el[0].scrollIntoView({block:'start'}));cy.screenshot((candidate?'candidate-labels-':'profile-labels-')+theme,{capture:'viewport',overwrite:true});}
   });
  }
+});
+
+describe('optional owner email fields, original Premium CSS',()=>{
+ for(const width of [320,360,390])for(const theme of ['light','dark'])it(`${width}px ${theme} email fields focus above footer`,()=>{
+  cy.viewport(width,380);cy.visit('/cypress/fixtures/profile-layout.html?candidate&mail');cy.document().then(doc=>doc.documentElement.classList.toggle('ion-palette-dark',theme==='dark'));cy.contains('button','Edytuj profil').click();
+  cy.get('section[aria-label="E-mail konta"] > label').should('have.length',2).each($label=>{
+   const label=$label[0],input=label.querySelector('input')!;const text=label.ownerDocument.createRange();text.selectNode(label.firstChild!);input.focus();input.scrollIntoView({block:'center'});
+   cy.wrap(input).should(()=>{const box=input.getBoundingClientRect();expect(box.top-text.getBoundingClientRect().bottom).to.be.at.least(6);expect(box.left).to.be.at.least(0);expect(box.right).to.be.at.most(width);expect(box.top).to.be.at.least(0);expect(box.bottom).to.be.at.most(label.ownerDocument.querySelector('ion-footer')!.getBoundingClientRect().top+1);});
+  });
+  if(width===390)cy.screenshot('email-fields-'+theme,{capture:'viewport',overwrite:true});
+ });
 });

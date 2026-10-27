@@ -1,13 +1,14 @@
 // Bounded, static WebP container validation. No trust in MIME or declared dimensions alone.
 // Checks RIFF boundaries/padding, image chunks, keyframe headers and partition bounds.
 export const webpMaxBytes=150000;
-export function webpSize(b:Uint8Array):{width:number;height:number}|null {
+type Dimensions={width:number;height:number};
+export function webpSize(b:Uint8Array):Dimensions|null {
  if(b.length<20||b.length>webpMaxBytes)return null;
  const v=new DataView(b.buffer,b.byteOffset,b.byteLength);
  const tag=(n:number)=>String.fromCharCode(...b.subarray(n,n+4));
  const u24=(n:number)=>b[n]|b[n+1]<<8|b[n+2]<<16;
  if(tag(0)!=='RIFF'||tag(8)!=='WEBP'||v.getUint32(4,true)+8!==b.length)return null;
- let pos=12,image:{width:number;height:number}|null=null,extended:typeof image=null,alpha=false,icc=false,flags=0;
+ let pos=12,image:Dimensions|null=null,extended:Dimensions|null=null,alpha=false,icc=false,flags=0;
  while(pos<b.length){
   if(pos+8>b.length)return null;
   const type=tag(pos),size=v.getUint32(pos+4,true),start=pos+8,end=start+size;

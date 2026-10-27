@@ -179,3 +179,10 @@ GoogleService-Info.plist
 # Consolidation local Android variants
 app/dist-b1/
 app/dist-live-local/
+
+# Isolated optional-email callback test build
+app/dist-email-local/
+
+# Separate static Auth preparation, never an automatic deployment
+app/dist-auth-host/
+app/dist-online-candidate/

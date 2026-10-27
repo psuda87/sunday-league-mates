@@ -1,3 +1,24 @@
+# Przebudowa kont — kandydat nieaktywny, blokery
+
+Kod2e0b0f2, Draft PR #18: https://github.com/psuda87/sunday-league-mates/pull/18 — bez konfliktów i merge, pełna aktywacja BLOCKED.
+
+2026-10-27 00:29 Europe/Warsaw — przebudowa kont: kandydat, aktywacja BLOCKED
+Kontynuacja feat/account-model-foundation / Draft PR18 z e81ddac; main134c52b. Resolver nickname/potwierdzonego email bez telefonu/fallbacku, rzeczywista rejestracja bez emaila z idempotencją i wznowieniem po Auth, wspólny atomowy zapis PR16+rename+kontakt z hasłem tylko dla rename, ochrona oczekiwanego UUID, minimalny admin DTO i reset z dodatkowym potwierdzeniem. Domyślne bramki false, UI opt-in bez CSS/karty/nav. Nowe4 migracje tej kontynuacji,42 łącznie; historia bez edycji. Audyt READ ONLY: developer64 kont/46 duplikatów/53 zły format/3 brak; PR16 42/31/15/9 i2 pending; fundament9 bez konfliktów. Anonimowy raport docs/ACCOUNT_MODEL_LOCAL_AUDIT.json, niczego nie nadpisano.
+PASS264 Vitest/45, TS/lint,70 SQL/RLS/replay42,49 real HTTP od pustej bazy+21 dodatkowych,12 Chrome (fixture UI), main/Premium/demo build+isolation, source guards. SQL lint4 stare warningi, brak nowych. Potwierdzony email w testach jest fixture; dostarczanie/callback/recovery NOT TESTED. Właściciel wybrał brak wysyłki i zablokowaną aktywację. Po testach58321/59321 active=false i API account_model=false/self_registration=false; backend i dane POCO/Cloud nietknięte. Fikcyjne konta zachowane, bez resetów/merge/deploy, APK nie przygotowano.
+Pełnego zadania nie uznano za zakończone: do dokończenia email verification/recovery i ich konfiguracja, legal/anti-bot, mapa kolizji i skoordynowany cutover/odbiór Androida. Raport docs/ACCOUNT_MODEL_CANDIDATE.md i docs/ODPOWIEDZI_CODEX.txt. PR17/14/15 i cudze worktree zachowane.
+
+---
+
+# Model kont — etap1, nieaktywny fundament
+
+Draft PR #18: https://github.com/psuda87/sunday-league-mates/pull/18; implementacja2a6113b.
+
+2026-10-26 19:35 Europe/Warsaw — model kont etap1: nieaktywny fundament
+feat/account-model-foundation z main134c52b, osobny worktree. Nowe3 migracje, kanoniczny nickname + pochodny unikalny rejestr/RLS, jawny preflight bez nadpisywania, atomowy rename z aktualnym hasłem i CAS/idempotencją, bez begin/finish/pending/zmiany sesji i bez haseł w SQL. Feature gate domyślnie false, brak UI i przełączenia resolvera/telefonu/rejestracji. Dotychczasowy main/UI i wcześniejsze35 migracji zachowane, PR17 niezmieniony.
+PASS TS/lint/build,259 Vitest/44 pliki,47 SQL/RLS/replay38,25 real HTTP/Auth/Edge/PostgREST w NOWYM lokalnym slm-account-foundation57321. Rzeczywiste wyścigi dwóch ownerów i jednego ownera, rollback błędnego hasła/kolizji, sesje/refresh, UUID/profil/numer/grupy/zgody, IDOR i ledger bez sekretów sprawdzone. Chronione źródła/runtime i55 Premium PASS, auto deployment false. Konta fikcyjne pozostawiono; istniejące bazy/POCO/Cloud nietknięte. Bez APK/testu fizycznego/merge. Szczegóły i blokery cutover docs/ACCOUNT_MODEL_FOUNDATION.md; raport docs/ODPOWIEDZI_CODEX.txt. Następny bezpieczny etap: mapowanie konfliktów oraz przygotowanie wspólnego resolvera i transakcyjnego zapisu profilu przed jakąkolwiek aktywacją.
+
+---
+
 # PR16 — poprawka etykiet odebrana na POCO
 
 2026-10-26 18:51 Europe/Warsaw — PR16: ręczny odbiór poprawki etykiet na POCO
@@ -167,3 +188,10 @@ Pozosta?y moderate zale?no?ci oraz ostrze?enia bundle/Browserslist/Gradle. Brak 
 Nast?pny etap: r?czny odbi?r obecnej integracji na telefonie, przegl?d rollout danych i osobne uzgodnienie poczty oraz FCM. Merge kodu nie oznacza wdro?enia ani gotowo?ci do wydania.
 
 Raport: [REPOSITORY_AUDIT.md](REPOSITORY_AUDIT.md). Szczeg??owa historia: [ODPOWIEDZI_CODEX.txt](ODPOWIEDZI_CODEX.txt).
+
+
+2026-10-27 08:22 Europe/Warsaw — feat/account-model-foundation, Draft PR18 od33e95b3: opcjonalny e-mail/signup/profil, prawdziwy scoped proof SMTP/callback i recovery przez Auth. Bez zmiany primary/UUID/telefonów/zgód. PASS:280 Vitest,88 SQL-RLS/43 migracje,49 core HTTP+21 dodatkowych,29 SMTP-HTTP/3 browser callbacki,9 fault-race,18 UI browser, TypeScript aplikacji i nowych modułów/ESLint/build main+Premium+demo+callback/source guards. Dodatkowy strict całego Edge:3 zastane błędy niezmienionego webp.ts;4 stare SQL warnings. Obie nowe instancje60321/61321 active=false i capabilities=false. Wszystkie konta/wiadomości zachowane; wcześniejsze bazy, POCO, Cloud i inne worktree nietknięte. Internet SMTP/fizyczny Android NOT TESTED; bez APK/merge/deploy. Blokery: prawdziwy darmowy SMTP, domena/HTTPS callback, konflikty kont/legal/anti-bot i wspólna aktywacja. Szczegóły/odtworzenie docs/ACCOUNT_EMAIL_FLOWS.md, zrzuty fikcyjne docs/ui/account-email. Zmiany do push na istniejący Draft PR18; bez merge.
+
+2026-10-27 17:56 Europe/Warsaw — Zakończenie: kod 9ab903f331bf1785fc9f2c5cc0fa6a037466d423 wypchnięty na origin/feat/account-model-foundation. Draft PR18 zaktualizowany i sprawdzony: open/draft=true/merged=false/mergeable=true, main134c52b bez zmiany. Finalne powtórzenie29 SMTP-HTTP/3 callbacków gotowego buildu +9 fault/race PASS po walidacji pojedynczego odbiorcy. SQL i HTTP potwierdziły wyłączenie obu nowych instancji. Raport docs/ACCOUNT_EMAIL_FLOWS.md zawiera „Decyzje podjęte samodzielnie”; docs/ODPOWIEDZI_CODEX.txt i STATUS uzupełnione. Bez merge/Cloud/płatnych usług/resetu/nowego APK; SMTP internetowe, docelowy callback i POCO nadal do osobnego odbioru.
+
+2026-10-27 19:10 Europe/Warsaw — przygotowanie online, PR18 od5de91d3:44 migracje, podpisana bramka/Turnstile gate i transakcyjny przydział rejestracji, bezpiecznie wyłączony niekompletny SMTP, izolacja tokenów nowego projektu, poprawka strict WebP i UTF-8, patche Vitest/qs. Dowody:312 Vitest łącznie z bramką,96 SQL-RLS,102 v2/31 legacy/11 historia,14 preflight-restore,49+21 Auth HTTP,29 SMTP+9 fault,29 chronione API (dostawca captcha fixture),3 publiczne sandbox Cloudflare,18+2 browser,4 real Chrome CSP. Pełny strict/lint/buildy/izolacja demo PASS;6 moderate (3runtime),4 stare SQL warnings pozostają jawnie. Raport docs/SECURITY_AUDIT.md. Osobny zależny Draft PR wydzieli hosting/bramkę/konfigurację Android-PWA i plan cutover. Bez Cloud/merge/publikacji/APK/resetów; rzeczywisty SMTP/widget/domena/legal/odbiór POCO nadal NO-GO. Chronologia docs/ODPOWIEDZI_CODEX.txt.

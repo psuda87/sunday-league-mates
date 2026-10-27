@@ -45,7 +45,14 @@ export function useOwnProfile(manager:SessionManager,userId:string|null,selectio
   finally{if(ticket===generation.current){flight.current=false;setSaving(false);}}
  }
  useEffect(()=>{const reload=()=>setRevision(v=>v+1);window.addEventListener('slm-profile-changed',reload);return()=>window.removeEventListener('slm-profile-changed',reload);},[]);
- return {...current,photo,saveIdentity,saveNumber,changeAlias,saving:current.phase==='ready'&&saving,reload:()=>setRevision(v=>v+1),
+ async function requestEmail(email:string,password:string,requestId:string){
+  const auth=manager.getSnapshot();if(flight.current||!adapter||!current.profile?.account_model||auth.phase!=='ready'||auth.session?.user_id!==userId)return false;
+  const ticket=generation.current;flight.current=true;setSaving(true);
+  try{await manager.call('model_email_request',{email,current_password:password,request_id:requestId});const profile=await adapter.read();if(ticket!==generation.current)return false;setState({owner:userId,phase:'ready',profile,notice:'Zlecono obsługę adresu. Potwierdź go dopiero przez link z wiadomości.'});return true;}
+  catch{if(ticket===generation.current)setState(previous=>({...previous,notice:'Nie potwierdzono żądania e-mail. Sprawdź obecne hasło i adres.'}));return false;}
+  finally{if(ticket===generation.current){flight.current=false;setSaving(false);}}
+ }
+ return {...current,requestEmail,photo,saveIdentity,saveNumber,changeAlias,saving:current.phase==='ready'&&saving,reload:()=>setRevision(v=>v+1),
   async save(fullName,number){
    const auth=manager.getSnapshot();
    if(flight.current||!adapter||!current.profile||current.phase!=='ready'||auth.phase!=='ready'||auth.session?.user_id!==userId)return false;

@@ -15,7 +15,7 @@ import { useB1Lifecycle } from './useB1Lifecycle';
 import '../demo/palettes.css';
 import '../pages/Accounts.css';
 
-export default function B1App({manager:provided}:{manager?:SessionManager}){
+export default function B1App({manager:provided,accountModel=false,signupChallenge}:{manager?:SessionManager;accountModel?:boolean;signupChallenge?:(requestId:string)=>Promise<string>}){
  const [manager]=useState(()=>provided??new SessionManager(tokenStore,accountRequest));
  const auth=useSyncExternalStore(manager.subscribe,manager.getSnapshot);
  const [picker,setPicker]=useState<{owner:string;done:boolean}|null>(null);
@@ -36,8 +36,9 @@ export default function B1App({manager:provided}:{manager?:SessionManager}){
   if(picker&&(auth.phase!=='checking'&&(auth.phase!=='ready'||forced||auth.session?.user_id!==picker.owner)||ready&&picker.done))setPicker(null);
  },[auth.phase,auth.session,forced,ready,picker]);
  const view:AccountView|null=pending??(auth.phase==='checking'?'checking':auth.phase==='unavailable'||auth.phase==='storage_error'?'network':forced?'password':ready?requested:requested==='login'?'login':auth.message||requested==='expired'?'expired':requested==='register'||requested==='forgot'?requested:'login');
- const base=useMemo(()=>b1Port(manager),[manager]);
+ const base=useMemo(()=>b1Port(manager,accountModel,accountRequest,signupChallenge),[manager,accountModel,signupChallenge]);
  const port:AccountUiPort={...base,
+  async signUp(profile,email,password){setPending('login');try{await base.signUp(profile,email,password);setRequested(null);}finally{setPending(null);}},
   async signIn(identifier,password){setPending('login');try{await base.signIn(identifier,password);setRequested(null);}finally{setPending(null);}},
   async updatePassword(password,current){setPending('password');try{await base.updatePassword(password,current);setRequested(null);}finally{setPending(null);}},
  };
@@ -51,7 +52,7 @@ export default function B1App({manager:provided}:{manager?:SessionManager}){
  return <>
  {(ready&&!forced||auth.phase==='checking'&&!!picker)&&<div hidden={view!==null} className="slm-demo-world"><WorldApp key={owner??'none'} liveAuth personalProfile={personalProfile} groupsView={owner?<PremiumGroups key={owner} manager={manager} userId={owner}/>:undefined} onAccount={next=>{if(next==='password')setRequested('password');}} onLogout={()=>{setRequested(null);void port.signOut();}}/></div>}
  {view&&<IonPage className="slm-demo slm-account-page"><IonContent ref={scope}><main className="slm-accounts"><div className="slm-account-shell"><header className="slm-account-brand"><span>SUNDAY LEAGUE MATES</span><img src="/assets/branding/slm-logo-primary-transparent.png" width="450" height="505" alt="Sunday League Mates"/></header>
- <AccountScreens key={view} view={view} port={port} onNavigate={navigate} loginOrPhone/>
+ <AccountScreens key={view} view={view} port={port} onNavigate={navigate} loginOrPhone={!accountModel} nicknameModel={accountModel}/>
  <details className="slm-account-appearance"><summary>Wygląd demonstracji</summary><AppearanceSettings enablePalettes/></details>
  </div></main></IonContent></IonPage>}
  </>;

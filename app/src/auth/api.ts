@@ -26,10 +26,11 @@ export class AccountError extends Error {
 const endpoint = import.meta.env.VITE_SLM_FUNCTION_URL ||
   'https://hjtcyybkxebvdropchac.supabase.co/functions/v1/accounts';
 
-export async function accountRequest<T>(action: string, values: Record<string, unknown> = {}, session?: Session | null): Promise<T> {
+export function createAccountRequest(target:string){
+ return async function request<T>(action: string, values: Record<string, unknown> = {}, session?: Session | null): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(action==='profile_photo_upload'?endpoint+(endpoint.includes('?')?'&':'?')+'photo=upload':endpoint, { method: 'POST', headers: {
+    response = await fetch(action==='profile_photo_upload'?target+(target.includes('?')?'&':'?')+'photo=upload':target, { method: 'POST', headers: {
       'Content-Type': 'application/json', ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}),
     }, body: JSON.stringify({ ...values, action }), signal: AbortSignal.timeout(20000) });
   } catch { throw new AccountError('Brak połączenia. Sprawdź internet i spróbuj ponownie.', 'network_error'); }
@@ -37,3 +38,5 @@ export async function accountRequest<T>(action: string, values: Record<string, u
   if (!response.ok) throw new AccountError(data?.error || 'Nie udało się wykonać operacji.', data?.code || 'server_error');
   return data as T;
 }
+}
+export const accountRequest=createAccountRequest(endpoint);
