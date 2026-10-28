@@ -186,3 +186,6 @@ app/dist-email-local/
 # Separate static Auth preparation, never an automatic deployment
 app/dist-auth-host/
 app/dist-online-candidate/
+
+# Isolated real-data Premium test build
+app/dist-premium-real-local/

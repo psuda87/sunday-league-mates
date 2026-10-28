@@ -8,7 +8,7 @@ import type { Session } from './api';
 import { b1Port } from './b1Port';
 vi.mock('./useOwnProfile',()=>({useOwnProfile:(_manager:unknown,_owner:unknown,selection?:{begin:()=>void;end:()=>void})=>({photo:{beginSelection:selection?.begin,endSelection:selection?.end}})}));
 const worldLifecycle=vi.hoisted(()=>({mounts:0,unmounts:0}));
-vi.mock('../demo/App',()=>({default:function MockWorld({onLogout,onAccount,personalProfile}:{personalProfile?:{photo:{beginSelection:()=>void;endSelection:()=>void}};onLogout:()=>void;onAccount:(view:string)=>void}){
+vi.mock('../events/PremiumWorld',()=>({default:function MockWorld({onLogout,onAccount,personalProfile}:{personalProfile?:{photo:{beginSelection:()=>void;endSelection:()=>void}};onLogout:()=>void;onAccount:(view:string)=>void}){
  const [draft,setDraft]=useState(false);
  useEffect(()=>{worldLifecycle.mounts++;return()=>{worldLifecycle.unmounts++;};},[]);
  return <div>Chroniony świat demo{draft&&<span>Wybrany plik RAM</span>}<button onClick={()=>{setDraft(true);personalProfile?.photo.beginSelection();}}>Otwórz galerię</button><button onClick={()=>personalProfile?.photo.endSelection()}>Zakończ wybór</button><button onClick={onLogout}>Wyloguj</button><button onClick={()=>onAccount('password')}>Hasło konta</button></div>;
