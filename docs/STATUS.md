@@ -184,3 +184,5 @@ PASS: buildweb/TS,Capacitorsync,assembleDebugexit0,podpis zgodny z zachowanym po
 ADB nie widzi telefonu: aktualny cert instalacji,instalacja,tunel,resume i ręcznyodbiór NOT TESTED. Nic nie instalowano/nieczyszczono. Osobny lokalny plik kont wTEMP,bez sekretów wrepo.
 Przygotowany jeden automatyczny checkSLMPRchecks:pull_request→main,TS/lint/Vitest/build/frozen/routing/SQLHTTP w efemerycznymDockerze; opt-in i fail-fast,bez produkcyjnych sekretów. Actions NIE uruchomiono,variables/protection NIE zmieniono. Mainprotectedfalse,rulesets0;plan/pozostały darmowy limit niepotwierdzone. Nie wymagać nieistniejących checków.
 Dokumenty docs/ANDROID_MAIN_ACCEPTANCE.md i docs/MAIN_PROTECTION_PLAN.md. Następny krok:odbiórDraftPRprzygotowania do chore/main-stabilization,osobna zgoda na instalację/aktywacjęCI/ochronę i merge. PR24/25 i main niezmienione;bezdeployu/resetów/nowychmodułów. Zapis odpowiedzi docs/ODPOWIEDZI_CODEX.txt.
+
+2026-10-28 23:55:51 Europe/Warsaw: DraftPR26 https://github.com/psuda87/sunday-league-mates/pull/26; stan przygotowany, bez aktywacji/instalacji/merge.

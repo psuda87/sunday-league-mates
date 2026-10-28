@@ -4,6 +4,8 @@
 
 Kod APK: dokładnie **`39ef2e3937b781439864029a92c12de315024263`**, PR24. Domyślny LIVE bez zmian. Gałąź przygotowania: `chore/android-main-acceptance`, z tego SHA; dodatkowe skrypty/CI nie są źródłem aplikacji w APK.
 
+Draft przygotowania: [PR26](https://github.com/psuda87/sunday-league-mates/pull/26) → chore/main-stabilization. Nie zmieniono PR24 ani25.
+
 ## Artefakt i wariant
 
 - APK: `I:\slm\sunday-league-mates\.worktrees\android-main-acceptance\.cache\artifacts\slm-pr24-39ef2e3-premium-debug.apk`.

@@ -2,6 +2,8 @@
 
 **Plan, nie aktywacja.** Main134c52b i PR24/39ef2e3 pozostały bez zmian. Odczyty GitHub: `protected=false`, rulesets0. Nie zmieniono reguł, zmiennych repo, wymaganych checków, planu, płatności ani widoczności repo.
 
+Zmiany do przeglądu: [Draft PR26](https://github.com/psuda87/sunday-league-mates/pull/26), baza chore/main-stabilization, nie main.
+
 ## Możliwości bezpłatne i nieustalone dane
 
 Repo jest prywatne. [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions) opisuje bezpłatny przydział, a [aktualna tabela użycia](https://docs.github.com/en/billing/reference/product-usage-included) również przeliczenie przydziału na kwotę compute. Nie należy traktować limitu minut jako gwarancji braku kosztów po wyczerpaniu przydziału. Bez metody płatności GitHub blokuje przekroczenie limitu; przy metodzie płatności potrzebne jest potwierdzone zatrzymanie użycia/budżet. Nie uruchamiano płatnych usług.
