@@ -16,7 +16,8 @@
     "Owner-authorized inactive account-model candidate: conditional nickname/contact/password fields and original form bindings; no card/nav/CSS/theme changes or default activation",
     "Inactive account-model email extension: conditional owner email settings and required recovery email; no existing card/nav/CSS changes",
     "Online-readiness opt-in: optional nonvisual signup challenge, fixed callback app URL and isolated project token-store factory; default legacy keys/native protection and frozen visuals preserved",
-    "Owner-authorized real-data stage1: real events slot in Premium shell, shared original EventForm optional data port, nontechnical group/profile text; CSS/assets/Ultimate/BottomNav remain unchanged. No demo reducer used for real events."
+    "Owner-authorized real-data stage1: real events slot in Premium shell, shared original EventForm optional data port, nontechnical group/profile text; CSS/assets/Ultimate/BottomNav remain unchanged. No demo reducer used for real events.",
+    "Owner-authorized P0 Stage3 UI restore: MatchHero accepts restricted safe card DTO without invented counts; Teams extracts original SVG/formation into presentation-only PremiumPitch shared by unchanged demo behavior and manual live RAM preview. CSS/Ultimate/BottomNav unchanged. See PREMIUM_UI_REGRESSION.md."
   ],
   "files": {
     "app/demo/main.tsx": {
@@ -136,7 +137,7 @@
       "text": true
     },
     "app/src/demo/Teams.tsx": {
-      "sha256": "4b6deac973e1dc4e01e1ec7aa95e8c3c008a66dcba3844693a3b88c03200ffa8",
+      "sha256": "df6f798173982e3f026b21dfea1b4bdefa0a3548cdad1afd237f53af2ff22773",
       "text": true
     },
     "app/src/demo/UltimatePlayerCard.tsx": {
@@ -208,7 +209,7 @@
       "text": true
     },
     "app/src/ui/MatchHero.tsx": {
-      "sha256": "98bbd8c4b80f674b87b38303606f4cd772f04676382691fb1efec1e49d701bcc",
+      "sha256": "328af3bb4624cb68ad937f653002c05dd59b86389449d82bd8ca01747eb3b1ac",
       "text": true
     },
     "app/src/ui/MatchSections.tsx": {

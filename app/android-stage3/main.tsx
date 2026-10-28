@@ -1,3 +1,5 @@
+import { Capacitor } from '@capacitor/core';
+import { StatusBar } from '@capacitor/status-bar';
 import { createRoot } from 'react-dom/client';
 import { IonApp, setupIonicReact } from '@ionic/react';
 import '@ionic/react/css/core.css';
@@ -15,6 +17,7 @@ import { installFrozenAndroid } from '../src/native/frozenDemoAndroid';
 
 initializeTheme({palettes:true});
 setupIonicReact({hardwareBackButton:true});
+if(Capacitor.getPlatform()==='android')void StatusBar.setOverlaysWebView({overlay:false});
 installFrozenAndroid();
 // Local test namespace only (20 lowercase letters), not a Supabase Cloud project.
 const manager = new SessionManager(createProjectTokenStore('slmfinanceandroiddev'), accountRequest);

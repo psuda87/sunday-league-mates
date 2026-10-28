@@ -17,7 +17,7 @@ const allowed = new Set([
   'src/groups/GroupControls.tsx', 'src/groups/GroupControls.css', // Presentation only; no Auth/API imports.
   'src/demo/eventDraft.ts', 'src/demo/EventForm.tsx', 'src/demo/DemoBottomNav.tsx',
   'src/demo/Identity.tsx', 'src/demo/portraits.ts', 'src/demo/Finance.tsx', 'src/demo/Teams.tsx', 'src/demo/UltimatePlayerCard.tsx', 'src/demo/App.tsx', 'src/demo/data.ts', 'src/demo/Panels.tsx', 'src/demo/Profile.tsx', 'demo/index.html', 'demo/main.tsx', 'src/ui/Demo.tsx', 'src/ui/MatchHero.tsx',
-  'src/ui/Players.tsx', 'src/ui/MatchHeader.tsx', 'src/ui/ParticipantGroup.tsx', 'src/ui/MatchFilters.tsx', 'src/ui/MatchCapacityProgress.tsx', 'src/ui/capacity.ts', 'src/ui/BottomNav.tsx',
+  'src/ui/PremiumPitch.tsx', 'src/ui/Players.tsx', 'src/ui/MatchHeader.tsx', 'src/ui/ParticipantGroup.tsx', 'src/ui/MatchFilters.tsx', 'src/ui/MatchCapacityProgress.tsx', 'src/ui/capacity.ts', 'src/ui/BottomNav.tsx',
   'src/ui/AppearanceSettings.tsx', 'src/ui/MatchSections.tsx', 'src/ui/MatchTabs.tsx', 'src/ui/theme.ts', 'src/theme/variables.css',
   'src/pages/Accounts.css',
 ]);
