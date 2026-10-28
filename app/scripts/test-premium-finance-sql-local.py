@@ -18,17 +18,17 @@ for _ in range(100):
 else:raise RuntimeError('Fixture PostgreSQL unavailable; nothing removed')
 # Keep the original test functions/scenarios; replace ONLY the environment setup/cleanup.
 original=Path(__file__).with_name('test-v2-local.py')
-source=original.read_text()
+source=original.read_text(encoding='utf8')
 prefix=source[:source.index('try:\n    branch =')].replace('DB = "slm_backend_test_" + uuid.uuid4().hex','DB = "postgres"')
 scenario=source[source.index('    for file in ("settlements.sql"'):source.index('\nfinally:')]
 namespace={'__file__':str(original),'__name__':'stage2_finance_fixture'}
 exec(compile(prefix,str(original),'exec'),namespace)
 namespace['CONTAINER']=container;namespace['READINESS']=True
 sql=namespace['sql'];check=namespace['check']
-sql((root/'app/supabase/tests/support/profile_contract_bootstrap.sql').read_text())
+sql((root/'app/supabase/tests/support/profile_contract_bootstrap.sql').read_text(encoding='utf8'))
 sql("alter table auth.users add column aud text,add column role text,add column raw_user_meta_data jsonb default '{}'::jsonb,add column deleted_at timestamptz,add column raw_app_meta_data jsonb default '{}'::jsonb;")
 files=sorted((root/'app/supabase/migrations').glob('*.sql'))
-for migration in files:sql(migration.read_text())
+for migration in files:sql(migration.read_text(encoding='utf8'))
 check(len(files)==44,'44 unchanged source migrations replayed in fresh fixture')
 exec(compile('if True:\n'+scenario,str(original),'exec'),namespace)
 print('Auth UID/JWT/storage are fixture contracts; real HTTP/Auth/Edge NOT tested. Database retained, not reset or deleted.')

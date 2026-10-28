@@ -1,6 +1,7 @@
 import { afterEach,expect,it,vi } from 'vitest';
 import { act,cleanup,fireEvent,render,renderHook,screen,waitFor } from '@testing-library/react';
 import type { SessionManager } from '../auth/sessionManager';
+import { AccountError } from '../auth/api';
 import { account,detail } from './contracts';
 import { usePremiumFinance } from './usePremiumFinance';
 import PremiumFinance from './PremiumFinance';
@@ -42,4 +43,17 @@ it('administrator confirms an existing receipt with expected amount and refreshe
 it('hides a previous group synchronously when scope changes and ignores its late response',async()=>{
  const m=manager();const {result,rerender}=renderHook(({group})=>usePremiumFinance(m,'member',group),{initialProps:{group:'g'}});await waitFor(()=>expect(result.current.own).not.toBeNull());
  let finish:(v:unknown)=>void=()=>{};vi.mocked(m.call).mockImplementation(()=>new Promise(resolve=>{finish=resolve;}));rerender({group:'other'});expect(result.current.own).toBeNull();await act(async()=>{finish(own('member','g'));});expect(result.current.own).toBeNull();expect(result.current.error).not.toBe('');
+});
+it('clears an uncertain finance intent on logout even when its screen has already unmounted',async()=>{
+ let lost=true,signedOut=false;const listeners=new Set<()=>void>();
+ const m=manager(async()=>{if(lost)throw new AccountError('Lost acknowledgement','network_error');return {ok:true,group_id:'g'};});
+ const snapshot=m.getSnapshot;vi.spyOn(m,'getSnapshot').mockImplementation(()=>signedOut?{phase:'signed_out',session:null,message:''}:snapshot());
+ vi.spyOn(m,'subscribe').mockImplementation(listener=>{listeners.add(listener);return()=>{listeners.delete(listener);};});
+ const body={amount_cents:1000,reason:'New intentional payment after login'};
+ const first=renderHook(()=>usePremiumFinance(m,'member','g'));await waitFor(()=>expect(first.result.current.own).not.toBeNull());
+ await act(()=>first.result.current.mutate('submit_payment',body));first.unmount();
+ act(()=>{signedOut=true;listeners.forEach(listener=>listener());});signedOut=false;lost=false;
+ const second=renderHook(()=>usePremiumFinance(m,'member','g'));await waitFor(()=>expect(second.result.current.own).not.toBeNull());await act(()=>second.result.current.mutate('submit_payment',body));
+ const calls=vi.mocked(m.call).mock.calls.filter(([action])=>action==='group_finance_submit_payment');
+ expect(calls).toHaveLength(2);expect(calls[0][1]?.request_id).not.toBe(calls[1][1]?.request_id);
 });

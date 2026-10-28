@@ -4,13 +4,19 @@ import { account,detail,receipts } from './contracts';
 import type { Account,Detail,Receipt } from './contracts';
 import { AccountError } from '../auth/api';
 // Preserve an uncertain intent across view navigation in this authenticated RAM session.
-const intents=new WeakMap<SessionManager,{owner:string;keys:Map<string,string>}>();
-function requestKeys(manager:SessionManager,owner:string){let entry=intents.get(manager);if(!entry||entry.owner!==owner){entry={owner,keys:new Map()};intents.set(manager,entry);}return entry.keys;}
+const intents=new WeakMap<SessionManager,{owner:string;keys:Map<string,string>;watching:boolean}>();
+function requestRegistry(manager:SessionManager,owner:string){let entry=intents.get(manager);if(!entry){entry={owner,keys:new Map(),watching:false};intents.set(manager,entry);}if(entry.owner!==owner){entry.keys.clear();entry.owner=owner;}return entry;}
 export function usePremiumFinance(manager:SessionManager,userId:string,groupId:string,eventId?:string,manage=false,onChanged?:()=>void){
  const scope=`${userId}:${groupId}:${eventId??''}:${manage}`,currentScope=useRef(scope);currentScope.current=scope;
  const [state,setState]=useState<{scope:string;own:Account|null;detail:Detail|null;pending:Receipt[];names:Record<string,string>}>({scope,own:null,detail:null,pending:[],names:{}}),[loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
- const registry=requestKeys(manager,userId);
- const alive=useRef(true),generation=useRef(0),flight=useRef(false),keys=useRef(registry);keys.current=registry;
+ const registry=requestRegistry(manager,userId);
+ const alive=useRef(true),generation=useRef(0),flight=useRef(false),keys=useRef(registry.keys);keys.current=registry.keys;
+ // A data-only observer lives with this manager, not with an individual screen.
+ // Logout must clear uncertain intents even after navigating away from Finance.
+ // Network unavailability keeps them for a verified session resume and safe retry.
+ useEffect(()=>{if(registry.watching)return;registry.watching=true;manager.subscribe(()=>{
+  const auth=manager.getSnapshot();if(auth.phase==='signed_out'||auth.phase==='storage_error'||auth.session&&auth.session.user_id!==registry.owner)registry.keys.clear();
+ });},[manager,registry]);
  const valid=useCallback(()=>alive.current&&currentScope.current===scope&&manager.getSnapshot().phase==='ready'&&manager.getSnapshot().session?.user_id===userId,[manager,userId,scope]);
  const reload=useCallback(async()=>{
   const ticket=++generation.current;setLoading(true);setError('');setState({scope,own:null,detail:null,pending:[],names:{}});
