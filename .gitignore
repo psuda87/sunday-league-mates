@@ -179,3 +179,6 @@ GoogleService-Info.plist
 # Consolidation local Android variants
 app/dist-b1/
 app/dist-live-local/
+
+app/dist-android-stage3/
+app/dist-premium-finance-local/

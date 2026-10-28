@@ -1,4 +1,5 @@
 import { useCallback,useEffect,useRef,useState } from 'react';
+import { AccountError } from '../auth/api';
 import type { SessionManager } from '../auth/sessionManager';
 import type { GroupWorld,GroupPerson } from '../demo/groups';
 import type { GroupBinding,GroupDetail,GroupIdentity,GroupRequest,GroupSummary } from './model';
@@ -27,7 +28,7 @@ export function useGroups(manager:SessionManager,userId:string){
  const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState(''),[found,setFound]=useState<GroupBinding['found']>([]),[candidates,setCandidates]=useState<GroupBinding['candidates']>([]);
  const [searching,setSearching]=useState(false),[finding,setFinding]=useState(false);
  const alive=useRef(true),generation=useRef(0),searchEpoch=useRef(0),candidateEpoch=useRef(0),flight=useRef(false),selected=useRef<string|null>(window.location.hash.startsWith('#group/')?window.location.hash.slice(7):null),keys=useRef(new Map<string,string>());
- const fail=useCallback((e:unknown)=>{if(alive.current)setError(e instanceof Error?e.message:'Nie udało się potwierdzić danych grup.');},[]);
+ const fail=useCallback((e:unknown)=>{if(alive.current)setError(e instanceof AccountError&&e.code==='forbidden'?'Nie masz dostępu do tej grupy.':'Nie udało się potwierdzić danych grup. Odśwież i spróbuj ponownie.');},[]);
  const refresh=useCallback(async()=>{
   if(!alive.current)return;const ticket=++generation.current;setLoading(true);setError('');
   try {
@@ -51,7 +52,7 @@ export function useGroups(manager:SessionManager,userId:string){
  useEffect(()=>{alive.current=true;void refresh();return()=>{alive.current=false;invalidate();};},[refresh,userId,invalidate]);
  const mutate=async<T,>(action:string,body:Record<string,unknown>)=>{
   const fingerprint=JSON.stringify([action,body]);let key=keys.current.get(fingerprint);if(!key){key=crypto.randomUUID();keys.current.set(fingerprint,key);}
-  const result=await manager.call<T>(action,{...body,request_id:key});keys.current.delete(fingerprint);return result;
+  const result=await manager.call<T>(action,{...body,request_id:key});keys.current.delete(fingerprint);window.dispatchEvent(new Event('slm-groups-changed'));return result;
  };
  async function work<T>(task:()=>Promise<T>):Promise<T|null>{
   if(flight.current||manager.getSnapshot().phase!=='ready'||manager.getSnapshot().session?.user_id!==userId)return null;

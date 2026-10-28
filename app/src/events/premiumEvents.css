@@ -1,0 +1,30 @@
+/* Restores the original Premium shell; only the real events subtree is scoped. */
+.slm-premium-events {min-width:0;width:100%;padding-bottom:18px;}
+.slm-events-controls {display:grid;gap:8px;margin:10px 0 14px;min-width:0;}
+.slm-events-controls label {display:grid;gap:7px;min-width:0;font-size:.8rem;color:var(--slm-text-secondary);}
+.slm-events-controls select,.slm-lineup-roster select {display:block;box-sizing:border-box;width:100%;min-width:0;min-height:44px;padding:9px 12px;border:1px solid var(--slm-border);border-radius:10px;background:var(--slm-panel);color:var(--slm-text);font:inherit;}
+.slm-events-controls ion-button {margin:0;min-height:44px;white-space:normal;}
+.slm-premium-events .slm-event-label {margin-top:10px;}
+.slm-events-private-note {margin:4px 4px 0;font-size:.72rem;color:var(--slm-text-secondary);}
+.slm-premium-events .slm-match-list > div {min-width:0;}
+.slm-premium-events .slm-compact-count > span:only-child {font-size:.66rem;}
+.slm-premium-events .slm-live-entry {display:flex;align-items:flex-start;gap:10px;min-width:0;}
+.slm-premium-events .slm-demo-person-meta {min-width:0;overflow-wrap:anywhere;}
+.slm-premium-events .slm-demo-person-meta small {display:block;}
+.slm-lineup-roster {margin-block:12px;}
+.slm-lineup-roster summary {min-height:44px;cursor:pointer;}
+.slm-lineup-roster label {display:grid;grid-template-columns:minmax(0,1fr) minmax(110px,42%);gap:8px;align-items:center;margin-block:8px;font-size:.8rem;overflow-wrap:anywhere;}
+.slm-live-teams .slm-pitch-name {overflow-wrap:anywhere;}
+.slm-premium-events button:focus-visible,.slm-premium-events select:focus-visible {outline:2px solid var(--slm-gold);outline-offset:2px;}
+
+/* Restore flexible header width; no logo clipping or phone-specific offsets. */
+.slm-premium-events .slm-compact-header {padding-inline-end:max(8px,env(safe-area-inset-right,0px));box-sizing:border-box;min-width:0;max-width:100%;}
+.slm-premium-events .slm-compact-header h1 {min-width:0;overflow-wrap:anywhere;font-size:clamp(1.2rem,6vw,1.7rem);}
+.slm-scroll-header-marker {height:1px;}
+.slm-scroll-header {position:sticky;top:var(--ion-safe-area-top,0px);height:44px;margin-bottom:-44px;z-index:8;display:flex;align-items:center;gap:8px;box-sizing:border-box;min-height:44px;padding:0 6px;background:var(--slm-panel);border-bottom:1px solid var(--slm-border);border-radius:0 0 10px 10px;}
+.slm-scroll-header[data-stuck=false] {visibility:hidden;pointer-events:none;}
+.slm-scroll-header strong {flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.slm-scroll-header ion-button {flex:none;min-height:44px;margin:0;}
+.slm-team-unassigned button {min-height:44px;margin:3px;padding:8px;border:1px solid var(--slm-border);border-radius:9px;background:var(--slm-panel);color:var(--slm-text);}
+
+.slm-premium-events button,.slm-premium-events input,.slm-premium-events select,.slm-premium-events summary,.slm-premium-events [tabindex] {scroll-margin-top:calc(56px + var(--ion-safe-area-top,0px));}

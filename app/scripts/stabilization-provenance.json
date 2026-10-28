@@ -1,0 +1,390 @@
+{
+  "base": "134c52b1aee0d0804cc0cf71f151f95040e7a38f",
+  "approved_source": "a82397b130ca2296511247e848139edb79308a87",
+  "source_prs": [
+    20,
+    21,
+    22,
+    23
+  ],
+  "excluded_prs": [
+    18,
+    19
+  ],
+  "files": {
+    "app/android-stage3/index.html": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "4613b3347dce547e32bdfc7c1b4cbbeafc99d54b9507d519c2130fa849e51cd3",
+      "history": [
+        "c6e224ea16c31a744a397310315d568f34117464"
+      ]
+    },
+    "app/android-stage3/main.tsx": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "938d1467e61ceb84c5c25f50974dcb3bf81f9d94b65d991d046a260639aa0ab2",
+      "history": [
+        "534986ccb6e57c4aad8b09a870542650fd3ddb13",
+        "74b1595d7a8dc79d50ba451df6afe2ea6da95e55",
+        "c6e224ea16c31a744a397310315d568f34117464"
+      ]
+    },
+    "app/capacitor.config.ts": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "4a6280636c6386e75040eabb01232291e128f2b26fd54b10f07f47389be5e77a",
+      "history": [
+        "c6e224ea16c31a744a397310315d568f34117464"
+      ]
+    },
+    "app/cypress/premium-behavior.cy.ts": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "895d46e15433b969d778c0e66bce6527ef8db580a78a7aa3181ac3221fd2bb4d",
+      "history": [
+        "f2c31fdfb901467e46fcb0099dec0e565f512bb7"
+      ]
+    },
+    "app/scripts/test-premium-behavior-http.mjs": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "05c794e7f7fbf39e51189c89a6158405c00052d0616236e1d003ffd63787c6d7",
+      "history": [
+        "f2c31fdfb901467e46fcb0099dec0e565f512bb7"
+      ]
+    },
+    "app/scripts/test-premium-finance-authority-http.mjs": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "f9326c55f1c3d2d78fd08cc4b43262ca836a899046eb64b9f46e0214e16fc93e",
+      "history": [
+        "a82397b130ca2296511247e848139edb79308a87"
+      ]
+    },
+    "app/src/auth/projectStore.test.ts": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "411920b1e67f503704c93a695be2a1dcdd4799030e373a3e79bf96839518d21c",
+      "history": [
+        "845d35e1bc644be5935d3658ed1e3a57cd74b518"
+      ]
+    },
+    "app/src/auth/tokenStore.ts": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "12af3ce3df4c8afc3ca123fb761cde0ce4f4c1c3367357f6e4b9edeab30ed562",
+      "history": [
+        "845d35e1bc644be5935d3658ed1e3a57cd74b518"
+      ]
+    },
+    "app/src/demo/App.tsx": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "1e8b3c00aa8f985d6011cdc519ae02d6c9893999aa8912bf3eaa27a0e214ba85",
+      "history": [
+        "d621f730bfbf501fdedac02f0b104427965afc34"
+      ]
+    },
+    "app/src/demo/EventForm.tsx": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "ca71db90b3dc9317c9f1739d4137fd90a286d88bb6fdd38a6e333349e98dd214",
+      "history": [
+        "d621f730bfbf501fdedac02f0b104427965afc34"
+      ]
+    },
+    "app/src/demo/GroupScreens.tsx": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "c182e21b52af1ecfdf19e7c93796e48c69e1c4ad0b82b1f0aa733589f9624ca9",
+      "history": [
+        "d621f730bfbf501fdedac02f0b104427965afc34"
+      ]
+    },
+    "app/src/demo/Profile.tsx": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "ae9eb9d7c30b80cd210f01e312d5ea8d904bb79f744a7f11fd4ba1e95b31b82e",
+      "history": [
+        "d621f730bfbf501fdedac02f0b104427965afc34"
+      ]
+    },
+    "app/src/demo/Teams.tsx": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "df6f798173982e3f026b21dfea1b4bdefa0a3548cdad1afd237f53af2ff22773",
+      "history": [
+        "534986ccb6e57c4aad8b09a870542650fd3ddb13"
+      ]
+    },
+    "app/src/events/PremiumEvents.tsx": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "4f831c5819bf7474d5e0121cf4533fab9f1b940a0ba8fc06734b27f3da17545f",
+      "history": [
+        "f2c31fdfb901467e46fcb0099dec0e565f512bb7",
+        "534986ccb6e57c4aad8b09a870542650fd3ddb13",
+        "b46689a02d17d5eb6fccc5e3f4d9ed007480640d",
+        "d621f730bfbf501fdedac02f0b104427965afc34"
+      ]
+    },
+    "app/src/events/PremiumScrollHeader.tsx": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "c8ac9fabcfcae6764ee299ee47bec438268f4202df17a4964ae8ba869f952cc5",
+      "history": [
+        "f2c31fdfb901467e46fcb0099dec0e565f512bb7"
+      ]
+    },
+    "app/src/events/PremiumTeams.tsx": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "dad199918fbfd0447b027576b969bf7135e74eb7c19d2796947d0b0ce820fd6a",
+      "history": [
+        "f2c31fdfb901467e46fcb0099dec0e565f512bb7",
+        "534986ccb6e57c4aad8b09a870542650fd3ddb13"
+      ]
+    },
+    "app/src/events/PremiumWorld.tsx": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "1e6a99a7033350b391b23abce7c81ecf449bb9d2278793af9491be8f6af3d88c",
+      "history": [
+        "b46689a02d17d5eb6fccc5e3f4d9ed007480640d",
+        "d621f730bfbf501fdedac02f0b104427965afc34"
+      ]
+    },
+    "app/src/events/eventFilters.test.ts": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "071c2cba954e3b8c98852cfb4b195da58a05d9f17bd7ebcc984129faaa9acadb",
+      "history": [
+        "f2c31fdfb901467e46fcb0099dec0e565f512bb7"
+      ]
+    },
+    "app/src/events/eventFilters.ts": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "762ff73bbe4304563efdc1be2db2e8e47b6c496c525e338193ed776ed5df377f",
+      "history": [
+        "f2c31fdfb901467e46fcb0099dec0e565f512bb7"
+      ]
+    },
+    "app/src/events/model.test.ts": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "a0ca36737cddde0857bbe1213ee51055240771fbd9db8f8ea3697f070c998f23",
+      "history": []
+    },
+    "app/src/events/model.ts": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "564d18b5239daeec755756ac46da5e84ef74bbff82730442d2f168e09073ff70",
+      "history": []
+    },
+    "app/src/events/premium.test.tsx": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "923f3f2eb63fbb50f6e55ebcdeb872e9f33d27ac39160e3d2bccddbd7872d0fd",
+      "history": [
+        "f2c31fdfb901467e46fcb0099dec0e565f512bb7",
+        "d621f730bfbf501fdedac02f0b104427965afc34"
+      ]
+    },
+    "app/src/events/premiumContracts.ts": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "0f54a4c7ea1c2f57a730f33a6bf3a5234f6bded8cd47be7008eb9a20b42d94af",
+      "history": [
+        "f2c31fdfb901467e46fcb0099dec0e565f512bb7",
+        "d621f730bfbf501fdedac02f0b104427965afc34"
+      ]
+    },
+    "app/src/events/premiumEvents.css": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "4fc9dcbf468a2853a82a73a37530dfbe6e8aac10ed7afb2f89129850847530fc",
+      "history": [
+        "f2c31fdfb901467e46fcb0099dec0e565f512bb7",
+        "534986ccb6e57c4aad8b09a870542650fd3ddb13"
+      ]
+    },
+    "app/src/events/premiumForm.ts": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "c79d0093a8d09978e5b634a7f6a00be32f6375ad12f97bc3a2fa0a59dfa6242d",
+      "history": [
+        "d621f730bfbf501fdedac02f0b104427965afc34"
+      ]
+    },
+    "app/src/events/premiumUi.test.tsx": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "21aced10d860e19b37df8c1a641adb65a6f354ec71f870d28179d9358d592ffa",
+      "history": [
+        "f2c31fdfb901467e46fcb0099dec0e565f512bb7",
+        "534986ccb6e57c4aad8b09a870542650fd3ddb13"
+      ]
+    },
+    "app/src/events/usePremiumEvents.ts": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "dd7405c9d19174ad86a86fb42c7ddaa50b3313daa15b7441e70ae43eab3256b1",
+      "history": [
+        "f2c31fdfb901467e46fcb0099dec0e565f512bb7",
+        "b46689a02d17d5eb6fccc5e3f4d9ed007480640d",
+        "d621f730bfbf501fdedac02f0b104427965afc34"
+      ]
+    },
+    "app/src/finance/PremiumFinance.tsx": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "9211518b8292d1e4ba491d7d32f7e4a7ed7963c487683e8fd73d93a0ebd279df",
+      "history": [
+        "b46689a02d17d5eb6fccc5e3f4d9ed007480640d"
+      ]
+    },
+    "app/src/finance/PremiumGroupFinance.tsx": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "d517453d2b7f4596756dd6b30deb07070463b437d01e420361266e1bcd995024",
+      "history": [
+        "b46689a02d17d5eb6fccc5e3f4d9ed007480640d"
+      ]
+    },
+    "app/src/finance/contracts.ts": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "f4668d44e871ba1cf5b0ac78dcf6929584b7a67ffd3528a1d8e1f8c98e641620",
+      "history": [
+        "b46689a02d17d5eb6fccc5e3f4d9ed007480640d"
+      ]
+    },
+    "app/src/finance/finance.test.tsx": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "e777f13346e559365c91acac43f436509f758dbc18365417125234a92ad51fd7",
+      "history": [
+        "a82397b130ca2296511247e848139edb79308a87",
+        "8743d796d8da08bd613f04fd6258b74cbb5ab9c4",
+        "b46689a02d17d5eb6fccc5e3f4d9ed007480640d"
+      ]
+    },
+    "app/src/finance/premiumFinance.css": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "9d76224b5c35b2c6de12bba13e70a7dbfcfb5e242ccd6b48480ad0df2396d824",
+      "history": [
+        "b46689a02d17d5eb6fccc5e3f4d9ed007480640d"
+      ]
+    },
+    "app/src/finance/usePremiumFinance.ts": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "2bca0842a31b303e4d85099bda84f4ea5097a70041dd57d4dfc64b278e618098",
+      "history": [
+        "a82397b130ca2296511247e848139edb79308a87",
+        "8743d796d8da08bd613f04fd6258b74cbb5ab9c4",
+        "b46689a02d17d5eb6fccc5e3f4d9ed007480640d"
+      ]
+    },
+    "app/src/groups/useGroups.test.tsx": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "90c18c621cb9802cb7e125337146aec85695e4e03f0af397ed0675937874cce8",
+      "history": [
+        "d621f730bfbf501fdedac02f0b104427965afc34"
+      ]
+    },
+    "app/src/groups/useGroups.ts": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "96ac4d2a9f24307913748f8965bf3209c266667a5b7a99f6f2d3fe68cd803e37",
+      "history": [
+        "d621f730bfbf501fdedac02f0b104427965afc34"
+      ]
+    },
+    "app/src/profile/imageDimensions.ts": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "6d9b4605276cd985e02df40f3897d995ca6396a72d1a3720c3e75b7a70db5b51",
+      "history": []
+    },
+    "app/src/ui/MatchHero.tsx": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "328af3bb4624cb68ad937f653002c05dd59b86389449d82bd8ca01747eb3b1ac",
+      "history": [
+        "534986ccb6e57c4aad8b09a870542650fd3ddb13"
+      ]
+    },
+    "app/src/ui/PremiumPitch.tsx": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "b8e50502f4c135e7a7c21899f81fbced63940deeddaa09e29306ecc58b3a7bf2",
+      "history": [
+        "534986ccb6e57c4aad8b09a870542650fd3ddb13"
+      ]
+    },
+    "app/supabase/migrations/20261028174603_premium_match_membership_visibility.sql": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "ba8e2ef05b106e4b3feba1420368c97dcbbcdbafa944acd02b78e4288ba430da",
+      "history": [
+        "f2c31fdfb901467e46fcb0099dec0e565f512bb7"
+      ]
+    },
+    "app/supabase/migrations/20261028174920_premium_member_creation_finance_guard.sql": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "fe59475ebb32549a92f70a351a18efb1b981eef0f3b1c2b972e55f75a6bff9b3",
+      "history": [
+        "f2c31fdfb901467e46fcb0099dec0e565f512bb7"
+      ]
+    },
+    "app/supabase/migrations/20261028175508_premium_match_feed_filters.sql": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "a2e5e7abfa154de332c27ec66d7e713a742f7b9678fe9a8f594ddd5289e4b964",
+      "history": [
+        "f2c31fdfb901467e46fcb0099dec0e565f512bb7"
+      ]
+    },
+    "app/supabase/migrations/20261028181054_premium_group_admin_only_finance.sql": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "da56d8ff935e6fbe3631cddc7e47162469a5772b8975bf61ab1bfbeba51dbaf1",
+      "history": [
+        "a82397b130ca2296511247e848139edb79308a87"
+      ]
+    },
+    "app/supabase/tests/premium_admin_finance.sql": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "36fee297d6399e3ce92e99cd86eb5e5464c3445013ff00ceb3c9d0b98d01b32f",
+      "history": [
+        "a82397b130ca2296511247e848139edb79308a87"
+      ]
+    },
+    "app/supabase/tests/premium_match_visibility.sql": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "0823bcb8465010d70587c717aa004f527fdf5141aaa3de7797d75a84b54ef170",
+      "history": [
+        "f2c31fdfb901467e46fcb0099dec0e565f512bb7"
+      ]
+    },
+    "app/vite.android-stage3.config.ts": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "0191c3b1cde8c8ed2573a4c9e0ec19b7ba6468d33fdc70de6124f1a2ba0ef043",
+      "history": [
+        "c6e224ea16c31a744a397310315d568f34117464"
+      ]
+    },
+    "app/vite.premium-finance-local.config.ts": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "9c5c8f8d33052ee374d6d83db067f4a60399ff8d3aa5fbf4055429b9d2c12900",
+      "history": [
+        "8743d796d8da08bd613f04fd6258b74cbb5ab9c4"
+      ]
+    },
+    "docs/PREMIUM_LINEUP_BACKEND_PLAN.md": {
+      "source": "a82397b130ca2296511247e848139edb79308a87",
+      "source_sha256": "c6f1457383d498cfe3617682c522f3232428a3239f283236384476b50969aeaf",
+      "history": [
+        "f2c31fdfb901467e46fcb0099dec0e565f512bb7"
+      ]
+    }
+  },
+  "adaptations": {
+    "app\\src\\auth\\B1App.tsx": "main B1 unchanged Auth; import PremiumWorld and pass existing manager/userId only",
+    "app\\src\\auth\\B1App.test.tsx": "Keep Auth unit isolation; actual unmocked entry chain covered separately",
+    "app\\android-stage3\\main.tsx": "No candidate accountModel prop exists: retain main B1 Auth only",
+    "app\\supabase\\functions\\accounts\\handler.ts": "main handler unchanged Auth; add only scope/period to matches whitelist",
+    "app\\vite.demo.config.ts": "Presentation-only PremiumPitch added to explicit isolated-demo allowlist",
+    "app/src/live/Matches.tsx": "Main LIVE preserved; server capability enables ordinary member create; basic edit available independently of financial admin; no styling rewrite",
+    "app/supabase/functions/_shared/webp.ts": "Type-only explicit dimensions union replaces narrowed typeof null; validator behavior unchanged",
+    "app/scripts/test-premium-behavior-http.mjs": "Dedicated55321 tests against main Auth; candidate model must be absent, no fallback to previous used projects",
+    "app/scripts/test-premium-finance-authority-http.mjs": "Dedicated55321 authority tests, candidate unavailable by absence",
+    "app/supabase/tests/premium_match_visibility.sql": "Assert candidate schema absent rather than selecting excluded Auth18 table",
+    "app/scripts/consolidation-sources.json": "Token namespace hash taken from immutable source a823; historical main migration hashes retained",
+    "app/vite.demo.config.ts": "Only original presentation PremiumPitch allowed; no Auth/API bundle inclusion",
+    "app/package.json": "Approved opt-in entry scripts; Vitest4.1.12/qs6.16.1 maintenance; no SMTP dependencies",
+    "app/scripts/premium318-contract.json": "Only six hashes already approved in a823; all other main-approved visual hashes retained",
+    "app/src/auth/B1App.test.tsx": "Old gate test mocks the new wrapper path; separate premiumRuntime test renders actual graph without UI mocks",
+    "app/scripts/stabilization-browser.mjs": "PR23 real-HTTP browser runner adapted to isolated55321/5196; screenshots use synthetic data only"
+  },
+  "approved_visual_exceptions": [
+    "app/src/demo/App.tsx",
+    "app/src/demo/EventForm.tsx",
+    "app/src/demo/GroupScreens.tsx",
+    "app/src/demo/Profile.tsx",
+    "app/src/demo/Teams.tsx",
+    "app/src/ui/MatchHero.tsx"
+  ],
+  "strategy": "Selective source transplant on main; no parent ancestry from experimental Auth18, no fake merge, source commits retained in original branches",
+  "unchanged_main_migrations": 35,
+  "added_approved_migrations": 4,
+  "new_compatibility_migration": {
+    "file": "app/supabase/migrations/20261028204500_restore_pr16_match_name_projection.sql",
+    "reason": "Real PR16 regression test exposed overwritten privacy-aware name projection in new matches dispatcher; restores same existing formatter, no changes to consent/identity/roles",
+    "tested": "isolated55321 only"
+  }
+}
