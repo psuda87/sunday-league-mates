@@ -97,3 +97,6 @@ Procedura nie utworzyła teraz nowych kont/grup/meczów i nie zmieniła fixture.
 - Nowy Auth18 nadal nieaktywny; bez Cloud, płatnych usług, wdrożeń i merge. Nie ponawiano pełnej regresji SQL/HTTP finansów, ponieważ ich kod/kontrakty są niezmienione.
 
 Samodzielnie wybrano współdzielony prezentacyjny Pitch zamiast kopiowania demo reducera, ręczny podgląd zamiast nowego algorytmu, opcjonalną projekcję karty zamiast fałszywego0/0 oraz natywny inset zamiast sztucznego CSS przesunięcia pod konkretny telefon.
+
+
+[2026-10-28 18:15:26 Europe/Warsaw] Wynik P0: kod i zrzuty wypchnięte, commit534986ccb6e57c4aad8b09a870542650fd3ddb13. Draft PR23 https://github.com/psuda87/sunday-league-mates/pull/23 zależny od22, bez merge. APK e2e2b0f630c56a35dc5166a5424ac0f08a4bbdac55791f6a0a8d88fb16f1f251 gotowy w .worktrees/premium-ui-regression/app/android/app/build/outputs/apk/debug/app-debug.apk. Przegląd Chrome przed/po i24 testy PASS, native POCO OCZEKUJE. Wymagana osobna zgoda na aktualizację; nowego APK nie zainstalowano. Pełny raport docs/PREMIUM_UI_REGRESSION.md; odpowiedzi docs/ODPOWIEDZI_CODEX.txt.
