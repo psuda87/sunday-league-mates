@@ -9,8 +9,9 @@ from pathlib import Path
 import subprocess
 import uuid
 
-READINESS=os.environ.get("SLM_SECURITY_READINESS")=="1"
-CONTAINER = "supabase_db_slm-online-readiness" if READINESS else "supabase_db_sunday-league-mates"
+PREMIUM=os.environ.get("SLM_PREMIUM_REAL_EVENTS")=="1"
+READINESS=PREMIUM or os.environ.get("SLM_SECURITY_READINESS")=="1"
+CONTAINER = "supabase_db_slm-premium-real-events" if PREMIUM else "supabase_db_slm-online-readiness" if READINESS else "supabase_db_sunday-league-mates"
 DB = "slm_backend_test_" + uuid.uuid4().hex
 created = False
 passed = 0
@@ -50,12 +51,14 @@ def rpc(index, action, body, finance=False, expected=None, rollback=False):
 
 try:
     branch = subprocess.check_output(["git", "branch", "--show-current"], text=True).strip()
-    assert branch in ("feat/integration","feat/v1-consolidation","feat/premium-b3-groups",*( ["feat/account-model-foundation"] if READINESS else [])), "Requires reviewed integration/consolidation branch"
+    if PREMIUM:assert branch=="feat/premium-real-events-stage1", "Premium tests require isolated branch"
+    assert branch in ("feat/integration","feat/v1-consolidation","feat/premium-b3-groups",*( ["feat/premium-real-events-stage1"] if PREMIUM else ["feat/account-model-foundation"] if READINESS else [])), "Requires reviewed integration/consolidation branch"
     context_host = subprocess.check_output(["docker","context","inspect","--format","{{.Endpoints.docker.Host}}"],text=True).strip()
     docker_host = os.environ.get("DOCKER_HOST") or context_host
     assert docker_host.startswith(("npipe://", "unix://")), "Only a local Docker socket is allowed"
     inspected = subprocess.check_output(["docker", "inspect", "--format", "{{.Name}}", CONTAINER], text=True).strip()
     assert inspected == "/" + CONTAINER
+    if PREMIUM:assert json.loads(subprocess.check_output(["docker","inspect",CONTAINER]))[0]["Config"]["Labels"]["com.supabase.cli.project"]=="slm-premium-real-events"
     assert command(["createdb", "-U", "postgres", "-T", "template0", DB]).returncode == 0
     created = True
     dump = command(["pg_dump", "-U", "postgres", "-d", "postgres", "--schema-only"])

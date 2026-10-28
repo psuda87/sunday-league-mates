@@ -15,7 +15,8 @@
     "Owner-reported PR16 nested label/input spacing: column layout and existing 7px gap only within Premium profile editor; card/nav/colors unchanged",
     "Owner-authorized inactive account-model candidate: conditional nickname/contact/password fields and original form bindings; no card/nav/CSS/theme changes or default activation",
     "Inactive account-model email extension: conditional owner email settings and required recovery email; no existing card/nav/CSS changes",
-    "Online-readiness opt-in: optional nonvisual signup challenge, fixed callback app URL and isolated project token-store factory; default legacy keys/native protection and frozen visuals preserved"
+    "Online-readiness opt-in: optional nonvisual signup challenge, fixed callback app URL and isolated project token-store factory; default legacy keys/native protection and frozen visuals preserved",
+    "Owner-authorized real-data stage1: real events slot in Premium shell, shared original EventForm optional data port, nontechnical group/profile text; CSS/assets/Ultimate/BottomNav remain unchanged. No demo reducer used for real events."
   ],
   "files": {
     "app/demo/main.tsx": {
@@ -99,7 +100,7 @@
       "text": true
     },
     "app/src/demo/App.tsx": {
-      "sha256": "07d83da5673573d2a9972314783ad5d205dd708d2c1c6ca365c955a080f50b32",
+      "sha256": "1e8b3c00aa8f985d6011cdc519ae02d6c9893999aa8912bf3eaa27a0e214ba85",
       "text": true
     },
     "app/src/demo/DemoBottomNav.tsx": {
@@ -111,7 +112,7 @@
       "text": true
     },
     "app/src/demo/EventForm.tsx": {
-      "sha256": "abdaefc1709754e97e7a74bc692ffcc8754cea9e5ff40597a7b081e863969973",
+      "sha256": "ca71db90b3dc9317c9f1739d4137fd90a286d88bb6fdd38a6e333349e98dd214",
       "text": true
     },
     "app/src/demo/Finance.tsx": {
@@ -119,7 +120,7 @@
       "text": true
     },
     "app/src/demo/GroupScreens.tsx": {
-      "sha256": "56734655462b4c042d6cacd04cabccfdd161b6e90c3919d45ffa93b0c6b09813",
+      "sha256": "c182e21b52af1ecfdf19e7c93796e48c69e1c4ad0b82b1f0aa733589f9624ca9",
       "text": true
     },
     "app/src/demo/Identity.tsx": {
@@ -131,7 +132,7 @@
       "text": true
     },
     "app/src/demo/Profile.tsx": {
-      "sha256": "8836de763da62f01de28dc2455bdfa714808ccaaa4611c9e483204fa9b2f9382",
+      "sha256": "ae9eb9d7c30b80cd210f01e312d5ea8d904bb79f744a7f11fd4ba1e95b31b82e",
       "text": true
     },
     "app/src/demo/Teams.tsx": {
