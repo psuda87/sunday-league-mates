@@ -178,3 +178,48 @@ Trwałe składy/autorstwo/CAS realizować jako następny samodzielny etap wedłu
 Przy kontroli funkcji/RLS wykorzystano aktualne [zalecenia Supabase dla funkcji](https://supabase.com/docs/guides/database/functions) i [RLS](https://supabase.com/docs/guides/database/postgres/row-level-security): serwerowe API z jawnie zweryfikowaną sesją, ograniczone EXECUTE, prywatne helpery, bez poszerzania grantów. Źródła te opisują model zabezpieczeń; wyniki PASS powyżej pochodzą z wykonanych testów projektu.
 
 Kontrola consolidation została zaktualizowana z44 do47 plików migracji (nowe3). Hashy32 historycznych migracji i chronionych źródeł main nie zmieniono. Guard zachowuje ancestry, wyłączony deployment i canonical local preparation; po aktualizacji PASS.
+
+
+# Ostateczna decyzja finansowa właściciela — 2026-10-28 22:01:09 Europe/Warsaw
+
+**Obowiązuje wyłącznie aktualny, aktywny administrator grupy.** To zastępuje wcześniejszą sekcję tego raportu, w której twórca-organizator zachowywał finanse. Zasady zapisano również na początku AGENTS.md; nie zmieniono wcześniejszych wpisów historycznych.
+
+## Wynik audytu RPC/RLS
+
+| Ścieżka | Wynik / zmiana |
+|---|---|
+| `group_finance_admin` | Bieżący admin_id + członkostwo + niearchiwalna grupa + aktywne konto bez operacji w toku; usunięty wyjątek archived dla ostatniego admina |
+| `match_finance` | Wyłącznie group_finance_admin dla rzeczywistej grupy wydarzenia; zero sprawdzania created_by lub organizer |
+| `own_finance_scope` | Zweryfikowana bieżąca sesja i aktualna rola w tej grupie; event_id musi należeć do group_id, bez alternatywnej ścieżki przez twórcę |
+| `group_finance_dispatch_core` / publiczny dispatcher | Odczyt administracyjny, approve/cost/charge/attendance, record/accept/reject/correct_payment przechodzą przez powyższe helpery; własne account/submit_payment zachowane |
+| Legacy settlements/events + `finance_admin` RLS | Korzystają z legacy_finance_manager; tylko administrator faktycznie zmapowanej grupy legacy, bez globalnej roli jako fallbacku. Dodatni test poprawnie zmapowanego administratora i ujemny byłego/globalnego w transakcji z rollback |
+| Polityki ledger/payments/surplus | Aktualna rola sprawdzana przez own_finance_scope; osobne własne wiersze pozostają dostępne. Direct REST po transferze roli starym tokenem nie pokazuje cudzych wpisów |
+| `matches_create/edit` | Tworzenie przez aktywnego członka, edycja podstawowych danych przez twórcę nadal działa; edycja nie zatwierdza kosztów ani nie nadaje ról |
+| Dostęp bezpośredni | Publiczne dispatchery nadal service-only; klienckie helpery finansowe tylko finance_admin i own_finance_scope z tożsamością z sesji; brak rozszerzonych grantów |
+
+Przejrzano rzeczywiste definicje wdrożonych funkcji oraz źródła migracji. Jedyną aktywną funkcją finansową z odwołaniem do created_by był match_finance; po poprawce takich funkcji jest0. Nie usuwano created_by z wydarzenia — nadal identyfikuje autora i służy prawu edycji podstawowych danych.
+
+Grupy, mecze i finanse używają istniejącego wspólnego advisory lock(20261014,1), więc transfer roli i operacje finansowe zachowują istniejącą serializację. Nowe żądanie po zatwierdzonym transferze czyta aktualną rolę w bazie; nie potrzebuje refresh JWT. To nie oznacza automatycznego wymazania wcześniej odczytanego ekranu na innym urządzeniu: bez Realtime widok odświeża się przy dotychczasowym odświeżeniu/wznowieniu, a decyzję serwer odrzuca od razu.
+
+## Implementacja bez zmian wyglądu
+
+Nowa migracja `20261028181054_premium_group_admin_only_finance.sql` zastępuje cztery powyższe helpery. Nie zmienia kont, UUID, admin_id, kwot, ledgera ani poprzednich migracji. Private SECURITY DEFINER i ich istniejące ACL zachowane tam, gdzie wymaga ich RLS; pusty search_path i kwalifikacje. Legacy manager jest invoker. Brak nowych grantów.
+
+Jedyna produkcyjna zmiana frontendu to niewizualny `usePremiumFinance`: stara wskazówka manage nie wystarcza bez świeżego potwierdzenia administratora w projekcji konta (surplus!==null); po zdarzeniu istniejących grup ponownie pobiera zakres i usuwa cache panelu administratora. Własne konto nadal działa. Nie zmieniono ekranów, markup, tekstów interfejsu, CSS, assetów, nawigacji ani zamrożonych komponentów Premium.
+
+## Wykonane kontrole
+
+- **48 rzeczywistych testów HTTP PASS** w izolacji65321: członek tworzy/edytuje podstawowe dane; twórca także z flagą organizatora nie ma żadnej z10 testowanych operacji finansowych. Własne należności/historia/zgłoszenie wpłaty działają. Admin zatwierdza zakończony fixture, akceptuje wpłatę i wykonuje korektę wpłaty/kosztu.
+- Transfer administratora: dokładnie ten sam stary access token, bez refresh/login, traci admin RPC, cudzy ledger przez RLS i możliwość replay dawnego zatwierdzonego UUID. Dotyczy też własnego meczu byłego administratora, który nadal jest organizatorem. Nowy admin bez ponownego logowania widzi zakres i akceptuje kolejną wpłatę.
+- Obcy administrator grupyB nie może tworzyć/czytać finansów grupyA. Nieaktywny członek nie tworzy; nieaktywny admin nie podejmuje decyzji i nie czyta cudzego ledgera. Ostatni admin poza zarchiwizowaną grupą nie zachowuje wyjątku finansowego.
+- **32 Vitest/5 plików PASS**, w tym regresja starego manage hint i utraty cached admin przy slm-groups-changed. Nie jest to wyłącznie ukrycie przycisków — serwer i RLS sprawdzono osobno realnym HTTP.
+- SQL test admin/legacy-map/ACL w transakcji rollback + dotychczasowy test visibility/RLS/ACL PASS. Dodatnie/ujemne testy legacy helperów nie są deklaracją pełnego finansowego E2E starych kont.
+- TypeScript app, strict Edge, ESLint, build main i Premium PASS. Consolidation:32 historyczne migracje zachowane,48 wersjonowanych plików; frozen Premium55 źródeł PASS. SQL lint0 błędów i4 dotychczasowe ostrzeżenia. Bez pełnej ciężkiej regresji.
+
+Fixture kosztów zakończono wyłącznie przez zmianę starts_at świeżo utworzonego lokalnego testowego meczu. Testy czasowo dezaktywowały wyłącznie własne nowe konta fixture i przywróciły ich aktywność w finally; nie dotknięto kont POCO. Pomocnicza zmiana roli globalnej/mappingu legacy do testów została cofnięta; brak zapisanych haseł/tokenów w raportach, SQL lub Git. Dane testowe zachowane.
+
+## Stan wdrożenia i ograniczenia
+
+Tylko nowa izolacja `slm-premium-behavior-review`65321 ma48 migracji. **Używany backend POCO64321 nadal44, bez zastosowania tej poprawki. Cloud bez zmian.** Nowy Auth nadal nieaktywny. Nie zbudowano/nie instalowano nowego APK, nie wykonano merge ani deployu do używanego projektu. Pełna nowa polityka będzie chroniła używany backend dopiero po osobno uzgodnionym lokalnym wdrożeniu przygotowanych4 migracji i istniejącej zmiany allowlisty filtrów, nie po samym APK.
+
+Trwałe składy i odbiór nowego UI pozostają odrębnymi, wcześniej opisanymi etapami. Nie rozszerzano tego zadania o nowe ekrany edycji lub finanse.

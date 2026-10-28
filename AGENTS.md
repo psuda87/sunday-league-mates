@@ -1,3 +1,10 @@
+# Obowiązująca decyzja właściciela — finanse grupy, 28.10.2026
+
+- Każdy aktywny członek może tworzyć mecze swojej grupy; twórca może edytować podstawowe dane. Samo `created_by` ani flaga organizatora nie nadają uprawnień finansowych.
+- Zatwierdzanie kosztów, wpłat, korekt i rozliczeń należy wyłącznie do aktualnego, aktywnego administratora danej grupy. Transfer/odebranie roli odbiera uprawnienia również przy dotychczasowym tokenie. Nie stosować globalnego fallbacku legacy ani wyjątku dla byłego administratora poza grupą.
+- Zwykły członek zachowuje własne należności, historię i zgłaszanie własnych wpłat. Nie poszerzać grantów, RLS ani uprawnień do zarządzania grupą.
+- Te zasady zastępują historyczne uprawnienia finansowe twórcy/organizatora poniżej. Testy nowej migracji wyłącznie w lokalnej izolacji; Cloud/używany backend wymagają osobnej zgody. Premium3.18 bez przebudowy; dopuszczalne tylko niezbędne zmiany dostępności istniejących akcji.
+
 # Aktualny zakres Premium B3 — lokalne grupy
 
 - Gałąź feat/premium-b3-groups z main a46f5e4. Domyślny LIVE zachowany; jawny wariant Premium ma rzeczywiste B1/B2/B3, wydarzenia i finanse nadal oznaczone demo. Bez B4.

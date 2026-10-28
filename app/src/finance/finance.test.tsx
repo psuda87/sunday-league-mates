@@ -57,3 +57,23 @@ it('clears an uncertain finance intent on logout even when its screen has alread
  const calls=vi.mocked(m.call).mock.calls.filter(([action])=>action==='group_finance_submit_payment');
  expect(calls).toHaveLength(2);expect(calls[0][1]?.request_id).not.toBe(calls[1][1]?.request_id);
 });
+
+it('ignores a stale creator/admin manage hint when the current account projection is not admin',async()=>{
+ const m=manager(),{result}=renderHook(()=>usePremiumFinance(m,'member','g','e',true));
+ await waitFor(()=>expect(result.current.own).not.toBeNull());expect(result.current.detail).toBeNull();
+ expect(vi.mocked(m.call).mock.calls.map(c=>c[0])).toEqual(['group_finance_account']);
+});
+it('a group-role refresh removes cached administrator detail but keeps own account access',async()=>{
+ let admin=true;const m=manager(),normal=vi.mocked(m.call).getMockImplementation()!;
+ vi.mocked(m.call).mockImplementation(async(action,body)=>{
+  if(action==='group_finance_account')return {...own(),surplus:admin?[]:null};
+  if(action==='groups_detail')return {members:[{user_id:'member',nickname:'Fixture'}]};
+  if(action==='group_finance_pending')return {payments:[]};
+  return normal(action,body);
+ });
+ const {result}=renderHook(()=>usePremiumFinance(m,'member','g','e',true));await waitFor(()=>expect(result.current.detail).not.toBeNull());
+ const detailCalls=vi.mocked(m.call).mock.calls.filter(c=>c[0]==='group_finance_detail').length;
+ act(()=>{admin=false;window.dispatchEvent(new Event('slm-groups-changed'));});expect(result.current.detail).toBeNull();
+ await waitFor(()=>expect(result.current.own).not.toBeNull());expect(result.current.detail).toBeNull();expect(result.current.own?.surplus).toBeNull();
+ expect(vi.mocked(m.call).mock.calls.filter(c=>c[0]==='group_finance_detail')).toHaveLength(detailCalls);
+});
