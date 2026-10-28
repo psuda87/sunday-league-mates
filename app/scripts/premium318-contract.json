@@ -12,7 +12,8 @@
     "Shared groups selectors and avatar props accept narrow live DTOs; no fabricated World, statistics or profile fallback",
     "Owner-approved B3 POCO corrections: compact scoped consent switch and refresh icon; frozen card/nav/global CSS unchanged",
     "PR16 owner-authorized independent nickname/three global profile names and atomic privacy controls; original Ultimate/BottomNav rules unchanged",
-    "Owner-reported PR16 nested label/input spacing: column layout and existing 7px gap only within Premium profile editor; card/nav/colors unchanged"
+    "Owner-reported PR16 nested label/input spacing: column layout and existing 7px gap only within Premium profile editor; card/nav/colors unchanged",
+    "Selective consolidation: reuse only already-approved PR20-23 presentation exceptions from immutable source a82397b; no new visual hashes. New Auth/SMTP/online excluded. See scripts/stabilization-provenance.json and MAIN_CONSOLIDATION_REPORT."
   ],
   "files": {
     "app/demo/main.tsx": {
@@ -96,7 +97,7 @@
       "text": true
     },
     "app/src/demo/App.tsx": {
-      "sha256": "07d83da5673573d2a9972314783ad5d205dd708d2c1c6ca365c955a080f50b32",
+      "sha256": "1e8b3c00aa8f985d6011cdc519ae02d6c9893999aa8912bf3eaa27a0e214ba85",
       "text": true
     },
     "app/src/demo/DemoBottomNav.tsx": {
@@ -108,7 +109,7 @@
       "text": true
     },
     "app/src/demo/EventForm.tsx": {
-      "sha256": "abdaefc1709754e97e7a74bc692ffcc8754cea9e5ff40597a7b081e863969973",
+      "sha256": "ca71db90b3dc9317c9f1739d4137fd90a286d88bb6fdd38a6e333349e98dd214",
       "text": true
     },
     "app/src/demo/Finance.tsx": {
@@ -116,7 +117,7 @@
       "text": true
     },
     "app/src/demo/GroupScreens.tsx": {
-      "sha256": "56734655462b4c042d6cacd04cabccfdd161b6e90c3919d45ffa93b0c6b09813",
+      "sha256": "c182e21b52af1ecfdf19e7c93796e48c69e1c4ad0b82b1f0aa733589f9624ca9",
       "text": true
     },
     "app/src/demo/Identity.tsx": {
@@ -128,11 +129,11 @@
       "text": true
     },
     "app/src/demo/Profile.tsx": {
-      "sha256": "8836de763da62f01de28dc2455bdfa714808ccaaa4611c9e483204fa9b2f9382",
+      "sha256": "ae9eb9d7c30b80cd210f01e312d5ea8d904bb79f744a7f11fd4ba1e95b31b82e",
       "text": true
     },
     "app/src/demo/Teams.tsx": {
-      "sha256": "4b6deac973e1dc4e01e1ec7aa95e8c3c008a66dcba3844693a3b88c03200ffa8",
+      "sha256": "df6f798173982e3f026b21dfea1b4bdefa0a3548cdad1afd237f53af2ff22773",
       "text": true
     },
     "app/src/demo/UltimatePlayerCard.tsx": {
@@ -204,7 +205,7 @@
       "text": true
     },
     "app/src/ui/MatchHero.tsx": {
-      "sha256": "98bbd8c4b80f674b87b38303606f4cd772f04676382691fb1efec1e49d701bcc",
+      "sha256": "328af3bb4624cb68ad937f653002c05dd59b86389449d82bd8ca01747eb3b1ac",
       "text": true
     },
     "app/src/ui/MatchSections.tsx": {

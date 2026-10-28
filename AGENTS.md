@@ -1,3 +1,14 @@
+# Konsolidacja 2026-10-28 — bieżące zasady, nadrzędne wobec historii poniżej
+
+- Jeden moduł: nowa gałąź od aktualnego main → testy → akceptacja właściciela → PR → merge wyłącznie po wyraźnej zgodzie → kolejny moduł od zaktualizowanego main. Przygotowanie PR nie upoważnia do merge.
+- chore/main-stabilization selektywnie przenosi zaakceptowane wydarzenia/finanse/Android/Premium z PR20–23. Eksperymentalne Auth18 i online19 pozostają osobno; nie aktywować ich ani nie przenosić ich migracji przez merge całego stosu.
+- Domyślny LIVE main zachowany. Jawny Premium/B1/Android Stage3 używa rzeczywistych meczów, grup, finansów i własnego profilu. Demo nadal izolowane; katalog demo zawiera również współdzieloną prezentację, nie usuwać go zbiorczo.
+- Każdy aktywny członek grupy może tworzyć mecz. Twórca może edytować podstawowe dane; nie otrzymuje uprawnień finansowych. Finanse wyłącznie aktualnego aktywnego administratora grupy, nigdy z created_by, globalnej roli ani dawnej roli. Własne należności i zgłoszenia wpłat pozostają dostępne.
+- Własne grupy + publiczne przyszłe mecze w feedzie; historia własnych aktualnych grup i własnego udziału po odejściu. Obce prywatne mecze niewidoczne; filtrowanie serwerowe przed paginacją. Składy/zamiany jawnie lokalne, bez fikcyjnego autora/zapisu.
+- Premium3.18/d0f9fa9, karta30772de i historycznie zaakceptowane wyjątki chronione przez kontrakt oraz premium-route-policy.mjs. Zmiana hashy/routingu nie zastępuje zgody właściciela. Zmiana strażników i CI wymaga osobnego przeglądu właściciela.
+- Testy integracyjne wyłącznie w slm-main-stabilization/55321 przygotowanym z wersjonowanych źródeł. Bez resetu, używanej bazy POCO, Cloud, instalacji APK i deployu. CI tylko ręczne po potwierdzeniu bezpłatnego limitu; nie zmieniać ochrony GitHub bez zgody.
+- Raport: docs/MAIN_CONSOLIDATION_REPORT.md; dokumenty historyczne poniżej nie opisują automatycznie aktualnej gotowości.
+
 # Aktualny zakres Premium B3 — lokalne grupy
 
 - Gałąź feat/premium-b3-groups z main a46f5e4. Domyślny LIVE zachowany; jawny wariant Premium ma rzeczywiste B1/B2/B3, wydarzenia i finanse nadal oznaczone demo. Bez B4.

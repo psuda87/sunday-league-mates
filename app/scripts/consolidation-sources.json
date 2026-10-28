@@ -43,7 +43,11 @@
     "app/src/main.tsx": "f9e7285642b31f60759cc3a09ae10c0468c99f06757e389dc1de82d5593d5963",
     "app/src/ui/BottomNav.tsx": "0c169adb2d8104083cfebd577ac4dd5c80378011fb584fc12f1108bc13416eff",
     "app/src/auth/sessionManager.ts": "0e17626195b4f5c4b9b1e5114c2281fcf285548130f55f2bb0b3448051833c16",
-    "app/src/auth/tokenStore.ts": "a7ec9357ad73567f18b370fb9b5634f1d94d4fd239f2796f93a0f0da6afd9295",
+    "app/src/auth/tokenStore.ts": "12af3ce3df4c8afc3ca123fb761cde0ce4f4c1c3367357f6e4b9edeab30ed562",
     "app/android/app/build.gradle": "f26c431469aa7ad2fe97845c46465e0d7618d107343e1f264670493dec0091d8"
+  },
+  "accepted_token_namespace": {
+    "source": "a82397b130ca2296511247e848139edb79308a87",
+    "reason": "Stage 3 project-specific secure vault factory; existing default vault and Keystore policy preserved"
   }
 }

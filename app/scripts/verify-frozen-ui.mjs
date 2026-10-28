@@ -1,3 +1,4 @@
+import {verifyPremiumRuntime} from './premium-route-policy.mjs';
 // Self-contained source checks: no sibling checkout, cache or fetched reference branch required.
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
@@ -11,3 +12,5 @@ for(const [path,expected] of Object.entries(contract.files)){
  assert.equal(createHash('sha256').update(value).digest('hex'),expected.sha256,'Approved UI changed: '+path);
 }
 console.log(`PASS Premium source contract: ${Object.keys(contract.files).length} files; frozen 3.18 + accepted card 30772de + existing B1/B2 bindings.`);
+
+const runtime=verifyPremiumRuntime(repo);console.log(`PASS approved entry/runtime: ${runtime.bindings} import boundaries, immutable approvals and candidate exclusion.`);

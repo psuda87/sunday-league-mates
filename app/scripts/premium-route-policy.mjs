@@ -1,0 +1,74 @@
+import {readFileSync,existsSync,readdirSync} from 'node:fs';
+import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
+import assert from 'node:assert/strict';
+import ts from 'typescript';
+export const MAIN='134c52b1aee0d0804cc0cf71f151f95040e7a38f';
+export const APPROVED='a82397b130ca2296511247e848139edb79308a87';
+const historyCache=new Map();
+const selected=new Set(['app/src/demo/App.tsx','app/src/demo/EventForm.tsx','app/src/demo/GroupScreens.tsx','app/src/demo/Profile.tsx','app/src/demo/Teams.tsx','app/src/ui/MatchHero.tsx']);
+const digest=s=>createHash('sha256').update(typeof s==='string'?s.replace(/\r\n/g,'\n'):s).digest('hex');
+export function verifyPremiumRuntime(root,overrides={}){
+ const read=p=>Object.hasOwn(overrides,p)?overrides[p]:readFileSync(root+'/'+p,'utf8');
+ const git=(ref,p)=>{const key=root+ref+p;if(!historyCache.has(key))historyCache.set(key,execFileSync('git',['show',ref+':'+p],{cwd:root,encoding:'utf8',stdio:['ignore','pipe','pipe']}));return historyCache.get(key);};
+ // Do not trust editable hashes as proof of owner approval. Compare to immutable historical Git objects.
+ const original=JSON.parse(git(MAIN,'app/scripts/premium318-contract.json'));
+ const manifest=JSON.parse(read('app/scripts/premium318-contract.json'));
+ assert.deepEqual(Object.keys(manifest.files).sort(),Object.keys(original.files).sort(),'Frozen file list changed without approval');
+ for(const path of Object.keys(original.files)){
+  const ref=selected.has(path)?APPROVED:MAIN;
+  const raw=original.files[path].text?git(ref,path):execFileSync('git',['show',ref+':'+path],{cwd:root,stdio:['ignore','pipe','pipe']});
+  const current=original.files[path].text?read(path):Object.hasOwn(overrides,path)?overrides[path]:readFileSync(root+'/'+path);
+  const expected=digest(raw);
+  assert.equal(manifest.files[path].sha256,expected,'Unapproved contract hash: '+path);
+  assert.equal(digest(current),expected,'Unapproved visual source: '+path);
+ }
+ const mainSteps=execFileSync('git',['ls-tree','-r','--name-only',MAIN,'--','app/supabase/migrations'],{cwd:root,encoding:'utf8'}).trim().split('\n');
+ const added=['20261028174603_premium_match_membership_visibility.sql','20261028174920_premium_member_creation_finance_guard.sql','20261028175508_premium_match_feed_filters.sql','20261028181054_premium_group_admin_only_finance.sql'].map(n=>'app/supabase/migrations/'+n);
+ assert.deepEqual(readdirSync(root+'/app/supabase/migrations').filter(n=>n.endsWith('.sql')).sort(),[...mainSteps,...added,'app/supabase/migrations/20261028204500_restore_pr16_match_name_projection.sql'].map(p=>p.split('/').at(-1)).sort(),'Unexpected migration/model activation');
+ for(const p of [...mainSteps,...added])assert.equal(digest(read(p)),digest(git(added.includes(p)?APPROVED:MAIN,p)),'Historical migration overwritten: '+p);
+ assert.equal(digest(read('app/src/auth/tokenStore.ts')),digest(git(APPROVED,'app/src/auth/tokenStore.ts')),'Secure vault namespace changed');
+ const bindings={
+  'app/src/events/PremiumWorld.tsx':['../demo/App','./PremiumEvents','./usePremiumEvents'],
+  'app/src/events/PremiumEvents.tsx':['../ui/MatchHero','../ui/MatchTabs','./PremiumTeams','../finance/PremiumFinance','./PremiumScrollHeader'],
+  'app/src/events/PremiumTeams.tsx':['../ui/PremiumPitch'],
+  'app/src/auth/B1App.tsx':['../events/PremiumWorld'],
+  'app/android-stage3/main.tsx':['../src/auth/B1App'],
+  'app/b1/main.tsx':['../src/auth/B1App'],
+  'app/src/main.tsx':['./App'],
+ };
+ for(const [path,imports] of Object.entries(bindings)){
+  const ast=ts.createSourceFile(path,read(path),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+  const actual=ast.statements.filter(ts.isImportDeclaration).map(i=>i.moduleSpecifier.text);
+  for(const target of imports)assert(actual.includes(target),'Entry/import routing regression: '+path+' -> '+target);
+ }
+ // These reviewed controllers are part of the approved runtime, not spare files next to a replacement.
+ for(const path of ['app/src/events/PremiumWorld.tsx','app/src/events/PremiumEvents.tsx','app/src/events/PremiumTeams.tsx','app/src/events/PremiumScrollHeader.tsx','app/src/ui/PremiumPitch.tsx','app/src/finance/PremiumFinance.tsx','app/src/finance/premiumFinance.css','app/src/events/premiumEvents.css'])
+  assert.equal(digest(read(path)),digest(git(APPROVED,path)),'Approved runtime replaced/condition changed: '+path);
+ assert.equal(digest(read('app/src/groups/PremiumGroups.tsx')),digest(git(MAIN,'app/src/groups/PremiumGroups.tsx')),'Group UI wrapper replaced');
+ const old=git(MAIN,'app/src/auth/B1App.tsx');
+ const expected=old.replace("import WorldApp from '../demo/App';","import WorldApp from '../events/PremiumWorld';").replace("<WorldApp key={owner??'none'}","<WorldApp key={owner??'none'} manager={manager} userId={owner??''}");
+ assert.equal(digest(read('app/src/auth/B1App.tsx')),digest(expected),'Auth/Premium gate adapter changed without review');
+ assert.equal(digest(read('app/src/App.tsx')),digest(git(MAIN,'app/src/App.tsx')),'Default LIVE routing changed without owner decision');
+ assert.match(read('app/index.html'),/src=\"\/src\/main\.tsx\"/,'Default HTML entry changed');
+ assert.match(read('app/android-stage3/index.html'),/src=\"\.\/main\.tsx\"/,'Android HTML entry changed');
+ assert.match(read('app/b1/index.html'),/src=\"\.\/main\.tsx\"/,'Premium HTML entry changed');
+ for(const path of ['app/capacitor.config.ts','app/vite.android-stage3.config.ts','app/vite.premium-finance-local.config.ts','app/android-stage3/index.html'])
+  assert.equal(digest(read(path)),digest(git(APPROVED,path)),'Build/entry configuration changed: '+path);
+ for(const path of ['app/vite.config.ts','app/vite.b1.config.ts','app/vite.live-local.config.ts','app/index.html','app/b1/index.html','app/b1/main.tsx','app/src/main.tsx'])
+  assert.equal(digest(read(path)),digest(git(MAIN,path)),'Existing entry configuration changed: '+path);
+ const android=git(APPROVED,'app/android-stage3/main.tsx').replace(' accountModel={false}','');
+ assert.equal(digest(read('app/android-stage3/main.tsx')),digest(android),'Android render condition changed');
+ const configs=readdirSync(root+'/app').filter(p=>/^vite\..*config\.ts$/.test(p)).sort();
+ assert.deepEqual(configs,['vite.config.ts','vite.b1.config.ts','vite.demo.config.ts','vite.live-local.config.ts','vite.premium-finance-local.config.ts','vite.android-stage3.config.ts','vite.stabilization.config.ts'].sort(),'Unreviewed alternative Vite entry');
+ const pkg=JSON.parse(read('app/package.json')),baseline=JSON.parse(git(MAIN,'app/package.json'));
+ for(const [key,value] of Object.entries(baseline.scripts).filter(([key])=>key.startsWith('build')))
+  assert.equal(pkg.scripts[key],value,'Existing build command changed: '+key);
+ assert.deepEqual(Object.keys(pkg.scripts).filter(k=>k.startsWith('build')).sort(),[...Object.keys(baseline.scripts).filter(k=>k.startsWith('build')),'build:android-stage3','build:premium-finance-local'].sort(),'Unreviewed build entry command');
+ for(const name of ['prebuild','postbuild','preinstall','postinstall','prepare'])assert(!pkg.scripts[name],'Unexpected lifecycle entry: '+name);
+ for(const [key,config] of [['build:android-stage3','vite.android-stage3.config.ts'],['build:premium-finance-local','vite.premium-finance-local.config.ts']])
+  assert.equal(pkg.scripts[key],'tsc --noEmit && vite build --config '+config,'Reviewed build bypassed');
+ for(const path of ['app/src/auth/emailProof.ts','app/src/auth/onlineClient.ts','app/supabase/migrations/20261026225907_account_model_candidate.sql'])
+  assert(!existsSync(root+'/'+path),'Unapproved account candidate entered consolidation: '+path);
+ return {frozen:Object.keys(original.files).length,bindings:Object.keys(bindings).length};
+}
