@@ -190,3 +190,5 @@ app/dist-online-candidate/
 # Isolated real-data Premium test build
 app/dist-premium-real-local/
 app/dist-premium-finance-local/
+
+app/dist-android-stage3/
