@@ -101,3 +101,5 @@ Najmniejszy następny etap: ręczny odbiór tego pionu na POCO po osobnej decyzj
 Źródła techniczne sprawdzone27.10.2026: [Supabase roles](https://supabase.com/docs/guides/database/postgres/roles), [API/RLS](https://supabase.com/docs/guides/api/securing-your-api), [Cypress16 cy.env](https://docs.cypress.io/api/commands/env). Weryfikacja opiera się przede wszystkim na rzeczywiście wykonanych testach tego checkoutu.
 
 2026-10-28 07:58 Europe/Warsaw — Końcowa kontrola po wznowieniu: kod bez zmiany od zapisanych testów27.10; skan493 ścieżek bez rozpoznawalnych sekretów i składnia runnerów PASS. Wcześniejszy limit automatycznego review zatrzymał wyłącznie końcową kontrolę/push; nie utracono implementacji ani wyników. PR18/19 i main ponownie zweryfikowane bez zmiany.
+
+2026-10-28 07:59 Europe/Warsaw — Publikacja kodu d621f730bfbf501fdedac02f0b104427965afc34: [Draft PR20](https://github.com/psuda87/sunday-league-mates/pull/20), baza PR18/845d35e. Stan open/Draft/niescalony, brak konfliktów przy weryfikacji. PR18/19/main oraz backend/CSS/Ultimate/nav/Android bez zmiany. Oryginalny worktree ui-beta zachowuje wszystkie6 lokalnych zmian. Nie wykonano Cloud/APK/merge.
