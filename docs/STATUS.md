@@ -1,6 +1,12 @@
+# Git etapu 2 — push zapisany, utworzenie PR BLOCKED
+
+2026-10-28 16:56 Europe/Warsaw — kod `b46689a02d17d5eb6fccc5e3f4d9ed007480640d` wypchnięty na `origin/feat/premium-real-finance-stage2`, zdalny SHA potwierdzony. API GitHuba odrzuciło odczyt/utworzenie Draft PR (`Forbidden`), więc numeru PR nie ma. [Porównanie z właściwą bazą etapu1](https://github.com/psuda87/sunday-league-mates/compare/feat/premium-real-events-stage1...feat/premium-real-finance-stage2?expand=1); przy tworzeniu wybrać Draft, nie merge. Raport: [PREMIUM_REAL_FINANCE_STAGE2.md](PREMIUM_REAL_FINANCE_STAGE2.md). Aktualizacja dokumentów ma osobny commit. Bez zmian istniejących PR/gałęzi; Supabase Cloud nietknięty.
+
+---
+
 # Premium real data — etap 2: finanse, odbiór E2E BLOCKED
 
-2026-10-28 09:03 Europe/Warsaw — `feat/premium-real-finance-stage2` od HEAD PR20 `448a2967489040162bfc6653c197af9afe9dcb55`; zależny PR do `feat/premium-real-events-stage1`. PR18/19/20 i ich gałęzie bez zmian. P0: Premium → rzeczywiste `finance_groups`/`group_finance_*`, własne saldo i należności łącznie z gośćmi, statusy/historia/blokada, zgłoszenie wpłaty, panel administratora i potwierdzanie/odrzucanie/księgowanie/approval przez istniejący backend. UUID retry zachowany w RAM także po niepewnym odczycie/remount; scope i sesja sprawdzane, bez fikcyjnego salda przy błędzie. P1 nie rozpoczęto.
+2026-10-28 09:03 Europe/Warsaw — `feat/premium-real-finance-stage2` od HEAD PR20 `448a2967489040162bfc6653c197af9afe9dcb55`; docelowa baza Draft PR `feat/premium-real-events-stage1`. PR18/19/20 i ich gałęzie bez zmian. P0: Premium → rzeczywiste `finance_groups`/`group_finance_*`, własne saldo i należności łącznie z gośćmi, statusy/historia/blokada, zgłoszenie wpłaty, panel administratora i potwierdzanie/odrzucanie/księgowanie/approval przez istniejący backend. UUID retry zachowany w RAM także po niepewnym odczycie/remount; scope i sesja sprawdzane, bez fikcyjnego salda przy błędzie. P1 nie rozpoczęto.
 
 PASS: TypeScript, pełny lint, 326 Vitest/54 pliki i końcowy zmieniony zakres17/2, build main/Premium/demo+izolacja16, frozen UI55. Nowa zatrzymana po testach fixture PostgreSQL:44 niezmienione migracje,101 PASS SQL/RLS/finanse (Auth/JWT/Storage fixture), jeden scenariusz późnego cutoff FIFO NOT TESTED ze względu na zegar serwera. Chromium UI z kontrolowanym adapterem:320/390/768 Dark/Light, >=44px, odczyt statusu po decyzji PASS; **nie jest to E2E Supabase**.
 

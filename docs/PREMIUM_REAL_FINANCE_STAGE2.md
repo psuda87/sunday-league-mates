@@ -118,4 +118,12 @@ Uruchomić **pełny izolowany lokalny Supabase** z tą samą gałęzią, bez akt
 
 Na fizycznym Androidzie po osobnej zgodzie na APK: pola kwoty i powodu przy IME, przewijanie ponad BottomNav, systemowy wstecz, Dark/Light, przejście tło/wznowienie i sprawdzenie sesji, brak poprzednich danych po zmianie konta, powrót do aktywnej zakładki po wpłacie. Nie wykonywano instalacji na POCO.
 
-Stan Git/PR i SHA zostaną dopisane po zapisaniu implementacji; bez merge i ręcznego wdrożenia.
+## Git i Draft PR — 2026-10-28 16:56 Europe/Warsaw
+
+Commit implementacji **`b46689a02d17d5eb6fccc5e3f4d9ed007480640d`** został zwykłym pushem zapisany na `origin/feat/premium-real-finance-stage2`; `git ls-remote` potwierdził dokładny SHA. Bazowa gałąź PR20 nadal ma `448a2967489040162bfc6653c197af9afe9dcb55`. Worktree po zapisie implementacji był czysty.
+
+**Draft PR nie został utworzony.** Odczyt PR20 oraz żądanie `POST /repos/psuda87/sunday-league-mates/pulls` z `draft=true`, właściwym head i bazą etapu1 zostały odrzucone przez API: `Forbidden`. Zwykły Git fetch/push działa; uprawnienie do push nie zapewniło tutaj dostępu do REST API. Nie obchodzono ograniczenia ani nie pobierano tokenów z konfiguracji. Nie ma numeru PR, który można uczciwie podać.
+
+[Przygotowane porównanie gałęzi do utworzenia Draft PR](https://github.com/psuda87/sunday-league-mates/compare/feat/premium-real-events-stage1...feat/premium-real-finance-stage2?expand=1). Baza: `feat/premium-real-events-stage1`; head: `feat/premium-real-finance-stage2`; wybrać **Create draft pull request**. Tytuł: „Premium: rzeczywiste rozliczenia grup i decyzje o wpłatach (etap 2)”. Opis: zakres P0 i tabela kontroli z tego raportu, z jawnym BLOCKED pełnego E2E i brakiem zmian backendu. Nie tworzyć PR bezpośrednio do main.
+
+Końcowa aktualizacja dokumentacji ma oddzielny commit po powyższym SHA implementacji. Bez merge i ręcznego wdrożenia. Fixture PostgreSQL została zatrzymana (`docker stop` własnego kontenera), lecz jej baza/kontener/wolumen pozostały do inspekcji. Cypress z pełnym backendem nie został wykonany — pełny stos jest zablokowany; wskazany test Chromium używa kontrolowanego adaptera UI.
