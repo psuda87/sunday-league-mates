@@ -10,11 +10,11 @@ for(const [path,expected] of Object.entries({...manifest.main_migrations,...mani
  const value=readFileSync(repo+path,'utf8').replace(/\r\n/g,'\n');
  assert.equal(createHash('sha256').update(value).digest('hex'),expected,'Protected main source modified: '+path);
 }
-assert.equal(readdirSync(repo+'app/supabase/migrations').filter(p=>p.endsWith('.sql')).length,44);
+assert.equal(readdirSync(repo+'app/supabase/migrations').filter(p=>p.endsWith('.sql')).length,48);
 for(const path of ['vercel.json','app/vercel.json']){
  const config=JSON.parse(readFileSync(repo+path,'utf8'));
  assert.equal(config.git?.deploymentEnabled,false,'Automatic deployment must stay disabled: '+path);
 }
 const prepare=readFileSync(new URL('./prepare-edge-local.py',import.meta.url),'utf8');
 assert(!/premium318-live|\.worktrees|B22_LOCAL_ONLY/.test(prepare),'Local prep must use canonical sources only');
-console.log('PASS consolidation: 32 main migrations unchanged, 44 versioned steps (35 previous + 9 inactive account/email/online model), main ancestry, deployment disabled, canonical local preparation.');
+console.log('PASS consolidation: 32 main migrations unchanged, 48 versioned steps (44 previous + 4 membership/privacy/admin-only finance steps; account model remains inactive), main ancestry, deployment disabled, canonical local preparation.');

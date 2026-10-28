@@ -21,7 +21,7 @@ export function usePremiumFinance(manager:SessionManager,userId:string,groupId:s
  const reload=useCallback(async()=>{
   const ticket=++generation.current;setLoading(true);setError('');setState({scope,own:null,detail:null,pending:[],names:{}});
   try{const own=account(await manager.call('group_finance_account',{group_id:groupId}),groupId,userId);
-   const event=eventId&&manage?detail(await manager.call('group_finance_detail',{group_id:groupId,event_id:eventId}),groupId,eventId):null;
+   const event=eventId&&manage&&own.surplus!==null?detail(await manager.call('group_finance_detail',{group_id:groupId,event_id:eventId}),groupId,eventId):null;
    const names:Record<string,string>={};
    if(own.surplus!==null||event) {const g=await manager.call<{members:{user_id:string;nickname:string;display_name?:string}[]}>('groups_detail',{group_id:groupId});if(!Array.isArray(g.members))throw Error('Missing payer identities');for(const m of g.members){const label=m.display_name??m.nickname;if(typeof m.user_id!=='string'||typeof label!=='string'||!label.trim())throw Error('Invalid identity');names[m.user_id]=label;}}
    const pending=own.surplus!==null?receipts(await manager.call('group_finance_pending',{group_id:groupId}),groupId):event?.payments.filter(p=>p.status==='pending')??[];
@@ -30,6 +30,7 @@ export function usePremiumFinance(manager:SessionManager,userId:string,groupId:s
   finally{if(alive.current&&generation.current===ticket)setLoading(false);}
  },[manager,userId,groupId,eventId,manage,valid,scope]);
  useEffect(()=>{alive.current=true;void reload();return()=>{alive.current=false;};},[reload]);
+ useEffect(()=>{const changed=()=>{void reload();};window.addEventListener('slm-groups-changed',changed);return()=>window.removeEventListener('slm-groups-changed',changed);},[reload]);
  useEffect(()=>{let previous=manager.getSnapshot().phase;return manager.subscribe(()=>{const phase=manager.getSnapshot().phase;if(phase===previous)return;previous=phase;if(phase==='signed_out'||phase==='storage_error')keys.current.clear();if(phase!=='ready'){generation.current++;setState({scope,own:null,detail:null,pending:[],names:{}});setLoading(true);}else void reload();});},[manager,reload,scope]);
  async function mutate(action:string,body:Record<string,unknown>){
   if(flight.current||!valid())return false;flight.current=true;setBusy(true);setError('');setNotice('');
