@@ -5,6 +5,7 @@
 Nie wykryto P0/P1 w sprawdzonym zakresie. Werdykt dotyczy kodu konsolidacji i przetestowanej lokalnej konfiguracji, **nie jest zgodą na merge, wdrożenie Cloud ani aktualizację POCO**. Pozostałe ograniczenia i decyzje są wymienione poniżej. Zielone testy nie dowodzą pełnego bezpieczeństwa.
 
 - Audytowany PR: [#24](https://github.com/psuda87/sunday-league-mates/pull/24).
+- Osobny Draft PR raportu: [#25](https://github.com/psuda87/sunday-league-mates/pull/25), bez zmian w kodzie PR24.
 - Dokładny HEAD: **`39ef2e3937b781439864029a92c12de315024263`**.
 - Sprawdzony `origin/main`: **`134c52b1aee0d0804cc0cf71f151f95040e7a38f`**.
 - GitHub: PR24 Draft, `mergeable=true`, brak konfliktu z tym main. Main jest przodkiem PR24. Nie wykonano merge/rebase ani zmiany PR24.
