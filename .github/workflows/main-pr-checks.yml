@@ -1,0 +1,63 @@
+name: SLM main PR checks
+# Prepared only: repository opt-in remains unset. Do not require skipped/nonexistent checks.
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: slm-main-pr-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  checks:
+    name: SLM PR checks
+    if: github.event_name == 'workflow_dispatch' || !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Require owner confirmation of free quota and blocked overages
+        env:
+          SLM_FREE_CI_ENABLED: ${{ vars.SLM_FREE_CI_ENABLED }}
+        run: |
+          if [ "$SLM_FREE_CI_ENABLED" != "true" ]; then
+            echo "::error::CI not enabled: owner must confirm free allowance and blocked paid overages first."
+            exit 1
+          fi
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+      - run: npm ci --ignore-scripts
+        working-directory: app
+      - name: Types, lint, unit/server security, actual rendered Premium, immutable approvals
+        working-directory: app
+        run: |
+          npx tsc --noEmit
+          npm run typecheck:edge
+          npm run lint
+          npm run test.unit -- --run
+          npm run verify:consolidation
+          npm run test:premium-policy
+          node --test scripts/local-test-context.cases.mjs
+      - name: Default LIVE and explicit Premium/Android web, isolated demo
+        working-directory: app
+        run: |
+          npm run build
+          npm run build:premium-finance-local
+          npm run build:android-stage3
+          npm run build:demo
+      - name: SQL/RLS and genuine HTTP on ephemeral local Supabase only
+        run: |
+          mkdir -p .cache
+          docker info > .cache/docker-info.log
+          node app/scripts/prepare-stabilization-local.mjs
+          npx --yes --package=supabase@2.121.0 supabase start --workdir .cache/stabilization-stack --exclude studio,realtime,imgproxy,logflare,vector,supavisor,mailpit,postgres-meta > .cache/supabase-private.log 2>&1
+          node app/scripts/test-premium-behavior-http.mjs
+          node app/scripts/test-premium-finance-authority-http.mjs
+          node app/scripts/test-stabilization-profile-http.mjs
+          node app/scripts/test-stabilization-sql.mjs

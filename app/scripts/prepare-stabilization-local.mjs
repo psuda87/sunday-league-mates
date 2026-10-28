@@ -1,8 +1,9 @@
+import {assertLocalTestContext} from './local-test-context.mjs';
 import {mkdirSync,readFileSync,writeFileSync,readdirSync,existsSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import assert from 'node:assert/strict';
 const branch=execFileSync('git',['branch','--show-current'],{encoding:'utf8'}).trim();
-assert(branch==='chore/main-stabilization'||process.env.GITHUB_ACTIONS==='true'&&process.env.GITHUB_REF==='refs/heads/chore/main-stabilization');
+assertLocalTestContext(branch);
 const dir='.cache/stabilization-stack/supabase';
 assert(!existsSync(dir+'/config.toml'),'Refusing to overwrite an existing local project; reuse it without resetting');
 mkdirSync(dir+'/migrations',{recursive:true});
@@ -13,7 +14,7 @@ writeFileSync(dir+'/functions/accounts/stabilization-local.ts',`import {createHa
 declare const Deno:{env:{get(n:string):string|undefined};serve(h:(r:Request)=>Promise<Response>):void};
 const url=Deno.env.get('SUPABASE_URL')??'';
 if(!['http://kong:8000','http://127.0.0.1:55321'].includes(url))throw Error('Local isolation required');
-Deno.serve(createHandler({url,anon:Deno.env.get('SUPABASE_ANON_KEY')??'',service:Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')??'',origins:['http://127.0.0.1:5196','http://localhost:5196']}));
+Deno.serve(createHandler({url,anon:Deno.env.get('SUPABASE_ANON_KEY')??'',service:Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')??'',origins:['http://127.0.0.1:5196','http://localhost:5196','https://localhost','http://localhost','capacitor://localhost']}));
 `);
 writeFileSync(dir+'/config.toml',`project_id = "slm-main-stabilization"
 [api]
