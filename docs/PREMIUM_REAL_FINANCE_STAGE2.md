@@ -192,3 +192,7 @@ Pozostałe ograniczenia2–5 z sekcji historycznej nadal obowiązują: własny p
 - Symulacja zakończenia wyłącznie przez datę własnego fixture; późne17:00 sprawdzone dodatkowo na rzeczywistym zegarze.
 - Czyszczenie niepewnych UUID obserwuje sesję także po wyjściu z widoku; nie zmienia sposobu logowania ani trwałości tokenów.
 - Błąd sieci sprawdzany zgodnie z pełną bramką SessionManager, bez pozostawiania danych na ekranie dla wygody testu.
+
+## Zakończenie lokalne i Draft PR
+
+2026-10-28 17:38 Europe/Warsaw — [Draft PR21](https://github.com/psuda87/sunday-league-mates/pull/21), base feat/premium-real-events-stage1448a296, head feat/premium-real-finance-stage2. Commit kodu/testów8743d796d8da08bd613f04fd6258b74cbb5ab9c4 wypchnięty. GitHub potwierdził open/Draft/niescalony/bez konfliktów; poprzednie PR i main bez zmiany. Lokalny API GitHub pozwolił utworzyć PR, więc historyczny Forbidden nie jest już blockerem. Brak merge/deploy/APK/Cloud. Finalne capabilities kandydata false odczytane przez rzeczywiste HTTP; dwie własne nowe fixture SQL zatrzymano z zachowaniem danych i kontenerów. Gotowość: przygotowanie odbioru POCO po osobnej zgodzie, nie publikacja produkcyjna. Chronologia docs/ODPOWIEDZI_CODEX.txt.
