@@ -1,4 +1,4 @@
-﻿import { createRoot } from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import { IonApp, setupIonicReact } from '@ionic/react';
 import '@ionic/react/css/core.css';
 import '@ionic/react/css/normalize.css';
@@ -19,4 +19,3 @@ installFrozenAndroid();
 // Local test namespace only (20 lowercase letters), not a Supabase Cloud project.
 const manager = new SessionManager(createProjectTokenStore('slmfinanceandroiddev'), accountRequest);
 createRoot(document.getElementById('root')!).render(<IonApp><Demo manager={manager} accountModel={false} /></IonApp>);
-
