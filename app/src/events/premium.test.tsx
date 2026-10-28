@@ -31,6 +31,7 @@ it('requires stable requested event identity and never invents counts for privat
  expect(eventSummary(locked).access).toBe('none');expect(()=>heroMatch(eventSummary(locked))).toThrow();
  expect(()=>matchDetail({...detail,event:locked,participants:[{id:'secret'}]},event.id)).toThrow();
  expect(()=>matchDetail({...detail,event:{...event,registered_count:1}},event.id)).toThrow();
+ expect(()=>eventSummary({...event,own_history:'yes'})).toThrow();
 });
 it('suggests Thursday/Sunday18:00 without inventing a venue or capacity',()=>{
  const d=premiumDefaults(now);expect(d).toMatchObject({location:'',address:'',capacity:0,durationMinutes:90,minimum:10,costCents:27000});
@@ -62,7 +63,8 @@ it('drops a late private detail after Back or changing the active group',async()
  const m=manager(),{result}=renderHook(()=>usePremiumEvents(m,'owner'));
  await waitFor(()=>expect(result.current.loading).toBe(false));
  let finish!:(value:unknown)=>void;
- vi.mocked(m.call).mockImplementation(async<T,>()=>await new Promise<unknown>(resolve=>{finish=resolve;}) as T);
+ const normal=vi.mocked(m.call).getMockImplementation()!;
+ vi.mocked(m.call).mockImplementation(async<T,>(action:string,body?:Record<string,unknown>)=>action==='matches_detail'?await new Promise<unknown>(resolve=>{finish=resolve;}) as T:normal(action,body) as Promise<T>);
  let pending!:Promise<boolean>;
  act(()=>{pending=result.current.open(event.id);});act(()=>result.current.selectGroup(''));
  await act(async()=>{finish(detail);await pending;});expect(result.current.detail).toBeNull();
@@ -105,4 +107,27 @@ it('withdrawal stays enabled despite debt and real guest writes have no invented
  fireEvent.submit(screen.getByLabelText('Imię lub pseudonim gościa').closest('form')!);
  await waitFor(()=>expect(actWrite).toHaveBeenCalledWith('guest',{guest_name:'Guest One',guest_phone:'',list:'registered'}));
  await waitFor(()=>expect(screen.getByLabelText('Imię lub pseudonim gościa')).toHaveValue(''));
+});
+
+it('enables creation for members only when the server confirms the new contract and sends filters before paging',async()=>{
+ const m=manager(),normal=vi.mocked(m.call).getMockImplementation()!;
+ vi.mocked(m.call).mockImplementation(async<T,>(action:string,body?:Record<string,unknown>)=>action==='matches_list'?{events:[event],server_now:now,member_creation_enabled:true} as T:action==='groups_list'?{groups:[{...group,admin_id:'someone-else',organizer:false}]} as T:normal(action,body));
+ const {result}=renderHook(()=>usePremiumEvents(m,'owner'));await waitFor(()=>expect(result.current.loading).toBe(false));expect(result.current.organizers).toHaveLength(1);
+ act(()=>result.current.selectGroup('public'));await waitFor(()=>expect(result.current.loading).toBe(false));
+ expect(vi.mocked(m.call).mock.calls.filter(c=>c[0]==='matches_list').at(-1)?.[1]).toMatchObject({scope:'public',period:'upcoming',offset:0});
+ act(()=>result.current.changeFilter('history'));await waitFor(()=>expect(result.current.loading).toBe(false));
+ expect(vi.mocked(m.call).mock.calls.filter(c=>c[0]==='matches_list').at(-1)?.[1]).toMatchObject({scope:'public',period:'history'});
+});
+it('does not advertise member creation against the previous backend contract',async()=>{
+ const m=manager();vi.mocked(m.call).mockResolvedValueOnce({events:[event],server_now:now}).mockResolvedValueOnce({groups:[{...group,admin_id:'other',organizer:false}]});
+ const {result}=renderHook(()=>usePremiumEvents(m,'owner'));await waitFor(()=>expect(result.current.loading).toBe(false));expect(result.current.organizers).toEqual([]);
+});
+
+it('resets the server scope as well as the selector when membership disappears',async()=>{
+ const m=manager(),normal=vi.mocked(m.call).getMockImplementation()!;let left=false;
+ vi.mocked(m.call).mockImplementation(async(action:string,body?:Record<string,unknown>)=>action==='groups_list'&&left?{groups:[]}:normal(action,body));
+ const {result}=renderHook(()=>usePremiumEvents(m,'owner'));await waitFor(()=>expect(result.current.loading).toBe(false));
+ act(()=>result.current.selectGroup(group.id));await waitFor(()=>expect(result.current.loading).toBe(false));
+ left=true;await act(()=>result.current.refresh());await waitFor(()=>expect(result.current.activeGroup).toBe(''));
+ await waitFor(()=>expect(vi.mocked(m.call).mock.calls.filter(c=>c[0]==='matches_list').at(-1)?.[1]).toMatchObject({scope:'all'}));
 });

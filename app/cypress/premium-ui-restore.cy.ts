@@ -25,7 +25,7 @@ describe('Premium visual restore, local real Supabase',()=>{
   cy.contains('button','Historia').click();cy.get('.slm-card-link').first().click();cy.get('[role="tab"]').should('have.length',4);cy.then(()=>cy.screenshot(mode+'-details-dark',{capture:'viewport',overwrite:true}));cy.contains('[role="tab"]','Składy').click();
   cy.then(()=>{if(mode==='before'){cy.screenshot('before-pitch-placeholder',{capture:'viewport',overwrite:true});return;}
    cy.contains('Lokalny podgląd · bez zapisu na serwerze').should('be.visible');
-   cy.get('.slm-lineup-roster select').first().select('a');cy.get('.slm-lineup-roster select').eq(1).select('b');
+   cy.contains('button','Utwórz lokalny podgląd').click();
    cy.contains('button','Zamień zawodników').click();
    cy.get('.slm-team-a .slm-pitch-player').first().click();cy.get('.slm-team-b .slm-pitch-player').first().click();cy.contains('Zamieniono wyłącznie w lokalnym podglądzie.').should('be.visible');
    for(const width of [320,360,390])for(const dark of [false,true]){cy.viewport(width,760);cy.document().then(doc=>doc.documentElement.classList.toggle('ion-palette-dark',dark));cy.get('.slm-football-pitch').scrollIntoView();cy.get('.slm-football-pitch').then($p=>expect($p[0].scrollWidth).to.be.at.most(width));}

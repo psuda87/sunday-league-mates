@@ -100,3 +100,81 @@ Samodzielnie wybrano współdzielony prezentacyjny Pitch zamiast kopiowania demo
 
 
 [2026-10-28 18:15:26 Europe/Warsaw] Wynik P0: kod i zrzuty wypchnięte, commit534986ccb6e57c4aad8b09a870542650fd3ddb13. Draft PR23 https://github.com/psuda87/sunday-league-mates/pull/23 zależny od22, bez merge. APK e2e2b0f630c56a35dc5166a5424ac0f08a4bbdac55791f6a0a8d88fb16f1f251 gotowy w .worktrees/premium-ui-regression/app/android/app/build/outputs/apk/debug/app-debug.apk. Przegląd Chrome przed/po i24 testy PASS, native POCO OCZEKUJE. Wymagana osobna zgoda na aktualizację; nowego APK nie zainstalowano. Pełny raport docs/PREMIUM_UI_REGRESSION.md; odpowiedzi docs/ODPOWIEDZI_CODEX.txt.
+
+
+[2026-10-28 18:19:33 Europe/Warsaw] PR23 — po osobnej zgodzie zaktualizowano POCO c7a559b5 przez adb install-r: Success. Hash APK e2e2b0f630c56a35dc5166a5424ac0f08a4bbdac55791f6a0a8d88fb16f1f251 zgodny. Bez uninstall/clear. Istniejący reverse64321 potwierdzony; curl z telefonu do lokalnego accounts PASS, capabilities nowego Auth wszystkie false. MainActivity COLD Status:ok; ograniczony odczyt logcat procesu:0 dopasowań fatal/WebView-network/uncaughtJS. Fizyczny odbiór wyglądu/status bara/sesji/logowania i boiska OCZEKUJE potwierdzenia użytkownika. Bez zmian backendu/Cloud/danych biznesowych. Odpowiedzi docs/ODPOWIEDZI_CODEX.txt.
+
+
+# Przywrócenie zachowania Premium — 2026-10-28 19:03:51 Europe/Warsaw
+
+Gałąź `fix/premium-real-ui-regression`, kontynuacja istniejącego Draft PR23 (base PR22). Baza tej aktualizacji `5de79ce`. Przed zmianami sprawdzono statusy root/worktree i PR23. Zachowano wszystkie niezapisane notatki; poniższy wpis nie zastępuje wcześniejszego odbioru instalacji lub raportu P0.
+
+## Diagnoza i plan przekazane przed kodem
+
+DemoTeams + demo/data miały podział `exampleLineup` (parzyste/nieparzyste indeksy), interaktywny wybór dwóch znaczników i `lineup_swap` w RAM. Stage1 wprowadził placeholder, poprzedni P0 odzyskał geometrię, lecz główne ustawianie odbywało się selectami. Demo nie miało trwałego backendu/autora/CAS. LIVE i Premium dzielą istniejący serwer matches_dispatch: stary list zwracał wszystkie mecze, a create wymagał organizer. Stąd niezgodność z nowymi regułami; samo ukrycie React nie wystarczało.
+
+Trwałe składy wyraźnie oddzielono jako kolejny etap **przed** implementacją. Powstał konkretny projekt: [PREMIUM_LINEUP_BACKEND_PLAN.md](PREMIUM_LINEUP_BACKEND_PLAN.md). Nie wdrożono tabel/RPC zapisu składów, autora ani CAS. Nie przedstawiamy ich jako PASS.
+
+## Zrealizowane zachowania
+
+- Start: aktualne grupy + dostępne nadchodzące publiczne. Historia: aktualne grupy + własne historyczne wpisy po wyjściu (także odpowiedzialność za gości). Obce prywatne wydarzenia nie są zwracane w list ani detail. To nowa decyzja właściciela, zastępująca wcześniejsze publiczne prywatne kafelki.
+- Zakres: Wszystkie dostępne / konkretna grupa / Publiczne / Moje mecze, do tego Nadchodzące/Historia. Zakres i okres wykonują się w SQL **przed LIMIT/OFFSET**, z zawsze obowiązującą autoryzacją. Edge przepuszcza tylko nowe niesekretne scope/period; p_user i p_session nadal wyłącznie z serwera. React dodatkowo odrzuca obce prywatne DTO ze starszego API.
+- `own_history` jest niezależne od aktywnego zapisu. Dzięki temu historyczne wycofane wpisy lub odpowiedzialność za gości nie znikają tylko dlatego, że nie są już registered/reserve.
+- Każdy aktywny członek może tworzyć we własnej niearchiwalnej grupie. Oryginalny BottomNav + i EventForm zachowane. Frontend włącza nową regułę wyłącznie po `member_creation_enabled:true`; wobec starego backendu nadal respektuje jego ograniczenia, bez fałszywie aktywnego plusa.
+- Ważna zależność: stare match_finance nadawało uprawnienia każdemu twórcy-członkowi. Nowy zwykły twórca **nie** uzyskuje finansów ani uprawnień zarządzania grupą; finance wymaga administratora albo twórcy nadal posiadającego rolę organizatora. Kwoty, FIFO, wpłaty, ledger i reguły naliczania bez zmian. Wąskie ograniczenie uprawnień twórcy jest celową częścią tej aktualizacji, nie zmianą logiki kwot.
+- Boisko: oryginalne PremiumPitch, przycisk Utwórz lokalny podgląd, odzyskany deterministyczny podział demo — jawnie przykład w RAM, nie wynik zapisany/losowanie serwera. Nieparzyste liczby, goście, wybór dwóch osób, natychmiastowa zamiana i Zakończ zamiany działają. To adaptacja dawnego zachowania, bez kopiowania World/reduceWorld i bez nowego algorytmu oceny/doboru.
+- Zamiast selectów główna interakcja odbywa się na boisku; nieprzypisani mają listę z prostymi A/B. Nowe wpisy pozostają poza podziałem, wycofane/rezerwa usuwane z lokalnego przypisania. Publiczny outsider nie może edytować; wymagane członkostwo z rzeczywistych grup.
+- Cofnij zmiany odtwarza brak zapisanego serwerowego baseline. Zapis na serwerze pozostaje wyłączony, etykieta informuje o braku zapisanego składu. Nie generujemy autora ani daty i nie zapisujemy do localStorage. Cofnięcie/niezmieniony zapis i zachowanie prawdziwego autora/CAS wymagają następnego etapu; obecne testy potwierdzają tylko uczciwy lokalny szkic.
+- Kompaktowy sticky header pokazuje tytuł/powrót/odświeżanie, bez dużego logo. Dekoracyjny nagłówek przewija się normalnie. IntersectionObserver obserwuje rzeczywisty scroll element Ionic, stała geometria baru nie przesuwa strony przy aktywacji; scroll-padding/scroll-margin chronią fokus. Przy wyjściu ustawienie scroll-padding jest odtwarzane.
+- Elastyczna szerokość tytułu i odstęp na safe-area po prawej zapobiegają obcięciu herbu. Zachowane natywne nie-overlay StatusBar i BottomNav; brak zmian Ultimate, globalnego CSS i profilu.
+
+## Backend i izolacja — dokładny stan
+
+Trzy nowe wersjonowane migracje utworzone CLI (starych44 nie zmieniono):
+
+1. `20261028174603_premium_match_membership_visibility.sql`: prywatny feed predicate, filtrowanie przed paginacją, odmowa detail, member create, bezpieczne current_group_member/own_history DTO.
+2. `20261028174920_premium_member_creation_finance_guard.sql`: zwykły twórca nie uzyskuje roli finansowej; istniejące grants/role bez rozszerzenia.
+3. `20261028175508_premium_match_feed_filters.sql`: zakres/okres w SQL przed paginacją. Zachowano zabezpieczony publiczny dispatcher i niewystawione prywatne funkcje.
+
+Zastosowano **wyłącznie do nowej** izolacji `slm-premium-behavior-review`, API65321, UI5192,47 migracji. Rzeczywiste GoTrue/Edge/PostgREST i nowe fikcyjne konta/grupy/mecze wyłącznie tam. Dla testów historii przesunięto wyłącznie własne świeżo utworzone fixture meczów o3h wstecz; nie zegar i nie stare dane. Wszystkie testowe dane/kontenery zachowane, bez resetów/usuwania.
+
+**Używany backend POCO premium-finance64321 nadal ma44 migracje.** Nie zastosowano do niego nowych migracji ani nowego handlera. Cloud bez zmian. Nowy model Auth nieaktywny w obu środowiskach. Konta/hasła POCO, numery, UUID i wcześniejsze fixture są nietknięte. Backend testowy nie ma Storage/Studio/Realtime/SMTP, bo ten odbiór ich nie wymaga; nie jest to pełna regresja zdjęć lub poczty.
+
+Przygotowanie nowej izolacji: `python app/scripts/prepare-premium-behavior-local.py` i przypisany jej CLI start, bez resetów. Helper jest przypięty do brancha i nowego project_id. Dalsze migrowanie tylko tej izolacji poleceniem CLI z `.cache/premium-behavior-stack`; nie uruchamiać podobnych poleceń z katalogu starego projektu. Canonical backend: app/supabase, generated cache jest jedynie uruchomieniem tych źródeł.
+
+## Faktyczne testy
+
+| Kontrola | Wynik |
+|---|---|
+| TypeScript app + osobno Android entry; strict Edge | PASS |
+| ESLint | PASS, bez ostrzeżeń |
+| Celowany Vitest Events/UI/filters/Finance/oryginalne Teams | **30 PASS /5 plików** |
+| Real Auth → Edge → SQL HTTP | **29 PASS**, brak fixture odpowiedzi HTTP |
+| HTTP prywatność | Brak tytułu/UUID obcego prywatnego meczu w DTO, detail odmówiony; publiczne telefony ukryte; dawny członek otrzymuje własne prywatne wpisy, bez cudzych uczestników |
+| HTTP uprawnienia | Zwykły członek tworzy z własnym UUID mimo próby owner spoof; obcy/były członek odrzuceni; brak finansów i realny groups_permission403; admin zachowuje finance authority |
+| HTTP filtry | Current/public/history/former-own, scope group/public/mine i period na serwerze PASS; query nie omija ACL |
+| Direct REST/RPC + SQL/RLS/ACL | PASS, bez direct dispatcher/helper i grantów do zapisu/zmiany ról; invoker i RLS zachowane; nowy Auth false |
+| Lokalny SQL lint |0 błędów, **4 zastane warnings**: push_claim1, email_profile_save1, finance_dispatch_core2; nie naprawiano poza zakresem |
+| Chrome real backend | **3 PASS**: filtry/+ członka/formularz; odd roster/goście/swap/undo/sticky; historia po wyjściu |
+| Chrome mobile320/360/390 ×Light/Dark | PASS, szerokości, prawy brzeg herbu, scroll, kompaktowy sticky bez img; wariant z symulowanym top safe-area24px |
+| Build main/Premium/demo + izolacja demo | PASS,16 izolowanych artefaktów; ostrzeżenia chunk size/bundlera jawne |
+| Frozen UI |55 źródeł zgodnych z istniejącym kontraktem PR23; dziś bez zmian oryginalnych komponentów demo/Ultimate/BottomNav/globalCSS |
+| Nowy APK/native POCO/IME/Back/resume | **NOT TESTED**, brak builda APK, sync/instalacji i działań na telefonie w tej aktualizacji |
+| Trwały zapis/autorstwo/CAS składów | **NIE ZAIMPLEMENTOWANO**, wyłącznie projekt następnego etapu |
+
+Nie uruchamiano pełnej starej regresji ani migracji na używanym stacku. Testy przechwyciły realną kolizję automatycznie przewijanego przycisku ze sticky barem; poprawiono stałą geometrię i przewijanie z odstępem, po czym Chrome PASS bez force-click. Test spóźnionego detail zaadaptowano do nowego pobrania listy po zmianie zakresu; nadal potwierdza odrzucenie starej odpowiedzi.
+
+## Zrzuty porównawcze
+
+Wcześniejszy wygląd i interakcja formularza przypisań: `docs/ui/premium-ui-restore/premium-ui-restore.cy.ts/after-pitch-dark.png`, wcześniejsze karty `after-list-390-dark.png` z poprzedniego P0.
+Nowe rzeczywiste zrzuty: `docs/ui/premium-behavior/premium-behavior.cy.ts/filters-320-light.png`, `filters-390-dark.png`, warianty360/390Light/Dark i `pitch-sticky-dark.png`. Obejrzano zrzuty listy, boiska i sticky; wyłącznie fikcyjne dane z realnego backendu. Zbiory fixture są różne, dlatego to porównanie układu/zachowania, nie test identycznych pikseli. Zdjęcia telefonu/IME nowej wersji nie istnieją i nie są deklarowane.
+
+## APK i następny bezpieczny krok
+
+Kod Premium buduje się — **można przygotować nowy APK po uzgodnieniu docelowego lokalnego backendu**. Nie przygotowano i nie zainstalowano teraz APK, bo używana baza64321 nadal ma stary kontrakt. Aby na niej odebrać nową regułę członkostwa i serwerową prywatność, potrzebne jest odrębnie zatwierdzone zastosowanie tych3 migracji i lokalnej aktualizacji allowlisty scope/period handlera, z backupem/weryfikacją bez resetu. Alternatywą jest jawny APK do nowej izolacji65321 z osobną sesją; obecnego APK nie przełączano i nie podmieniano konfiguracji Androida.
+
+Trwałe składy/autorstwo/CAS realizować jako następny samodzielny etap według projektu, po jego zatwierdzeniu. Nie wdrażać częściowo ani nie przedstawiać disabled przycisku jako ukończonego zapisu. W tym zadaniu nie wykonano merge/deploy do używanego projektu lub Cloud, zmiany danych produkcyjnych ani instalacji telefonu.
+
+Przy kontroli funkcji/RLS wykorzystano aktualne [zalecenia Supabase dla funkcji](https://supabase.com/docs/guides/database/functions) i [RLS](https://supabase.com/docs/guides/database/postgres/row-level-security): serwerowe API z jawnie zweryfikowaną sesją, ograniczone EXECUTE, prywatne helpery, bez poszerzania grantów. Źródła te opisują model zabezpieczeń; wyniki PASS powyżej pochodzą z wykonanych testów projektu.
+
+Kontrola consolidation została zaktualizowana z44 do47 plików migracji (nowe3). Hashy32 historycznych migracji i chronionych źródeł main nie zmieniono. Guard zachowuje ancestry, wyłączony deployment i canonical local preparation; po aktualizacji PASS.

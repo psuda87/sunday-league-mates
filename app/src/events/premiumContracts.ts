@@ -7,7 +7,7 @@ export interface EventSummary {
   status:'scheduled'|'cancelled'; access:'full'|'own'|'none'; own_participation:boolean;
   duration_minutes?:number; capacity?:number; cost_cents?:number; minimum_players?:number;
   registered_count?:number|null; reserve_count?:number|null; registration_open?:boolean;
-  decision_required?:boolean; can_manage?:boolean; can_edit?:boolean; version?:number;
+  current_group_member?:boolean; own_history?:boolean; decision_required?:boolean; can_manage?:boolean; can_edit?:boolean; version?:number;
 }
 export interface MatchEntry extends Omit<Participant,'status'|'contact_phone'> {
   status:'registered'|'reserve'|'withdrawn'; contact_phone:string|null; joined_at:string;
@@ -23,12 +23,14 @@ export function eventSummary(value:unknown):EventSummary {
     if(!['duration_minutes','capacity','cost_cents','minimum_players','version'].every(k=>integer(r[k]))||!['registration_open','decision_required','can_manage','can_edit'].every(k=>typeof r[k]==='boolean'))throw Error('Incomplete match contract');
     if(r.access==='full'&&(!integer(r.registered_count)||!integer(r.reserve_count)))throw Error('Missing authorized counts');
   }
+  for(const key of ['own_history','current_group_member'])if(r[key]!==undefined&&typeof r[key]!=='boolean')throw Error('Invalid event privacy flags');
   return r as unknown as EventSummary;
 }
 export function matchList(value:unknown){
   const r=row(value);if(!Array.isArray(r.events)||!text(r.server_now)||!Number.isFinite(Date.parse(String(r.server_now))))throw Error('Invalid match list');
+  if(r.member_creation_enabled!==undefined&&typeof r.member_creation_enabled!=='boolean')throw Error('Invalid creation capability');
   const events=r.events.map(eventSummary);if(new Set(events.map(e=>e.id)).size!==events.length)throw Error('Duplicate match identifiers');
-  return {events,server_now:r.server_now as string};
+  return {events,server_now:r.server_now as string,memberCreationEnabled:r.member_creation_enabled===true};
 }
 export function matchDetail(value:unknown,id:string):MatchDetail {
   const r=row(value),event=eventSummary(r.event);

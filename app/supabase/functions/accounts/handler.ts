@@ -413,7 +413,7 @@ export function createHandler(env: Environment) {
         const allowed = prefix === 'groups_'
           ? ['name','description','query','group_id','user_id','phone','id','request_id','accept','organizer','share_full_name','confirm_nickname']
           : prefix === 'matches_'
-          ? ['event_id','guest_name','guest_phone','list','participant_id','user_id','name','group_id','date','time','starts_at','location','address','duration_minutes','capacity','cost_cents','visibility','expected_version','absent','reason','request_id','offset']
+          ? ['event_id','guest_name','guest_phone','list','participant_id','user_id','name','group_id','date','time','starts_at','location','address','duration_minutes','capacity','cost_cents','visibility','expected_version','absent','reason','request_id','offset','scope','period']
           : ['group_id','event_id','user_id','participant_id','payment_id','request_id','amount_cents','expected_amount_cents','expected_version','reason','payable','absent'];
         const payload = Object.fromEntries(allowed.filter(key => Object.hasOwn(body, key)).map(key => [key, body[key]]));
         const r = await call('/rest/v1/rpc/' + rpc, 'POST', {
