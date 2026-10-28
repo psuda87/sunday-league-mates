@@ -833,3 +833,11 @@ Właściciel po aktualizacji APK z kodu69f3aa6 potwierdził: „ok działa jest 
 Przygotowałem i wypchnąłem Draft PR #24: https://github.com/psuda87/sunday-league-mates/pull/24 z chore/main-stabilization. Main134c52b pozostał bez zmian. Zachowano Premium, działający backend i profil PR16; eksperymentalne Auth18/online19 pozostają osobno.
 Naprawiono regresję wyświetlania nazw uczestników, przywracając istniejącą projekcję PR16 osobną migracją. PASS:289Vitest,116kontroliHTTP,6zestawówSQL/RLS,13kontroli ochronyUI,3testy przeglądarkowe oraz TypeScript/lint/buildy/Capacitor/Android. Pozostają4ostrzeżeniaSQL i6alertów moderate. APK nie instalowano; odbiórPOCO pozostaje do wykonania.
 Pełny raport: docs/MAIN_CONSOLIDATION_REPORT.md oraz inwentarze PR/gałęzi/worktree/importów. Decyzje samodzielne i wymagające zgody opisane w raporcie. Zapis odpowiedzi: docs/ODPOWIEDZI_CODEX.txt. Bez merge, wdrożeńCloud, resetów i usuwania gałęzi. CI ręczne przygotowane, nie uruchomione; ustawienia GitHub bez zmian.
+
+
+[2026-10-28 23:06:05 Europe/Warsaw] Końcowy audyt PR24
+Werdykt READY FOR OWNER REVIEW. Sprawdzono PR24/39ef2e3 względem main134c52b. Nie wykrytoP0/P1; to nie jest zgoda na merge ani deklaracja100%bezpieczeństwa.
+Ponowione PASS:19Vitest,77kontroliHTTP,6zestawówSQL/RLS,2dodatkoweChromeE2E karty i finansów,provenance/guard/katalog40migracji/APK. Pozostają nieblokujące ograniczenia ochrony wrapperaUI,brak branchprotection,endpointAPK64321 kontra testy55321,zależności i kosmetyka długiej nazwy. Szczegóły i kryteria właściciela:docs/FINAL_MAIN_AUDIT.md.
+Raport publikowany w osobnymDraftPR na audit/pr24-final do chore/main-stabilization; kodPR24 i main niezmienione. Bez merge,deployu,resetów,migracji,instalacjiAPK i zmian backenduPOCO/Cloud. Raport końcowy zapisany również w docs/ODPOWIEDZI_CODEX.txt.
+
+[2026-10-28 23:07:08 Europe/Warsaw] Raport audytu opublikowany w osobnym Draft PR #25: https://github.com/psuda87/sunday-league-mates/pull/25 (baza chore/main-stabilization, nie main). Werdykt READY FOR OWNER REVIEW, brak wykrytych P0/P1. PR24/39ef2e3 i main134c52b niezmienione. Pozostałe P2/P3 i ograniczenia: docs/FINAL_MAIN_AUDIT.md. Bez merge/deployu/instalacji/migracji. Zapis odpowiedzi docs/ODPOWIEDZI_CODEX.txt.

@@ -176,3 +176,12 @@ Automatyczne PASS: TS aplikacji/strict Edge, lint,289 Vitest/50plików,13 guards
 Ręczne POCO: NOT TESTED; APK NIE instalowano. Hostowane CI NOT RUN, przygotowane ręczne z warunkiem bezpłatnego limitu; GitHub protection/rulesets bez zmian. Zachowane HEAD i niezacommitowane notatki pozostałych16worktree.
 Otwarte:4zastane ostrzeżeniaSQL (push_claim wymaga osobnej kontroli delivery),6moderate npm,brak trwałych składów,Cloud/SMTP/FCM bez odbioru. APK Stage3 nadal celuje w64321, testy odbyły się na55321; przed instalacją osobno uzgodnić kompatybilny backend/endpoint.
 Następny krok: odbiór Draft https://github.com/psuda87/sunday-league-mates/pull/24 i raportu docs/MAIN_CONSOLIDATION_REPORT.md; osobna zgoda na test telefonu/merge/Cloud/ochronę CI. Bez merge, deployu, resetów i usuwania gałęzi. Pełna odpowiedź docs/ODPOWIEDZI_CODEX.txt.
+
+
+## 2026-10-28 23:06:05 Europe/Warsaw — końcowy audyt PR24
+Gałąź dokumentacji audit/pr24-final. Audytowany PR24 HEAD39ef2e3937b781439864029a92c12de315024263; main134c52b1aee0d0804cc0cf71f151f95040e7a38f niezmieniony. Werdykt READY FOR OWNER REVIEW, brak wykrytychP0/P1 w zakresie; bez zgody na merge/deploy/instalację.
+Ponowione:47źródeł provenance,guardPremium,19Vitest,48HTTPuprawnień+29HTTPwidoczności,6SQL/RLS,2Chrome rzeczywistej karty/finansów,odczytykatalogu40migracji/RLS/ACL,APKmanifest/hash/zasoby. Całość na izolowanym55321; bez zmian Cloud/POCO64321/migracji. Nie powtarzano pełnych289Vitest/buildów — sprawdzono wcześniejsze logi i zgodność źródeł/artefaktu.
+P2: luka guardu wrapperaPremiumGroupFinance (aktualny render prawidłowy); endpointAPK64321 inny niż testowy55321; brak branchprotection/requiredchecks;6moderate zależności. P3:4ostrzeżeniaSQL,przycinanie długiego pseudonimu wzorca. FizycznyPOCO/Cloud/SMTP/FCM NOT TESTED. UstawieniaGitHub niezmienione:mainprotectedfalse,rulesets0.
+Raport docs/FINAL_MAIN_AUDIT.md; osobnyDraftPR raportu do chore/main-stabilization. PR24 nie zmieniano. Wymagana osobna akceptacja właściciela zakresu/ryzyk,merge,CI/ochrony i odbioru telefonu. Zapis odpowiedzi docs/ODPOWIEDZI_CODEX.txt.
+
+2026-10-28 23:07:08 Europe/Warsaw: osobny Draft raportu #25 https://github.com/psuda87/sunday-league-mates/pull/25, bez zmian PR24/main. Następny krok wyłącznie odbiór właściciela.
