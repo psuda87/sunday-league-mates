@@ -1,3 +1,11 @@
+# Aktualizacja etapu 2 — 2026-10-28
+
+Binding finansów Premium z tabeli historycznego etapu1 poniżej został zaimplementowany: własne saldo, należności i blokada przez `group_finance_account`, panel uprawnionego administratora/organizatora, istniejące operacje wpłat i zatwierdzenia zakończonego meczu. Ekrany korzystają z API, bez demo reducera. Pełny odbiór Supabase Auth/Edge/HTTP pozostaje **BLOCKED** przez pojemność Dockera Cloud; SQL/RLS i Chromium z fikcyjnym adapterem UI są odrębnymi dowodami, nie pełnym E2E. P1 administracji meczem pozostaje nieprzeniesiony. Własny koszt i goście są kwotą łączną płatnika według istniejącego DTO; brak fikcyjnego rozbicia zastosowanych wpłat. Historyczne wyniki etapu1 poniżej zachowano, nie przypisano im nowego PASS.
+
+Aktualny zakres, użyte kontrakty, ograniczenia retry, testy i zrzuty: [PREMIUM_REAL_FINANCE_STAGE2.md](PREMIUM_REAL_FINANCE_STAGE2.md).
+
+---
+
 # Premium — prawdziwe dane, etap 1
 
 2026-10-27, Europe/Warsaw. Branch `feat/premium-real-events-stage1`, baza PR18 **845d35e1bc644be5935d3658ed1e3a57cd74b518**, main **134c52b1aee0d0804cc0cf71f151f95040e7a38f**. Na początku sprawdzono fetch i otwarte PR:18 Auth,19 infrastruktura zależna od18,17 diagnostyka,15 audyt profilu,14 Cloud,7 Android. PR19 HEAD54c2241. Nie modyfikowano tych PR ani ich gałęzi. Nowa integracja jest osobnym zależnym Draft PR do brancha18; nie potrzebuje hostingu z19. Po odbiorze18 należy osobno zdecydować o kolejności review/retargetowania.

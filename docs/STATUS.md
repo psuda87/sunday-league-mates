@@ -1,3 +1,13 @@
+# Premium real data — etap 2: finanse, odbiór E2E BLOCKED
+
+2026-10-28 09:03 Europe/Warsaw — `feat/premium-real-finance-stage2` od HEAD PR20 `448a2967489040162bfc6653c197af9afe9dcb55`; zależny PR do `feat/premium-real-events-stage1`. PR18/19/20 i ich gałęzie bez zmian. P0: Premium → rzeczywiste `finance_groups`/`group_finance_*`, własne saldo i należności łącznie z gośćmi, statusy/historia/blokada, zgłoszenie wpłaty, panel administratora i potwierdzanie/odrzucanie/księgowanie/approval przez istniejący backend. UUID retry zachowany w RAM także po niepewnym odczycie/remount; scope i sesja sprawdzane, bez fikcyjnego salda przy błędzie. P1 nie rozpoczęto.
+
+PASS: TypeScript, pełny lint, 326 Vitest/54 pliki i końcowy zmieniony zakres17/2, build main/Premium/demo+izolacja16, frozen UI55. Nowa zatrzymana po testach fixture PostgreSQL:44 niezmienione migracje,101 PASS SQL/RLS/finanse (Auth/JWT/Storage fixture), jeden scenariusz późnego cutoff FIFO NOT TESTED ze względu na zegar serwera. Chromium UI z kontrolowanym adapterem:320/390/768 Dark/Light, >=44px, odczyt statusu po decyzji PASS; **nie jest to E2E Supabase**.
+
+BLOCKED: pełny lokalny Supabase/real Auth/Edge/HTTP/Chrome — rozpakowanie obrazów przekroczyło32GB vfs Dockera; brak odbioru dwóch kont przez pełny backend. Ponadto własne DTO nie rozdziela zastosowanych wpłat na poszczególnych gości ani nie daje zwykłemu zawodnikowi wstępnego podziału; decyzja dla historycznego płatnika bez bezpiecznej nazwy z aktualnego DTO grupy wstrzymana. Pełny restart procesu traci RAM niepewnego zamiaru wpłaty: najpierw sprawdzić historię. Android NOT TESTED. Brak zmian backendu/Cloud/Auth/migracji/Edge/Firebase/rozliczania/APK, resetów, merge i wdrożeń. Następny krok: brakujący odbiór dwóch fikcyjnych kont na działającym pełnym izolowanym Supabase, bez aktywacji nowego Auth. Szczegóły i dwa jawnie fixture zrzuty: [PREMIUM_REAL_FINANCE_STAGE2.md](PREMIUM_REAL_FINANCE_STAGE2.md); chronologia `docs/ODPOWIEDZI_CODEX.txt`.
+
+---
+
 # Przebudowa kont — kandydat nieaktywny, blokery
 
 Kod2e0b0f2, Draft PR #18: https://github.com/psuda87/sunday-league-mates/pull/18 — bez konfliktów i merge, pełna aktywacja BLOCKED.
