@@ -1,0 +1,439 @@
+{
+  "main": "134c52b1aee0d0804cc0cf71f151f95040e7a38f",
+  "refs": [
+    {
+      "ref": "chore/android-phone-readiness",
+      "sha": "ae9fac7cfe7dccffdfd355e8e62aebb539203d01",
+      "ahead_main": 1,
+      "behind_main": 4
+    },
+    {
+      "ref": "chore/local-phone-fixtures",
+      "sha": "ac4954c41b876ae47055174176116a4877c952a5",
+      "ahead_main": 5,
+      "behind_main": 6
+    },
+    {
+      "ref": "chore/main-stabilization",
+      "sha": "cb13ee9cbb2eb7130c2d9cfabee4a94697413a71",
+      "ahead_main": 2,
+      "behind_main": 0
+    },
+    {
+      "ref": "chore/online-readiness",
+      "sha": "54c2241e6df40c977c89b665aeade0ee5a4b9abc",
+      "ahead_main": 10,
+      "behind_main": 0
+    },
+    {
+      "ref": "feat/account-model-foundation",
+      "sha": "845d35e1bc644be5935d3658ed1e3a57cd74b518",
+      "ahead_main": 7,
+      "behind_main": 0
+    },
+    {
+      "ref": "feat/auth",
+      "sha": "c5473b75e6f43b79bcbd65bf4bb856d4e1ea15fd",
+      "ahead_main": 0,
+      "behind_main": 16
+    },
+    {
+      "ref": "feat/cloud-test-preparation",
+      "sha": "65e7fd0a0b67c37040fa10c92b86b50f31e8c45d",
+      "ahead_main": 2,
+      "behind_main": 1
+    },
+    {
+      "ref": "feat/events",
+      "sha": "6638e18b4ed763e5bdee45ea61416a576e00bbec",
+      "ahead_main": 0,
+      "behind_main": 14
+    },
+    {
+      "ref": "feat/integration",
+      "sha": "13cf1a82e9e993cc9b4c4a53bc3e0aff9d9a307f",
+      "ahead_main": 0,
+      "behind_main": 6
+    },
+    {
+      "ref": "feat/premium-account-identifiers",
+      "sha": "7e8cea4fc3b1bf5ef8560d44e3a31ca6f315ca6c",
+      "ahead_main": 3,
+      "behind_main": 0
+    },
+    {
+      "ref": "feat/premium-b3-groups",
+      "sha": "c22d65b8a5457c22018d48f098e2e64faed5f7ee",
+      "ahead_main": 3,
+      "behind_main": 2
+    },
+    {
+      "ref": "feat/premium-profile-name-privacy",
+      "sha": "a26ed578e38034db5404bf59315096c7f3723bad",
+      "ahead_main": 8,
+      "behind_main": 1
+    },
+    {
+      "ref": "feat/premium-real-events-stage1",
+      "sha": "448a2967489040162bfc6653c197af9afe9dcb55",
+      "ahead_main": 9,
+      "behind_main": 0
+    },
+    {
+      "ref": "feat/premium-real-finance-stage2",
+      "sha": "4b7e740261e4937e80470079a8d5d43e153de883",
+      "ahead_main": 13,
+      "behind_main": 0
+    },
+    {
+      "ref": "feat/premium318-live",
+      "sha": "4b14e0ce5c225900aca8d7c36442f8aa23fc3c56",
+      "ahead_main": 3,
+      "behind_main": 6
+    },
+    {
+      "ref": "feat/premium319-android",
+      "sha": "ac4954c41b876ae47055174176116a4877c952a5",
+      "ahead_main": 5,
+      "behind_main": 6
+    },
+    {
+      "ref": "feat/premium320-visual-parity",
+      "sha": "c6c2ff624eb42d9bc39725f10a58c8df07f81cee",
+      "ahead_main": 6,
+      "behind_main": 6
+    },
+    {
+      "ref": "feat/slm-v1-live",
+      "sha": "5c3f13fe0cbe3d0f8e14b7c980189b25cf7bb94f",
+      "ahead_main": 72,
+      "behind_main": 9
+    },
+    {
+      "ref": "feat/ui-beta",
+      "sha": "2d5984cbb82dda3c0fe2f713499cbf3edd588057",
+      "ahead_main": 63,
+      "behind_main": 9
+    },
+    {
+      "ref": "feat/v1-consolidation",
+      "sha": "3a9d0c856e5c7d733e8eea570715fadde1076711",
+      "ahead_main": 5,
+      "behind_main": 4
+    },
+    {
+      "ref": "fix/bottom-nav-highlight",
+      "sha": "25404f45ca415ea6f5eaa04780707a820cb415ca",
+      "ahead_main": 2,
+      "behind_main": 3
+    },
+    {
+      "ref": "fix/premium-profile-display-name",
+      "sha": "a3576210e978b0c608eb706b7554430aaa269ab8",
+      "ahead_main": 2,
+      "behind_main": 1
+    },
+    {
+      "ref": "fix/premium-real-ui-regression",
+      "sha": "a82397b130ca2296511247e848139edb79308a87",
+      "ahead_main": 19,
+      "behind_main": 0
+    },
+    {
+      "ref": "main",
+      "sha": "a46f5e42c1e996b8e4cac16e443b21e5dedc7dd1",
+      "ahead_main": 0,
+      "behind_main": 2
+    },
+    {
+      "ref": "test/android-premium-real-stage3",
+      "sha": "74b1595d7a8dc79d50ba451df6afe2ea6da95e55",
+      "ahead_main": 15,
+      "behind_main": 0
+    },
+    {
+      "ref": "origin/chore/android-phone-readiness",
+      "sha": "ae9fac7cfe7dccffdfd355e8e62aebb539203d01",
+      "ahead_main": 1,
+      "behind_main": 4
+    },
+    {
+      "ref": "origin/chore/local-phone-fixtures",
+      "sha": "ac4954c41b876ae47055174176116a4877c952a5",
+      "ahead_main": 5,
+      "behind_main": 6
+    },
+    {
+      "ref": "origin/chore/main-stabilization",
+      "sha": "cb13ee9cbb2eb7130c2d9cfabee4a94697413a71",
+      "ahead_main": 2,
+      "behind_main": 0
+    },
+    {
+      "ref": "origin/chore/online-readiness",
+      "sha": "54c2241e6df40c977c89b665aeade0ee5a4b9abc",
+      "ahead_main": 10,
+      "behind_main": 0
+    },
+    {
+      "ref": "origin/feat/account-model-foundation",
+      "sha": "845d35e1bc644be5935d3658ed1e3a57cd74b518",
+      "ahead_main": 7,
+      "behind_main": 0
+    },
+    {
+      "ref": "origin/feat/auth",
+      "sha": "c5473b75e6f43b79bcbd65bf4bb856d4e1ea15fd",
+      "ahead_main": 0,
+      "behind_main": 16
+    },
+    {
+      "ref": "origin/feat/cloud-test-preparation",
+      "sha": "65e7fd0a0b67c37040fa10c92b86b50f31e8c45d",
+      "ahead_main": 2,
+      "behind_main": 1
+    },
+    {
+      "ref": "origin/feat/events",
+      "sha": "6638e18b4ed763e5bdee45ea61416a576e00bbec",
+      "ahead_main": 0,
+      "behind_main": 14
+    },
+    {
+      "ref": "origin/feat/integration",
+      "sha": "13cf1a82e9e993cc9b4c4a53bc3e0aff9d9a307f",
+      "ahead_main": 0,
+      "behind_main": 6
+    },
+    {
+      "ref": "origin/feat/premium-account-identifiers",
+      "sha": "7e8cea4fc3b1bf5ef8560d44e3a31ca6f315ca6c",
+      "ahead_main": 3,
+      "behind_main": 0
+    },
+    {
+      "ref": "origin/feat/premium-b3-groups",
+      "sha": "c22d65b8a5457c22018d48f098e2e64faed5f7ee",
+      "ahead_main": 3,
+      "behind_main": 2
+    },
+    {
+      "ref": "origin/feat/premium-profile-name-privacy",
+      "sha": "a26ed578e38034db5404bf59315096c7f3723bad",
+      "ahead_main": 8,
+      "behind_main": 1
+    },
+    {
+      "ref": "origin/feat/premium-real-events-stage1",
+      "sha": "448a2967489040162bfc6653c197af9afe9dcb55",
+      "ahead_main": 9,
+      "behind_main": 0
+    },
+    {
+      "ref": "origin/feat/premium-real-finance-stage2",
+      "sha": "4b7e740261e4937e80470079a8d5d43e153de883",
+      "ahead_main": 13,
+      "behind_main": 0
+    },
+    {
+      "ref": "origin/feat/premium318-live",
+      "sha": "4b14e0ce5c225900aca8d7c36442f8aa23fc3c56",
+      "ahead_main": 3,
+      "behind_main": 6
+    },
+    {
+      "ref": "origin/feat/premium319-android",
+      "sha": "ac4954c41b876ae47055174176116a4877c952a5",
+      "ahead_main": 5,
+      "behind_main": 6
+    },
+    {
+      "ref": "origin/feat/premium320-visual-parity",
+      "sha": "c6c2ff624eb42d9bc39725f10a58c8df07f81cee",
+      "ahead_main": 6,
+      "behind_main": 6
+    },
+    {
+      "ref": "origin/feat/push-notifications",
+      "sha": "103d08c0dd12e4c0aa59e7d2402d2b02ba0e52b3",
+      "ahead_main": 0,
+      "behind_main": 13
+    },
+    {
+      "ref": "origin/feat/settlements",
+      "sha": "81d71c7fb24dc4b410f178c3fa4101a5fa2ce410",
+      "ahead_main": 0,
+      "behind_main": 13
+    },
+    {
+      "ref": "origin/feat/slm-v1-live",
+      "sha": "5c3f13fe0cbe3d0f8e14b7c980189b25cf7bb94f",
+      "ahead_main": 72,
+      "behind_main": 9
+    },
+    {
+      "ref": "origin/feat/ui-beta",
+      "sha": "2d5984cbb82dda3c0fe2f713499cbf3edd588057",
+      "ahead_main": 63,
+      "behind_main": 9
+    },
+    {
+      "ref": "origin/feat/v1-consolidation",
+      "sha": "3a9d0c856e5c7d733e8eea570715fadde1076711",
+      "ahead_main": 5,
+      "behind_main": 4
+    },
+    {
+      "ref": "origin/fix/bottom-nav-highlight",
+      "sha": "25404f45ca415ea6f5eaa04780707a820cb415ca",
+      "ahead_main": 2,
+      "behind_main": 3
+    },
+    {
+      "ref": "origin/fix/premium-profile-display-name",
+      "sha": "a3576210e978b0c608eb706b7554430aaa269ab8",
+      "ahead_main": 2,
+      "behind_main": 1
+    },
+    {
+      "ref": "origin/fix/premium-real-ui-regression",
+      "sha": "a82397b130ca2296511247e848139edb79308a87",
+      "ahead_main": 19,
+      "behind_main": 0
+    },
+    {
+      "ref": "origin/main",
+      "sha": "134c52b1aee0d0804cc0cf71f151f95040e7a38f",
+      "ahead_main": 0,
+      "behind_main": 0
+    },
+    {
+      "ref": "origin/test/android-premium-real-stage3",
+      "sha": "74b1595d7a8dc79d50ba451df6afe2ea6da95e55",
+      "ahead_main": 15,
+      "behind_main": 0
+    }
+  ],
+  "worktrees_before": [
+    {
+      "path": "I:/slm/sunday-league-mates",
+      "head": "2d5984cbb82dda3c0fe2f713499cbf3edd588057",
+      "branch": "refs/heads/feat/ui-beta",
+      "status": [
+        " M app/src/demo/Profile.test.tsx",
+        " M app/src/demo/Profile.tsx",
+        " M app/src/demo/UltimatePlayerCard.test.tsx",
+        " M app/src/ui/UltimatePlayerCard.tsx",
+        " M docs/ODPOWIEDZI_CODEX.txt",
+        " M docs/STATUS.md"
+      ]
+    },
+    {
+      "path": "I:/slm/sunday-league-mates/.worktrees/account-foundation",
+      "head": "54c2241e6df40c977c89b665aeade0ee5a4b9abc",
+      "branch": "refs/heads/chore/online-readiness",
+      "status": []
+    },
+    {
+      "path": "I:/slm/sunday-league-mates/.worktrees/account-identifiers",
+      "head": "7e8cea4fc3b1bf5ef8560d44e3a31ca6f315ca6c",
+      "branch": "refs/heads/feat/premium-account-identifiers",
+      "status": []
+    },
+    {
+      "path": "I:/slm/sunday-league-mates/.worktrees/android-premium-stage3",
+      "head": "74b1595d7a8dc79d50ba451df6afe2ea6da95e55",
+      "branch": "refs/heads/test/android-premium-real-stage3",
+      "status": [
+        " M docs/ANDROID_PREMIUM_STAGE3.md",
+        " M docs/ODPOWIEDZI_CODEX.txt",
+        " M docs/STATUS.md"
+      ]
+    },
+    {
+      "path": "I:/slm/sunday-league-mates/.worktrees/bottom-nav-highlight",
+      "head": "a46f5e42c1e996b8e4cac16e443b21e5dedc7dd1",
+      "branch": "refs/heads/main",
+      "status": [
+        " M docs/ODPOWIEDZI_CODEX.txt",
+        " M docs/STATUS.md"
+      ]
+    },
+    {
+      "path": "I:/slm/sunday-league-mates/.worktrees/cloud-test-preparation",
+      "head": "65e7fd0a0b67c37040fa10c92b86b50f31e8c45d",
+      "branch": "refs/heads/feat/cloud-test-preparation",
+      "status": []
+    },
+    {
+      "path": "I:/slm/sunday-league-mates/.worktrees/main-stabilization",
+      "head": "134c52b1aee0d0804cc0cf71f151f95040e7a38f",
+      "branch": "refs/heads/chore/main-stabilization",
+      "status": []
+    },
+    {
+      "path": "I:/slm/sunday-league-mates/.worktrees/premium-b3-groups",
+      "head": "c22d65b8a5457c22018d48f098e2e64faed5f7ee",
+      "branch": "refs/heads/feat/premium-b3-groups",
+      "status": [
+        " M docs/ODPOWIEDZI_CODEX.txt",
+        " M docs/STATUS.md"
+      ]
+    },
+    {
+      "path": "I:/slm/sunday-league-mates/.worktrees/premium-profile-name",
+      "head": "a3576210e978b0c608eb706b7554430aaa269ab8",
+      "branch": "refs/heads/fix/premium-profile-display-name",
+      "status": []
+    },
+    {
+      "path": "I:/slm/sunday-league-mates/.worktrees/premium-real-events",
+      "head": "448a2967489040162bfc6653c197af9afe9dcb55",
+      "branch": "refs/heads/feat/premium-real-events-stage1",
+      "status": []
+    },
+    {
+      "path": "I:/slm/sunday-league-mates/.worktrees/premium-real-finance",
+      "head": "4b7e740261e4937e80470079a8d5d43e153de883",
+      "branch": "refs/heads/feat/premium-real-finance-stage2",
+      "status": []
+    },
+    {
+      "path": "I:/slm/sunday-league-mates/.worktrees/premium-ui-regression",
+      "head": "a82397b130ca2296511247e848139edb79308a87",
+      "branch": "refs/heads/fix/premium-real-ui-regression",
+      "status": []
+    },
+    {
+      "path": "I:/slm/sunday-league-mates/.worktrees/premium318-live",
+      "head": "c6c2ff624eb42d9bc39725f10a58c8df07f81cee",
+      "branch": "refs/heads/feat/premium320-visual-parity",
+      "status": []
+    },
+    {
+      "path": "I:/slm/sunday-league-mates/.worktrees/profile-name-privacy-review",
+      "head": "a26ed578e38034db5404bf59315096c7f3723bad",
+      "branch": "refs/heads/feat/premium-profile-name-privacy",
+      "status": []
+    },
+    {
+      "path": "I:/slm/sunday-league-mates/.worktrees/slm-v1-live",
+      "head": "5c3f13fe0cbe3d0f8e14b7c980189b25cf7bb94f",
+      "branch": "refs/heads/feat/slm-v1-live",
+      "status": []
+    },
+    {
+      "path": "I:/slm/sunday-league-mates/.worktrees/v1-consolidation",
+      "head": "3a9d0c856e5c7d733e8eea570715fadde1076711",
+      "branch": "refs/heads/feat/v1-consolidation",
+      "status": []
+    },
+    {
+      "path": "I:/slm/sunday-league-mates-integration",
+      "head": "ae9fac7cfe7dccffdfd355e8e62aebb539203d01",
+      "branch": "refs/heads/chore/android-phone-readiness",
+      "status": []
+    }
+  ],
+  "preservation": "All16 other worktree HEADs and dirty file SHA256 unchanged at final verification; no checkout/reset/clean/delete there"
+}

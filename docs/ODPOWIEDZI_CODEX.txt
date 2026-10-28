@@ -827,3 +827,9 @@ Ręczny wygląd/fizyczna klawiatura tej wersji nadal do odbioru przez właścici
 
 === 2026-10-26 18:51 Europe/Warsaw — PR16: ręczny odbiór poprawki etykiet na POCO
 Właściciel po aktualizacji APK z kodu69f3aa6 potwierdził: „ok działa jest ok”. Zapisano pozytywny ręczny odbiór poprawki odstępów formularza profilu na POCO. Nie dopisujemy oddzielnych wyników każdego pola, motywu ani scenariusza klawiatury, ponieważ odpowiedź była ogólna. Bez nowych zmian aplikacji/backendu/APK i bez ponawiania testów. PR #16 bez merge; potwierdzenie działania nie jest poleceniem scalania. Raport docs/ODPOWIEDZI_CODEX.txt.
+
+
+[2026-10-28 22:43:55 Europe/Warsaw] Konsolidacja stabilnego main — zakończenie przygotowania
+Przygotowałem i wypchnąłem Draft PR #24: https://github.com/psuda87/sunday-league-mates/pull/24 z chore/main-stabilization. Main134c52b pozostał bez zmian. Zachowano Premium, działający backend i profil PR16; eksperymentalne Auth18/online19 pozostają osobno.
+Naprawiono regresję wyświetlania nazw uczestników, przywracając istniejącą projekcję PR16 osobną migracją. PASS:289Vitest,116kontroliHTTP,6zestawówSQL/RLS,13kontroli ochronyUI,3testy przeglądarkowe oraz TypeScript/lint/buildy/Capacitor/Android. Pozostają4ostrzeżeniaSQL i6alertów moderate. APK nie instalowano; odbiórPOCO pozostaje do wykonania.
+Pełny raport: docs/MAIN_CONSOLIDATION_REPORT.md oraz inwentarze PR/gałęzi/worktree/importów. Decyzje samodzielne i wymagające zgody opisane w raporcie. Zapis odpowiedzi: docs/ODPOWIEDZI_CODEX.txt. Bez merge, wdrożeńCloud, resetów i usuwania gałęzi. CI ręczne przygotowane, nie uruchomione; ustawienia GitHub bez zmian.

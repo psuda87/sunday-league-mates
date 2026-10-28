@@ -167,3 +167,12 @@ Pozosta?y moderate zale?no?ci oraz ostrze?enia bundle/Browserslist/Gradle. Brak 
 Nast?pny etap: r?czny odbi?r obecnej integracji na telefonie, przegl?d rollout danych i osobne uzgodnienie poczty oraz FCM. Merge kodu nie oznacza wdro?enia ani gotowo?ci do wydania.
 
 Raport: [REPOSITORY_AUDIT.md](REPOSITORY_AUDIT.md). Szczeg??owa historia: [ODPOWIEDZI_CODEX.txt](ODPOWIEDZI_CODEX.txt).
+
+
+## 2026-10-28 22:43:55 Europe/Warsaw — konsolidacja stabilnego main, Draft PR24
+Branch chore/main-stabilization, baza origin/main134c52b niezmieniona. e73d5fe: selektywne PR20–23/Premium real data; cb13ee9: guards/CI/testy i zgodność PR16. Auth18/online19 wyłączone z konsolidacji. Domyślny LIVE zachowany.
+Backend: 35 migracji main +4 PR23 +nowa20261028204500 restore_pr16_match_name_projection =40. Zastosowane tylko w nowym lokalnym slm-main-stabilization/55321. Edge lokalnie z tych samych źródeł. Bez migracji/deploy Cloud i bez zmian używanej bazy POCO64321.
+Automatyczne PASS: TS aplikacji/strict Edge, lint,289 Vitest/50plików,13 guards,116HTTP (29mecze+48finanse+39profil/Auth/Storage),6SQL/RLS,3Chrome320/360/390Light/Dark,build LIVE/Premium/demo/Androidweb,Capacitor sync/assembleDebug exit0. Regresja PR16 nazwy uczestników wykryta i naprawiona nową migracją, bez zmiany wcześniejszych SQL/zgód.
+Ręczne POCO: NOT TESTED; APK NIE instalowano. Hostowane CI NOT RUN, przygotowane ręczne z warunkiem bezpłatnego limitu; GitHub protection/rulesets bez zmian. Zachowane HEAD i niezacommitowane notatki pozostałych16worktree.
+Otwarte:4zastane ostrzeżeniaSQL (push_claim wymaga osobnej kontroli delivery),6moderate npm,brak trwałych składów,Cloud/SMTP/FCM bez odbioru. APK Stage3 nadal celuje w64321, testy odbyły się na55321; przed instalacją osobno uzgodnić kompatybilny backend/endpoint.
+Następny krok: odbiór Draft https://github.com/psuda87/sunday-league-mates/pull/24 i raportu docs/MAIN_CONSOLIDATION_REPORT.md; osobna zgoda na test telefonu/merge/Cloud/ochronę CI. Bez merge, deployu, resetów i usuwania gałęzi. Pełna odpowiedź docs/ODPOWIEDZI_CODEX.txt.
