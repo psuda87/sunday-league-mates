@@ -1,3 +1,10 @@
+# Przygotowanie odbioru PR24 i ochrony main — bez aktywacji
+
+- chore/android-main-acceptance pochodzi z PR24/39ef2e3. APK ma pozostać z dokładnie tego kodu, jawny Android Stage3/local debug; domyślnego LIVE i Premium nie zmieniać.
+- Telefonowy64321 kierujemy dopiero po zgodzie przez USB do izolowanego55321. Nie migrować używanej bazy64321/Cloud, nie instalować APK ani nie czyścić danych. Skrypt przygotowania restartuje co najwyżej dedykowany Edge55321 i odrzuca drift źródeł/historii.
+- Automatyczne PR-to-main CI jest przygotowane, nie uruchomione. Opt-in wymaga potwierdzenia bezpłatnego limitu/zakazu nadwyżek; bez opt-in job ma fail-fast. Nie włączać required checks ani reguł main bez osobnej zgody i faktycznego zielonego przebiegu. Plan prywatnego GitHub może ograniczać ochronę.
+- Instrukcje: docs/ANDROID_MAIN_ACCEPTANCE.md i docs/MAIN_PROTECTION_PLAN.md. Bez merge; Draft przygotowania kierować do chore/main-stabilization, nie main.
+
 # Konsolidacja 2026-10-28 — bieżące zasady, nadrzędne wobec historii poniżej
 
 - Jeden moduł: nowa gałąź od aktualnego main → testy → akceptacja właściciela → PR → merge wyłącznie po wyraźnej zgodzie → kolejny moduł od zaktualizowanego main. Przygotowanie PR nie upoważnia do merge.
