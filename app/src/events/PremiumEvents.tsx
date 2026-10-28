@@ -1,3 +1,6 @@
+import PremiumFinance from '../finance/PremiumFinance';
+import PremiumGroupFinance from '../finance/PremiumGroupFinance';
+import type { SessionManager } from '../auth/sessionManager';
 import { useEffect,useRef,useState } from 'react';
 import { IonButton,IonIcon } from '@ionic/react';
 import { refreshOutline } from 'ionicons/icons';
@@ -15,10 +18,11 @@ import { premiumDefaults } from './premiumForm';
 import type { PremiumEventsController } from './usePremiumEvents';
 import { matchDate,money } from './model';
 
-export default function PremiumEvents({data,userId,onGroups}:{data:PremiumEventsController;userId:string;onGroups:()=>void}){
+export default function PremiumEvents({data,userId,onGroups,manager}:{manager?:SessionManager;data:PremiumEventsController;userId:string;onGroups:()=>void}){
+  const [finance,setFinance]=useState(false);
   const [filter,setFilter]=useState<MatchFilter>('upcoming'),[guest,setGuest]=useState(''),[phone,setPhone]=useState(''),[reserve,setReserve]=useState(false),[reason,setReason]=useState('');
   const area=useRef<HTMLElement>(null);
-  useFrozenBack(()=>{if(!data.detail&&!data.creating)return false;data.back();return true;},()=>area.current,25);
+  useFrozenBack(()=>{if(finance){setFinance(false);return true;}if(!data.detail&&!data.creating)return false;data.back();return true;},()=>area.current,25);
   const d=data.detail,e=d?.event,full=e?.access==='full',own=d?.participants.find(p=>p.member_id===userId&&p.status!=='withdrawn');
   useEffect(()=>{setGuest('');setPhone('');setReserve(false);setReason('');},[e?.id]);
   const hasPlace=!!e&&full&&e.registered_count!<e.capacity!,closed=!e?.registration_open||e.status==='cancelled';
@@ -32,6 +36,7 @@ export default function PremiumEvents({data,userId,onGroups}:{data:PremiumEvents
   }
   const ownAction=e&&d&&e.access!=='none'&&<><IonButton className="slm-match-cta" expand="block" disabled={writeDisabled||closed||(own?.status!=='registered'&&(!full||blocked||own?.status==='reserve'&&!hasPlace))} onClick={()=>{void data.act(own?.status==='registered'?'withdraw':hasPlace?'join':'reserve',own?.status==='registered'?{participant_id:own.id}:{});}}>{closed?'ZAPISY ZAMKNIĘTE':own?.status==='registered'?'WYCOFAJ ZAPIS':blocked?'BLOKADA · ZALEGŁOŚCI':own?.status==='reserve'?hasPlace?'POTWIERDŹ WOLNE MIEJSCE':'JESTEŚ NA REZERWIE':hasPlace?'ZAPISZ SIĘ NA MECZ':'DOŁĄCZ DO REZERWY'}</IonButton>{own?.status==='registered'&&!closed&&<p className="slm-muted">Po 17:00 rezygnacja może pozostawić obowiązek opłaty do czasu rozliczenia zastępstwa.</p>}{own?.status==='reserve'&&!closed&&<IonButton fill="clear" disabled={writeDisabled} onClick={()=>{void data.act('withdraw',{participant_id:own.id});}}>Opuść rezerwę</IonButton>}{own?.status==='reserve'&&hasPlace&&!closed&&<p role="status">Zwolniło się miejsce. Potwierdź udział, aby je zająć. Rezerwa nie awansuje automatycznie.</p>}{blocked&&<p>Nowe zapisy na płatne mecze są zablokowane z powodu zaległości. Możesz nadal wycofać swój udział.</p>}</>;
   const filtered=data.events.filter(m=>(!data.activeGroup||m.group_id===data.activeGroup)&&(filter==='history'?m.status==='cancelled'||Date.parse(m.starts_at)<=Date.parse(data.serverNow):m.status!=='cancelled'&&Date.parse(m.starts_at)>Date.parse(data.serverNow)&&(filter!=='mine'||m.own_participation))).sort((a,b)=>filter==='history'?b.starts_at.localeCompare(a.starts_at):a.starts_at.localeCompare(b.starts_at));
+  if(finance&&manager)return <><MatchHeader title="Rozliczenia" onBack={()=>setFinance(false)}/><PremiumGroupFinance manager={manager} userId={userId} initialGroup={data.activeGroup}/></>;
   return <section ref={area} className="slm-matches-screen" aria-label="Mecze" aria-busy={writeDisabled}>
     {data.creating&&data.serverNow?<>{messages}<EventForm onBack={data.back} onSave={input=>data.create(input)} live={{groups:data.organizers,initial:premiumDefaults(data.serverNow,data.organizers.some(g=>g.id===data.activeGroup)?data.activeGroup:data.organizers[0]?.id),busy:data.busy}}/></>:<>
     <MatchHeader title={e?'Szczegóły meczu':'Mecze'} action={refresh} onBack={e?data.back:undefined}/>{messages}
@@ -45,10 +50,11 @@ export default function PremiumEvents({data,userId,onGroups}:{data:PremiumEvents
         <ParticipantGroup title="Rezerwa" emptyText="Rezerwa jest pusta." description="Kolejność zgłoszeń. Zajęcie wolnego miejsca wymaga potwierdzenia.">{d.participants.filter(p=>p.status==='reserve').map(participant)}</ParticipantGroup>
         {d.participants.some(p=>p.status==='withdrawn')&&<ParticipantGroup title="Wycofane wpisy" emptyText="Brak wpisów.">{d.participants.filter(p=>p.status==='withdrawn').map(participant)}</ParticipantGroup>}
       </>}
-      settlement={<section className="slm-panel"><h2>Rozliczenie</h2><p>Rozliczenia tej grupy pozostają zachowane. Ich obsługa w tym widoku będzie dostępna w kolejnym etapie.</p><p>Nie pokazujemy przykładowych wpłat ani salda.</p></section>}/>}</>
+      settlement={manager?<PremiumFinance key={`${userId}:${e.group_id}:${e.id}`} manager={manager} userId={userId} groupId={e.group_id} eventId={e.id} manage={!!e.can_manage||data.groups.some(g=>g.id===e.group_id&&g.admin_id===userId)} onChanged={()=>{void data.recheckFinancial?.();}}/>:<p>Rozliczenia wymagają aktywnej sesji.</p>}/>}</>
     :!data.loading&&!data.error&&<>
       <label className="slm-group-form">Aktywna grupa<select aria-label="Aktywna grupa" value={data.activeGroup} onChange={ev=>data.selectGroup(ev.target.value)}><option value="">Wszystkie widoczne mecze</option>{data.groups.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></label>
       {!data.groups.length&&<section className="slm-group-empty"><h2>Znajdź swoją ekipę</h2><p>Utwórz grupę albo przyjmij zaproszenie, aby grać razem.</p><button type="button" className="slm-group-primary" onClick={onGroups}>Przejdź do grup</button></section>}
+      {manager&&<IonButton fill="outline" onClick={()=>setFinance(true)}>Moje rozliczenia grupowe</IonButton>}
       <MatchFilters value={filter} onChange={value=>{setFilter(value);if(data.offset)void data.refresh();}}/>
       {data.organizers.length>0&&<IonButton fill="clear" disabled={writeDisabled} onClick={data.beginCreate}>Utwórz mecz</IonButton>}
       <div className="slm-match-list">{filtered.map(m=><div key={m.id} data-event={m.id}>{m.access==='full'?<MatchHero compact match={heroMatch(m)} displayName={m.name} badge={badge(m)} onOpen={()=>{void data.open(m.id);}} openDisabled={writeDisabled}/>:<section className="slm-panel"><h2>{m.name}</h2><p>{matchDate(m.starts_at)} · {m.location} · {m.group_name}</p><p>Prywatny mecz</p>{m.access==='own'&&<button type="button" onClick={()=>{void data.open(m.id);}}>Twój udział</button>}</section>}</div>)}</div>

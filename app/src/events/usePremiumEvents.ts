@@ -61,9 +61,10 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
       if(!authorized())return;setCreating(false);await refresh();await open(result.event_id);
     });
   }
+  async function recheckFinancial(){const id=detail?.event.id;if(!id)return;const ticket=++detailEpoch.current;try{const d=matchDetail(await manager.call('matches_detail',{event_id:id}),id);if(authorized()&&ticket===detailEpoch.current)setDetail(d);}catch{if(authorized()){setDetail(null);setError('Nie potwierdzono uprawnień po zmianie finansów. Odśwież mecz.');}}}
   const organizers=groups.filter(g=>g.admin_id===userId||g.organizer);
   function beginCreate(){back();if(organizers.length)setCreating(true);}
   function selectGroup(id:string){back();setActiveGroup(groups.some(g=>g.id===id)?id:'');}
-  return {events,groups,detail,loading,busy,error,notice,serverNow,activeGroup,offset,creating,organizers,refresh,open,back,act,create,beginCreate,selectGroup};
+  return {recheckFinancial,events,groups,detail,loading,busy,error,notice,serverNow,activeGroup,offset,creating,organizers,refresh,open,back,act,create,beginCreate,selectGroup};
 }
 export type PremiumEventsController=ReturnType<typeof usePremiumEvents>;
