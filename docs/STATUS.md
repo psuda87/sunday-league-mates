@@ -1,4 +1,16 @@
-# Stage 2A — zapis na GitHub, utworzenie Draft PR BLOCKED
+# Stage 2A — domknięty i ponownie zweryfikowany lokalnie
+
+2026-10-29 17:32 Europe/Warsaw — `feat/premium-lineups-stage2a`, kontynuacja istniejącego `c1cb2fd` od wskazanego Stage 1 `7ad5c75`. Nowy kod testów: `338db5af9ad06f12ba26e6f5df6e455aa12c2930`. Backend pozostaje dokładnie zatwierdzonym `b46b7b9`; brak ponownej implementacji, zmian migracji/handlera/Auth/finansów/UI/strażników. Dodano powtarzalny `app/scripts/test-lineups-edge-local.py`, zamykający brak rzeczywistego GoTrue → accounts Edge → PostgREST → PostgreSQL, także po restarcie i odebraniu dostępu.
+
+Automatyczne PASS tej sesji Windows: 50 SQL/RLS/PostgREST/restart, 13 rzeczywistych GoTrue/Edge HTTP, 320 Vitest/52 pliki (23 Edge), 13 Cypress/5 plików z kontrolowanym API, TS aplikacji/strict Edge/lint, 29 testów strażników, konsolidacja 41 migracji / frozen UI 55 / runtime 8, build LIVE/Premium/demo + izolacja 16 plików. Istniejące ostrzeżenia rozmiaru chunków. Cloud Codex: brak osobnego przebiegu, nie przypisujemy mu lokalnych wyników. Ręczny odbiór POCO: NOT TESTED.
+
+Migracje: wszystkie 41 odtworzono wyłącznie w NOWYCH odizolowanych fixtures; w istniejących projektach lokalnych i Cloud nie zastosowano żadnej. Edge uruchomiono tylko w nowej fixture. Końcowe `slm-lineups-stage2a-53bd33b37e1e` i `slm-lineups-edge-54d5c6c50f4c` z kontenerami pomocniczymi zatrzymane/zachowane, brak portów, sieć none/container. Wcześniejsze próby runnera zatrzymane/zachowane. Główne worktree `feat/ui-beta` z niezapisanymi zmianami nietknięte.
+
+Brak obowiązkowych poleceń lokalnych pozostających dla Stage 2A; odtworzenie PowerShell i granice testów: [PREMIUM_LINEUPS_STAGE2A.md](PREMIUM_LINEUPS_STAGE2A.md). Niewykonane: Kong/Storage nowego stosu, fizyczny Android/APK, hostowane CI, Supabase Cloud, merge, podłączenie UI/Stage 2B. Nie zmieniano telefonu ani Windows. Następny krok: review istniejącego zakresu i odrębne zlecenie Stage 2B; nie podłączać Zapisz w ramach Stage 2A. Wcześniejszy Draft PR pozostaje nieutworzony po Forbidden; [porównanie gałęzi](https://github.com/psuda87/sunday-league-mates/compare/fix/premium-lineup-stage1-contract...feat/premium-lineups-stage2a). Pełna chronologia: `docs/ODPOWIEDZI_CODEX.txt`.
+
+---
+
+# Historycznie: Stage 2A — zapis na GitHub, utworzenie Draft PR BLOCKED
 
 2026-10-29 14:38 Europe/Warsaw — `f7c13bb3bc85a903c9840c9e47e08fcec0c4a887` wypchnięty na `feat/premium-lineups-stage2a`. API GitHuba odrzuciło POST DraftPR (`Forbidden`), numeruPR brak. [Porównanie do wskazanej bazy](https://github.com/psuda87/sunday-league-mates/compare/fix/premium-lineup-stage1-contract...feat/premium-lineups-stage2a?expand=1). Backend źródłowo zatwierdzony b46b7b9,50SQL/RLS/PostgRESTHTTP/restart,320Vitest,29policy,TS/lint/buildy/guard55/runtime8/konsolidacja41 PASS. PełnyGoTrueEdgeHTTP iAndroid NOT TESTED. Raport `docs/PREMIUM_LINEUPS_STAGE2A.md`; końcowe Git-doc osobnym commitem. SupabaseCloud/UI/Stage1/Save nietknięte; bezmerge/deploy/Stage2B.
 

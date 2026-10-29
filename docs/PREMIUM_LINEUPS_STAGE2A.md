@@ -4,6 +4,45 @@
 
 **Stage 2A ukończony w zakresie kodu i opisanych testów. Stage 2B nie rozpoczęty.** Edytor, wygląd i stale wyłączony przycisk „Zapisz” są niezmienione. Nie przenoszono Auth18 i nie dotykano Supabase Cloud ani istniejących baz.
 
+## Ponowna weryfikacja i domknięcie — 2026-10-29, Europe/Warsaw
+
+Kontynuowano istniejące `origin/feat/premium-lineups-stage2a` / `c1cb2fd0f7686cd6a7217c763ac88bbc176d8c9f`, po fetch i potwierdzeniu bazy `7ad5c75414cf669d4471f3122e93073dab9aa8d7`. Nie implementowano ponownie backendu. Bieżąca sesja ma rzeczywisty dostęp do Windows i lokalnego Dockera; poniższe wyniki **nie pochodzą z osobnego środowiska Cloud Codex**. Utworzono osobny worktree `.worktrees/premium-lineups-stage2a`; niezapisane zmiany `feat/ui-beta` pozostawiono nietknięte.
+
+Nowy commit testów **`338db5af9ad06f12ba26e6f5df6e455aa12c2930`** dodaje wyłącznie `app/scripts/test-lineups-edge-local.py`. Istniejące migracje, handler, Auth, finanse, UI i strażniki są bajtowo niezmienione względem poprzedniego Stage 2A. Domknięto wcześniejszy brak GoTrue → Edge HTTP; historyczne wpisy NOT TESTED poniżej opisują poprzednią sesję.
+
+| Faktycznie wykonane teraz na Windows | Wynik |
+|---|---|
+| Istniejący runner SQL/RLS/PostgREST, replay 41 migracji, wyścigi, prywatność, no-op, roster, regresje, restart PostgreSQL | **50 PASS**, exit 0 |
+| Nowy runner z rzeczywistym GoTrue i accounts w Supabase Edge Runtime | **13 PASS**, exit 0 |
+| Vitest, w tym 23 jednostkowe Edge | **320 PASS / 52 pliki** |
+| TypeScript aplikacji / strict Edge / ESLint | PASS |
+| Konsolidacja, zamrożone UI, granice runtime, negatywne testy polityki | **41 migracji / 55 plików / 8 granic / 29 prób — PASS** |
+| Build LIVE / Premium lokalny / demo i izolacja demo | PASS, izolacja **16 plików**; istniejące ostrzeżenia rozmiaru chunków |
+| Cypress, istniejące `cypress/e2e`, Chrome headless | **13 PASS / 5 plików**, API kontrolowane przez intercepty |
+
+Nowy test uruchamia cztery NOWE kontenery: PostgreSQL 17, GoTrue 2.197.0, PostgREST 12.2.12 i Edge Runtime 1.77.4, wszystkie z przypiętych digestów. PostgreSQL ma `--network none`; pozostałe współdzielą jego odizolowaną przestrzeń sieciową. Brak publikowanych portów i dostępu do Cloud/istniejących baz. GoTrue sam tworzy rzeczywisty schemat Auth; na nim odtwarzane są wszystkie 41 kanoniczne migracje. Nie używa się testowych tabel Auth ani ręcznie podpisanych tokenów użytkowników. Syntetyczne klucze anon/service służą wyłącznie tej fixture; cztery access tokeny użytkowników wydaje GoTrue przez rzeczywiste logowanie accounts. Runner dodatkowo wymaga w tokenie roli `authenticated`.
+
+Sprawdzono zapis członka i odczyt drugiego klienta, trzech gości bez kont, no-op autora/czasu/wersji, retry, prywatnego outsidera, fałszowanie autora, równoległy zapis z jednym HTTP 409, stary roster, obcy wpis, bezpośredni REST/RPC oraz odebranie dostępu po wyjściu z grupy i logout. Po restarcie całego stosu ten sam token GoTrue odczytuje identyczny snapshot, bez ponownego logowania. Kontenery pomocnicze zatrzymywane są przed restartem bazy i ponownie dołączają do jej nowej przestrzeni sieciowej. HTTP routing harness zastępuje lokalnie Kong; **Kong i Storage nie zostały tym testem zweryfikowane**. Storage ma tylko minimalny schemat wymagany przez historyczne migracje, a endpointy Storage nie są wywoływane.
+
+Końcowe udane fixtures: `slm-lineups-stage2a-53bd33b37e1e` (+ `-rest`) oraz `slm-lineups-edge-54d5c6c50f4c` (+ `-auth`, `-rest`, `-edge`). Po zakończeniu niezależnie potwierdzono ich zatrzymanie, brak portów i izolację sieci. Wcześniejsze nieudane próby nowego runnera również zatrzymano i zachowano; dotyczyły transportu nc, konfiguracji testowego GoTrue i ponownego dołączenia przestrzeni sieciowej przy restarcie. Nie wymagały poprawiania ani osłabiania backendu lub testów istniejących.
+
+Cypress początkowo nie startował, ponieważ proces sesji dziedziczył `ELECTRON_RUN_AS_NODE=1`. Usunięto tę zmienną wyłącznie w procesie uruchamiającym test, bez zmiany konfiguracji Windows. Końcowy przebieg miał exit 0. Serwer Vite działał na `127.0.0.1:5197` z adresem API skierowanym na lokalny nieużywany port; intercepty obsłużyły żądania, bez kontaktu z Cloud. Serwer po testach zatrzymano. Test nie dowodzi podłączenia składów do UI; przycisk Zapisz pozostaje wyłączony.
+
+### Powtórzenie na komputerze — PowerShell
+
+Polecenia zostały już wykonane w tej sesji. Nie trzeba ponawiać ich do zamknięcia Stage 2A; każdy runner tworzy nowe, zatrzymywane i zachowywane kontenery. Wymagają istniejącego Pythona i działającego lokalnego Dockera z obrazami o digestach zapisanych w runnerach, bez instalacji dodatkowych narzędzi.
+
+```powershell
+Set-Location 'I:\slm\sunday-league-mates\.worktrees\premium-lineups-stage2a'
+git branch --show-current # musi być feat/premium-lineups-stage2a
+python -X utf8 app/scripts/test-lineups-local.py
+if ($LASTEXITCODE -ne 0) { throw 'SQL/RLS runner nie przeszedł' }
+python -X utf8 app/scripts/test-lineups-edge-local.py
+if ($LASTEXITCODE -ne 0) { throw 'GoTrue/Edge runner nie przeszedł' }
+```
+
+**Cloud Codex:** brak osobnego przebiegu. **Wymagające lokalnego komputera:** dla backendu Stage 2A brak pozostałych obowiązkowych poleceń; powyższe są instrukcją odtworzenia. **Niewykonane:** fizyczny POCO/Android, instalacja APK, test zapisu z Premium UI (Stage 2B), Kong/Storage tego nowego stosu, hostowane CI, Cloud i merge. Nie stosowano migracji ani nie wdrażano Edge do istniejących lokalnych projektów lub Supabase Cloud. Ręczny odbiór produktu pozostaje osobnym krokiem; Stage 2B nie rozpoczęto.
+
 ## Migracja i dane
 
 Nowa, jedyna migracja: `app/supabase/migrations/20261029140000_match_lineups.sql`. Zależności: komplet40 migracji konsolidacji PR24, w tym PR16 projekcja nazw i końcowa reguła admin-only finansów. Żadna historyczna migracja nie została zmieniona; brak zależności od9 migracji eksperymentalnego Auth18. Łącznie41.
@@ -94,8 +133,9 @@ Handler bierze p_user/p_session ze starego zweryfikowanego kontekstu PR24, odrzu
 | Build LIVE / Premium lokalny / demo | PASS; izolacja demo16 PASS, zastane ostrzeżenia chunków |
 | Frozen wygląd i runtime / konsolidacja | PASS po addytywnym przypięciu jednej migracji;55 plików UI i Stage1 niezmienione |
 | Negatywne testy strażnika | **29 PASS**, poprzednie23 zachowane +6 dodatkowych odmów dla backendu |
-| Pełny GoTrue → Edge HTTP, fizyczny Android | **NOT TESTED** w tej instancji; nie przypisujemy im PASS |
-| Chromium UI | NOT RUN, brak zmiany/podłączenia UI |
+| GoTrue → Edge HTTP | Wcześniej NOT TESTED; domknięcie powyżej: **13 PASS** w nowym odizolowanym stosie |
+| Fizyczny Android | **NOT TESTED**, bez instalacji APK |
+| Chromium UI | Bieżący Cypress: **13 PASS**, kontrolowane API; bez testu podłączenia Stage 2B |
 
 ### Wiarygodność i izolacja
 
@@ -117,7 +157,7 @@ Zmiany: jedna nowa migracja, addytywna gałąź `lineups_*` w `accounts/handler.
 
 Kontrakt i lokalny backend są gotowe do rozpoczęcia Stage2B **po akceptacji właściciela**. Stage2B ma użyć GET jako baseline, utrzymać draft i oba tokeny, zachować UUID niepewnego żądania, filtrować stale_entry_ids względem rosteru, obsłużyć409 bez nadpisania oraz odświeżyć GET po zapisie/replay. Nazwę autora pokazywać tylko z last_change serwera. Nie podłączono żadnego przycisku ani klientowego zapisu teraz.
 
-Ograniczenia: globalna blokada odziedziczona po PR24 serializuje operacje (wystarczająca dla aktualnej skali, nie deklaracja dużej przepustowości); token rosteru jest konserwatywny; brak push/Realtime aktualizacji składu; stare przypisania po zmianie rosteru wymagają świadomej korekty; istniejący limit12KB payloadu. Przed odbiorem integracji wykonać pełny lokalny GoTrue/Edge/HTTP i test dwóch klientów po restarcie, a fizyczny Android dopiero przy osobno zatwierdzonym etapie. Żadnego wdrożenia Cloud ani merge nie wykonano.
+Ograniczenia: globalna blokada odziedziczona po PR24 serializuje operacje (wystarczająca dla aktualnej skali, nie deklaracja dużej przepustowości); token rosteru jest konserwatywny; brak push/Realtime aktualizacji składu; stare przypisania po zmianie rosteru wymagają świadomej korekty; istniejący limit12KB payloadu. Lokalny GoTrue/Edge/HTTP, dwa klienty i restart zaliczono w domknięciu powyżej. Fizyczny Android dopiero przy osobno zatwierdzonym etapie. Żadnego wdrożenia Cloud ani merge nie wykonano.
 
 ## Git / Draft PR — 2026-10-29 14:38 Europe/Warsaw
 
