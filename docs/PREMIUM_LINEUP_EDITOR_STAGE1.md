@@ -69,4 +69,10 @@ Backend, Auth, migracje, RLS, finanse, dane, grafiki, globalny CSS, geometria bo
 4. Rozszerzanie profilu na osoby spoza uprawnionego kontekstu grupy i udostępnianie zdjęć wymaga osobnego kontraktu, nie zgadywania na podstawie meczu publicznego.
 5. Przed merge wymagany przegląd zmian przypiętego runtime i jawna decyzja właściciela o aktualizacji jego reguły zatwierdzeń. Nie zmieniano jej automatycznie.
 
-SHA implementacji i wynik utworzenia Draft PR zostaną dopisane po zapisaniu kodu.
+## Git / wynik próby Draft PR — 2026-10-29 13:05 Europe/Warsaw
+
+Commit implementacji **`6acde90598a7bd67ce97eb676089d5995bb8fe9e`** wypchnięto zwykłym pushem na `origin/feat/premium-lineup-editor-stage1`. Zdalna gałąź została utworzona. Końcowe uzupełnienie dokumentacji jest osobnym commitem po SHA implementacji.
+
+**Draft PR NIE został utworzony:** żądanie `POST /repos/psuda87/sunday-league-mates/pulls` z `draft=true`, head etapu1 i base `chore/main-stabilization` zwróciło `Forbidden`. Odczyt PR24 przez API także był niedostępny; stan HEAD bazy sprawdzono natywnym Git. Nie pozyskiwano tokenów ani nie obchodzono blokady. Nie ma numeru PR, który można podać jako utworzony.
+
+[Porównanie do utworzenia zależnego Draft PR](https://github.com/psuda87/sunday-league-mates/compare/chore/main-stabilization...feat/premium-lineup-editor-stage1?expand=1). Wybrać **Create draft pull request**, baza `chore/main-stabilization`, head `feat/premium-lineup-editor-stage1`. Proponowany tytuł: „Premium: odwracalna edycja składów i profile zawodników — etap 1”. Opis powinien zachować wynik FAIL strażnika runtime i NOT TESTED pełnego Supabase/Android, wraz z zakresem etapu2 z tego raportu. Bez merge i wdrożeń.

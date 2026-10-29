@@ -1,3 +1,9 @@
+# Edytor składów — zapis Git, Draft PR BLOCKED
+
+2026-10-29 13:05 Europe/Warsaw — implementacja `6acde90598a7bd67ce97eb676089d5995bb8fe9e` wypchnięta na `origin/feat/premium-lineup-editor-stage1`. Utworzenie zależnego Draft PR przez API odrzucone (`Forbidden`), numeru PR nie ma. [Właściwe porównanie do chore/main-stabilization](https://github.com/psuda87/sunday-league-mates/compare/chore/main-stabilization...feat/premium-lineup-editor-stage1?expand=1). Szczegóły i wyniki, w tym niezmieniony guard runtime FAIL do przeglądu: [PREMIUM_LINEUP_EDITOR_STAGE1.md](PREMIUM_LINEUP_EDITOR_STAGE1.md). Dokumentacja końcowa ma oddzielny commit; bez merge/Cloud/deploy i bez rozpoczęcia etapu2.
+
+---
+
 # Edytor składów Premium — etap 1, lokalny podgląd
 
 2026-10-29 13:03 Europe/Warsaw — `feat/premium-lineup-editor-stage1` od dokładnego PR24 `39ef2e3937b781439864029a92c12de315024263`; baza zdalna sprawdzona, początkowy worktree czysty. Zachowano oryginalny PremiumPitch, karty/Ultimate/BottomNav/CSS. Dodano odrębne baseline/draft, transfer jednej osoby A/B, poprawne przywracanie i wykrywanie zamiany powrotnej, stabilne ID uczestnictwa/gości. Profil z boiska używa istniejących groups_profile i UltimatePlayerCard, bez obchodzenia grupowych uprawnień; powrót zachowuje szkic. Zapis stale niedostępny, brak backendu składów i fikcyjnego autora.
