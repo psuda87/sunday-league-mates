@@ -1,3 +1,10 @@
+# POCO — najnowszy APK zainstalowany do podglądu
+
+2026-10-29 21:49 Europe/Warsaw — na wyraźne polecenie właściciela zainstalowano najnowszy istniejący APK Stage2B na fizycznym POCO X3 NFC (M2007J20CG/surya, Android12). ADB install -r: **Success**, dane aplikacji zachowane. Uruchomiono MainActivity; proces działa, aplikacja aktywna na ekranie. **PASS instalacja/start; ręczny odbiór wyglądu i funkcji jeszcze niewykonany.**
+
+APK: .worktrees/premium-lineups-stage2b/app/android/app/build/outputs/apk/debug/app-debug.apk; 7868562B; SHA256 **8742579e298e893b7d0abdc68b4e104e8b8cc87ed60267548e5665e556859c63**. AppId pl.psuda87.slm, versionCode1/versionName1.0, endpoint lokalny127.0.0.1:64321. Bez nowego buildu, zmian źródeł, migracji, Cloud, resetu lub konfiguracji telefonu; nie dodawano adb reverse. Gotowość backendu pozostaje niepotwierdzona — audyt wykazał niezgodny stos64321. Następny krok: użytkownik sprawdza wygląd; funkcjonalny odbiór i zgodny lokalny backend wymagają dalszego zlecenia. Raport: docs/ODPOWIEDZI_CODEX.txt. Komputer pozostaje włączony zgodnie z cofnięciem wcześniejszego polecenia.
+
+---
 # Audyt Stage 2B — PASS WITH WARNINGS; POCO BLOCKED
 
 2026-10-29 19:19 Europe/Warsaw — `audit/premium-lineups-stage2b`, od dokładnego PR27/`58a9babf257876e47cf6db269a0bf05d2e1db1f4`. Niezależnie przeczytano kod/diff i ponowiono testy. **Bez krytycznej luki w sprawdzonym zakresie**; P3: początkowy GET także dla ukrytej zakładki Składy, bez automatycznego zapisu/obejścia uprawnień. Chroniona prezentacja 55 plików zgodna z historycznymi wzorcami; dokładny diff czterech plików runtime uzasadnia przypięcie f47cd80, ale przegląd właściciela pozostaje wymagany. Żadnych zmian kodu/guardów/manifestów.
