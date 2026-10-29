@@ -1,6 +1,6 @@
 # Stage 2A — trwały backend składów
 
-2026-10-29, Europe/Warsaw. Gałąź `feat/premium-lineups-stage2a` od dokładnego `7ad5c75414cf669d4471f3122e93073dab9aa8d7`. Przed pracą lokalny/zdalny HEAD bazy był zgodny i worktree czysty. Backend implementacji zapisany w **`6f511f45737135e6ebe969b9ec14595708821c32`**; końcowy commit zawiera także addytywną ochronę źródeł i dokumentację. Baza zależnego Draft PR: `fix/premium-lineup-stage1-contract`.
+2026-10-29, Europe/Warsaw. Gałąź `feat/premium-lineups-stage2a` od dokładnego `7ad5c75414cf669d4471f3122e93073dab9aa8d7`. Przed pracą lokalny/zdalny HEAD bazy był zgodny i worktree czysty. Backend implementacji zapisany w **`b46b7b91796b96acfc809799e09a5a6898b99342`**; końcowy commit zawiera także addytywną ochronę źródeł i dokumentację. Baza zależnego Draft PR: `fix/premium-lineup-stage1-contract`.
 
 **Stage 2A ukończony w zakresie kodu i opisanych testów. Stage 2B nie rozpoczęty.** Edytor, wygląd i stale wyłączony przycisk „Zapisz” są niezmienione. Nie przenoszono Auth18 i nie dotykano Supabase Cloud ani istniejących baz.
 
@@ -81,7 +81,7 @@ Handler bierze p_user/p_session ze starego zweryfikowanego kontekstu PR24, odrzu
 | Kontrola | Wynik / granica |
 |---|---|
 | Nowy PostgreSQL17,41 migracji od zera | PASS; brak schematu Auth18 |
-| SQL/RLS/wyścigi i rzeczywisty PostgREST HTTP | **48 PASS** końcowego przebiegu + **1 PASS** trwałości po restarcie, wykonany osobno na tej samej fixture |
+| SQL/RLS/wyścigi i rzeczywisty PostgREST HTTP | **50 PASS** końcowego pełnego przebiegu, łącznie z restartem i retry po zmniejszeniu limitu |
 | Dwie równoczesne sesje SQL | Jeden sukces i jeden konflikt; osobno identyczny retry daje jedną wersję/rekord żądania |
 | Dwa równoczesne rzeczywiste HTTP | Jeden sukces i jeden błąd wersji; retry zwycięzcy bez nowej wersji |
 | Prywatność/role | Członek, outsider, inny admin, były/nieaktywny, fałszywy autor/sesja, bieżące/cofnięte zgody, historyczny autor po wyjściu, brak eskalacji finansowej PASS |
@@ -101,15 +101,15 @@ Handler bierze p_user/p_session ze starego zweryfikowanego kontekstu PR24, odrzu
 
 Runner `app/scripts/test-lineups-local.py` wymaga tej gałęzi i lokalnego socketu Docker. Tworzy nowy PostgreSQL z `--network none`, nie publikuje portów, nie resetuje i nie usuwa baz. Replay41 źródeł używa testowego bootstrapu Auth/Storage. Uruchamia przypięty PostgREST12.2.12 (`sha256:5f4ce744539bbba786b4e24dbbd95bdb2a956dcf568c5374995a0ff4a68f5bd2`) w tym samym izolowanym namespace i wysyła prawdziwe HTTP po wewnętrznym loopback. Tokeny są syntetyczne, lokalnie podpisane kluczem wygenerowanym tylko w pamięci runnera; nie są wydane przez GoTrue. Dlatego test PostgREST/JWT i jednostkowy handler są odrębnymi dowodami, nie pełnym Supabase E2E.
 
-Dodany `verify_restart` uruchomiono osobno na zachowanej fixture bez ponownego replay całej bazy: faktyczny stop/start PostgreSQL zachował identyczne drużyny, wersję, UUID autora i czas. Runner zawiera tę kontrolę również na końcu przyszłego pełnego przebiegu (49 kontroli łącznie).
+`verify_restart` w końcowym pełnym przebiegu wykonał faktyczny stop/start PostgreSQL i potwierdził identyczne drużyny, wersję, UUID autora i czas. Cały runner zakończył się50 PASS, bez pominięć. Dodatkowo sprawdza replay pierwotnego większego składu po późniejszym zmniejszeniu pojemności: dynamiczna kontrola limitu dotyczy nowego zapisu, nie odczytu zatwierdzonego receipt z rejestru.
 
-Końcowa fixture: `slm-lineups-stage2a-e76f7f3b916b` oraz jej `-rest`. Oba kontenery zatrzymane i zachowane, bez drop/reset/remove. Wcześniejsze fixtures prób runnera również zatrzymano i zachowano. Nie łączono się z używaną bazą POCO, Cloud ani żadnymi prawdziwymi kontami. Uzupełnienie własnych danych starego testu finansów oraz obsługi odpowiedzi błędów klienta HTTP poprawiło wyłącznie runner, nie istniejące testy bezpieczeństwa/backend Auth.
+Końcowa fixture: `slm-lineups-stage2a-dbfaba8a9003` oraz jej `-rest`. Oba kontenery zatrzymane i zachowane, bez drop/reset/remove. Wcześniejsze fixtures prób runnera również zatrzymano i zachowano. Nie łączono się z używaną bazą POCO, Cloud ani żadnymi prawdziwymi kontami. Uzupełnienie własnych danych starego testu finansów oraz obsługi odpowiedzi błędów klienta HTTP poprawiło wyłącznie runner, nie istniejące testy bezpieczeństwa/backend Auth.
 
 Z repo: `python3 app/scripts/test-lineups-local.py`. Z `app/`: `npm run test.unit -- --run`, `npm run typecheck:edge`, `npx tsc --noEmit`, `npm run lint -- .`, buildy powyżej, `npm run verify:consolidation`, `npm run test:premium-policy`. Każdy pełny przebieg SQL tworzy nową fixture; nie powtarzać bez potrzeby.
 
 ## Ochrona kontraktów i pliki
 
-Dodanie migracji celowo ujawniło stare dokładne oczekiwanie40. Nie usunięto go ani nie zmieniono na dowolną liczbę: lista jest teraz dokładnie41, z **jedną** nową ścieżką i porównaniem jej pełnej zawartości do niezmiennego implementacyjnego `6f511f4`. Dodatkowo przypięto cały handler z tym samym źródłem. Wszystkie poprzednie SHA, historyczne SQL, manifest55, kontrola UI, routing i wykluczenie Auth18 zostały zachowane. Sześć nowych prób odrzuca wyłączenie RLS, grant client RPC, zapis przy no-op, usunięcie CAS/scope i autora z body. To rozszerzenie ochrony nowego backendu, nie osłabienie strażników.
+Dodanie migracji celowo ujawniło stare dokładne oczekiwanie40. Nie usunięto go ani nie zmieniono na dowolną liczbę: lista jest teraz dokładnie41, z **jedną** nową ścieżką i porównaniem jej pełnej zawartości do niezmiennego implementacyjnego `b46b7b9`. Dodatkowo przypięto cały handler z tym samym źródłem. Wszystkie poprzednie SHA, historyczne SQL, manifest55, kontrola UI, routing i wykluczenie Auth18 zostały zachowane. Sześć nowych prób odrzuca wyłączenie RLS, grant client RPC, zapis przy no-op, usunięcie CAS/scope i autora z body. To rozszerzenie ochrony nowego backendu, nie osłabienie strażników.
 
 Zmiany: jedna nowa migracja, addytywna gałąź `lineups_*` w `accounts/handler.ts`, `lineups.test.ts`, `supabase/tests/match_lineups.sql`, `scripts/test-lineups-local.py`; trzy istniejące skrypty guardów z powyższym rozszerzeniem; ten raport, aktualizacja planu, STATUS i ODPOWIEDZI_CODEX. **app/src (w tym Stage1), UI/assets, Auth/sesja, finanse, stare migracje, zależności i konfiguracja wdrożeń pozostają bez zmian.**
 

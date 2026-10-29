@@ -9,7 +9,7 @@ export const APPROVED='a82397b130ca2296511247e848139edb79308a87';
 // dependencies use this immutable source. Visual files/other runtime keep prior approvals.
 export const LINEUP_STAGE1='b30908e15cedff6ffa1a4ca76f0fb514e04302a7';
 // Additive backend approval: exactly one new migration and the reviewed API route.
-export const LINEUPS_STAGE2A='6f511f45737135e6ebe969b9ec14595708821c32';
+export const LINEUPS_STAGE2A='b46b7b91796b96acfc809799e09a5a6898b99342';
 export const LINEUPS_MIGRATION='app/supabase/migrations/20261029140000_match_lineups.sql';
 const lineupStage1=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/PremiumTeams.tsx','app/src/events/lineupEditor.ts','app/src/events/LineupPlayerProfile.tsx']);
 const historyCache=new Map();

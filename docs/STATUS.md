@@ -1,3 +1,9 @@
+# Stage 2A — końcowy przebieg50 PASS
+
+2026-10-29 14:37 Europe/Warsaw — backend składu na `feat/premium-lineups-stage2a`; końcowa poprawka kodu b46b7b91796b96acfc809799e09a5a6898b99342 zachowuje replay potwierdzonego żądania także po późniejszym zmniejszeniu pojemności. Oczekiwania guardów przypięte do tego dokładnego źródła, bez osłabienia dawnych kontroli. Finalny pełny runner:50PASS SQL/RLS/PostgRESTHTTP/restart, fixture slm-lineups-stage2a-dbfaba8a9003 i-rest zatrzymane/zachowane. Poprzednie48+1 poniżej to wcześniejszy przebieg. Pozostałe wyniki:320Vitest,23Edge,29policy,TS/lint/buildy/izolacja16/guard55/runtime8/41migracji PASS. Bez GoTrueEdgeHTTP E2E, bez zmiany UI/Save, Cloud, merge lub Stage2B. Raport `docs/PREMIUM_LINEUPS_STAGE2A.md` uaktualniony; przygotowanie Draft PR do fix/premium-lineup-stage1-contract.
+
+---
+
 # Stage 2A — backend trwałych składów, bez podłączenia UI
 
 2026-10-29 14:30 Europe/Warsaw — `feat/premium-lineups-stage2a` od7ad5c75414cf669d4471f3122e93073dab9aa8d7. Implementacja6f511f4: nowa migracja20261029140000, tabela slm_match_lineups, accounts lineups_get/save i usługowy dispatcher. Aktywni członkowie grupy, identyfikatory uczestnictwa/gości, oddzielna wersja składu i token rosteru, atomowy CAS oraz idempotencja na istniejącym rejestrze. No-op nie zmienia autora/czasu/wersji. Nazwa autora według aktualnych zgód PR16 także przy replay; brak nazwisk w cache. Bez eskalacji finansów/ról i bez Auth18.
