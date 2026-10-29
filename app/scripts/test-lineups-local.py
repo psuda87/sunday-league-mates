@@ -182,6 +182,10 @@ try:
  save(1,payload(get()),expected='lineup_closed');check(get()['version']==current['version'],'ended match read allowed but new writes closed')
  sql(f"update public.slm_matches set starts_at=now()+interval '2 days' where id='{match}'")
  domain(0,'matches','cancel',event_id=match,reason='Fixture cancel');save(1,payload(get()),expected='event_cancelled');check(True,'cancelled match rejects new writes without deleting lineup')
+ # A committed receipt must remain replayable even after the current capacity shrinks.
+ current_version=get()['version'];sql(f"update public.slm_matches set capacity=10 where id='{match}'")
+ receipt=save(1,initial_body)
+ check(receipt['replayed'] and receipt['version']==1 and get()['version']==current_version,'retry of committed larger lineup survives later capacity reduction without rewriting current state')
  domain(2,'groups','leave',group_id=group)
  # Replay authored by1 still returns a safe public fallback if its author2 left.
  check(save(1,privacy_body)['last_change']['display_name']=='Lineup_002','former author fallback never reveals surname on retry')

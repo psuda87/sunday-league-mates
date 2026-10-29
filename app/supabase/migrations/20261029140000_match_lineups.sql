@@ -65,7 +65,7 @@ begin
   or jsonb_typeof(p_body->'expected_roster_version') is distinct from 'string' or (p_body->>'expected_roster_version')!~'^[0-9a-f]{64}$'
   or jsonb_typeof(p_body->'team_a') is distinct from 'array' or jsonb_typeof(p_body->'team_b') is distinct from 'array' then raise exception 'invalid_input';end if;
  expected:=(p_body->>'expected_version')::bigint;
- if jsonb_array_length(p_body->'team_a')+jsonb_array_length(p_body->'team_b')>e.capacity then raise exception 'lineup_invalid_assignment';end if;
+ if jsonb_array_length(p_body->'team_a')+jsonb_array_length(p_body->'team_b')>1000 then raise exception 'lineup_invalid_assignment';end if;
  if exists(select 1 from jsonb_array_elements((p_body->'team_a')||(p_body->'team_b')) x where jsonb_typeof(x) is distinct from 'string') then raise exception 'lineup_invalid_assignment';end if;
  select coalesce(array_agg(x::uuid order by x::uuid),'{}'::uuid[]) into a from jsonb_array_elements_text(p_body->'team_a') x;
  select coalesce(array_agg(x::uuid order by x::uuid),'{}'::uuid[]) into b from jsonb_array_elements_text(p_body->'team_b') x;
@@ -81,7 +81,7 @@ begin
  if clock_timestamp()>=e.starts_at+make_interval(mins=>e.duration_minutes) then raise exception 'lineup_closed';end if;
  if expected<>(current_state->>'version')::bigint then raise exception 'lineup_version_conflict';end if;
  if p_body->>'expected_roster_version'<>current_state->>'roster_version' then raise exception 'lineup_roster_conflict';end if;
- if exists(select 1 from unnest(all_ids) x where not exists(select 1 from public.slm_match_entries p where p.id=x and p.event_id=e.id and p.status='registered')) then raise exception 'lineup_invalid_assignment';end if;
+ if cardinality(all_ids)>e.capacity or exists(select 1 from unnest(all_ids) x where not exists(select 1 from public.slm_match_entries p where p.id=x and p.event_id=e.id and p.status='registered')) then raise exception 'lineup_invalid_assignment';end if;
  changed:=to_jsonb(a)<>current_state->'team_a' or to_jsonb(b)<>current_state->'team_b';
  if changed then
   insert into public.slm_match_lineups(event_id,version,team_a,team_b,roster_version,updated_by,updated_at)
