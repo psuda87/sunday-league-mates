@@ -1,3 +1,13 @@
+# Stage 2A — backend trwałych składów, bez podłączenia UI
+
+2026-10-29 14:30 Europe/Warsaw — `feat/premium-lineups-stage2a` od7ad5c75414cf669d4471f3122e93073dab9aa8d7. Implementacja6f511f4: nowa migracja20261029140000, tabela slm_match_lineups, accounts lineups_get/save i usługowy dispatcher. Aktywni członkowie grupy, identyfikatory uczestnictwa/gości, oddzielna wersja składu i token rosteru, atomowy CAS oraz idempotencja na istniejącym rejestrze. No-op nie zmienia autora/czasu/wersji. Nazwa autora według aktualnych zgód PR16 także przy replay; brak nazwisk w cache. Bez eskalacji finansów/ról i bez Auth18.
+
+PASS:48SQL/RLS/realPostgRESTHTTP na nowej odizolowanej fixture +1 osobna rzeczywista próba restartu PostgreSQL,320Vitest/52(w tym23Edge),TS/strictEdge/lint,buildLIVE/Premium/demo+izolacja16,guard55/runtime8/konsolidacja41 i29testów polityki. Guard rozszerzony wyłącznie o dokładnie1przypiętą migrację i pełny handler, stare zatwierdzenia/55plików UI bez zmian. SQL/JWT używa testowego bootstrapu i lokalnie podpisanych tokenów; pełny GoTrue→EdgeHTTP oraz Android NOT TESTED. UI/Stage1/przyciskZapisz niezmienione, Stage2B nie rozpoczęto.
+
+Fixture slm-lineups-stage2a-e76f7f3b916b i-rest zatrzymane/zachowane, bez resetu/drop/usuwania. Cloud/POCO/istniejące bazy/produkcyjne konta nietknięte; bez merge/deploy/APK. Gotowe do rozpoczęcia lokalnego Stage2B po akceptacji, nie oznacza odbioru produkcji. Raport/kontrakt/ograniczenia: [PREMIUM_LINEUPS_STAGE2A.md](PREMIUM_LINEUPS_STAGE2A.md), chronologia ODPOWIEDZI_CODEX.txt. Przygotowanie Draft PR do fix/premium-lineup-stage1-contract.
+
+---
+
 # Kontrola Stage1 — końcowy zapis Git
 
 2026-10-29 13:53 Europe/Warsaw — poprawka `b377174799723345c07647b32769d9319a89c507` wypchnięta na `fix/premium-lineup-stage1-contract`. PASS guard55/runtime8,23policy,297Vitest,TS/lint/buildy/demo; bez zmiany aplikacji. Draft PR nie utworzony: API `Forbidden`. [Porównanie względem Stage1](https://github.com/psuda87/sunday-league-mates/compare/feat/premium-lineup-editor-stage1...fix/premium-lineup-stage1-contract?expand=1). Raport `docs/PREMIUM_LINEUP_EDITOR_STAGE1.md` uzupełniony; rekomendacja dalszej integracji lokalnego Stage1 po review. Brak merge, backendu iStage2. Końcowy zapis dokumentacji w osobnym commicie.

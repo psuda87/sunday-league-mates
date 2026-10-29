@@ -65,6 +65,16 @@ def rest(i,role,path,body=None):
  except ValueError:data={}
  return status,data
 def rest_rpc(i,action,body):return rest(i,'service_role','rpc/slm_lineups_dispatch',dict(p_user=users[i],p_session=sessions[i],p_action=action,p_body=body))
+def verify_restart():
+ before=sql("select coalesce(jsonb_agg(to_jsonb(x) order by event_id),'[]')::text from public.slm_match_lineups x")
+ assert before!='[]','Persistence fixture must contain a committed lineup'
+ subprocess.run(['docker','stop',CONTAINER],check=True,stdout=subprocess.DEVNULL)
+ subprocess.run(['docker','start',CONTAINER],check=True,stdout=subprocess.DEVNULL)
+ for _ in range(100):
+  if subprocess.run(['docker','exec',CONTAINER,'pg_isready','-U','postgres'],capture_output=True).returncode==0:break
+  time.sleep(.15)
+ else:raise RuntimeError('Retained PostgreSQL restart unavailable')
+ check(sql("select coalesce(jsonb_agg(to_jsonb(x) order by event_id),'[]')::text from public.slm_match_lineups x")==before,'committed teams/version/author/time survive real PostgreSQL restart')
 try:
  for _ in range(100):
   r=subprocess.run(['docker','exec',CONTAINER,'pg_isready','-U','postgres'],capture_output=True)
@@ -184,6 +194,9 @@ try:
  domain(1,'groups','transfer',group_id=authority,user_id=users[0])
  for file in ['premium_match_visibility.sql','premium_admin_finance.sql','premium_profile_name.sql','settlements.sql','integration-contracts.sql']:
   sql((ROOT/'app/supabase/tests'/file).read_text());check(True,'existing regression SQL '+file)
+ if rest_started:
+  subprocess.run(['docker','stop',REST],check=True,stdout=subprocess.DEVNULL);rest_started=False
+ verify_restart()
  print(f'RESULT {passed} PASS; real PostgreSQL transactions/RLS/concurrency. Auth schema fixture and locally signed JWT; real PostgREST HTTP tested, GoTrue/Edge HTTP NOT TESTED.',flush=True)
 finally:
  if rest_started:subprocess.run(['docker','stop',REST],capture_output=True)

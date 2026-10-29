@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {verifyPremiumRuntime,APPROVED} from './premium-route-policy.mjs';
+import {verifyPremiumRuntime,APPROVED,LINEUPS_MIGRATION} from './premium-route-policy.mjs';
 const root=fileURLToPath(new URL('../../',import.meta.url));
 const read=p=>readFileSync(root+'/'+p,'utf8');
 test('actual source graph passes',()=>assert.equal(verifyPremiumRuntime(root).frozen,55));
@@ -21,6 +21,12 @@ for(const [label,path,mutate] of [
  ['original pitch geometry changed','app/src/ui/PremiumPitch.tsx',s=>s.replace('M4 80H96','M4 90H96')],
  ['BottomNav restyled','app/src/demo/DemoBottomNav.tsx',s=>s.replace('slm-demo-nav-notch','slm-demo-nav-notch-altered')],
  ['Ultimate component replaced','app/src/ui/UltimatePlayerCard.tsx',()=>"export default function Card(){return null;}"],
+ ['lineup table RLS disabled',LINEUPS_MIGRATION,s=>s.replace('enable row level security','disable row level security')],
+ ['lineup service RPC exposed',LINEUPS_MIGRATION,s=>s.replace('to service_role;','to authenticated,service_role;')],
+ ['lineup no-op always writes',LINEUPS_MIGRATION,s=>s.replace('if changed then','if true then')],
+ ['lineup CAS removed',LINEUPS_MIGRATION,s=>s.replace("raise exception 'lineup_version_conflict';",'null;')],
+ ['lineup scope check removed',LINEUPS_MIGRATION,s=>s.replace('group_id=e.group_id and user_id=p_user','group_id=e.group_id')],
+ ['lineup API author forged','app/supabase/functions/accounts/handler.ts',s=>s.replace('p_user:ctx.id,p_session:ctx.sid,p_action:action.slice(8)','p_user:body.user_id,p_session:ctx.sid,p_action:action.slice(8)')],
  ['cards replaced in rendering','app/src/events/PremiumEvents.tsx',s=>s.replace('<MatchHero compact','<section compact')],
  ['Android HTML uses a different entry','app/android-stage3/index.html',s=>s.replace('./main.tsx','../demo/main.tsx')],
  ['main switches to demo','app/src/App.tsx',()=>"export {default} from './ui/Demo';"],

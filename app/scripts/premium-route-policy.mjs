@@ -8,6 +8,9 @@ export const APPROVED='a82397b130ca2296511247e848139edb79308a87';
 // Owner-requested Stage 1 review: only these two controllers and their two new
 // dependencies use this immutable source. Visual files/other runtime keep prior approvals.
 export const LINEUP_STAGE1='b30908e15cedff6ffa1a4ca76f0fb514e04302a7';
+// Additive backend approval: exactly one new migration and the reviewed API route.
+export const LINEUPS_STAGE2A='6f511f45737135e6ebe969b9ec14595708821c32';
+export const LINEUPS_MIGRATION='app/supabase/migrations/20261029140000_match_lineups.sql';
 const lineupStage1=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/PremiumTeams.tsx','app/src/events/lineupEditor.ts','app/src/events/LineupPlayerProfile.tsx']);
 const historyCache=new Map();
 const selected=new Set(['app/src/demo/App.tsx','app/src/demo/EventForm.tsx','app/src/demo/GroupScreens.tsx','app/src/demo/Profile.tsx','app/src/demo/Teams.tsx','app/src/ui/MatchHero.tsx']);
@@ -29,8 +32,10 @@ export function verifyPremiumRuntime(root,overrides={}){
  }
  const mainSteps=execFileSync('git',['ls-tree','-r','--name-only',MAIN,'--','app/supabase/migrations'],{cwd:root,encoding:'utf8'}).trim().split('\n');
  const added=['20261028174603_premium_match_membership_visibility.sql','20261028174920_premium_member_creation_finance_guard.sql','20261028175508_premium_match_feed_filters.sql','20261028181054_premium_group_admin_only_finance.sql'].map(n=>'app/supabase/migrations/'+n);
- assert.deepEqual(readdirSync(root+'/app/supabase/migrations').filter(n=>n.endsWith('.sql')).sort(),[...mainSteps,...added,'app/supabase/migrations/20261028204500_restore_pr16_match_name_projection.sql'].map(p=>p.split('/').at(-1)).sort(),'Unexpected migration/model activation');
+ assert.deepEqual(readdirSync(root+'/app/supabase/migrations').filter(n=>n.endsWith('.sql')).sort(),[...mainSteps,...added,'app/supabase/migrations/20261028204500_restore_pr16_match_name_projection.sql',LINEUPS_MIGRATION].map(p=>p.split('/').at(-1)).sort(),'Unexpected migration/model activation');
  for(const p of [...mainSteps,...added])assert.equal(digest(read(p)),digest(git(added.includes(p)?APPROVED:MAIN,p)),'Historical migration overwritten: '+p);
+ for(const p of [LINEUPS_MIGRATION,'app/supabase/functions/accounts/handler.ts'])
+  assert.equal(digest(read(p)),digest(git(LINEUPS_STAGE2A,p)),'Unreviewed Stage 2A backend source: '+p);
  assert.equal(digest(read('app/src/auth/tokenStore.ts')),digest(git(APPROVED,'app/src/auth/tokenStore.ts')),'Secure vault namespace changed');
  const bindings={
   'app/src/events/PremiumWorld.tsx':['../demo/App','./PremiumEvents','./usePremiumEvents'],

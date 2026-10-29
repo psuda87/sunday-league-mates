@@ -1,3 +1,13 @@
+# Aktualizacja Stage 2A — 2026-10-29 14:30 Europe/Warsaw
+
+Backend poniższego historycznego projektu został zaimplementowany w `feat/premium-lineups-stage2a` od7ad5c75. Nowa migracja `20261029140000_match_lineups.sql`, akcje accounts `lineups_get/lineups_save`, usługowy dispatcher, CAS/idempotencja, aktualna projekcja autora. Pełny bieżący kontrakt i testy: [PREMIUM_LINEUPS_STAGE2A.md](PREMIUM_LINEUPS_STAGE2A.md).
+
+Doprecyzowania względem projektu: `roster_version` jest tokenem SHA256 z wersji wydarzenia i posortowanych registered IDs; arrays oznaczają zbiory, nie pozycje na boisku. GET jawnie raportuje stale_entry_ids; zapis przyjmuje tylko aktualne wpisy. Replay zwraca pierwotny receipt z nazwą autora wyliczoną na nowo, a nie aktualny skład — potem wymagany GET. Nowe zapisy odwołanego/zakończonego meczu są zamknięte, historia pozostaje do odczytu członkom. Stage1 niezmieniony, przycisk Zapisz nadal disabled; podłączenie do API należy wyłącznie do osobno zatwierdzonego Stage2B.
+
+---
+
+## Historyczny projekt sprzed Stage 2A
+
 # Trwałe składy — projekt kolejnego etapu, NIE WDROŻONO
 
 Obecny backend nie ma tabeli/RPC trwałych składów. Demo przechowuje `game.lineup` wyłącznie w World; kopiowanie tego reducera nie tworzy serwerowego zapisu. Zakres wymaga nowej tabeli, walidacji uczestników, CAS, projekcji autora, uprawnień i HTTP testów równoległości, dlatego zgodnie z poleceniem oddzielono go przed implementacją. Poniżej konkretny minimalny projekt; nie jest migracją wykonywaną w tym PR.
