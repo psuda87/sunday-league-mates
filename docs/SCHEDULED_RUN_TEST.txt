@@ -1,0 +1,6 @@
+Test zaplanowanej automatyzacji ChatGPT — zapis na GitHubie.
+Data i godzina wykonania (Europe/Warsaw): 2026-10-29 22:35:42 CET (+01:00).
+
+Ten plik zostal utworzony przez automatyzacje ChatGPT z dostepem do GitHuba,
+na osobnej galezi test/scheduled-cloud-run od main.
+Test nie uruchamia Codex Cloud, nie zmienia main i nie modyfikuje kodu aplikacji.
