@@ -119,4 +119,8 @@ Kontrakt i lokalny backend są gotowe do rozpoczęcia Stage2B **po akceptacji w�
 
 Ograniczenia: globalna blokada odziedziczona po PR24 serializuje operacje (wystarczająca dla aktualnej skali, nie deklaracja dużej przepustowości); token rosteru jest konserwatywny; brak push/Realtime aktualizacji składu; stare przypisania po zmianie rosteru wymagają świadomej korekty; istniejący limit12KB payloadu. Przed odbiorem integracji wykonać pełny lokalny GoTrue/Edge/HTTP i test dwóch klientów po restarcie, a fizyczny Android dopiero przy osobno zatwierdzonym etapie. Żadnego wdrożenia Cloud ani merge nie wykonano.
 
-Końcowy SHA gałęzi i rzeczywisty wynik utworzenia Draft PR zostaną dopisane po zapisaniu dokumentacji.
+## Git / Draft PR — 2026-10-29 14:38 Europe/Warsaw
+
+Kod, dokładna aprobata źródeł i raport w commicie **`f7c13bb3bc85a903c9840c9e47e08fcec0c4a887`** zostały wypchnięte na `origin/feat/premium-lineups-stage2a`. Przed ostatnią aktualizacją Git-doc worktree był czysty. Końcowe potwierdzenie Git jest oddzielnym commitem dokumentacyjnym po tym SHA; źródło zatwierdzonego backendu pozostaje b46b7b91796b96acfc809799e09a5a6898b99342.
+
+**Draft PR nie utworzono.** POST GitHub API z `draft:true`, base `fix/premium-lineup-stage1-contract` i head tej gałęzi zwróciło `Forbidden`. Nie ma numeru PR do potwierdzenia; nie obchodzono ograniczenia ani nie pozyskiwano dodatkowych tokenów. [Właściwe porównanie do utworzenia Draft PR](https://github.com/psuda87/sunday-league-mates/compare/fix/premium-lineup-stage1-contract...feat/premium-lineups-stage2a?expand=1). Wybrać **Create draft pull request**; tytuł: „Stage 2A: trwały zapis składów z CAS, RLS i idempotencją”. Opis i review muszą zachować rozróżnienie50SQL/PostgRESTHTTP i320Vitest od niewykonanego pełnegoGoTrue/EdgeHTTP oraz brak podłączenia przycisku Zapisz. Bez merge, wdrożeń i Stage2B.
