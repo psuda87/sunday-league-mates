@@ -5,6 +5,10 @@ import assert from 'node:assert/strict';
 import ts from 'typescript';
 export const MAIN='134c52b1aee0d0804cc0cf71f151f95040e7a38f';
 export const APPROVED='a82397b130ca2296511247e848139edb79308a87';
+// Owner-requested Stage 1 review: only these two controllers and their two new
+// dependencies use this immutable source. Visual files/other runtime keep prior approvals.
+export const LINEUP_STAGE1='b30908e15cedff6ffa1a4ca76f0fb514e04302a7';
+const lineupStage1=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/PremiumTeams.tsx','app/src/events/lineupEditor.ts','app/src/events/LineupPlayerProfile.tsx']);
 const historyCache=new Map();
 const selected=new Set(['app/src/demo/App.tsx','app/src/demo/EventForm.tsx','app/src/demo/GroupScreens.tsx','app/src/demo/Profile.tsx','app/src/demo/Teams.tsx','app/src/ui/MatchHero.tsx']);
 const digest=s=>createHash('sha256').update(typeof s==='string'?s.replace(/\r\n/g,'\n'):s).digest('hex');
@@ -31,7 +35,8 @@ export function verifyPremiumRuntime(root,overrides={}){
  const bindings={
   'app/src/events/PremiumWorld.tsx':['../demo/App','./PremiumEvents','./usePremiumEvents'],
   'app/src/events/PremiumEvents.tsx':['../ui/MatchHero','../ui/MatchTabs','./PremiumTeams','../finance/PremiumFinance','./PremiumScrollHeader'],
-  'app/src/events/PremiumTeams.tsx':['../ui/PremiumPitch'],
+  'app/src/events/PremiumTeams.tsx':['../ui/PremiumPitch','./lineupEditor','./LineupPlayerProfile'],
+  'app/src/events/LineupPlayerProfile.tsx':['../groups/contracts','../ui/UltimatePlayerCard'],
   'app/src/auth/B1App.tsx':['../events/PremiumWorld'],
   'app/android-stage3/main.tsx':['../src/auth/B1App'],
   'app/b1/main.tsx':['../src/auth/B1App'],
@@ -43,8 +48,8 @@ export function verifyPremiumRuntime(root,overrides={}){
   for(const target of imports)assert(actual.includes(target),'Entry/import routing regression: '+path+' -> '+target);
  }
  // These reviewed controllers are part of the approved runtime, not spare files next to a replacement.
- for(const path of ['app/src/events/PremiumWorld.tsx','app/src/events/PremiumEvents.tsx','app/src/events/PremiumTeams.tsx','app/src/events/PremiumScrollHeader.tsx','app/src/ui/PremiumPitch.tsx','app/src/finance/PremiumFinance.tsx','app/src/finance/premiumFinance.css','app/src/events/premiumEvents.css'])
-  assert.equal(digest(read(path)),digest(git(APPROVED,path)),'Approved runtime replaced/condition changed: '+path);
+ for(const path of ['app/src/events/PremiumWorld.tsx','app/src/events/PremiumEvents.tsx','app/src/events/PremiumTeams.tsx','app/src/events/PremiumScrollHeader.tsx','app/src/ui/PremiumPitch.tsx','app/src/finance/PremiumFinance.tsx','app/src/finance/premiumFinance.css','app/src/events/premiumEvents.css','app/src/events/lineupEditor.ts','app/src/events/LineupPlayerProfile.tsx'])
+  assert.equal(digest(read(path)),digest(git(lineupStage1.has(path)?LINEUP_STAGE1:APPROVED,path)),'Approved runtime replaced/condition changed: '+path);
  assert.equal(digest(read('app/src/groups/PremiumGroups.tsx')),digest(git(MAIN,'app/src/groups/PremiumGroups.tsx')),'Group UI wrapper replaced');
  const old=git(MAIN,'app/src/auth/B1App.tsx');
  const expected=old.replace("import WorldApp from '../demo/App';","import WorldApp from '../events/PremiumWorld';").replace("<WorldApp key={owner??'none'}","<WorldApp key={owner??'none'} manager={manager} userId={owner??''}");

@@ -1,3 +1,10 @@
+# Stage1 — kontrola Premium uporządkowana, PASS
+
+2026-10-29 13:51 Europe/Warsaw — `fix/premium-lineup-stage1-contract` od b30908e. FAIL wynikał wyłącznie z porównania PremiumEvents/PremiumTeams z poprzednim a82397b. Tylko te2 istniejące pliki i2 nowe zależności lineupEditor/LineupPlayerProfile przypięto teraz do niezmiennego b30908e. Bez zmiany runtime aplikacji, wyglądu, manifestu55 i wcześniejszych zatwierdzeń innych plików; strażnik nie jest wyłączony ani oparty na bieżących edytowalnych hashach.
+PASS: frozen55/runtime8,23testy polityki (1graf+22odmowy),297Vitest/51,TS/lint,buildLIVE/Premium/demo+izolacja16,verify:consolidation. Chromium nie ponawiano: brak zmian UI/zachowania; poprzednie zrzuty pozostają historyczne. Bez operacji/zmian Supabase/Auth/RLS/migracji/Cloud, merge iStage2. Rekomendacja: Stage1 gotowy do dalszej integracji lokalnego edytora po review, nie produkcyjny zapis składów. Szczegóły/przyczyna/klasyfikacja/ryzyka: [PREMIUM_LINEUP_EDITOR_STAGE1.md](PREMIUM_LINEUP_EDITOR_STAGE1.md); chronologia `ODPOWIEDZI_CODEX.txt`. Przygotowanie zależnego Draft PR do feat/premium-lineup-editor-stage1.
+
+---
+
 # Edytor składów — zapis Git, Draft PR BLOCKED
 
 2026-10-29 13:05 Europe/Warsaw — implementacja `6acde90598a7bd67ce97eb676089d5995bb8fe9e` wypchnięta na `origin/feat/premium-lineup-editor-stage1`. Utworzenie zależnego Draft PR przez API odrzucone (`Forbidden`), numeru PR nie ma. [Właściwe porównanie do chore/main-stabilization](https://github.com/psuda87/sunday-league-mates/compare/chore/main-stabilization...feat/premium-lineup-editor-stage1?expand=1). Szczegóły i wyniki, w tym niezmieniony guard runtime FAIL do przeglądu: [PREMIUM_LINEUP_EDITOR_STAGE1.md](PREMIUM_LINEUP_EDITOR_STAGE1.md). Dokumentacja końcowa ma oddzielny commit; bez merge/Cloud/deploy i bez rozpoczęcia etapu2.
