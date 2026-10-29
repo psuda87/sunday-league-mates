@@ -23,33 +23,33 @@ it('shows original plus only to authorized organizers and calls existing create 
 });
 it('manual live preview has no invented split, excludes reserve/withdrawn and swaps only RAM',()=>{
  const people=[entry('1'),entry('2'),entry('3','reserve'),entry('4','withdrawn')];
- const {rerender}=render(<PremiumTeams eventId="real" participants={people} cancelled={false}/>);
- expect(screen.getByText(/bez zapisu na serwerze/)).toBeTruthy();expect(screen.queryByRole('button',{name:'Uczestnik: Zawodnik 1'})).toBeNull();
+ const {rerender}=render(<PremiumTeams canEdit eventId="real" participants={people} cancelled={false}/>);
+ expect(screen.getByText('Lokalny podgląd · bez zapisu na serwerze')).toBeTruthy();expect(screen.queryByRole('button',{name:'Uczestnik: Zawodnik 1'})).toBeNull();
  expect(screen.queryByLabelText('Drużyna: Zawodnik 3')).toBeNull();expect(screen.queryByLabelText('Drużyna: Zawodnik 4')).toBeNull();
  fireEvent.click(screen.getByRole('button',{name:'Utwórz lokalny podgląd'}));
  fireEvent.click(screen.getByRole('button',{name:'Zamień zawodników'}));fireEvent.click(screen.getByRole('button',{name:'Wybierz do zamiany: Zawodnik 1'}));fireEvent.click(screen.getByRole('button',{name:'Wybierz do zamiany: Zawodnik 2'}));
  expect(within(screen.getByRole('region',{name:'Drużyna A, 1 osób'})).getByText('Zawodnik 2')).toBeTruthy();
- rerender(<PremiumTeams eventId="real" participants={[entry('1','withdrawn'),entry('2')]} cancelled={false}/>);
+ rerender(<PremiumTeams canEdit eventId="real" participants={[entry('1','withdrawn'),entry('2')]} cancelled={false}/>);
  expect(screen.queryByRole('button',{name:'Wybierz do zamiany: Zawodnik 1'})).toBeNull();
 });
 it('unmounting the match discards the preview and cancelled games cannot assign players',()=>{
- const people=[entry('1')],{unmount}=render(<PremiumTeams eventId="real" participants={people} cancelled={false}/>);
+ const people=[entry('1')],{unmount}=render(<PremiumTeams canEdit eventId="real" participants={people} cancelled={false}/>);
  fireEvent.click(screen.getByRole('button',{name:'Dodaj Zawodnik 1 do drużyny A'}));unmount();
- const next=render(<PremiumTeams eventId="real" participants={people} cancelled={false}/>);expect(screen.queryByRole('button',{name:'Uczestnik: Zawodnik 1'})).toBeNull();next.rerender(<PremiumTeams eventId="real" participants={people} cancelled/>);expect(screen.getByText('Mecz anulowany')).toBeTruthy();expect(screen.queryByLabelText('Drużyna: Zawodnik 1')).toBeNull();
+ const next=render(<PremiumTeams canEdit eventId="real" participants={people} cancelled={false}/>);expect(screen.queryByRole('button',{name:'Uczestnik: Zawodnik 1'})).toBeNull();next.rerender(<PremiumTeams canEdit eventId="real" participants={people} cancelled/>);expect(screen.getByText('Mecz anulowany')).toBeTruthy();expect(screen.queryByLabelText('Drużyna: Zawodnik 1')).toBeNull();
 });
 
 it('restores demo point-and-swap behavior for odd rosters and guests, with undo and no false author',()=>{
  const people=[entry('1'),entry('2'),{...entry('guest'),member_id:null},entry('reserve','reserve')];
- const {rerender}=render(<PremiumTeams eventId="odd" participants={people} cancelled={false}/>);
+ const {rerender}=render(<PremiumTeams canEdit eventId="odd" participants={people} cancelled={false}/>);
  fireEvent.click(screen.getByRole('button',{name:'Utwórz lokalny podgląd'}));
  expect(screen.getByRole('region',{name:'Drużyna A, 2 osób'})).toBeTruthy();expect(screen.getByRole('region',{name:'Drużyna B, 1 osób'})).toBeTruthy();
- expect(within(screen.getByRole('button',{name:'Uczestnik: Zawodnik guest'})).getByText('G')).toBeTruthy();
+ expect(within(screen.getByText('Zawodnik guest').closest('li')!).getByText('G')).toBeTruthy();
  fireEvent.click(screen.getByRole('button',{name:'Zamień zawodników'}));fireEvent.click(screen.getByRole('button',{name:'Wybierz do zamiany: Zawodnik guest'}));fireEvent.click(screen.getByRole('button',{name:'Wybierz do zamiany: Zawodnik 2'}));
  expect(within(screen.getByRole('region',{name:'Drużyna B, 1 osób'})).getByText('Zawodnik guest')).toBeTruthy();
  fireEvent.click(screen.getByRole('button',{name:'Zakończ zamiany'}));
- rerender(<PremiumTeams eventId="odd" participants={[...people,entry('new')]} cancelled={false}/>);expect(screen.getByText('Poza podziałem: 1')).toBeTruthy();
- fireEvent.click(screen.getByRole('button',{name:'Cofnij zmiany'}));expect(screen.queryByRole('button',{name:'Uczestnik: Zawodnik guest'})).toBeNull();
- expect(screen.getByText('Ostatnia zmiana: brak zapisanego składu na serwerze.')).toBeTruthy();expect(screen.getByRole('button',{name:'Zapis na serwerze niedostępny'})).toBeDisabled();
+ rerender(<PremiumTeams canEdit eventId="odd" participants={[...people,entry('new')]} cancelled={false}/>);expect(screen.getByText('Poza podziałem: 1')).toBeTruthy();
+ fireEvent.click(screen.getByRole('button',{name:'Przywróć skład'}));expect(within(screen.getByRole('region',{name:'Drużyna A, 2 osób'})).getByText('Zawodnik guest')).toBeTruthy();expect(screen.getByText('Poza podziałem: 1')).toBeTruthy();
+ expect(screen.getByText('Ostatnia zmiana: brak zapisanego składu na serwerze.')).toBeTruthy();expect(screen.getByRole('button',{name:'Zapisz'})).toBeDisabled();
 });
 it('nonmembers cannot edit or generate a local lineup',()=>{
  render(<PremiumTeams eventId="public" participants={[entry('1'),entry('2')]} cancelled={false} canEdit={false}/>);

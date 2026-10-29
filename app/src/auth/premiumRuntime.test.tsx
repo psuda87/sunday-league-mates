@@ -33,7 +33,7 @@ it('actual B1 entry renders API match, original pitch/profile/nav and hides data
  fireEvent.click(await screen.findByRole('tab',{name:/Składy/}));
  fireEvent.click(screen.getByRole('button',{name:'Utwórz lokalny podgląd'}));
  expect(container.querySelector('.slm-football-pitch')).toHaveTextContent('Runtime Owner');
- expect(screen.getByRole('button',{name:'Zapis na serwerze niedostępny'})).toBeDisabled();
+ expect(screen.getByRole('button',{name:'Zapisz'})).toBeDisabled();
  fireEvent.click(screen.getByRole('button',{name:'Profil'}));
  await waitFor(()=>expect(container.querySelector('.slm-ultimate-card')).toHaveTextContent('Runtime Owner'));
  expect(screen.getByLabelText('Numer koszulki 27')).toBeTruthy();

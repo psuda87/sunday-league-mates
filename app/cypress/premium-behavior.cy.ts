@@ -27,7 +27,7 @@ describe('Restored Premium behavior with genuine local HTTP',()=>{
   for(const width of [320,360,390])for(const dark of [false,true]){cy.viewport(width,760);cy.document().then(d=>d.documentElement.classList.toggle('ion-palette-dark',dark));scroll(600);cy.get('.slm-football-pitch').then($p=>expect($p[0].scrollWidth).to.be.at.most(width));}
   scroll(600);cy.get('.slm-scroll-header[data-stuck=true]').should('be.visible').then($h=>{const r=$h[0].getBoundingClientRect();expect(r.top).to.be.at.least(-1);expect(r.top).to.be.lessThan(30);expect($h.find('img')).to.have.length(0);});
   cy.screenshot('pitch-sticky-dark',{capture:'viewport',overwrite:true});
-  cy.contains('button','Cofnij zmiany').click();cy.get('.slm-football-pitch .slm-pitch-player').should('not.exist');cy.contains('Ostatnia zmiana: brak zapisanego składu na serwerze.').should('exist');cy.contains('button','Zapis na serwerze niedostępny').should('be.disabled');
+  cy.contains('button','Przywróć skład').click();cy.get('.slm-team-a .slm-pitch-player').should('have.length',2);cy.get('.slm-team-b .slm-pitch-player').should('have.length',1);cy.contains('Brak zmian względem składu początkowego.').should('exist');cy.contains('Ostatnia zmiana: brak zapisanego składu na serwerze.').should('exist');cy.contains('button',/^Zapisz$/).should('be.disabled');
  });
  it('former member history retains own match and excludes unrelated former-group events',()=>{
   login('former');cy.contains('button','Historia').click();cy.get('[data-event]').should('have.length',1).and('have.attr','data-event',fixture.own_past_id);

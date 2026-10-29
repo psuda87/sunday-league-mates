@@ -1,3 +1,11 @@
+# Edytor składów Premium — etap 1, lokalny podgląd
+
+2026-10-29 13:03 Europe/Warsaw — `feat/premium-lineup-editor-stage1` od dokładnego PR24 `39ef2e3937b781439864029a92c12de315024263`; baza zdalna sprawdzona, początkowy worktree czysty. Zachowano oryginalny PremiumPitch, karty/Ultimate/BottomNav/CSS. Dodano odrębne baseline/draft, transfer jednej osoby A/B, poprawne przywracanie i wykrywanie zamiany powrotnej, stabilne ID uczestnictwa/gości. Profil z boiska używa istniejących groups_profile i UltimatePlayerCard, bez obchodzenia grupowych uprawnień; powrót zachowuje szkic. Zapis stale niedostępny, brak backendu składów i fikcyjnego autora.
+
+PASS: TypeScript, pełny lint,297 Vitest/51 plików i końcowy zakres15/3, build LIVE/Premium/demo+izolacja16, Chromium320/390/768 Dark/Light z kontrolowanym adapterem (nie E2E Supabase). Kontrakt55 plików wyglądu PASS; **guard przypiętego runtime FAIL** na celowej zmianie PremiumEvents (również PremiumTeams jest przypięty do starego SHA). Nie zmieniano strażnika/hashów/CI: wymagany przegląd właściciela przed zmianą reguły zatwierdzeń/merge. Supabase/SQL/RLS/Auth/finanse/Android/produkcja niezmienione; brak migracji, resetów, APK/deploy/merge. Pełny Supabase/Cypress i fizyczny telefon NOT TESTED. Raport i4 rzeczywiste zrzuty fixture UI: [PREMIUM_LINEUP_EDITOR_STAGE1.md](PREMIUM_LINEUP_EDITOR_STAGE1.md). Etap2 wymaga osobnego backendu: trwałość, autor, CAS rosteru/składu i idempotencja; nie rozpoczęto.
+
+---
+
 # PR16 — poprawka etykiet odebrana na POCO
 
 2026-10-26 18:51 Europe/Warsaw — PR16: ręczny odbiór poprawki etykiet na POCO
