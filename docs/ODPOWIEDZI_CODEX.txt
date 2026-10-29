@@ -915,3 +915,7 @@ PR27 można skierować do dalszej integracji po review właściciela przypięcia
 === 2026-10-29 21:46 Europe/Warsaw — polecenie wyłączenia komputera ===
 Użytkownik po zakończonym audycie wyraźnie polecił wyłączyć komputer niezależnie od działających procesów i niezapisanych plików. Raport audytu jest wypchnięty. Po zapisaniu tego wpisu zostanie wydane lokalne shutdown.exe /s /f /t 30. Wymuszone zamknięcie może spowodować utratę niezapisanych danych. Wpis dokumentuje zlecenie; nie potwierdza fizycznego wyłączenia urządzenia.
 
+
+=== 2026-10-29 21:46 Europe/Warsaw — anulowanie wyłączenia ===
+Użytkownik cofnął polecenie wyłączenia komputera. Natychmiast wykonano shutdown.exe /a; kod zakończenia 0 potwierdził anulowanie zaplanowanego wyłączenia. Nie planować ponownego wyłączenia.
+
