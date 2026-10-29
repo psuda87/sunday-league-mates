@@ -45,7 +45,11 @@ Nowe próby odrzucają cofnięcie obu plików Stage1, wyłączenie detekcji zmia
 
 Pozostają ograniczenia opisane w etapie1: brak trwałego zapisu/autora/CAS, profil tylko w istniejącym uprawnionym kontekście grupy, brak nowego fizycznego odbioru Androida i pełnego Supabase E2E. Etapu2 nie rozpoczęto. Strażnik nadal wymaga dostępności przypiętych obiektów Git w checkout CI, tak jak wcześniejsza polityka; `b30908e` jest przodkiem tej gałęzi. Same testy nie chronią przed celową zmianą testów/strażnika — nadal potrzebny review właściciela.
 
-Zmieniono tylko2 skrypty polityki/testów i dokumentację. Manifest55, UI, backend, Auth, RLS, migracje, konfiguracja wdrożeń i zależności pozostały bez zmian. SHA poprawki i wynik próby Draft PR zostaną dopisane po commicie; baza PR: `feat/premium-lineup-editor-stage1`.
+Zmieniono tylko2 skrypty polityki/testów i dokumentację. Manifest55, UI, backend, Auth, RLS, migracje, konfiguracja wdrożeń i zależności pozostały bez zmian. Commit poprawki kontroli: **`b377174799723345c07647b32769d9319a89c507`**, wypchnięty na `origin/fix/premium-lineup-stage1-contract`. Baza `feat/premium-lineup-editor-stage1` pozostaje na b30908e. Końcowe potwierdzenie Git jest osobnym commitem dokumentacyjnym.
+
+### Git / Draft PR — 2026-10-29 13:53 Europe/Warsaw
+
+**Draft PR nie utworzono.** Żądanie POST GitHub API z `draft=true`, bazą Stage1 i właściwym head zwróciło `Forbidden`. Nie obchodzono ograniczenia ani nie pozyskiwano nowych tokenów. [Porównanie do utworzenia Draft PR](https://github.com/psuda87/sunday-league-mates/compare/feat/premium-lineup-editor-stage1...fix/premium-lineup-stage1-contract?expand=1); wybrać bazę `feat/premium-lineup-editor-stage1`, head `fix/premium-lineup-stage1-contract` i **Create draft pull request**. Tytuł: „Premium 3.18: minimalna aktualizacja strażnika po Stage 1”. Nie ma numeru PR, który można potwierdzić. Bez merge i wdrożeń.
 
 ---
 

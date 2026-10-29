@@ -1,3 +1,9 @@
+# Kontrola Stage1 — końcowy zapis Git
+
+2026-10-29 13:53 Europe/Warsaw — poprawka `b377174799723345c07647b32769d9319a89c507` wypchnięta na `fix/premium-lineup-stage1-contract`. PASS guard55/runtime8,23policy,297Vitest,TS/lint/buildy/demo; bez zmiany aplikacji. Draft PR nie utworzony: API `Forbidden`. [Porównanie względem Stage1](https://github.com/psuda87/sunday-league-mates/compare/feat/premium-lineup-editor-stage1...fix/premium-lineup-stage1-contract?expand=1). Raport `docs/PREMIUM_LINEUP_EDITOR_STAGE1.md` uzupełniony; rekomendacja dalszej integracji lokalnego Stage1 po review. Brak merge, backendu iStage2. Końcowy zapis dokumentacji w osobnym commicie.
+
+---
+
 # Stage1 — kontrola Premium uporządkowana, PASS
 
 2026-10-29 13:51 Europe/Warsaw — `fix/premium-lineup-stage1-contract` od b30908e. FAIL wynikał wyłącznie z porównania PremiumEvents/PremiumTeams z poprzednim a82397b. Tylko te2 istniejące pliki i2 nowe zależności lineupEditor/LineupPlayerProfile przypięto teraz do niezmiennego b30908e. Bez zmiany runtime aplikacji, wyglądu, manifestu55 i wcześniejszych zatwierdzeń innych plików; strażnik nie jest wyłączony ani oparty na bieżących edytowalnych hashach.
