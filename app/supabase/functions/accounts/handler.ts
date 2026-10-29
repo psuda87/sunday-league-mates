@@ -259,6 +259,34 @@ export function createHandler(env: Environment) {
         if (!result.ok) throw new ApiError(503, 'service_unavailable', 'Nie udało się pobrać własnych grup finansowych.');
         return respond(result.data);
       }
+      if (action === 'lineups_get' || action === 'lineups_save') {
+        await rate('lineups:' + ctx.id, 60);
+        const fields = action === 'lineups_get' ? ['event_id'] : ['event_id','expected_version','expected_roster_version','team_a','team_b','request_id'];
+        if (Object.keys(body).some(key => key !== 'action' && !fields.includes(key)))
+          throw new ApiError(400, 'invalid_input', 'Żądanie składu zawiera niedozwolone pola.');
+        const payload = Object.fromEntries(fields.filter(key => Object.hasOwn(body,key)).map(key => [key,body[key]]));
+        const r = await call('/rest/v1/rpc/slm_lineups_dispatch', 'POST', {p_user:ctx.id,p_session:ctx.sid,p_action:action.slice(8),p_body:payload}, undefined, true);
+        if (!r.ok) {
+          const code = typeof r.data?.message === 'string' ? r.data.message : '';
+          const errors: Record<string,[number,string]> = {
+            session_invalid:[401,'Sesja wygasła. Zaloguj się ponownie.'],
+            not_found:[404,'Mecz nie istnieje lub nie masz dostępu do jego składu.'],
+            group_archived:[409,'Grupa jest zarchiwizowana.'],
+            event_cancelled:[409,'Nie można zmieniać składu odwołanego meczu.'],
+            lineup_closed:[409,'Nie można zmieniać składu zakończonego meczu.'],
+            lineup_version_conflict:[409,'Ktoś zmienił skład. Pobierz aktualną wersję bez nadpisywania szkicu.'],
+            lineup_roster_conflict:[409,'Lista uczestników lub mecz uległy zmianie. Pobierz aktualne dane.'],
+            idempotency_conflict:[409,'Identyfikator żądania dotyczy innej operacji.'],
+            lineup_invalid_assignment:[400,'Skład zawiera powtórzone lub nieuprawnione wpisy uczestników.'],
+            invalid_input:[400,'Sprawdź format danych składu.'],
+            request_required:[400,'Brak identyfikatora operacji.'],
+          };
+          if (errors[code]) throw new ApiError(errors[code][0],code,errors[code][1]);
+          if (['22P02','22003'].includes(r.data?.code)) throw new ApiError(400,'invalid_input','Sprawdź identyfikatory i wersje składu.');
+          throw new ApiError(503,'service_unavailable','Nie potwierdzono operacji składu. Ponów z tym samym identyfikatorem.');
+        }
+        return respond(r.data);
+      }
       const scoped = [
         ['group_finance_', 'slm_group_finance_dispatch'],
         ['groups_', 'slm_groups_dispatch'],
