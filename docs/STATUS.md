@@ -1,3 +1,13 @@
+# Etap 3A — integracja i frontendowe CI przygotowane, bez merge
+
+2026-10-29 23:51 Europe/Warsaw — `chore/slm-v1-integration-ready` od dokładnego58a9babf257876e47cf6db269a0bf05d2e1db1f4. Dodano minimalny `.github/workflows/main-pr-checks.yml` dla PR do main i manual dispatch; korzysta z frontendowego zakresu PR26, bez starszego backendu40. Wymaga jawnego opt-in `SLM_FREE_CI_ENABLED=true` po potwierdzeniu bezpłatnego limitu; ręczne uruchomienie wymaga dodatkowego potwierdzenia. SKIPPED nie oznacza PASS. Nie zmieniono ustawień GitHub ani nie aktywowano płatnych usług.
+
+Faktyczne lokalne PASS w Cloud: TS aplikacji/strictEdge, lint,335Vitest/53pliki,37policy,verify41migracji/55visual/10importów,5buildówLIVE/Premium-local/Premium-finance-local/Androidweb/demo i izolacja16; YAML i8blokówBash sprawdzone statycznie. Całe app/ i wszystkie istniejące guardy, zależności, UI/Backend/Auth/finanse niezmienione względem58a9bab. Brak migracji/resetu/budowyAPK/CapacitorSync/deploy/Cloud/merge.
+
+SQL/RLS i rzeczywiste GoTrue/Edge/UI **NOT RUN**: nie zmieniono branch guardów i nie tworzono baz. Ich wymagania oraz bezpieczna propozycja dopuszczenia CI przez pełne SHA/źródła opisana w [SLM_V1_INTEGRATION_READY.md](SLM_V1_INTEGRATION_READY.md). GitHubAPI odmawia odczytu konfiguracji; hostowaneCI **NOT RUN/niepotwierdzone**. Publikacja/PR zostaną zapisane w dzienniku po próbie. Następny krok: review workflow/przypięć, potwierdzenie limitu i rzeczywisty frontendowy przebieg; backendCI i zgodny POCO osobno. STOP po3A, bez Stage3B.
+
+---
+
 # Stage 2B — integracja edytora składów, gotowa do review
 
 2026-10-29 18:33 Europe/Warsaw — zwykły push nowej gałęzi z 7 zrzutami potwierdzony. **Draft PR [#27](https://github.com/psuda87/sunday-league-mates/pull/27) utworzony**, base feat/premium-lineups-stage2a/3b00ec2, przy utworzeniu head 290996da4b0e9f1bf02e6e4f6945d388fca3f647, draft/open, bez merge. Końcowy Git-doc osobno; runtime/testy bez dalszych zmian.
