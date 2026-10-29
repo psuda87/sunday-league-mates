@@ -1,4 +1,18 @@
-# Stage 2B — integracja edytora składów, gotowa do review
+# Audyt Stage 2B — PASS WITH WARNINGS; POCO BLOCKED
+
+2026-10-29 19:19 Europe/Warsaw — `audit/premium-lineups-stage2b`, od dokładnego PR27/`58a9babf257876e47cf6db269a0bf05d2e1db1f4`. Niezależnie przeczytano kod/diff i ponowiono testy. **Bez krytycznej luki w sprawdzonym zakresie**; P3: początkowy GET także dla ukrytej zakładki Składy, bez automatycznego zapisu/obejścia uprawnień. Chroniona prezentacja 55 plików zgodna z historycznymi wzorcami; dokładny diff czterech plików runtime uzasadnia przypięcie f47cd80, ale przegląd właściciela pozostaje wymagany. Żadnych zmian kodu/guardów/manifestów.
+
+Faktyczne automatyczne PASS audytu, Windows/lokalny Docker: **335 Vitest/53 pliki** (23 UI/API,23 Edge) + **2 osobne próby audytowe**; **14 real Chrome UI +14 GoTrue/Edge/PostgREST/PostgreSQL**; **50 SQL/RLS/regresji finansów/restartu** z czystej bazy 2A o identycznym app/supabase; TS/strict Edge/lint; **37 policy**, verify **41 migracji/55 visual/10 granic**; build LIVE/Premium/demo, izolacja16. Testy uruchomiono bez obchodzenia branch guardów. Cypress13/5 i Android build/sync/Gradle to wyniki poprzedniej implementacji, nie nowy przebieg audytu.
+
+**POCO BLOCKED środowiskowo:** endpoint APK 127.0.0.1:64321 wskazuje niezgodny slm-premium-real-finance (44 wersje, brak6 kanonicznych/9 obcych, brak lineups, Edge zatrzymany). slm-main-stabilization ma40 kanonicznych i brakuje41. migracji; niczego tam nie stosowano. ADB1.0.41 dostępny, urządzeń0. Istniejący APK sprawdzony odczytem; nie instalowano, nie zmieniono telefonu. Raport proponuje nowy osobno zatwierdzany projekt55341 i późniejsze USB reverse, z dokładnymi punktami STOP i PowerShell.
+
+Migracje/Edge do istniejących baz/Cloud: **żadne**. Nowe fixtures audytu slm-lineups-edge-aab9e771aef2 (+auth/rest/edge) i slm-lineups-stage2a-58f8de471a97 (+rest) odtworzyły41 migracji wyłącznie testowo; wszystkie6 kontenerów zatrzymane/zachowane, network none/container, bez portów. Brak osobnego przebiegu Cloud Codex. Niewykonane: fizyczny POCO, nowy pełny CLI Kong/Storage, nowy Cypress/native build i hostowaneCI. Nie było merge/deployu/resetu; zastane zmiany głównego worktree zachowane.
+
+PR27 można skierować do dalszej integracji po review właściciela przypięcia; audyt nie upoważnia do merge ani poprawek. **STOP po raporcie**, czekamy na decyzję przed backendem telefonu/poprawkami/instalacją i testami POCO. Raport: [PREMIUM_LINEUPS_STAGE2B_AUDIT.md](PREMIUM_LINEUPS_STAGE2B_AUDIT.md). Chronologia: `docs/ODPOWIEDZI_CODEX.txt`.
+
+---
+
+# Historycznie: Stage 2B — integracja edytora składów, gotowa do review
 
 2026-10-29 18:33 Europe/Warsaw — zwykły push nowej gałęzi z 7 zrzutami potwierdzony. **Draft PR [#27](https://github.com/psuda87/sunday-league-mates/pull/27) utworzony**, base feat/premium-lineups-stage2a/3b00ec2, przy utworzeniu head 290996da4b0e9f1bf02e6e4f6945d388fca3f647, draft/open, bez merge. Końcowy Git-doc osobno; runtime/testy bez dalszych zmian.
 
