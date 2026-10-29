@@ -7,9 +7,10 @@ import { membership } from './groups';
 const as=(w:World,id:string)=>reduceWorld(w,{type:'user',id});
 const input=(groupId='group-1')=>({...defaultEvent(),groupId});
 const update=(w:World,visibility:'private'|'public')=>{const g=w.games[0];return reduceWorld(w,{type:'event_update',gameId:g.id,input:{...input(g.groupId),startsAt:g.startsAt,name:g.name,capacity:g.capacity,costCents:g.costCents,visibility}});};
+// Cases outside describe use these same dated fixtures and must share its clock.
+beforeAll(()=>{vi.useFakeTimers({toFake:['Date']});vi.setSystemTime(new Date('2026-10-19T10:00:00Z'));});
+afterAll(()=>vi.useRealTimers());
 describe('3.16 group events demo policy',()=>{
- beforeAll(()=>{vi.useFakeTimers({toFake:['Date']});vi.setSystemTime(new Date('2026-10-19T10:00:00Z'));});
- afterAll(()=>vi.useRealTimers());
  it('maps every fixture deterministically, preserving independent entries and history',()=>{
   const a=initialWorld(),b=initialWorld();expect(a).toEqual(b);
   expect(a.games).toHaveLength(10);expect(a.games.every(g=>a.groupState.groups.some(group=>group.id===g.groupId)&&a.players.some(p=>p.id===g.createdBy))).toBe(true);

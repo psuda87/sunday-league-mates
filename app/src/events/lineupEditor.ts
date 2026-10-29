@@ -4,11 +4,13 @@ export interface LineupEditor {
   eventId: string;
   baseline: Assignment;
   draft: Assignment;
+  restorePoint: Assignment;
   initialized: boolean;
   mode: 'swap' | 'transfer' | null;
   selected: string | null;
 }
 export type LineupAction =
+  | {type: 'load'; eventId: string; baseline: Assignment; proposal?: Assignment}
   | {type: 'roster'; eventId: string; ids: string[]}
   | {type: 'preview'; ids: string[]}
   | {type: 'mode'; mode: LineupEditor['mode']}
@@ -18,7 +20,7 @@ export type LineupAction =
   | {type: 'restore'};
 
 export const emptyLineup = (eventId: string): LineupEditor => ({
-  eventId, baseline: {}, draft: {}, initialized: false, mode: null, selected: null,
+  eventId, baseline: {}, draft: {}, restorePoint: {}, initialized: false, mode: null, selected: null,
 });
 export function lineupChanged(baseline: Assignment, draft: Assignment): boolean {
   return [...new Set([...Object.keys(baseline), ...Object.keys(draft)])]
@@ -27,18 +29,20 @@ export function lineupChanged(baseline: Assignment, draft: Assignment): boolean 
 
 // Participation IDs (including guests), never account IDs. No persistence or API writes.
 export function editLineup(state: LineupEditor, action: LineupAction): LineupEditor {
+  if (action.type === 'load') return {...emptyLineup(action.eventId), baseline: {...action.baseline},
+    draft: {...(action.proposal ?? action.baseline)}, restorePoint: {...(action.proposal ?? action.baseline)}, initialized: true};
   if (action.type === 'roster') {
     if (state.eventId !== action.eventId) return emptyLineup(action.eventId);
     const ids = new Set(action.ids);
     const retain = (source: Assignment): Assignment => Object.fromEntries(Object.entries(source).filter(([id]) => ids.has(id)));
-    return {...state, baseline: retain(state.baseline), draft: retain(state.draft), selected: null};
+    return {...state, baseline: retain(state.baseline), draft: retain(state.draft), restorePoint: retain(state.restorePoint), selected: null};
   }
   if (action.type === 'preview') {
     if (state.initialized || new Set(action.ids).size < 2) return state;
     const baseline: Assignment = Object.fromEntries([...new Set(action.ids)].map((id, i) => [id, i % 2 === 0 ? 'a' : 'b']));
-    return {...state, baseline, draft: {...baseline}, initialized: true, selected: null};
+    return {...state, baseline, draft: {...baseline}, restorePoint: {...baseline}, initialized: true, selected: null};
   }
-  if (action.type === 'restore') return {...state, draft: {...state.baseline}, selected: null, mode: null, initialized: Object.keys(state.baseline).length > 0};
+  if (action.type === 'restore') return {...state, draft: {...state.restorePoint}, selected: null, mode: null};
   if (action.type === 'mode') return {...state, mode: action.mode, selected: null};
   if (action.type === 'assign') {
     if (state.draft[action.id]) return state;

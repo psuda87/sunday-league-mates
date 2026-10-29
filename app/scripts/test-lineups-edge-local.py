@@ -79,7 +79,7 @@ class WireSocket:
 
 def http(port, path, body=None, token=None):
     payload = b'' if body is None else json.dumps(body).encode('utf-8')
-    head = ('GET' if body is None else 'POST') + ' ' + path + ' HTTP/1.0\r\nHost: localhost\r\nConnection: close\r\n'
+    head = ('GET' if body is None else 'POST') + ' ' + path + ' HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n'
     if token:
         head += 'Authorization: Bearer ' + token + '\r\n'
     if body is not None:
@@ -159,9 +159,18 @@ def parallel(jobs):
         return list(pool.map(work, jobs))
 
 
-def main():
+def main(verify_ui=None):
     branch = command(['git', '-C', str(ROOT), 'branch', '--show-current']).decode().strip()
-    assert branch == 'feat/premium-lineups-stage2a', 'Reviewed Stage 2A branch required'
+    if branch == 'feat/premium-lineups-stage2b' and verify_ui is not None:
+        # The dependent UI runner may reuse the fixture ONLY with the exact
+        # Stage2A backend. This does not authorize a different schema or Auth.
+        paths = sorted((ROOT / 'app/supabase/migrations').glob('*.sql'))
+        paths += [ROOT / 'app/supabase/functions/accounts/handler.ts']
+        for path in paths:
+            canonical = command(['git', '-C', str(ROOT), 'show', '3b00ec268a19f64516daebbf0b238d796e826cd1:' + path.relative_to(ROOT).as_posix()])
+            assert path.read_bytes().replace(b'\r\n', b'\n') == canonical.replace(b'\r\n', b'\n'), 'Stage2A backend source changed'
+    else:
+        assert branch == 'feat/premium-lineups-stage2a', 'Reviewed Stage 2A branch required'
     context = json.loads(command(['docker', 'context', 'inspect']))[0]
     host = context['Endpoints']['docker']['Host'] if os.environ.get('DOCKER_CONTEXT') else os.environ.get('DOCKER_HOST', context['Endpoints']['docker']['Host'])
     assert host.startswith(('unix://', 'npipe://')), 'Local Docker socket required'
@@ -238,7 +247,7 @@ Deno.serve(async(req:Request)=>{
         encoded = login['access_token'].split('.')[1]
         claims = json.loads(base64.urlsafe_b64decode(encoded + '=' * (-len(encoded) % 4)))
         assert claims['role'] == 'authenticated', 'Real client must exercise authenticated ACL'
-        users.append({'id': user['id'], 'token': login['access_token']})
+        users.append({'id': user['id'], 'token': login['access_token'], 'session': login})
     admin, member, second, outsider = users
     check(sql('select count(*) from auth.sessions') == '4', 'four real GoTrue sessions accepted through unchanged accounts login')
     group = write(admin, 'groups_create', name='Lineup Edge fixture')['group_id']
@@ -309,6 +318,8 @@ Deno.serve(async(req:Request)=>{
             break
         time.sleep(.25)
     check(status == 200 and after == before, 'same GoTrue client reads identical persisted snapshot after isolated backend restart')
+    if verify_ui is not None:
+        verify_ui(users, group)
     write(second, 'groups_leave', group_id=group)
     account(second, 'lineups_get', expected=404, event_id=event)
     account(second, 'lineups_save', expected=404, **payload(get(), [], ids))
@@ -316,7 +327,8 @@ Deno.serve(async(req:Request)=>{
     account(member, 'logout')
     account(member, 'lineups_get', expected=401, event_id=event)
     check(True, 'revoked real application session cannot read lineup')
-    print('RESULT ' + str(passed) + ' PASS; real GoTrue-issued JWT -> accounts Edge -> PostgREST -> PostgreSQL. Kong/Storage/browser/Android not tested.', flush=True)
+    boundary = 'Kong/Storage/Android not tested; browser result above.' if verify_ui is not None else 'Kong/Storage/browser/Android not tested.'
+    print('RESULT ' + str(passed) + ' PASS; real GoTrue-issued JWT -> accounts Edge -> PostgREST -> PostgreSQL. ' + boundary, flush=True)
 
 
 if __name__ == '__main__':

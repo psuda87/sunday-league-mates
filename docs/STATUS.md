@@ -1,4 +1,20 @@
-# Stage 2A — domknięty i ponownie zweryfikowany lokalnie
+# Stage 2B — integracja edytora składów, gotowa do review
+
+2026-10-29 18:33 Europe/Warsaw — zwykły push nowej gałęzi z 7 zrzutami potwierdzony. **Draft PR [#27](https://github.com/psuda87/sunday-league-mates/pull/27) utworzony**, base feat/premium-lineups-stage2a/3b00ec2, przy utworzeniu head 290996da4b0e9f1bf02e6e4f6945d388fca3f647, draft/open, bez merge. Końcowy Git-doc osobno; runtime/testy bez dalszych zmian.
+
+2026-10-29 18:31 Europe/Warsaw — `feat/premium-lineups-stage2b` od dokładnego `3b00ec268a19f64516daebbf0b238d796e826cd1`. Runtime **f47cd80ad49aa6df0faf0dcb04093f2fa1adfbcd**, końcowy zakres weryfikacji **a75799f47a3e6636c2779622f70bc715adc1ab5a**; dokumentacja osobno. Istniejący PremiumTeams odczytuje i jawnie zapisuje lineups_get/save: baseline/draft, UUID uczestnictwa/gości, CAS/roster, stabilny request_id retry, GET po sukcesie/replay, autor wyłącznie z last_change, potwierdzane odświeżenie przy konflikcie. RAM per manager/użytkownik/grupa/mecz zachowuje szkic przez offline unmount; ponowna weryfikacja przed pokazaniem, logout/odmowa czyści zakres. Bez zmian Auth, finansów i backendu 2A.
+
+Automatyczne PASS tej sesji Windows: **335 Vitest/53 pliki**, w tym **23 UI/API fixture**; **14 Chrome UI z rzeczywistym GoTrue/Edge/PostgREST/PostgreSQL +14 towarzyszących kontroli backendu**; **50 SQL/RLS/PostgREST** na bazowym worktree 2A o identycznym backendzie; **13 Cypress/5 plików z kontrolowanym API**; TS/strict Edge/lint, build LIVE/Premium/demo (izolacja16), Android web/Capacitor sync/assembleDebug offline. Guard **55 visual /10 import boundaries /41 migracji**, **37 policy PASS**. Siedem zrzutów w docs/ui/lineups-stage2b. Fizyczny POCO NOT TESTED, APK nie instalowano.
+
+Migracje/Edge wdrożone do istniejących projektów/Cloud: **żadne**. Testy tworzą nowe network-none fixtures, 41 migracji od zera; końcowe `slm-lineups-edge-a10a01a6a920` i `slm-lineups-stage2a-a1ec4d83aabb` z kontenerami pomocniczymi zatrzymane/zachowane, brak publikacji portów. Most browsera wyłącznie loopback. Kong/Storage nie są dowiedzione przez ten test. Brak osobnego przebiegu Cloud Codex, hostowanego CI, merge, deployu lub zmiany telefonu. Główne worktree i niezapisane zmiany użytkownika nietknięte.
+
+Otwarte/granice: wymagany osobny review właściciela dokładnego przypięcia czterech plików runtime do f47cd80 (manifest55 i stare warunki bez zmian, 8 nowych odmów). Brak realtime/trwałego szkicu offline; globalna blokada i limit12KB odziedziczone po2A. Istniejące ostrzeżenia build/Gradle. Naprawiono zakres zegara dwóch istniejących testów demo po odtworzeniu tego samego FAIL na bazie2A; bez zmiany asercji lub logiki demo. Runner browsera używa produkcyjnego bundle i profilu poza repo, nie zmieniano filtrów testów ani konfiguracji Windows.
+
+**Technicznie gotowe do integracji po review; bez automatycznej zgody na merge.** Następny krok: review zależnego Draft PR do feat/premium-lineups-stage2a; osobno uzgodniony odbiór POCO i zgodny izolowany backend. Nie rozpoczynać kolejnego modułu. Kontrakt, polecenia PowerShell, ograniczenia, pliki i instrukcja POCO: [PREMIUM_LINEUPS_STAGE2B.md](PREMIUM_LINEUPS_STAGE2B.md). Chronologia: `docs/ODPOWIEDZI_CODEX.txt`.
+
+---
+
+# Historycznie: Stage 2A — domknięty i ponownie zweryfikowany lokalnie
 
 2026-10-29 17:32 Europe/Warsaw — `feat/premium-lineups-stage2a`, kontynuacja istniejącego `c1cb2fd` od wskazanego Stage 1 `7ad5c75`. Nowy kod testów: `338db5af9ad06f12ba26e6f5df6e455aa12c2930`. Backend pozostaje dokładnie zatwierdzonym `b46b7b9`; brak ponownej implementacji, zmian migracji/handlera/Auth/finansów/UI/strażników. Dodano powtarzalny `app/scripts/test-lineups-edge-local.py`, zamykający brak rzeczywistego GoTrue → accounts Edge → PostgREST → PostgreSQL, także po restarcie i odebraniu dostępu.
 
