@@ -19,15 +19,16 @@ describe('Restored Premium behavior with genuine local HTTP',()=>{
   }
   cy.get('button.slm-demo-create').click();cy.get('.slm-event-form').should('be.visible');cy.get('.slm-event-form select').first().should('have.value',fixture.group_id);
  });
- it('point-and-swap supports odd roster/guest, undo, sticky actions and no fake save/author',()=>{
+ it('point-and-swap supports odd roster/guest, persisted baseline, undo and sticky actions',()=>{
   login('member');cy.get('select[aria-label="Aktywna grupa"]').select(fixture.group_id);cy.get('[data-event="'+fixture.event_id+'"] .slm-card-link').click();cy.contains('[role="tab"]','Składy').click();
-  cy.contains('button','Utwórz lokalny podgląd').click();cy.get('.slm-team-a .slm-pitch-player').should('have.length',2);cy.get('.slm-team-b .slm-pitch-player').should('have.length',1);
+  cy.get('.slm-teams-disclaimer').then($p=>{if($p.text().includes('Propozycja')){cy.contains('button',/^Zapisz$/).click();cy.contains('Skład zapisany i odświeżony.').should('be.visible');}});
+  cy.contains('Zapisany skład · lokalna edycja').should('exist');cy.get('.slm-team-a .slm-pitch-player').should('have.length',2);cy.get('.slm-team-b .slm-pitch-player').should('have.length',1);
   cy.contains('button','Zamień zawodników').click();cy.get('.slm-team-a .slm-pitch-player').first().click();cy.get('.slm-team-b .slm-pitch-player').first().click();cy.contains('Zamieniono wyłącznie w lokalnym podglądzie.').should('be.visible');
   cy.contains('button','Zakończ zamiany').click();
   for(const width of [320,360,390])for(const dark of [false,true]){cy.viewport(width,760);cy.document().then(d=>d.documentElement.classList.toggle('ion-palette-dark',dark));scroll(600);cy.get('.slm-football-pitch').then($p=>expect($p[0].scrollWidth).to.be.at.most(width));}
   scroll(600);cy.get('.slm-scroll-header[data-stuck=true]').should('be.visible').then($h=>{const r=$h[0].getBoundingClientRect();expect(r.top).to.be.at.least(-1);expect(r.top).to.be.lessThan(30);expect($h.find('img')).to.have.length(0);});
   cy.screenshot('pitch-sticky-dark',{capture:'viewport',overwrite:true});
-  cy.contains('button','Przywróć skład').click();cy.get('.slm-team-a .slm-pitch-player').should('have.length',2);cy.get('.slm-team-b .slm-pitch-player').should('have.length',1);cy.contains('Brak zmian względem składu początkowego.').should('exist');cy.contains('Ostatnia zmiana: brak zapisanego składu na serwerze.').should('exist');cy.contains('button',/^Zapisz$/).should('be.disabled');
+  cy.contains('button','Przywróć skład').click();cy.get('.slm-team-a .slm-pitch-player').should('have.length',2);cy.get('.slm-team-b .slm-pitch-player').should('have.length',1);cy.contains('Brak niezapisanych zmian.').should('exist');cy.contains('Ostatnia zmiana:').should('exist');cy.contains('button',/^Zapisz$/).should('be.disabled');
  });
  it('former member history retains own match and excludes unrelated former-group events',()=>{
   login('former');cy.contains('button','Historia').click();cy.get('[data-event]').should('have.length',1).and('have.attr','data-event',fixture.own_past_id);
