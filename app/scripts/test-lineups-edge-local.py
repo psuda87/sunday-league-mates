@@ -327,7 +327,8 @@ Deno.serve(async(req:Request)=>{
     account(member, 'logout')
     account(member, 'lineups_get', expected=401, event_id=event)
     check(True, 'revoked real application session cannot read lineup')
-    print('RESULT ' + str(passed) + ' PASS; real GoTrue-issued JWT -> accounts Edge -> PostgREST -> PostgreSQL. Kong/Storage/browser/Android not tested.', flush=True)
+    boundary = 'Kong/Storage/Android not tested; browser result above.' if verify_ui is not None else 'Kong/Storage/browser/Android not tested.'
+    print('RESULT ' + str(passed) + ' PASS; real GoTrue-issued JWT -> accounts Edge -> PostgREST -> PostgreSQL. ' + boundary, flush=True)
 
 
 if __name__ == '__main__':

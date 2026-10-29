@@ -35,12 +35,15 @@ def verify_ui(users, group):
             token = self.headers.get('Authorization', '').removeprefix('Bearer ')
             status, data, _ = fixture.http(9000, self.path, body, token)
             wire = json.dumps(data).encode('utf-8')
-            self.send_response(status or 503)
-            self.send_header('Content-Type', 'application/json')
-            self.send_header('Cache-Control', 'no-store')
-            self.send_header('Content-Length', str(len(wire)))
-            self.end_headers()
-            self.wfile.write(wire)
+            try:
+                self.send_response(status or 503)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Cache-Control', 'no-store')
+                self.send_header('Content-Length', str(len(wire)))
+                self.end_headers()
+                self.wfile.write(wire)
+            except (BrokenPipeError, ConnectionResetError):
+                pass  # Browser may cancel a read when the editor unmounts.
 
     bridge = ThreadingHTTPServer(('127.0.0.1', 0), Bridge)
     thread = threading.Thread(target=bridge.serve_forever, daemon=True)
