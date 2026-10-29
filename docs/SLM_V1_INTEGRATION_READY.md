@@ -132,7 +132,13 @@ bezpieczeństwa całej historii; przed commitem sprawdzono zakres i nowe pliki.
 Odczyt `actions/variables/SLM_FREE_CI_ENABLED` zwrócił **Forbidden**. Nie da się
 potwierdzić opt-in, limitu, rulesets ani zielonego przebiegu. Nie ustawiono tej
 zmiennej ani nie zlecono workflow_dispatch. Pominięty job nie spełnia odbioru.
-Wynik próby utworzenia Draft PR i opublikowane SHA zapisuje dziennik
+Commit przygotowania workflow: `8387f89adcecc64b0b2a777bb2cf97d044c1fc29`, wypchnięty zwykłym pushem
+na `origin/chore/slm-v1-integration-ready`. Próba POST Draft PR do main
+zwróciła **Forbidden**; PR nie został utworzony. [Porównanie i ręczne utworzenie
+Draft PR](https://github.com/psuda87/sunday-league-mates/compare/main...chore/slm-v1-integration-ready?expand=1).
+Odczyt Actions runs także zwrócił **Forbidden**. Nie zlecono żadnego
+workflow_dispatch; nowy workflow nie ma triggera push. Końcowe potwierdzenie
+publikacji jest osobnym commitem dokumentacyjnym. Dziennik:
 `docs/ODPOWIEDZI_CODEX.txt`.
 
 Po review workflow i istniejących przypięć właściciel może potwierdzić limit,

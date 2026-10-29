@@ -4,7 +4,7 @@
 
 Faktyczne lokalne PASS w Cloud: TS aplikacji/strictEdge, lint,335Vitest/53pliki,37policy,verify41migracji/55visual/10importów,5buildówLIVE/Premium-local/Premium-finance-local/Androidweb/demo i izolacja16; YAML i8blokówBash sprawdzone statycznie. Całe app/ i wszystkie istniejące guardy, zależności, UI/Backend/Auth/finanse niezmienione względem58a9bab. Brak migracji/resetu/budowyAPK/CapacitorSync/deploy/Cloud/merge.
 
-SQL/RLS i rzeczywiste GoTrue/Edge/UI **NOT RUN**: nie zmieniono branch guardów i nie tworzono baz. Ich wymagania oraz bezpieczna propozycja dopuszczenia CI przez pełne SHA/źródła opisana w [SLM_V1_INTEGRATION_READY.md](SLM_V1_INTEGRATION_READY.md). GitHubAPI odmawia odczytu konfiguracji; hostowaneCI **NOT RUN/niepotwierdzone**. Publikacja/PR zostaną zapisane w dzienniku po próbie. Następny krok: review workflow/przypięć, potwierdzenie limitu i rzeczywisty frontendowy przebieg; backendCI i zgodny POCO osobno. STOP po3A, bez Stage3B.
+SQL/RLS i rzeczywiste GoTrue/Edge/UI **NOT RUN**: nie zmieniono branch guardów i nie tworzono baz. Ich wymagania oraz bezpieczna propozycja dopuszczenia CI przez pełne SHA/źródła opisana w [SLM_V1_INTEGRATION_READY.md](SLM_V1_INTEGRATION_READY.md). GitHubAPI odmawia odczytu konfiguracji; hostowaneCI **NOT RUN/niepotwierdzone**. Commit workflow `8387f89adcecc64b0b2a777bb2cf97d044c1fc29` wypchnięty na origin. POST DraftPR do main i odczyt Actions runs: **Forbidden**; PR nie powstał. [Link porównania](https://github.com/psuda87/sunday-league-mates/compare/main...chore/slm-v1-integration-ready?expand=1). Potwierdzenie publikacji osobnym commitem docs. Następny krok: review workflow/przypięć, potwierdzenie limitu i rzeczywisty frontendowy przebieg; backendCI i zgodny POCO osobno. STOP po3A, bez Stage3B.
 
 ---
 
