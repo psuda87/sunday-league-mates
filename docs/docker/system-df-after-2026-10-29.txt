@@ -1,0 +1,256 @@
+Images space usage:
+
+REPOSITORY                              TAG                      IMAGE ID       CREATED         SIZE      SHARED SIZE   UNIQUE SIZE   CONTAINERS
+postgres                                17-alpine                266d3c257594   7 days ago      424MB     0B            423.8MB       19
+public.ecr.aws/supabase/postgres        17.11.0.004              b15d862126dd   12 days ago     1.7GB     12.93MB       1.684GB       12
+public.ecr.aws/supabase/storage-api     v1.82.1                  ec2ad41411ea   2 weeks ago     1.43GB    12.93MB       1.418GB       11
+public.ecr.aws/supabase/realtime        v2.143.4                 35e99d3f1cbb   2 weeks ago     559MB     32B           559.2MB       3
+public.ecr.aws/supabase/studio          2026.10.12-sha-3699278   948770ec467f   2 weeks ago     1.74GB    326.1MB       1.417GB       3
+public.ecr.aws/supabase/logflare        1.53.0                   9d9c8f8c4626   3 weeks ago     678MB     34B           678MB         3
+public.ecr.aws/supabase/postgres-meta   v0.100.0                 145325b7e39f   3 weeks ago     569MB     326.1MB       243MB         3
+public.ecr.aws/supabase/edge-runtime    v1.77.4                  ad45164b7548   4 weeks ago     1.14GB    2B            1.135GB       23
+public.ecr.aws/supabase/mailpit         v1.31.3                  ed9b00c609e7   4 weeks ago     50.7MB    2B            50.67MB       6
+public.ecr.aws/supabase/gotrue          v2.197.0                 1736a63078f5   7 weeks ago     94.4MB    12.92MB       81.48MB       39
+public.ecr.aws/supabase/vector          0.58.0-alpine            5dcf67db0ee3   2 months ago    224MB     12.92MB       211MB         3
+public.ecr.aws/supabase/postgrest       v16.4                    d155c6718ed9   2 months ago    27.1MB    0B            27.12MB       12
+<none>                                  <none>                   5f4ce744539b   24 months ago   22.8MB    0B            22.75MB       13
+public.ecr.aws/supabase/kong            2.8.1                    1b53405d8680   4 years ago     203MB     0B            203.3MB       12
+
+Containers space usage:
+
+CONTAINER ID   IMAGE                                                   COMMAND                   LOCAL VOLUMES   SIZE      CREATED        STATUS                          NAMES
+809fba9a1ba3   postgres:17-alpine                                      "docker-entrypoint.s…"    1               20.5kB    3 hours ago    Up 9 minutes                    slm-lineups-stage2a-58f8de471a97
+301e3eaafea2   ad45164b7548                                            "edge-runtime start …"    0               123kB     3 hours ago    Up 9 minutes                    slm-lineups-edge-aab9e771aef2-edge
+a187e2b00854   5f4ce744539b                                            "/bin/postgrest"          0               4.1kB     3 hours ago    Up 9 minutes                    slm-lineups-edge-aab9e771aef2-rest
+d11ad7882f7c   1736a63078f5                                            "auth"                    0               4.1kB     3 hours ago    Up 9 minutes                    slm-lineups-edge-aab9e771aef2-auth
+15cc5c2d4266   266d3c257594                                            "docker-entrypoint.s…"    1               20.5kB    3 hours ago    Up 9 minutes                    slm-lineups-edge-aab9e771aef2
+ca1b1d741459   ad45164b7548                                            "edge-runtime start …"    0               123kB     4 hours ago    Up 9 minutes                    slm-lineups-edge-a10a01a6a920-edge
+9425a3308c0e   5f4ce744539b                                            "/bin/postgrest"          0               4.1kB     4 hours ago    Up 9 minutes                    slm-lineups-edge-a10a01a6a920-rest
+e08872027b0f   1736a63078f5                                            "auth"                    0               4.1kB     4 hours ago    Up 9 minutes                    slm-lineups-edge-a10a01a6a920-auth
+102537b6f2a1   266d3c257594                                            "docker-entrypoint.s…"    1               20.5kB    4 hours ago    Up 9 minutes                    slm-lineups-edge-a10a01a6a920
+06da59585263   ad45164b7548                                            "edge-runtime start …"    0               123kB     4 hours ago    Up 9 minutes                    slm-lineups-edge-42a1ed938369-edge
+526bcc1b24cf   5f4ce744539b                                            "/bin/postgrest"          0               4.1kB     4 hours ago    Up 9 minutes                    slm-lineups-edge-42a1ed938369-rest
+d3a5ee984470   1736a63078f5                                            "auth"                    0               4.1kB     4 hours ago    Up 9 minutes                    slm-lineups-edge-42a1ed938369-auth
+7159b5347690   266d3c257594                                            "docker-entrypoint.s…"    1               20.5kB    4 hours ago    Up 9 minutes                    slm-lineups-edge-42a1ed938369
+ff44554a93dc   ad45164b7548                                            "edge-runtime start …"    0               123kB     4 hours ago    Up 9 minutes                    slm-lineups-edge-3de381aac9fc-edge
+d0edc48a659e   5f4ce744539b                                            "/bin/postgrest"          0               4.1kB     4 hours ago    Up 9 minutes                    slm-lineups-edge-3de381aac9fc-rest
+0ce1ef92804e   1736a63078f5                                            "auth"                    0               4.1kB     4 hours ago    Up 9 minutes                    slm-lineups-edge-3de381aac9fc-auth
+f5f3e637159a   266d3c257594                                            "docker-entrypoint.s…"    1               20.5kB    4 hours ago    Up 9 minutes                    slm-lineups-edge-3de381aac9fc
+381996145e07   5f4ce744539b                                            "/bin/postgrest"          0               4.1kB     4 hours ago    Up 9 minutes                    slm-lineups-stage2a-a1ec4d83aabb-rest
+defa29d85936   postgres:17-alpine                                      "docker-entrypoint.s…"    1               20.5kB    4 hours ago    Up 9 minutes                    slm-lineups-stage2a-a1ec4d83aabb
+414ff7e022b3   ad45164b7548                                            "edge-runtime start …"    0               123kB     4 hours ago    Up 9 minutes                    slm-lineups-edge-d15112d64ce4-edge
+4c0e0a1ab5eb   5f4ce744539b                                            "/bin/postgrest"          0               4.1kB     4 hours ago    Up 9 minutes                    slm-lineups-edge-d15112d64ce4-rest
+664788158d80   1736a63078f5                                            "auth"                    0               4.1kB     4 hours ago    Up 9 minutes                    slm-lineups-edge-d15112d64ce4-auth
+b16d1265cadf   266d3c257594                                            "docker-entrypoint.s…"    1               20.5kB    4 hours ago    Up 9 minutes                    slm-lineups-edge-d15112d64ce4
+ce0cf3acdeb6   ad45164b7548                                            "edge-runtime start …"    0               123kB     4 hours ago    Up 9 minutes                    slm-lineups-edge-4faa0108318f-edge
+9dee87813dbc   5f4ce744539b                                            "/bin/postgrest"          0               4.1kB     4 hours ago    Up 9 minutes                    slm-lineups-edge-4faa0108318f-rest
+f3729afe1a64   1736a63078f5                                            "auth"                    0               4.1kB     4 hours ago    Up 9 minutes                    slm-lineups-edge-4faa0108318f-auth
+8eec6378141e   266d3c257594                                            "docker-entrypoint.s…"    1               20.5kB    4 hours ago    Up 9 minutes                    slm-lineups-edge-4faa0108318f
+23af38989706   ad45164b7548                                            "edge-runtime start …"    0               123kB     4 hours ago    Up 9 minutes                    slm-lineups-edge-053110f16c32-edge
+abe0977bf3da   5f4ce744539b                                            "/bin/postgrest"          0               4.1kB     4 hours ago    Up 9 minutes                    slm-lineups-edge-053110f16c32-rest
+712db337fdc4   1736a63078f5                                            "auth"                    0               4.1kB     4 hours ago    Up 9 minutes                    slm-lineups-edge-053110f16c32-auth
+f3a3de46f96e   266d3c257594                                            "docker-entrypoint.s…"    1               20.5kB    4 hours ago    Up 9 minutes                    slm-lineups-edge-053110f16c32
+eefbdea9f975   ad45164b7548                                            "edge-runtime start …"    0               123kB     5 hours ago    Up 9 minutes                    slm-lineups-edge-54d5c6c50f4c-edge
+808b56585d47   5f4ce744539b                                            "/bin/postgrest"          0               4.1kB     5 hours ago    Up 9 minutes                    slm-lineups-edge-54d5c6c50f4c-rest
+479883d70255   1736a63078f5                                            "auth"                    0               4.1kB     5 hours ago    Up 9 minutes                    slm-lineups-edge-54d5c6c50f4c-auth
+cd61d9004306   266d3c257594                                            "docker-entrypoint.s…"    1               20.5kB    5 hours ago    Up 9 minutes                    slm-lineups-edge-54d5c6c50f4c
+69dbb606f9ee   ad45164b7548                                            "edge-runtime start …"    0               123kB     5 hours ago    Up 9 minutes                    slm-lineups-edge-4dce51171c45-edge
+6d6d2c7a3c9c   5f4ce744539b                                            "/bin/postgrest"          0               4.1kB     5 hours ago    Up 9 minutes                    slm-lineups-edge-4dce51171c45-rest
+b6f41278fa00   1736a63078f5                                            "auth"                    0               4.1kB     5 hours ago    Up 9 minutes                    slm-lineups-edge-4dce51171c45-auth
+006f019d8fab   266d3c257594                                            "docker-entrypoint.s…"    1               20.5kB    5 hours ago    Up 9 minutes                    slm-lineups-edge-4dce51171c45
+4630e2161c6c   ad45164b7548                                            "edge-runtime start …"    0               123kB     5 hours ago    Up 9 minutes                    slm-lineups-edge-012f70500ecd-edge
+5fcee4f830c0   5f4ce744539b                                            "/bin/postgrest"          0               4.1kB     5 hours ago    Up 9 minutes                    slm-lineups-edge-012f70500ecd-rest
+ca91826d8d16   1736a63078f5                                            "auth"                    0               4.1kB     5 hours ago    Up 9 minutes                    slm-lineups-edge-012f70500ecd-auth
+3724f74a2037   266d3c257594                                            "docker-entrypoint.s…"    1               20.5kB    5 hours ago    Up 9 minutes                    slm-lineups-edge-012f70500ecd
+2937bce7ff20   ad45164b7548                                            "edge-runtime start …"    0               123kB     5 hours ago    Up 9 minutes                    slm-lineups-edge-111541d3171b-edge
+b7624b0fbbdf   5f4ce744539b                                            "/bin/postgrest"          0               4.1kB     5 hours ago    Up 9 minutes                    slm-lineups-edge-111541d3171b-rest
+ce1ddde7ae77   1736a63078f5                                            "auth"                    0               4.1kB     5 hours ago    Up 9 minutes                    slm-lineups-edge-111541d3171b-auth
+ac0ff2f6b905   266d3c257594                                            "docker-entrypoint.s…"    1               20.5kB    5 hours ago    Up 9 minutes                    slm-lineups-edge-111541d3171b
+71aeeb084ad2   1736a63078f5                                            "auth"                    0               4.1kB     5 hours ago    Up 9 minutes                    slm-lineups-edge-099d77a219cf-auth
+a388d720cfb3   266d3c257594                                            "docker-entrypoint.s…"    1               20.5kB    5 hours ago    Up 9 minutes                    slm-lineups-edge-099d77a219cf
+2072fafa0d04   1736a63078f5                                            "auth"                    0               4.1kB     5 hours ago    Up 9 minutes                    slm-lineups-edge-39b2cf7c0cf2-auth
+927d26213f22   266d3c257594                                            "docker-entrypoint.s…"    1               20.5kB    5 hours ago    Up 9 minutes                    slm-lineups-edge-39b2cf7c0cf2
+7bda99c9b960   1736a63078f5                                            "auth"                    0               4.1kB     5 hours ago    Up 9 minutes                    slm-lineups-edge-946cc43f3921-auth
+1c1a6257cd79   266d3c257594                                            "docker-entrypoint.s…"    1               20.5kB    5 hours ago    Up 9 minutes                    slm-lineups-edge-946cc43f3921
+ae17fe6cd5d4   5f4ce744539b                                            "/bin/postgrest"          0               4.1kB     5 hours ago    Up 9 minutes                    slm-lineups-stage2a-53bd33b37e1e-rest
+c33736350511   postgres:17-alpine                                      "docker-entrypoint.s…"    1               20.5kB    5 hours ago    Up 10 minutes                   slm-lineups-stage2a-53bd33b37e1e
+e4dcc9a561bb   public.ecr.aws/supabase/edge-runtime:v1.77.4            "sh -c 'exec edge-ru…"    1               483kB     24 hours ago   Exited (255) 5 hours ago        supabase_edge_runtime_slm-main-stabilization
+2545cb55767e   public.ecr.aws/supabase/storage-api:v1.82.1             "docker-entrypoint.s…"    1               4.1kB     24 hours ago   Up 5 hours (healthy)            supabase_storage_slm-main-stabilization
+6eca2774312d   public.ecr.aws/supabase/postgrest:v16.4                 "/bin/postgrest"          0               4.1kB     24 hours ago   Up 5 hours                      supabase_rest_slm-main-stabilization
+7b3f1d706c32   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     24 hours ago   Up 5 hours (healthy)            supabase_auth_slm-main-stabilization
+03382f5f1d64   public.ecr.aws/supabase/kong:2.8.1                      "sh -c 'cat <<'EOF' …"    0               160kB     24 hours ago   Up 5 hours (healthy)            supabase_kong_slm-main-stabilization
+65c8f4a2ce37   public.ecr.aws/supabase/postgres:17.11.0.004            "sh -c '\ncat <<'EOF'…"   1               86kB      24 hours ago   Up 5 hours (healthy)            supabase_db_slm-main-stabilization
+1c99a361d753   public.ecr.aws/supabase/edge-runtime:v1.77.4            "sh -c 'exec edge-ru…"    1               483kB     24 hours ago   Exited (255) 5 hours ago        supabase_edge_runtime_slm-premium-behavior-review
+9a60601a02ff   public.ecr.aws/supabase/postgrest:v16.4                 "/bin/postgrest"          0               4.1kB     27 hours ago   Up 5 hours                      supabase_rest_slm-premium-behavior-review
+57f35254dd44   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     27 hours ago   Up 5 hours (healthy)            supabase_auth_slm-premium-behavior-review
+30a2f4e7d537   public.ecr.aws/supabase/kong:2.8.1                      "sh -c 'cat <<'EOF' …"    0               160kB     27 hours ago   Up 5 hours (healthy)            supabase_kong_slm-premium-behavior-review
+9a2f2fb68c98   public.ecr.aws/supabase/postgres:17.11.0.004            "sh -c '\ncat <<'EOF'…"   1               86kB      27 hours ago   Up 5 hours (healthy)            supabase_db_slm-premium-behavior-review
+c8c4cb41651d   public.ecr.aws/supabase/edge-runtime:v1.77.4            "sh -c 'exec edge-ru…"    1               483kB     28 hours ago   Exited (255) 5 hours ago        supabase_edge_runtime_slm-premium-real-finance
+fcb039d33443   postgres:17-alpine                                      "docker-entrypoint.s…"    1               20.5kB    29 hours ago   Up 10 minutes                   slm-finance-sql-d7a82b6d84bb
+c6bd50ee774e   postgres:17-alpine                                      "docker-entrypoint.s…"    1               20.5kB    29 hours ago   Up 10 minutes                   slm-finance-sql-c2360aa20b0a
+dd335d647e19   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     29 hours ago   Up 5 hours (healthy)            supabase_auth_slm-premium-real-finance
+dc0de8b0d537   public.ecr.aws/supabase/studio:2026.10.12-sha-3699278   "docker-entrypoint.s…"    1               53.2kB    29 hours ago   Up 5 hours (healthy)            supabase_studio_slm-premium-real-finance
+dad9f852c6d3   public.ecr.aws/supabase/postgres-meta:v0.100.0          "docker-entrypoint.s…"    0               4.1kB     29 hours ago   Up 5 hours (healthy)            supabase_pg_meta_slm-premium-real-finance
+5ce3bd70e9ce   public.ecr.aws/supabase/storage-api:v1.82.1             "docker-entrypoint.s…"    1               4.1kB     29 hours ago   Up 5 hours (healthy)            supabase_storage_slm-premium-real-finance
+c870fb878c87   public.ecr.aws/supabase/postgrest:v16.4                 "/bin/postgrest"          0               4.1kB     29 hours ago   Up 5 hours                      supabase_rest_slm-premium-real-finance
+faf5effaee93   public.ecr.aws/supabase/realtime:v2.143.4               "/usr/bin/tini -s -g…"    0               4.1kB     29 hours ago   Up 5 hours (healthy)            supabase_realtime_slm-premium-real-finance
+158860f1c7d6   public.ecr.aws/supabase/mailpit:v1.31.3                 "/mailpit"                0               975kB     29 hours ago   Up 5 hours (healthy)            supabase_inbucket_slm-premium-real-finance
+f2c82b61e83d   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     29 hours ago   Exited (0) 29 hours ago         supabase_auth_slm-premium-real-finance_baseline_be02445f
+fc5afaff16e0   public.ecr.aws/supabase/kong:2.8.1                      "sh -c 'cat <<'EOF' …"    0               160kB     29 hours ago   Up 5 hours (healthy)            supabase_kong_slm-premium-real-finance
+c78d47d72ae0   public.ecr.aws/supabase/vector:0.58.0-alpine            "sh -c 'mkdir -p /et…"    0               20.5kB    29 hours ago   Restarting (0) 30 seconds ago   supabase_vector_slm-premium-real-finance
+9437b9f69c63   public.ecr.aws/supabase/logflare:1.53.0                 "sh -c 'cat <<'EOF' …"    0               3.47MB    29 hours ago   Up 5 hours (healthy)            supabase_analytics_slm-premium-real-finance
+ad4bce84aea4   public.ecr.aws/supabase/postgres:17.11.0.004            "sh -c '\ncat <<'EOF'…"   1               86kB      29 hours ago   Up 5 hours (healthy)            supabase_db_slm-premium-real-finance
+5c654abe9a51   public.ecr.aws/supabase/edge-runtime:v1.77.4            "sh -c 'exec edge-ru…"    1               483kB     2 days ago     Exited (255) 29 hours ago       supabase_edge_runtime_slm-premium-real-events
+2d23048a29c2   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     2 days ago     Up 5 hours (healthy)            supabase_auth_slm-premium-real-events
+4d8379cf5a31   public.ecr.aws/supabase/studio:2026.10.12-sha-3699278   "docker-entrypoint.s…"    1               53.2kB    2 days ago     Up 5 hours (healthy)            supabase_studio_slm-premium-real-events
+42d8d3189ba0   public.ecr.aws/supabase/postgres-meta:v0.100.0          "docker-entrypoint.s…"    0               4.1kB     2 days ago     Up 5 hours (healthy)            supabase_pg_meta_slm-premium-real-events
+453d84cd1517   public.ecr.aws/supabase/storage-api:v1.82.1             "docker-entrypoint.s…"    1               4.1kB     2 days ago     Up 5 hours (healthy)            supabase_storage_slm-premium-real-events
+c745a374bff2   public.ecr.aws/supabase/postgrest:v16.4                 "/bin/postgrest"          0               4.1kB     2 days ago     Up 5 hours                      supabase_rest_slm-premium-real-events
+237a29197971   public.ecr.aws/supabase/realtime:v2.143.4               "/usr/bin/tini -s -g…"    0               4.1kB     2 days ago     Up 5 hours (healthy)            supabase_realtime_slm-premium-real-events
+f555e7b5339f   public.ecr.aws/supabase/mailpit:v1.31.3                 "/mailpit"                0               1.46MB    2 days ago     Up 5 hours (healthy)            supabase_inbucket_slm-premium-real-events
+aa54b3e93aa9   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     2 days ago     Exited (0) 2 days ago           supabase_auth_slm-premium-real-events_baseline_7ecc8bca
+f4eb733655a1   public.ecr.aws/supabase/kong:2.8.1                      "sh -c 'cat <<'EOF' …"    0               160kB     2 days ago     Up 5 hours (healthy)            supabase_kong_slm-premium-real-events
+799ee1d21e8c   public.ecr.aws/supabase/vector:0.58.0-alpine            "sh -c 'mkdir -p /et…"    0               20.5kB    2 days ago     Restarting (0) 32 seconds ago   supabase_vector_slm-premium-real-events
+15870e0b822b   public.ecr.aws/supabase/logflare:1.53.0                 "sh -c 'cat <<'EOF' …"    0               3.47MB    2 days ago     Up 5 hours (healthy)            supabase_analytics_slm-premium-real-events
+0229a1e58c92   public.ecr.aws/supabase/postgres:17.11.0.004            "sh -c '\ncat <<'EOF'…"   1               86kB      2 days ago     Up 5 hours (healthy)            supabase_db_slm-premium-real-events
+55c14d379abc   public.ecr.aws/supabase/edge-runtime:v1.77.4            "sh -c 'exec edge-ru…"    1               483kB     2 days ago     Exited (255) 29 hours ago       supabase_edge_runtime_slm-online-readiness
+415f050c11b5   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     2 days ago     Up 5 hours (healthy)            supabase_auth_slm-online-readiness
+9cb07d81c348   public.ecr.aws/supabase/storage-api:v1.82.1             "docker-entrypoint.s…"    1               4.1kB     2 days ago     Up 5 hours (healthy)            supabase_storage_slm-online-readiness
+3d21d9c550dc   public.ecr.aws/supabase/postgrest:v16.4                 "/bin/postgrest"          0               4.1kB     2 days ago     Up 5 hours                      supabase_rest_slm-online-readiness
+8173e700b420   public.ecr.aws/supabase/mailpit:v1.31.3                 "/mailpit"                0               3.29MB    2 days ago     Up 5 hours (healthy)            supabase_inbucket_slm-online-readiness
+59731a01319d   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     2 days ago     Exited (0) 2 days ago           supabase_auth_slm-online-readiness_before_baseline_8c41686a
+5f54e1c18606   public.ecr.aws/supabase/kong:2.8.1                      "sh -c 'cat <<'EOF' …"    0               160kB     2 days ago     Up 5 hours (healthy)            supabase_kong_slm-online-readiness
+ceb2543cd47d   public.ecr.aws/supabase/postgres:17.11.0.004            "sh -c '\ncat <<'EOF'…"   1               86kB      2 days ago     Up 5 hours (healthy)            supabase_db_slm-online-readiness
+c7ce735e69e0   public.ecr.aws/supabase/edge-runtime:v1.77.4            "sh -c 'exec edge-ru…"    1               483kB     2 days ago     Exited (255) 2 days ago         supabase_edge_runtime_slm-account-mail
+7ecd19d1b0f2   public.ecr.aws/supabase/edge-runtime:v1.77.4            "sh -c 'exec edge-ru…"    1               487kB     2 days ago     Exited (255) 2 days ago         supabase_edge_runtime_slm-email-regression
+8c86a402bc6c   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     2 days ago     Up 5 hours (healthy)            supabase_auth_slm-email-regression
+840bda6fce29   public.ecr.aws/supabase/storage-api:v1.82.1             "docker-entrypoint.s…"    1               4.1kB     2 days ago     Up 5 hours (healthy)            supabase_storage_slm-email-regression
+5ad545a395d8   public.ecr.aws/supabase/postgrest:v16.4                 "/bin/postgrest"          0               4.1kB     2 days ago     Up 5 hours                      supabase_rest_slm-email-regression
+8109943a951b   public.ecr.aws/supabase/mailpit:v1.31.3                 "/mailpit"                0               1.94MB    2 days ago     Up 5 hours (healthy)            supabase_inbucket_slm-email-regression
+42b62e3af7c3   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     2 days ago     Exited (0) 2 days ago           supabase_auth_slm-email-regression_before_baseline_71e114b4
+8b5b80fb8a7a   public.ecr.aws/supabase/kong:2.8.1                      "sh -c 'cat <<'EOF' …"    0               160kB     2 days ago     Up 5 hours (healthy)            supabase_kong_slm-email-regression
+0f0a2d646735   public.ecr.aws/supabase/postgres:17.11.0.004            "sh -c '\ncat <<'EOF'…"   1               86kB      2 days ago     Up 5 hours (healthy)            supabase_db_slm-email-regression
+860f3b52db23   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     2 days ago     Up 5 hours (healthy)            supabase_auth_slm-account-mail
+32fbff94fd7f   public.ecr.aws/supabase/storage-api:v1.82.1             "docker-entrypoint.s…"    1               4.1kB     2 days ago     Up 5 hours (healthy)            supabase_storage_slm-account-mail
+17bc8d9f4dbc   public.ecr.aws/supabase/postgrest:v16.4                 "/bin/postgrest"          0               4.1kB     2 days ago     Up 5 hours                      supabase_rest_slm-account-mail
+4912a52b5537   public.ecr.aws/supabase/mailpit:v1.31.3                 "/mailpit"                0               4.4MB     2 days ago     Up 5 hours (healthy)            supabase_inbucket_slm-account-mail
+07af3627e391   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     2 days ago     Exited (0) 2 days ago           supabase_auth_slm-account-mail_before_baseline_a075c18e
+c53563d27ffd   public.ecr.aws/supabase/kong:2.8.1                      "sh -c 'cat <<'EOF' …"    0               160kB     2 days ago     Up 5 hours (healthy)            supabase_kong_slm-account-mail
+489b4757f81f   public.ecr.aws/supabase/postgres:17.11.0.004            "sh -c '\ncat <<'EOF'…"   1               86kB      2 days ago     Up 5 hours (healthy)            supabase_db_slm-account-mail
+555991e81dc4   public.ecr.aws/supabase/edge-runtime:v1.77.4            "sh -c 'exec edge-ru…"    1               483kB     2 days ago     Exited (255) 2 days ago         supabase_edge_runtime_slm-account-final
+019c8ee3bf17   public.ecr.aws/supabase/edge-runtime:v1.77.4            "sh -c 'exec edge-ru…"    1               483kB     2 days ago     Exited (255) 2 days ago         supabase_edge_runtime_slm-account-candidate
+dcd57c435624   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     2 days ago     Up 5 hours (healthy)            supabase_auth_slm-account-final
+40927c7095d9   public.ecr.aws/supabase/storage-api:v1.82.1             "docker-entrypoint.s…"    1               4.1kB     2 days ago     Up 5 hours (healthy)            supabase_storage_slm-account-final
+aac38958d9da   public.ecr.aws/supabase/postgrest:v16.4                 "/bin/postgrest"          0               4.1kB     2 days ago     Up 5 hours                      supabase_rest_slm-account-final
+9d5926fda397   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     2 days ago     Exited (0) 2 days ago           supabase_auth_slm-account-final_before_baseline_134c079c
+3e7d8795b674   public.ecr.aws/supabase/kong:2.8.1                      "sh -c 'cat <<'EOF' …"    0               160kB     2 days ago     Up 5 hours (healthy)            supabase_kong_slm-account-final
+c3bd81552352   public.ecr.aws/supabase/postgres:17.11.0.004            "sh -c '\ncat <<'EOF'…"   1               86kB      2 days ago     Up 5 hours (healthy)            supabase_db_slm-account-final
+5d29db98a9fc   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     2 days ago     Up 5 hours (healthy)            supabase_auth_slm-account-candidate
+7e32b5b41801   public.ecr.aws/supabase/storage-api:v1.82.1             "docker-entrypoint.s…"    1               4.1kB     2 days ago     Up 5 hours (healthy)            supabase_storage_slm-account-candidate
+d4fb8ff77812   public.ecr.aws/supabase/postgrest:v16.4                 "/bin/postgrest"          0               4.1kB     2 days ago     Up 5 hours                      supabase_rest_slm-account-candidate
+f099b1d3fd1c   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     2 days ago     Exited (0) 2 days ago           supabase_auth_slm-account-candidate_before_baseline_e9b0b66e
+8d9626bfdde5   public.ecr.aws/supabase/kong:2.8.1                      "sh -c 'cat <<'EOF' …"    0               160kB     2 days ago     Up 5 hours (healthy)            supabase_kong_slm-account-candidate
+b4b00daf0769   public.ecr.aws/supabase/postgres:17.11.0.004            "sh -c '\ncat <<'EOF'…"   1               86kB      2 days ago     Up 5 hours (healthy)            supabase_db_slm-account-candidate
+6a08a4ee7bdb   public.ecr.aws/supabase/edge-runtime:v1.77.4            "sh -c 'exec edge-ru…"    1               479kB     3 days ago     Exited (15) 3 days ago          supabase_edge_runtime_slm-account-foundation
+725959a80d64   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     3 days ago     Up 5 hours (healthy)            supabase_auth_slm-account-foundation
+2bf72f79b0d5   public.ecr.aws/supabase/storage-api:v1.82.1             "docker-entrypoint.s…"    1               4.1kB     3 days ago     Up 5 hours (healthy)            supabase_storage_slm-account-foundation
+e76b92dcaa5d   public.ecr.aws/supabase/postgrest:v16.4                 "/bin/postgrest"          0               4.1kB     3 days ago     Up 5 hours                      supabase_rest_slm-account-foundation
+ae7fb274e77b   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     3 days ago     Exited (0) 3 days ago           supabase_auth_slm-account-foundation_before_baseline_a7599acc
+611bb1dca045   public.ecr.aws/supabase/kong:2.8.1                      "sh -c 'cat <<'EOF' …"    0               160kB     3 days ago     Up 5 hours (healthy)            supabase_kong_slm-account-foundation
+9a03d656a438   public.ecr.aws/supabase/postgres:17.11.0.004            "sh -c '\ncat <<'EOF'…"   1               90.1kB    3 days ago     Up 5 hours (healthy)            supabase_db_slm-account-foundation
+7fd15539523a   public.ecr.aws/supabase/edge-runtime:v1.77.4            "sh -c 'exec edge-ru…"    1               479kB     3 days ago     Exited (15) 3 days ago          supabase_edge_runtime_slm-pr16-review
+f99f152a15ac   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     3 days ago     Up 5 hours (healthy)            supabase_auth_slm-pr16-review
+fe992ab007d6   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     3 days ago     Exited (0) 3 days ago           supabase_auth_slm-pr16-review_before_email_99ca3497
+f4d9c81cbdbb   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     3 days ago     Up 10 minutes                   supabase_auth_slm-pr16-review_missing_metadata
+008ab1da5907   public.ecr.aws/supabase/storage-api:v1.82.1             "docker-entrypoint.s…"    1               4.1kB     3 days ago     Up 5 hours (healthy)            supabase_storage_slm-pr16-review
+01cbec0fa729   public.ecr.aws/supabase/postgrest:v16.4                 "/bin/postgrest"          0               4.1kB     3 days ago     Up 5 hours                      supabase_rest_slm-pr16-review
+0bf45fb29351   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     3 days ago     Exited (0) 3 days ago           supabase_auth_slm-pr16-review_original_config
+bb136d20ae3a   public.ecr.aws/supabase/kong:2.8.1                      "sh -c 'cat <<'EOF' …"    0               160kB     3 days ago     Up 5 hours (healthy)            supabase_kong_slm-pr16-review
+2db70cb6b862   public.ecr.aws/supabase/postgres:17.11.0.004            "sh -c '\ncat <<'EOF'…"   1               90.1kB    3 days ago     Up 5 hours (healthy)            supabase_db_slm-pr16-review
+bcce8df9694b   public.ecr.aws/supabase/edge-runtime:v1.77.4            "sh -c 'exec edge-ru…"    1               483kB     4 days ago     Exited (255) 3 days ago         supabase_edge_runtime_sunday-league-mates
+3fbbf6953cf8   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     10 days ago    Up 5 hours (healthy)            supabase_auth_sunday-league-mates
+159eab4b525a   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     10 days ago    Up 5 hours (healthy)            supabase_auth_sunday-league-mates_before_http_tests_previous
+0f2883be12f2   public.ecr.aws/supabase/studio:2026.10.12-sha-3699278   "docker-entrypoint.s…"    1               41kB      10 days ago    Up 5 hours (healthy)            supabase_studio_sunday-league-mates
+c157fdf124f3   public.ecr.aws/supabase/postgres-meta:v0.100.0          "docker-entrypoint.s…"    0               4.1kB     10 days ago    Up 5 hours (healthy)            supabase_pg_meta_sunday-league-mates
+0d34b0b3491b   public.ecr.aws/supabase/storage-api:v1.82.1             "docker-entrypoint.s…"    1               4.1kB     10 days ago    Up 5 hours (healthy)            supabase_storage_sunday-league-mates
+5fed6d266320   public.ecr.aws/supabase/postgrest:v16.4                 "/bin/postgrest"          0               4.1kB     10 days ago    Up 5 hours                      supabase_rest_sunday-league-mates
+c55735b46faa   public.ecr.aws/supabase/realtime:v2.143.4               "/usr/bin/tini -s -g…"    0               4.1kB     10 days ago    Up 5 hours (healthy)            supabase_realtime_sunday-league-mates
+6bfc5119d1ae   public.ecr.aws/supabase/mailpit:v1.31.3                 "/mailpit"                0               4.36MB    10 days ago    Up 5 hours (healthy)            supabase_inbucket_sunday-league-mates
+381f3dc37817   public.ecr.aws/supabase/gotrue:v2.197.0                 "auth"                    0               4.1kB     10 days ago    Up 5 hours (healthy)            supabase_auth_sunday-league-mates_before_http_tests
+f75655e3b055   public.ecr.aws/supabase/kong:2.8.1                      "sh -c 'cat <<'EOF' …"    0               160kB     10 days ago    Up 5 hours (healthy)            supabase_kong_sunday-league-mates
+013249e32dcd   public.ecr.aws/supabase/vector:0.58.0-alpine            "sh -c 'mkdir -p /et…"    0               20.5kB    10 days ago    Restarting (0) 32 seconds ago   supabase_vector_sunday-league-mates
+b3f625cd2ca3   public.ecr.aws/supabase/logflare:1.53.0                 "sh -c 'cat <<'EOF' …"    0               3.47MB    10 days ago    Up 5 hours (healthy)            supabase_analytics_sunday-league-mates
+901e25581ea4   public.ecr.aws/supabase/postgres:17.11.0.004            "sh -c '\ncat <<'EOF'…"   1               90.1kB    10 days ago    Up 5 hours (healthy)            supabase_db_sunday-league-mates
+
+Local Volumes space usage:
+
+VOLUME NAME                                                        LINKS     SIZE
+supabase_storage_slm-premium-real-events                           1         0B
+supabase_db_sunday-league-mates                                    1         140.5MB
+supabase_storage_slm-main-stabilization                            1         0B
+1e4f246df948ade1a9dd4a7eb92095f04a486fea69f0915132286c0606769c3c   1         45.95MB
+31c09ad0221f80745addbf6abfa015e13258e99334e7082559a963ea0fa9c565   1         46.01MB
+supabase_edge_runtime_slm-main-stabilization                       1         90.11kB
+2a5300b52cd8da547d60a997e48b98652fa131f024c5d217aafcfb7e8774841c   1         44.47MB
+supabase_db_slm-premium-real-events                                1         102MB
+supabase_edge_runtime_slm-premium-behavior-review                  1         90.11kB
+supabase_edge_runtime_slm-premium-real-events                      2         90.11kB
+supabase_storage_slm-account-candidate                             1         0B
+supabase_storage_slm-pr16-review                                   1         81.51kB
+c9b59fa8401da8d3ca815035785acee7dfb6131d2a0c2b47bb93f111ec5b002a   1         42.47MB
+a20e95e1fc3b5a86ef24c377cf757beff26c8e5f25bcabcc2b215c896f3cef43   1         42.47MB
+31fb523e8f3f3ae826b9cdbc1230d2fd94ab436339092710a6e8dfdb3f15343f   1         45.95MB
+0d9edcb948a32fddf3cc0f2025b75deb533a6e8b1486f44fdd1663af0d31cca4   0         43.44MB
+e0e0ab2999536c6a243fea5c326154d3b9af6984a19742053e9ee0930d27a5f5   0         43.4MB
+supabase_db_slm-premium-behavior-review                            1         73.13MB
+supabase_storage_slm-account-mail                                  1         0B
+8b138f2dde19bb80c22cc159ce630c65f46a16dc1b86c482e1ce7b1d4013a274   0         43.58MB
+supabase_edge_runtime_slm-account-mail                             1         2.064MB
+b9b7b42c47980c2b2ddbe8a55154494cfc6f5d915e558d168434b90c42d76cf1   1         44.48MB
+bbbf7690e5f2ff97accc9b744530abb0be864c885a662b597bd6a870ed164cc9   0         43.85MB
+supabase_edge_runtime_slm-account-candidate                        1         90.11kB
+b45da26d30ece64358f9e998415cf1883a04732e335a0a3e5468a56a87d2d1d2   1         44.47MB
+supabase_storage_slm-email-regression                              1         0B
+9c6c8613aa4fa66474b0a4cc8dc2e3ee6b63673d3f6d26f08ee4816a0ae0214c   1         42.47MB
+7831bcae028b7d68311bed95dfccf7d505c27ce2ff076bf0481e2c6e03f400bc   1         41.84MB
+supabase_db_slm-account-candidate                                  1         80.38MB
+supabase_edge_runtime_slm-account-foundation                       1         57.34kB
+supabase_edge_runtime_sunday-league-mates                          2         102.4kB
+342a916878385ddd9cfdc96ee15110fc969dd3d8b68a40635f4a5181ac8cce55   0         43.44MB
+cbb0e730ab802927920846fe5073c83064534175fd577577f1be9e5c844470e9   0         43.72MB
+supabase_db_slm-pr16-review                                        1         81.02MB
+d5165038cd684c0a2eaaa385a3d0d85e749809e3cfb8db592b7344da721d4fac   1         46.03MB
+b8ff1fc4b29f34739f1f4d2db87140779173aa709a3f8e392ed6e345c5d85adf   0         43.44MB
+supabase_storage_sunday-league-mates                               1         81.51kB
+9c9e9c4aed64c073feee26061d16848cb014cd7ea0c89eafc1fa65fbce18350f   1         45.41MB
+supabase_edge_runtime_slm-account-final                            1         90.11kB
+supabase_edge_runtime_slm-online-readiness                         1         2.064MB
+5c0b317538d5043b18e5941f1883246b1f8fb2e485873113b8693acf2ef8b5f1   1         46.05MB
+supabase_db_slm-account-foundation                                 1         80.22MB
+supabase_db_slm-email-regression                                   1         80.46MB
+supabase_storage_slm-online-readiness                              1         1.052kB
+supabase_storage_slm-premium-real-finance                          1         163kB
+supabase_edge_runtime_slm-premium-real-finance                     2         90.11kB
+505b3c4c724fa07cf206fcf4a37002581094bda5dd22ff34aa545d023c4a5f61   1         45.95MB
+ad5a299257987a7aa85326c70b75c1e92929190c8e4a5513967a9baf6124730a   1         46.01MB
+a6b81fad41e9c215c9385b92fa19f20999c5fb74ae518e2149456d8a0cb558a9   1         46.02MB
+1262a600e5c20b8adc883720b1f7ae0c6a3e8fe76b4af594e3f17033e0917f06   0         43.72MB
+713da1711a21e8fccab8ebdd97a74557bc5d011764dae642103ec726f8b0ce6b   0         43.58MB
+supabase_db_slm-main-stabilization                                 1         81.5MB
+supabase_storage_slm-account-foundation                            1         0B
+4190fa13d025c39c25c7e3c113ec0cd454d77fbc7c0872a5e7d5990fdac824a2   1         45.09MB
+supabase_db_slm-account-mail                                       1         80.66MB
+supabase_db_slm-online-readiness                                   1         98.29MB
+supabase_storage_slm-account-final                                 1         0B
+5614740dd926972884019f9a3a9c18cac1f3f5eb23a26230d517f0f6d72b0eff   1         46.01MB
+60d9b6657e30aa102a900fd87791c00cd2ee22e1a9469bc946a05f6e1869c1c1   1         45.96MB
+7a379f177a5bcb2bd8df7599bf8b6528a5d36b9ed4a85aa2138a0f3b55c1fb9a   0         43.35MB
+f031bc882f7f17d5c4132ed08edd630e47c9fb938ce6f3ad00cacd5e8c8ae0a6   0         43.35MB
+supabase_db_slm-account-final                                      1         80.4MB
+supabase_db_slm-premium-real-finance                               1         85.34MB
+supabase_edge_runtime_slm-email-regression                         1         90.11kB
+supabase_edge_runtime_slm-pr16-review                              1         57.34kB
+
+Build cache usage: 0B
+
+CACHE ID   CACHE TYPE   SIZE      CREATED   LAST USED   USAGE     SHARED

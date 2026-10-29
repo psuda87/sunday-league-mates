@@ -4,6 +4,10 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
+    "android:ui": "node scripts/android-studio-prepare.mjs ui",
+    "android:check": "node scripts/android-studio-state.mjs",
+    "android:live": "node scripts/android-studio-prepare.mjs live",
+    "android:studio": "powershell.exe -NoProfile -File scripts/android-studio.ps1",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",

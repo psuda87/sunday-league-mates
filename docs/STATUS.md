@@ -1,3 +1,14 @@
+# Android Studio — workflow gotowy; odbiór nowego APK niewykonany
+
+2026-10-29 22:16 Europe/Warsaw — `chore/android-studio-workflow` od dokładnego Stage 2B/58a9bab. Projekt: `I:\slm\sunday-league-mates\.worktrees\android-studio-workflow\app\android`. VS Code/Codex: kod w tym worktree; Android Studio: build i późniejszy Run właściciela. `npm run android:ui` (domyślne demo 3.18, bez sieci/Dockera), `android:live` (lokalny 64321), `android:check` (aktualność źródeł i native assets). PowerShell obsługuje Assemble/Open/CheckOnly bez instalacji. Ta sama aplikacja i istniejące UI; konfiguracje chronione, hashe, CI, SQL, Auth, finanse i składy bez zmian.
+
+PASS: otwarcie i import Gradle w Android Studio 2025.3.3; JBR 21.0.10 / Gradle 8.14.3 / SDK 36; web UI/LIVE, Capacitor, assembleDebug offline obu wariantów, inspekcja APK/CSP/endpointów; 335 Vitest/53 pliki, 37 policy, lint, TS, verify 41/55/10 i domyślny build. Check odrzuca zmienione źródła/assety. Finalnie przygotowane UI. POCO M2007J20CG/surya, Android 12, wykrywany przez ADB; **nowego APK nie instalowano/uruchamiano, brak fizycznego PASS**. WebView debug false i logging none zachowane; WebView DevTools pozostaje ograniczeniem. Dostępne Logcat i to samo demo w Chrome DevTools.
+
+Docker: **163→162 kontenery, 140 running bez zmian**. Usunięto tylko zatrzymany stateless REST fixture 20f425db10e2, bez mountów, zależności i zmian warstwy plikowej; zapisano pełny ID i dowody. Wszystkie 14 obrazów / 65 wolumenów / 15 sieci i bazy zachowane. 57 aktywnych fixtures i 11 wolumenów bez referencji wymagają decyzji; nie wyłączano Docker Desktop. Nie uruchamiano backendu ani migracji/Edge w istniejącym projekcie/Cloud. Niewykonane: Cypress, backend E2E, hostowane CI i nowy APK na POCO. 22 wcześniejsze worktree i sześć zastanych niezapisanych plików zachowane.
+
+Instrukcje: [ANDROID_STUDIO_WORKFLOW.md](ANDROID_STUDIO_WORKFLOW.md), [DOCKER_INVENTORY.md](DOCKER_INVENTORY.md), pełne metadane w docs/docker. Chronologia: `docs/ODPOWIEDZI_CODEX.txt`. **STOP po przygotowaniu i raporcie**; czekamy na decyzję przed instalacją, Run, nowym backendem lub dalszym cleanup. Bez merge PR27, deployu, poprawek produkcji i wyłączania komputera.
+
+---
 # Stage 2B — integracja edytora składów, gotowa do review
 
 2026-10-29 18:33 Europe/Warsaw — zwykły push nowej gałęzi z 7 zrzutami potwierdzony. **Draft PR [#27](https://github.com/psuda87/sunday-league-mates/pull/27) utworzony**, base feat/premium-lineups-stage2a/3b00ec2, przy utworzeniu head 290996da4b0e9f1bf02e6e4f6945d388fca3f647, draft/open, bez merge. Końcowy Git-doc osobno; runtime/testy bez dalszych zmian.
