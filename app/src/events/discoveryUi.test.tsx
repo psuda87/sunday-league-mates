@@ -54,6 +54,15 @@ it('uses server has_more/next_offset above 100 and never filters that page local
  await act(()=>result.current.refresh(result.current.nextOffset!));expect(result.current.events[0].id).toBe('last');expect(result.current.offset).toBe(100);expect(result.current.hasMore).toBe(false);
  act(()=>result.current.selectGroup('groups'));await waitFor(()=>expect(result.current.offset).toBe(0));
 });
+it('does not retain the own-participation tab label after choosing a different server scope',async()=>{
+ const s=setup(),{result}=renderHook(()=>usePremiumEvents(s.manager,'owner'));
+ await waitFor(()=>expect(result.current.discoveryEnabled).toBe(true));
+ act(()=>result.current.changeFilter('mine'));await waitFor(()=>expect(result.current.loading).toBe(false));
+ expect(result.current.activeGroup).toBe('mine');
+ act(()=>result.current.selectGroup('public'));await waitFor(()=>expect(result.current.loading).toBe(false));
+ expect(result.current.listFilter).toBe('upcoming');expect(result.current.activeGroup).toBe('public');
+ expect(s.call).toHaveBeenCalledWith('matches_list',expect.objectContaining({scope:'public',period:'upcoming',offset:0}));
+});
 it('fails closed on an old backend for new scopes and retains retry controls',async()=>{
  const s=setup(async()=>({events:[],server_now:now})),{result}=renderHook(()=>usePremiumEvents(s.manager,'owner'));
  await waitFor(()=>expect(result.current.loading).toBe(false));expect(result.current.discoveryEnabled).toBe(false);
