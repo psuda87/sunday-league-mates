@@ -6,7 +6,7 @@
 
 Faktyczne PASS:34realSQL/ACL/RLS na NOWEJnetworknonefixture (Auth/Storage schematy testowe,nieGoTrue);345Vitest/54pliki, w tym10EdgeMock;TS/strictEdge/lint;4buildyLIVE/Premiumfinance/Androidweb/demo+izolacja16;55visualsource. **FAIL/BLOCK:** verify_consolidation42≠41; pełny runtime Unexpected migration/model activation; policy0/37PASS przez preemptujący kontrakt; Stage3Bverify_sources odrzuca handler. Guardów/workflow/pinów/approvalJSON nie zmieniono. Nie deklarujemy gotowości do merge ani hostowanegoPASS.
 
-Dwie nowe SQLfixture zatrzymane/zachowane, żadnych migracji istniejących baz/Cloud/deployu/telefonu/merge. NOT RUN: noweUI/Chromium/POCO/realGoTrueEdgeHTTP/hostowaneCI. Przed integracją wymagane zatwierdzenie minimalnegoUI i osobny review rozszerzenia kontraktu backendu41→42/handlera oraz snapshotuCI. Publikacja iDraftPR do bazyStage3B do zapisania w dzienniku po próbie.
+Dwie nowe SQLfixture zatrzymane/zachowane, żadnych migracji istniejących baz/Cloud/deployu/telefonu/merge. NOT RUN: noweUI/Chromium/POCO/realGoTrueEdgeHTTP/hostowaneCI. Przed integracją wymagane zatwierdzenie minimalnegoUI i osobny review rozszerzenia kontraktu backendu41→42/handlera oraz snapshotuCI. Commit backendu/projektuUI `907336d839d742e1420eb68d8c69b202948037de` wypchnięty. POST DraftPR do bazyStage3B: **Forbidden**, PR nie powstał. [Porównanie](https://github.com/psuda87/sunday-league-mates/compare/chore/slm-v1-integration-ci-stage3b...feat/public-match-discovery?expand=1). Publikacja potwierdzona osobnym commitem docs.
 
 ---
 

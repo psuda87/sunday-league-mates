@@ -187,3 +187,13 @@ Dopiero potem podłączenie UI i rzeczywisty lokalny HTTP/UI odbiór na zgodnym,
 osobno uzgodnionym backendzie. Deploy/migracje istniejących baz/Cloud/telefon
 nie zostały wykonane. Wynik publikacji i prób DraftPR zapisuje dziennik
 `docs/ODPOWIEDZI_CODEX.txt`; bazą zależnego PR jest gałąź Stage3B.
+
+## Publikacja
+
+Commit implementacji backendu i projektu UI: `907336d839d742e1420eb68d8c69b202948037de`. Gałąź wypchnięta
+zwykłym pushem. Próba utworzenia zależnego Draft PR do
+`chore/slm-v1-integration-ci-stage3b` zakończyła się **Forbidden**; PR nie powstał.
+[Porównanie / ręczne utworzenie Draft PR](https://github.com/psuda87/sunday-league-mates/compare/chore/slm-v1-integration-ci-stage3b...feat/public-match-discovery?expand=1). Nie zmieniono baz ani statusów
+istniejących PR. Nie zlecono Actions i nie ma potwierdzonego hostowanego PASS;
+obecne niezmienione source guardy blokują ten backendowy delta do review.
+Końcowe potwierdzenie publikacji zapisano osobnym commitem dokumentacyjnym.
