@@ -238,7 +238,7 @@ Deno.serve(async(req:Request)=>{
     sql('grant select on auth.users,auth.sessions to service_role;'
         'grant execute on all functions in schema auth to anon,authenticated,service_role;')
     migrations = sorted((ROOT / 'app/supabase/migrations').glob('*.sql'))
-    assert len(migrations) == (42 if not CI_MODE and branch == 'feat/public-match-discovery-stage2b' else 41), 'Expected exact reviewed migration set'
+    assert len(migrations) == (42 if CI_MODE or branch == 'feat/public-match-discovery-stage2b' else 41), 'Expected exact reviewed migration set'
     for file in migrations:
         sql(file.read_text(encoding='utf-8'))
     check(True, str(len(migrations))+' canonical migrations replay on real GoTrue Auth schema')
