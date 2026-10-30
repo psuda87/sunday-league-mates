@@ -1,3 +1,14 @@
+# SLM1.0 — zintegrowany kandydat do testów
+
+2026-10-30 20:25 Europe/Warsaw — `feat/slm-v1-release-candidate` od dokładnego Stage2C/e246c514af0fbca79dee892d9aa0e31b937a83c3. Cały zatwierdzony stos już w historii: main134c52b→39ef2e3→Stage1/fix7ad5c75→lineups2A/2B→CI3A/3B→discovery→audit→2B→2C. App identyczny z2C, bez merge/rebase/squash i bez Auth18 (nie przodek,9 migracji nieobecnych). Zachowane piny24a59e1/ae2fd95/d7b36ee i osobnycb63962;55 plików/manifest/workflow bez zmian.
+
+PASS tej sesji:361 Vitest/55 plików,lint,TypeScript/strictEdge,45policy,verify42/55/10,6buildów web,demo isolation16,Capacitor/Gradleoffline i inspekcja APK. Linux26+pełny sourcegate+10odmów, hosted NOT RUN do osobnego odczytu po publikacji. Nowa SQL referencja42 i syntetyczne dane7→42 PASS,47tabelRLS/ACL/legacy mapping i zachowanie danych;nieGoTrue ani kopia realnegoCloud. APK debug ca6de17a63b6de01f461b49bde95c8b2403edc6c809115b3a369cf585f70e1fc;local64321,loggingnone/WebViewdebugfalse,bez instalacji. EmulatorAVD/WHPXdostępny;LIVE/RunNOTRUN, wymaga pełnego backendu42.
+
+Odczyt Cloud hjtcyybkxebvdropchac:tylko7/42 migracji,13tabel,accountsv6,brakbucketów i push-worker. Badane definicje/kolumny/polityki7 zgodne z referencją,ale3historyczneSQLmająinnehashe;wymaganypełnydiff i restorebackupu.35migracjipending. Obecnelegacydane istnieją,jedenadminspełniapreflight;nieodczytywanotożsamości/sekretów. Cloud pełnegoRC BLOCK. DomyślnyLIVE nadalHome,pełnyPremiumStage3jawnylokalny64321;produkt1.0 wymaga decyzjioodroczonychsignup/statystykach/ocenach/algorytmie/push iHTTPS. Bez aktywacjiAuth18 lubzmianUI/finansów/składów.
+
+Raport:docs/SLM_V1_RELEASE_CANDI2026-10-30 20:25.md;planwdrożenia/backup/diff/rollbackbezwykonania:docs/SUPABASE_RC_DEPLOYMENT_PLAN.md;dokładneAndroidStudio:docs/ANDROID_STUDIO_RC.md;dowodywdocs/review/rc-*.json. Sześć zastanychusługbez zmian,nowa referencjazatrzymana/zachowana. Root6zmianwłaścicielazachowano. BezCloudwrites/migracjiistniejącychbaz/POCO/płatnychusług/mainmerge. Następne:reviewRC+zakres1.0/HTTPS, osobnybackuprestore i próba35migracji, nowybackend42+odbióremulatora. Chronologia:docs/ODPOWIEDZI_CODEX.txt.
+
+---
 # Public Match Discovery — Etap2C
 
 Publikacja: [Draft PR #29](https://github.com/psuda87/sunday-league-mates/pull/29) do Stage2B/fd4fccd, open/draft/clean, bez merge. Raport3041da0 wypchnięty; GitHub API:0 workflow runs dla tego SHA, hosted NOT RUN. PR28 nadal Draft. Końcowe potwierdzenie publikacji osobnym commitem docs.

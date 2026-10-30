@@ -1,0 +1,25 @@
+{
+  "project": "hjtcyybkxebvdropchac",
+  "cloud_accounts_version": 6,
+  "source_files": [
+    {
+      "file": "deno.json",
+      "cloud_sha256_lf": "a7506b680cdc1eb81864d01d961b2eb49d7f9c88bed2a8ec8492c87843ff396c",
+      "candidate_sha256_lf": "a7506b680cdc1eb81864d01d961b2eb49d7f9c88bed2a8ec8492c87843ff396c",
+      "identical": true
+    },
+    {
+      "file": "handler.ts",
+      "cloud_sha256_lf": "02c8f2c7f7366792dd2fe34737497155267d33c6ca23c31a901b6e4f25844836",
+      "candidate_sha256_lf": "36aae4dc733242458619fee14b72c88421f9694add8968efd0ac1553f43d6502",
+      "identical": false
+    },
+    {
+      "file": "index.ts",
+      "cloud_sha256_lf": "e51c388c4d686f9d17dd2080d73932b0b87e154225122b05d5bd31b95a945484",
+      "candidate_sha256_lf": "b29adcef44c6787dacc42efecb022e680cdfe027e5df6f6177362d8f5f1b0817",
+      "identical": false
+    }
+  ],
+  "push_worker_deployed": false
+}
