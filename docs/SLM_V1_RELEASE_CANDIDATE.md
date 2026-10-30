@@ -72,3 +72,9 @@ Wymagane następne kroki są konkretne:
 3. Dla odbioru emulatora przygotować nowy zgodny pełny backend42 (lub po osobnej zgodzie zweryfikowany Cloud i klient HTTPS), wykonać pełny login→grupy→mecze→goście→składy→discovery→finanse→logout i opcjonalny rzeczywisty hosted CI we właściwym, zatwierdzonym kontekście. POCO pozostaje osobnym etapem.
 
 W repo zapisano wyłącznie raporty, metadane bez PII, manifest42 i odtwarzalny test nowej referencji. Prywatne źródła odczytanego Edge są tylko w ignorowanym cache, nie zawierają eksportu sekretów; bundle Git i APK również nie są publikowane. Sześć zastanych usług SLM pozostawiono; główne worktree z sześcioma zmianami właściciela zachowane. Chronologia: `docs/ODPOWIEDZI_CODEX.txt`.
+
+## Publikacja i faktyczny CI
+
+Raport/testy referencyjne opublikowano w `01538e35e24d241f99f0840ca355da11abd62e72`. Utworzono [Draft PR #30](https://github.com/psuda87/sunday-league-mates/pull/30) do zweryfikowanego main134c52b; API potwierdza open/draft, merged=false, mergeable=true. Nowa gałąź zachowuje41 commitów całego stosu względem main i pełne wymagane ancestry; nie jest squash integracji. PR27/28/29 pozostają open/draft z niezmienionymi HEAD i bazami.
+
+Dla01538e3 GitHub API zwróciło dwa workflowy z pull_request: frontend/run41115653939 i isolated integration/run41115653617, oba completed/**skipped**. Oznacza to **hosted testy NOT RUN**, a nie PASS. Nie uruchamiano workflow_dispatch i nie zmieniano zmiennych opt-in ani workflow. Kolejny commit jedynie dopisuje potwierdzenie publikacji. [Porównanie całego stosu](https://github.com/psuda87/sunday-league-mates/compare/main...feat/slm-v1-release-candidate).

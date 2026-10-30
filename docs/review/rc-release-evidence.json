@@ -374,7 +374,7 @@
   "apk_sha256": "ca6de17a63b6de01f461b49bde95c8b2403edc6c809115b3a369cf585f70e1fc",
   "apk_endpoint": "http://127.0.0.1:64321/functions/v1/accounts",
   "apk_installed": false,
-  "hosted_github": "NOT RUN",
+  "hosted_github": "SKIPPED; tests NOT RUN",
   "apk_connect_src": "connect-src 'self' http://127.0.0.1:64321",
   "reviewed_pins": {
     "backend": "24a59e104bfe80b4d2f41cbd0ad02b58fc546040",
@@ -393,5 +393,26 @@
       "app/src/events/usePremiumEvents.ts": "56aff5a40e403c187bdd4e9f4c3ebbf6312b2462f7be0354a4d2895d7f468c26",
       "app/src/events/premiumContracts.ts": "2b05306709e6d43aa7e3e03025f866b61ad758218c3f8011ee9cf7a0ed3d1e59"
     }
+  },
+  "publication": {
+    "report_commit": "01538e35e24d241f99f0840ca355da11abd62e72",
+    "draft_pr": 30,
+    "base": "main",
+    "base_sha": "134c52b1aee0d0804cc0cf71f151f95040e7a38f",
+    "other_draft_prs_unchanged": [
+      27,
+      28,
+      29
+    ],
+    "hosted_runs": [
+      {
+        "id": 41115653939,
+        "conclusion": "skipped"
+      },
+      {
+        "id": 41115653617,
+        "conclusion": "skipped"
+      }
+    ]
   }
 }

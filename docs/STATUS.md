@@ -1,5 +1,7 @@
 # SLM1.0 — zintegrowany kandydat do testów
 
+Publikacja: [Draft PR #30](https://github.com/psuda87/sunday-league-mates/pull/30) do zweryfikowanego main134c52b, open/draft/mergeable, bez merge. Raport01538e3 wypchnięty. Dwa workflowy GitHub dla tego SHA:SKIPPED, więc hosted testy NOT RUN. PR27/28/29 nadal open/draft. Końcowy commit tylko potwierdza publikację.
+
 2026-10-30 20:25 Europe/Warsaw — `feat/slm-v1-release-candidate` od dokładnego Stage2C/e246c514af0fbca79dee892d9aa0e31b937a83c3. Cały zatwierdzony stos już w historii: main134c52b→39ef2e3→Stage1/fix7ad5c75→lineups2A/2B→CI3A/3B→discovery→audit→2B→2C. App identyczny z2C, bez merge/rebase/squash i bez Auth18 (nie przodek,9 migracji nieobecnych). Zachowane piny24a59e1/ae2fd95/d7b36ee i osobnycb63962;55 plików/manifest/workflow bez zmian.
 
 PASS tej sesji:361 Vitest/55 plików,lint,TypeScript/strictEdge,45policy,verify42/55/10,6buildów web,demo isolation16,Capacitor/Gradleoffline i inspekcja APK. Linux26+pełny sourcegate+10odmów, hosted NOT RUN do osobnego odczytu po publikacji. Nowa SQL referencja42 i syntetyczne dane7→42 PASS,47tabelRLS/ACL/legacy mapping i zachowanie danych;nieGoTrue ani kopia realnegoCloud. APK debug ca6de17a63b6de01f461b49bde95c8b2403edc6c809115b3a369cf585f70e1fc;local64321,loggingnone/WebViewdebugfalse,bez instalacji. EmulatorAVD/WHPXdostępny;LIVE/RunNOTRUN, wymaga pełnego backendu42.
