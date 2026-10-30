@@ -177,3 +177,10 @@ tylko po jego zatwierdzeniu. Nie aktualizowano wzorca Premium3.18.
 Supabase Cloud, istniejące bazy, Auth serwerowy, finanse, telefon i środowiska
 produkcyjne pozostały nietknięte. Brak merge/deploy/reset/db push. Commit/push
 niniejszego audytu nie jest akceptacją kontraktów. SHA publikacji dopisany poniżej.
+
+## Publikacja
+
+Commit audytu/testów/propozycji: `a62e211c32e7a947abc6b1503186da0890f39c2c`. Zwykły push nowej gałęzi
+potwierdzony przez `git ls-remote`. [Diff audytu](https://github.com/psuda87/sunday-league-mates/compare/feat/public-match-discovery...audit/public-match-discovery-backend?expand=1).
+Nie zlecono workflow ani PR/merge/deployu. Końcowy zapis potwierdzenia publikacji
+stanowi osobny commit dokumentacyjny; nie zmienia wyników ani źródeł.
