@@ -1,3 +1,10 @@
+# Najnowszy RC uruchomiony w emulatorze
+
+2026-10-30 21:16 Europe/Warsaw — Android Studio otwarte z `.worktrees/slm-v1-release-candidate/app/android`; istniejący AVD Medium_Phone_API_36.1 uruchomiony z widocznym oknem, bez wipe danych. APK RC SHA256 ca6de17a63b6de01f461b49bde95c8b2403edc6c809115b3a369cf585f70e1fc zainstalowany przez install -r wyłącznie na emulator-5554 (ro.kernel.qemu=1), MainActivity uruchomiona i na pierwszym planie. Potwierdzono wizualnie ekran Mecze z fikcyjnymi lokalnymi danymi i odtworzoną sesją.
+
+Przywrócono poprzednią mapę ADB tego emulatora64321→host55321. To istniejący backend41, użyty do podglądu podstawowych funkcji; nie deklarujemy pełnego discovery42 ani odbioru LIVE całego RC. Nie migrowano bazy, nie zmieniano Cloud ani fizycznego POCO. Kod/piny bez zmian. Zrzut:docs/ui/rc-launch/emulator-matches.png. Chronologia:docs/ODPOWIEDZI_CODEX.txt.
+
+---
 # SLM1.0 — zintegrowany kandydat do testów
 
 Publikacja: [Draft PR #30](https://github.com/psuda87/sunday-league-mates/pull/30) do zweryfikowanego main134c52b, open/draft/mergeable, bez merge. Raport01538e3 wypchnięty. Dwa workflowy GitHub dla tego SHA:SKIPPED, więc hosted testy NOT RUN. PR27/28/29 nadal open/draft. Końcowy commit tylko potwierdza publikację.

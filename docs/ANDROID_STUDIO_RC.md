@@ -1,5 +1,7 @@
 # Android Studio — kandydat SLM1.0
 
+Aktualizacja po przygotowaniu RC: na polecenie właściciela uruchomiono widoczny AVD Medium_Phone_API_36.1, zainstalowano najnowszy debug APK wyłącznie na emulatorze i otwarto MainActivity. Android Studio i emulator pozostają otwarte; potwierdzono ekran Mecze i odtworzoną sesję. Przywrócono wcześniejszą mapę64321→55321 do istniejącego backendu41, więc jest to podgląd podstawowych funkcji, bez pełnego discovery42. [Zrzut](ui/rc-launch/emulator-matches.png). Nie zmieniano Cloud, baz lub fizycznego POCO. Poniższe NOT RUN opisuje wcześniejszy etap przygotowania RC; pełny odbiór LIVE nadal wymaga backendu42.
+
 30.10.2026. Projekt: `I:\slm\sunday-league-mates\.worktrees\slm-v1-release-candidate\app\android`. Branch `feat/slm-v1-release-candidate`, kod aplikacji dokładnie Stage2C/e246c51. Pakiet `pl.psuda87.slm`, nazwa Sunday League Mates.
 
 **PASS:** build web/TypeScript, Capacitor sync, Gradle `assembleDebug --offline` na istniejącym JBR21/SDK36. Sprawdzono ZIP APK: właściwy wariant, lokalny endpoint, obecne discovery, brak Cloud endpointu accounts, logging none, WebView debug false. Dostępne AVD: Medium_Phone_API_36.1, Pixel_8_Pro, Small_Phone; WHPX działa. Nie instalowano ani nie uruchamiano APK w tym zadaniu; nie sprawdzono LIVE na emulatorze ani fizycznym POCO. Nie oznacza to testu Android12.
