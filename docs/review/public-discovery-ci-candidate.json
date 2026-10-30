@@ -1,0 +1,26 @@
+{
+  "status": "INACTIVE_OWNER_REVIEW_REQUIRED",
+  "stage3b_implementation": "6d96391298bbe18c582dc5c6ffda74c7045cfba3",
+  "discovery_implementation": "43f69a62c85dd354695f6fcb4531c85fb03651cf",
+  "exact_overlay": {
+    "app/scripts/discovery_local.py": "638dd2dbdc98020ef4c78e5a5759580c0f438051ceb6e60ffc1f60efb734ec62",
+    "app/scripts/premium-route-policy.mjs": "c392a66bdeb9fd3476c62a5835eca23955a892de8bb0a6ed9c2e1e4211744025",
+    "app/scripts/test-discovery-ui-browser.mjs": "489ae8cee69446bfb9ff6d4ac1379a2a98ddcf7dca34cf40e7d1531f376ffb85",
+    "app/scripts/test-discovery-ui-local.py": "0c5306b91019daaaa6274b9c4da9a00ddf8f1cf81a8213be23e0211b260b4851",
+    "app/scripts/test-lineups-edge-local.py": "90092f3cbc24c2f4eb5d2a5cd9cefd38d0350f5f3d88f12bdabf0974f0e2a9b1",
+    "app/scripts/test-lineups-local.py": "6d0538b4e9ce92d01053d1c3ef4df2972a48922ce7cdc891f6d0d7c41c5098d8",
+    "app/scripts/test-public-discovery-local.py": "e1ac97bbc3d8746d1328be4de53839fcbc243211017f37800e169dd3750a535c",
+    "app/scripts/test_discovery_audit_preflight.py": "902deb4b1e5d2bfc3f82b57271ab5818c3192ce27485958a23167f30b118c57e",
+    "app/scripts/verify-consolidation.mjs": "e8f07f164c37edaffba6a3e5ac59c324a666fbd4dc5d9925a1a66bd313392bb8",
+    "app/scripts/verify-premium-policy-cases.mjs": "2dcb6ee41260ee7101d14458a1814259b2817274b31a333ef95cf1c7616ae27a",
+    "app/src/events/PremiumEvents.tsx": "187c77a9a03cb1b96c7437179d7c4d4a934ed84404a22691986805edbeda026f",
+    "app/src/events/discoveryUi.test.tsx": "94198190215f72f41ed8f190dfc421ed3c6f181c4ac70e2c539f56403f7fb63d",
+    "app/src/events/premiumContracts.ts": "2b05306709e6d43aa7e3e03025f866b61ad758218c3f8011ee9cf7a0ed3d1e59",
+    "app/src/events/usePremiumEvents.ts": "56aff5a40e403c187bdd4e9f4c3ebbf6312b2462f7be0354a4d2895d7f468c26",
+    "app/supabase/functions/accounts/discovery.test.ts": "4509b9f3ed1cfaa960b5046e7dd1a6d564cb9c42b638282b5d076aaea41260b0",
+    "app/supabase/functions/accounts/handler.ts": "36aae4dc733242458619fee14b72c88421f9694add8968efd0ac1553f43d6502",
+    "app/supabase/migrations/20261030090000_public_match_discovery.sql": "85e51f5e5bd8ff3a60b588a53ce397921a36439f1d5aa9859913dc179e1dc669",
+    "app/supabase/tests/public_match_discovery.sql": "f08d5fc33f5e624b725458cbacd875c7fdded6bb8debf6dbfe24afd5b2f9fe15"
+  },
+  "activation": "Apply proposed patch, commit reviewed CI code, then separately repin ONLY implementation in lineups-ci-approval.json to that future commit. No Actions dispatch or repository-variable change."
+}

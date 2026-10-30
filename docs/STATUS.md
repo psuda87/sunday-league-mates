@@ -1,3 +1,14 @@
+# Public Match Discovery — Etap 2B
+
+2026-10-30 19:26 Europe/Warsaw — `feat/public-match-discovery-stage2b` od aktualnego audytu `ddd3a3e` (zawieraa62e211). Kod/testy/przypięcia `43f69a62c85dd354695f6fcb4531c85fb03651cf`. PASS funkcjonalny i bezpieczeństwa; WARN ograniczeń; BLOCK aktywacji CI do osobnego review. Premium: zakresy all/groups/public, query tylko Publiczne, debounce300ms, generacje odpowiedzi, reset strony, marker1 i has_more/next_offset, stary backend bez nowych opcji. Bez lokalnego filtrowania stron wersji1. Zachowano kartę/style/55 plików/manifest, Auth, finanse i składy.
+
+Aktywne piny wymagające końcowej akceptacji: backend42+handler dokładnie24a59e1, trzy runtime UI dokładnieae2fd95;41 wcześniejszych migracji i inne wyjątki bez zmian. Osobna NIEAKTYWNA propozycja CI przypina dokładnie18 źródeł do43f69a6, PASS32; aktywne CI/approval/workflow nietknięte, Actions nie uruchamiano.
+
+Faktycznie lokalnie PASS:361 Vitest/55 plików, TS/strict Edge/lint,45 policy, verify42/55/10;52 discoverySQL/RLS +50 lineupsSQL/RLS/PostgREST/regresji;11 realGoTrue/Edge kontroli do restartu +8 HTTP discovery i końcowy SQL braku członkostwa;14 istniejących browserlineups +14 discovery;9 localpreflight. Wszystkie6 buildów web, Capacitor sync i natywny Gradle assembleDebug offline PASS. Testy launchCI:20/23 PASS,3 Windows env błędy (CRLF w dwóch temp repo, brak symlink privilege); nie osłabiono asercji. CI hostowane/Cypress/fizyczny Android/instalacja APK:NOT RUN. Końcowy stary runner GoTrue nie doszedł do dwóch asercji leave/revoke po wcześniejszym błędzie nowego callbacka; nie deklarujemy13PASS.
+
+Testy tylko w nowych42-migracyjnych fixtures tego zadania, zatrzymane/zachowane. Nie używano ani nie migrowano bazy telefonu/Cloud; brak merge/deploy/resetów, ustawiania fikcyjnego CI i płatnych usług. Sześć zmian właściciela w root zachowano. Raport i dokładne diffy:docs/PUBLIC_MATCH_DISCOVERY_STAGE2B.md,docs/review. Następny krok:review DraftPR do audit/public-match-discovery-backend oraz osobna decyzja o przypięciach/CI. Zatrzymać się po etapie. Chronologia:docs/ODPOWIEDZI_CODEX.txt.
+
+---
 # Public Match Discovery — audyt backendu Etap 2A
 
 2026-10-30 — `audit/public-match-discovery-backend`, baza `24a59e104bfe80b4d2f41cbd0ad02b58fc546040`.
