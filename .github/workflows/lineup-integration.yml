@@ -32,8 +32,11 @@ jobs:
     if: >-
       github.repository == 'psuda87/sunday-league-mates' &&
       vars.SLM_FREE_CI_ENABLED == 'true' && vars.SLM_INTEGRATION_CI_ENABLED == 'true' &&
-      (github.event_name == 'pull_request' ||
-      (inputs.confirm_free_allowance == true && inputs.confirm_fixture_migrations == true))
+      ((github.event_name == 'pull_request' && github.base_ref == 'main' &&
+      github.event.pull_request.head.repo.full_name == github.repository) ||
+      (github.event_name == 'workflow_dispatch' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/chore/slm-v1-integration-ci-stage3b') &&
+      inputs.confirm_free_allowance == true && inputs.confirm_fixture_migrations == true))
     strategy:
       fail-fast: false
       matrix:

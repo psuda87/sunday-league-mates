@@ -266,6 +266,12 @@ class SourceTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             self.verify()
 
+    def test_reviewed_runner_update_can_repin_after_prior_pointer_exists(self):
+        self.write(self.root, 'app/scripts/test-lineups-edge-local.py', 'new reviewed launch wrapper')
+        new = self.commit(self.root, 'reviewed launch update retains an old pointer in history')
+        self.write(self.root, ci.APPROVAL, json.dumps({'base': self.base, 'implementation': new}))
+        self.assertEqual(self.verify(), new)
+
 
 if __name__ == '__main__':
     unittest.main()

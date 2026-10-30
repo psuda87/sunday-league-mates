@@ -112,6 +112,10 @@ def verify_sources(root=ROOT, base=BASE):
         require(subprocess.run(['git', '-C', str(root), 'merge-base', '--is-ancestor', ref, 'HEAD'],
                                capture_output=True).returncode == 0, 'Approved history missing')
     baseline, approved = archive(root, base), archive(root, implementation)
+    # The pointer is metadata, not executable input. A later reviewed launch
+    # implementation may already contain the prior pointer; never compare a
+    # pointer to itself or require a self-referential commit SHA.
+    approved.pop(APPROVAL, None)
     require(set(approved) == set(baseline) | ADDED, 'Implementation app file set changed')
     for name, data in baseline.items():
         if name not in CHANGED:
