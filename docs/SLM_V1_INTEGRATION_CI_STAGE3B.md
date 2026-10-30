@@ -48,7 +48,7 @@ pobieraniem obrazów. Nie podmienia nazwy gałęzi, GITHUB_REF ani GITHUB_SHA.
    przez .gitignore), nieśledzone wejścia i drift workflow są odrzucane.
 5. Tylko trzy wymienione runnery oraz dwa nowe pliki Python mogą różnić się od
    bazy3A; ich całe źródła oraz nowy workflow są porównywane z commitem implementacji
-   **`8646868d2b7d7cfa10f4003f8bd79372d60ea933`**. Wskazówka approval JSON została
+   **`6d96391298bbe18c582dc5c6ffda74c7045cfba3`**. Wskazówka approval JSON została
    dodana osobno, nie oblicza wzorca z aktualnego HEAD. Ten commit musi być
    przodkiem testowanego checkoutu. Poprzednie workflow/AGENTS/CODEOWNERS/Vercel
    pozostają zgodne z bazą.
@@ -123,7 +123,7 @@ na domyślnej gałęzi; nie scalać kodu wyłącznie po to, by obejść brak prz
 
 | Kontrola | Wynik i granica |
 |---|---|
-| Python unittest kontraktu startu | **22 PASS**, wiele negatywnych subprzypadków; metadane i tymczasowe repo Git, bez SQL |
+| Python unittest kontraktu startu | **23 PASS**, wiele negatywnych subprzypadków; metadane i tymczasowe repo Git, bez SQL |
 | Trzy rzeczywiste lokalne starty runnerów na gałęzi3B | **Oczekiwana odmowa PASS**; stare branch guardy zablokowały start, lista kontenerów niezmieniona |
 | Porównanie rzeczywistego checkoutu do bazy i zatwierdzonej implementacji | PASS, bez Docker start i bez fałszowania metadanych CI |
 | TypeScript aplikacji i strict Edge / ESLint | PASS |
@@ -137,7 +137,7 @@ na domyślnej gałęzi; nie scalać kodu wyłącznie po to, by obejść brak prz
 
 Pierwsza wersja nowego testu Python zawierała NameError po dodaniu przypadku
 workflow; poprawiono wyłącznie umiejscowienie testu i ponowiono cały kontrakt
-(22PASS). Statyczny skan YAML początkowo potraktował słowo „secrets.” w opisie
+(23PASS). Statyczny skan YAML początkowo potraktował słowo „secrets.” w opisie
 jako odwołanie do sekretu; poprawiono skan do rzeczywistej składni wyrażenia.
 Nie zmieniano ani nie wyłączano asercji backendu/Premium. Istniejące ostrzeżenia
 dużych chunków pozostały. Nie deklarujemy pełnej regresji natywnego Androida.
@@ -153,7 +153,7 @@ Wynik publikacji i prób API zapisano w `docs/ODPOWIEDZI_CODEX.txt`.
 Ta ścieżka testuje konkretny zatwierdzony snapshot, nie dowolny przyszły kod.
 Zmiana aplikacji albo runnerów wymaga nowego review źródeł i wskaźnika, nie
 przepisania wzorca na HEAD. Przy późniejszej integracji należy zachować historię
-bazy45d9a4d i implementacji8646868 (np. zwykły merge po zgodzie właściciela).
+bazy45d9a4d i implementacji6d96391 (np. zwykły merge po zgodzie właściciela).
 Squash/rebase usuwający ich przodkostwo spowoduje prawidłową odmowę guarda;
 nie należy wtedy wyłączać kontroli. Źródłowe referencje zachować także dla
 historycznych porównań Premium. W tej sesji nie wykonywano żadnej integracji.
@@ -161,10 +161,22 @@ historycznych porównań Premium. W tej sesji nie wykonywano żadnej integracji.
 ## Publikacja i aktualny status GitHub
 
 Gałąź opublikowano zwykłym pushem. Commit konfiguracji ze wskaźnikiem i
-raportem: `dc44ccc21a7de25149dceca1976a83be4bbb7a4a`; niezmienny kod startowy:8646868. Próba utworzenia
+raportem: `dc44ccc21a7de25149dceca1976a83be4bbb7a4a`; niezmienny kod startowy:6d96391. Próba utworzenia
 Draft PR do main zwróciła **Forbidden** — PR nie powstał, numeru brak.
 [Porównanie i ręczne utworzenie Draft PR](https://github.com/psuda87/sunday-league-mates/compare/main...chore/slm-v1-integration-ci-stage3b?expand=1). Odczyty Actions runs
 oraz zmiennych opt-in także zwróciły Forbidden. Nie zmieniono ustawień i nie
 zlecono workflow_dispatch. Nowy workflow nie reaguje na push. Nie potwierdzono
 hostowanego przebiegu ani pozostałego limitu; przygotowanie nie jest zgodą
 na płatne zasoby. Ten zapis publikacji tworzy osobny końcowy commit docs.
+
+### Końcowe dopracowanie przed zakończeniem3B
+
+Workflow odrzuca fork/obce repo head PR także przed checkoutem joba. Metadane
+wskaźnika są wyłączone z porównywanego snapshotu kodu, aby kolejny świadomie
+zatwierdzony commit runnerów mógł zawierać poprzedni wskaźnik bez cyklicznego SHA.
+Dodatkowy pozytywny test ponownego przypięcia przeszedł; negatywna próba zmiany
+backendu przez nowy wskaźnik nadal jest odrzucana. Końcowy kontrakt:23PASS.
+Porównanie rzeczywistych źródeł ponowiono po aktualizacji wskazówki. Historyczne
+wpisy22PASS/8646868 opisują wcześniejszy poprawny stan, nie końcowe przypięcie.
+Nie powtarzano całego Vitest/buildów, bo korekta objęła wyłącznie Python/YAML;
+źródła aplikacji i backendu nadal identyczne z bazą3A.
