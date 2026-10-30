@@ -1,3 +1,14 @@
+# Public Match Discovery — Etap2C
+
+2026-10-30 19:48 Europe/Warsaw — `chore/public-discovery-stage2c` od dokładnego fd4fccdc1c22caa5f217625809689f336139a122. Aplikacja/backend/Premium3.18/Auth/finanse/składy/Android i dotychczasowe piny bez zmian. Niezależne porównanie potwierdziło backend24a59e1, runtimeae2fd95, zapisany diff2B oraz55 plików/manifest.
+
+KontraktCI: dokładny overlay18 plików43f69a6 nad6d96391/45d9a4, SourceTests26, dwa oczekiwania42 wCI. Implementacja d7b36eee379acf5036f8ea8aaeeea5f7791c8a04; osobny pointer cb63962e0ff4ccfbc4fb7157e4627beeee5ae8d5. Workflow, repo/event/SHA/ancestry/hostedLinux/localDocker/opt-in i sekrety zachowane. Nie dispatchowano ani nie włączano Actions.
+
+PASS faktycznie:361Vitest/55 plików,TS/strictEdge/lint,45policy,verify42/55/10;60 mutacji rzeczywistych guardów,6 kontroli liczby migracji AST. Izolowany offline Linux Python3.12.16/Git2.47.3:26/26 kontraktu, rzeczywisty verify_sources na kloniecb63962 oraz10 rzeczywistych odmów (w tym PR16/43/Auth/finance/lineups/CI). Windows25/26: dwa problemyCRLF rozwiązane wyłącznie w tempGit; symlink nadalFAIL-ENV1314, ta sama asercjaPASS Linux, bez skipów. GitHub-hosted:NOT RUN. SQL/Edge HTTP/build/Android w2C:NOT RUN, brak zmian funkcjonalnych; wcześniejszych wyników nie zaliczano ponownie.
+
+WARN: sam runtime policy nie przypina treści migracjiPR16/20261028204500; consolidation oraz pełny sourceguardCI skutecznie odrzucają jej zmianę (zweryfikowano). Nie zastępować pełnych kontroli samym policyPASS. Raport:docs/PUBLIC_MATCH_DISCOVERY_STAGE2C.md; mapa wszystkich przodków od aktualnego origin/main134c52b:docs/PUBLIC_MATCH_DISCOVERY_INTEGRATION_MAP.md. Lokalny maina46f5e4 pozostawiony. Bez merge/rebase/deploy/Cloud, migracji istniejących baz, APK lub zmian właściciela w root. Następny krok:review DraftPR do Stage2B, zachowanie oryginalnych SHA/ancestry; ewentualny hosted run tylko osobno po potwierdzeniu darmowego limitu. Chronologia:docs/ODPOWIEDZI_CODEX.txt.
+
+---
 # Public Match Discovery — Etap 2B
 
 Publikacja: [Draft PR #28](https://github.com/psuda87/sunday-league-mates/pull/28), base audit/public-match-discovery-backend/ddd3a3e, open/draft, mergeable clean, bez merge. Kod43f69a6, raport/dowody eeb6940; zwykły push potwierdzony. Końcowe potwierdzenie osobnym commitem dokumentacyjnym, CI nieaktywowane.

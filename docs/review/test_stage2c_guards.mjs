@@ -16,6 +16,7 @@ try{
  for(const name of git('ls-files','--','app').toString().trim().split('\n')){
   const target=path.join(temporary,name);mkdirSync(path.dirname(target),{recursive:true});copyFileSync(path.join(root,name),target);
  }
+ copyFileSync(path.join(root,'vercel.json'),path.join(temporary,'vercel.json'));
  writeFileSync(path.join(temporary,'.git'),'gitdir: '+git('rev-parse','--absolute-git-dir').toString().trim()+'\n');
  symlinkSync(path.join(root,'app/node_modules'),path.join(temporary,'app/node_modules'),'junction');
  const consolidation=()=>spawnSync(process.execPath,[path.join(temporary,'app/scripts/verify-consolidation.mjs')],{cwd:temporary,encoding:'utf8'});
@@ -41,7 +42,7 @@ try{
   }
   passed++;
  }
- assert.equal(consolidation().status,0);passed++;
+ const baseline=consolidation();assert.equal(baseline.status,0,baseline.stderr);passed++;
  for(const name of [migration,historical[0]]){
   let original=null;try{original=readFileSync(path.join(temporary,name));}catch{/* extra43 is absent */}
   try{writeFileSync(path.join(temporary,name),'select 1; -- unauthorized mutation\n');assert.notEqual(consolidation().status,0);passed++;}
