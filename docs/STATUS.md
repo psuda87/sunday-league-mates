@@ -1,5 +1,7 @@
 # Public Match Discovery — Etap 2B
 
+Publikacja: [Draft PR #28](https://github.com/psuda87/sunday-league-mates/pull/28), base audit/public-match-discovery-backend/ddd3a3e, open/draft, mergeable clean, bez merge. Kod43f69a6, raport/dowody eeb6940; zwykły push potwierdzony. Końcowe potwierdzenie osobnym commitem dokumentacyjnym, CI nieaktywowane.
+
 2026-10-30 19:26 Europe/Warsaw — `feat/public-match-discovery-stage2b` od aktualnego audytu `ddd3a3e` (zawieraa62e211). Kod/testy/przypięcia `43f69a62c85dd354695f6fcb4531c85fb03651cf`. PASS funkcjonalny i bezpieczeństwa; WARN ograniczeń; BLOCK aktywacji CI do osobnego review. Premium: zakresy all/groups/public, query tylko Publiczne, debounce300ms, generacje odpowiedzi, reset strony, marker1 i has_more/next_offset, stary backend bez nowych opcji. Bez lokalnego filtrowania stron wersji1. Zachowano kartę/style/55 plików/manifest, Auth, finanse i składy.
 
 Aktywne piny wymagające końcowej akceptacji: backend42+handler dokładnie24a59e1, trzy runtime UI dokładnieae2fd95;41 wcześniejszych migracji i inne wyjątki bez zmian. Osobna NIEAKTYWNA propozycja CI przypina dokładnie18 źródeł do43f69a6, PASS32; aktywne CI/approval/workflow nietknięte, Actions nie uruchamiano.

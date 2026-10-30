@@ -89,3 +89,9 @@ Zakres rekomendowany do dalszego review na Draft PR do `audit/public-match-disco
 - Dowody wizualne: `docs/ui/public-discovery-stage2b/public-light.png`, `public-dark.png`.
 
 Źródła SQL/handler oraz odziedziczone testy discovery backendu nie są nowymi zmianami względem audytu. Nie włączono ponownie historycznych zmian do zakresu implementacji.
+
+## Publikacja
+
+Kod/testy/przypięcia: `43f69a62c85dd354695f6fcb4531c85fb03651cf`; raport i dowody: `eeb69404081da2d10beb8addf63ac1fc1300650c`, zwykły push potwierdzony. Utworzono [Draft PR #28](https://github.com/psuda87/sunday-league-mates/pull/28), base `audit/public-match-discovery-backend`/ddd3a3e, open/draft, bez merge; ponowny odczyt API potwierdził mergeable=true/clean. To stan techniczny Git, nie akceptacja właściciela ani PASS hostowanego CI.
+
+Końcowy APK debug SHA256: `910f97317be0b3c79684d8b0d5df1e7e7963dd8b9311648d65d82c2df1f7bde2`, artefakt ignorowany, nie instalowano. Wszystkie nowe kontenery testowe pozostają zatrzymane; działa tylko sześć zastanych usług backendu telefonu. Końcowe potwierdzenie publikacji stanowi osobny commit dokumentacyjny; źródła i wyniki bez dalszych zmian. [Porównanie](https://github.com/psuda87/sunday-league-mates/compare/audit/public-match-discovery-backend...feat/public-match-discovery-stage2b).
