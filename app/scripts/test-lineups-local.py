@@ -99,7 +99,7 @@ try:
  sql("alter table auth.users add column aud text,add column role text,add column raw_user_meta_data jsonb default '{}'::jsonb,add column deleted_at timestamptz,add column raw_app_meta_data jsonb default '{}'::jsonb;")
  migrations=sorted((ROOT/'app/supabase/migrations').glob('*.sql'))
  for file in migrations:sql(file.read_text())
- check(len(migrations)==(42 if not CI_MODE and branch=='feat/public-match-discovery-stage2b' else 41),str(len(migrations))+' canonical source migrations replayed, no Auth18')
+ check(len(migrations)==(42 if CI_MODE or branch=='feat/public-match-discovery-stage2b' else 41),str(len(migrations))+' canonical source migrations replayed, no Auth18')
  sql((ROOT/'app/supabase/tests/match_lineups.sql').read_text());check(True,'RLS/ACL/invoker/search_path contracts')
  for i,(u,sid) in enumerate(zip(users,sessions)):
   sql(f"insert into auth.users(id,email) values('{u}','{u}@fixture.invalid');select public.slm_account_provision('{u}','Lineup_{i:03d}','+48910000{i:03d}','{u}@fixture.invalid',null,null,false);update public.slm_account_security set must_change_password=false where user_id='{u}';insert into auth.sessions(id,user_id) values('{sid}','{u}');select public.slm_account_accept_session('{u}','{sid}',1);")

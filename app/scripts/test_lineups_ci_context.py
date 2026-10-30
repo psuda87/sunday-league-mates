@@ -150,7 +150,8 @@ class SourceTests(unittest.TestCase):
         cls.template.mkdir()
         cls.command(cls.template, 'init', '--quiet', '--initial-branch=fixture-contract')
         baseline = ['app/src/view.tsx', 'app/supabase/functions/accounts/handler.ts', 'app/package-lock.json',
-                    'app/scripts/premium-route-policy.mjs', *ci.CHANGED]
+                    'app/scripts/premium-route-policy.mjs', 'app/src/auth/sessionManager.ts',
+                    'app/src/finance/PremiumFinance.tsx','app/src/events/usePremiumLineup.ts', *ci.CHANGED]
         baseline += [f'app/supabase/migrations/{i:014d}_fixture.sql' for i in range(41)]
         for name in baseline:
             cls.write(cls.template, name, 'unchanged fixture source\n')
@@ -160,7 +161,19 @@ class SourceTests(unittest.TestCase):
         for name in ci.CHANGED | ci.ADDED:
             cls.write(cls.template, name, 'reviewed launch implementation fixture\n')
         cls.write(cls.template, ci.WORKFLOW, 'reviewed workflow fixture\n')
-        cls.implementation = cls.commit(cls.template, 'implementation')
+        cls.stage3b = cls.commit(cls.template, 'Stage3B implementation')
+        cls.overlay = {'app/src/view.tsx','app/supabase/functions/accounts/handler.ts',
+                       'app/src/discovery.tsx','app/supabase/migrations/00000000000041_discovery.sql',
+                       'app/scripts/test-lineups-local.py','app/scripts/test-lineups-edge-local.py'}
+        for name in cls.overlay:
+            value = "42 if not CI_MODE and branch=='fixture' else 41" if name.endswith(('test-lineups-local.py','test-lineups-edge-local.py')) else 'exact reviewed discovery source\n'
+            cls.write(cls.template,name,value)
+        cls.discovery = cls.commit(cls.template, 'exact discovery candidate')
+        for name in ('app/scripts/test-lineups-local.py','app/scripts/test-lineups-edge-local.py'):
+            cls.write(cls.template,name,"42 if CI_MODE or branch=='fixture' else 41")
+        cls.write(cls.template,'app/scripts/lineups_ci.py','reviewed Stage2C CI gate\n')
+        cls.write(cls.template,'app/scripts/test_lineups_ci_context.py','reviewed Stage2C source tests\n')
+        cls.implementation = cls.commit(cls.template, 'reviewed CI implementation')
         cls.write(cls.template, ci.APPROVAL, json.dumps({'base': cls.base, 'implementation': cls.implementation}))
         cls.commit(cls.template, 'approval pointer')
 
@@ -170,7 +183,7 @@ class SourceTests(unittest.TestCase):
 
     @staticmethod
     def command(root, *args):
-        return subprocess.check_output(['git', '-c', 'user.name=CI fixture', '-c', 'user.email=fixture@example.invalid',
+        return subprocess.check_output(['git', '-c', 'core.autocrlf=false', '-c', 'user.name=CI fixture', '-c', 'user.email=fixture@example.invalid',
                                         '-C', str(root), *args], stderr=subprocess.DEVNULL).decode().strip()
 
     @classmethod
@@ -190,7 +203,8 @@ class SourceTests(unittest.TestCase):
         shutil.copytree(self.template, self.root, dirs_exist_ok=True)
 
     def verify(self):
-        return ci.verify_sources(self.root, self.base)
+        with patch.object(ci,'STAGE3B_IMPLEMENTATION',self.stage3b), patch.object(ci,'DISCOVERY_IMPLEMENTATION',self.discovery), patch.object(ci,'DISCOVERY_OVERLAY',self.overlay):
+            return ci.verify_sources(self.root, self.base)
 
     def test_exact_approved_sources_pass_without_docker(self):
         with patch.object(ci, 'docker', side_effect=AssertionError('No Docker allowed in contract tests')):
@@ -199,7 +213,8 @@ class SourceTests(unittest.TestCase):
     def test_rejects_handler_ui_guard_and_runner_tampering(self):
         for name in ('app/src/view.tsx', 'app/supabase/functions/accounts/handler.ts',
                      'app/scripts/premium-route-policy.mjs', 'app/scripts/test-lineups-edge-local.py',
-                     'app/scripts/lineups_ci.py'):
+                     'app/scripts/lineups_ci.py','app/scripts/test_lineups_ci_context.py',
+                     'app/src/auth/sessionManager.ts','app/src/finance/PremiumFinance.tsx','app/src/events/usePremiumLineup.ts'):
             with self.subTest(name=name):
                 old = (self.root / name).read_bytes()
                 self.write(self.root, name, 'tampered\n')
@@ -237,12 +252,14 @@ class SourceTests(unittest.TestCase):
 
     def test_rejects_symlink_and_workflow_drift(self):
         path = self.root / 'app/src/view.tsx'
+        original=path.read_bytes()
         path.unlink()
         path.symlink_to('missing.tsx')
         with self.assertRaises(RuntimeError):
             self.verify()
         path.unlink()
-        self.write(self.root, 'app/src/view.tsx', 'unchanged fixture source\n')
+        path.write_bytes(original)
+        self.verify()
         self.write(self.root, ci.WORKFLOW, 'tampered workflow')
         with self.assertRaises(RuntimeError):
             self.verify()
@@ -266,12 +283,32 @@ class SourceTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             self.verify()
 
-    def test_reviewed_runner_update_can_repin_after_prior_pointer_exists(self):
-        self.write(self.root, 'app/scripts/test-lineups-edge-local.py', 'new reviewed launch wrapper')
+    def test_reviewed_ci_gate_update_can_repin_after_prior_pointer_exists(self):
+        self.write(self.root, 'app/scripts/lineups_ci.py', 'new reviewed CI gate implementation')
         new = self.commit(self.root, 'reviewed launch update retains an old pointer in history')
         self.write(self.root, ci.APPROVAL, json.dumps({'base': self.base, 'implementation': new}))
         self.assertEqual(self.verify(), new)
 
+
+    def test_new_pointer_cannot_authorize_arbitrary_runner_or_private_module_changes(self):
+        for name in ('app/scripts/test-lineups-edge-local.py','app/src/auth/sessionManager.ts',
+                     'app/src/finance/PremiumFinance.tsx','app/src/events/usePremiumLineup.ts','app/src/view.tsx',
+                     'app/supabase/migrations/00000000000041_discovery.sql'):
+            with self.subTest(name=name):
+                self.write(self.root,name,'unreviewed change')
+                bad=self.commit(self.root,'malicious approval repin')
+                self.write(self.root,ci.APPROVAL,json.dumps({'base':self.base,'implementation':bad}))
+                with self.assertRaises(RuntimeError):self.verify()
+
+    def test_discovery_ancestry_is_required_even_with_identical_tree(self):
+        tree=self.command(self.root,'rev-parse',self.discovery+'^{tree}')
+        orphan=self.command(self.root,'commit-tree',tree,'-m','same reviewed tree without approved ancestry')
+        with patch.object(ci,'STAGE3B_IMPLEMENTATION',self.stage3b), patch.object(ci,'DISCOVERY_IMPLEMENTATION',orphan), patch.object(ci,'DISCOVERY_OVERLAY',self.overlay):
+            with self.assertRaisesRegex(RuntimeError,'ancestry missing'):ci.verify_sources(self.root,self.base)
+
+    def test_declared_overlay_cannot_expand_to_unapproved_file(self):
+        with patch.object(ci,'STAGE3B_IMPLEMENTATION',self.stage3b), patch.object(ci,'DISCOVERY_IMPLEMENTATION',self.discovery), patch.object(ci,'DISCOVERY_OVERLAY',self.overlay|{'app/src/auth/sessionManager.ts'}):
+            with self.assertRaises(RuntimeError):ci.verify_sources(self.root,self.base)
 
 if __name__ == '__main__':
     unittest.main()
