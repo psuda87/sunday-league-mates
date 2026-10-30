@@ -1,3 +1,15 @@
+# Public match discovery — backend Etapu1 lokalnie PASS, UI/kontrakty BLOCKED
+
+2026-10-30 08:23 Europe/Warsaw — `feat/public-match-discovery`, baza dokładniee04d9a47560de36657da76f12ae63e20ef2299cb. Przygotowano nową migrację20261030090000_public_match_discovery.sql (42 po zachowanych41) i whitelistę query wyłącznie matches_list z fail-closed503 dla starego SQL bez markera wersji. Reuse istniejącego dispatcher/session/summary/RLS: all/grupy/public, szukanie tylko publicznych po nazwie meczu/grupy, literalnie/case-insensitive, limit100+has_more/next_offset, serwerowe predykaty przed paginacją. Prywatne obce mecze i dane grup/profili/finansów/składów nadal niedostępne; brak automatycznego członkostwa. Nie zmieniono Auth, finansów i mutacji zapisów/składów.
+
+**UI zatrzymano zgodnie z poleceniem:** PremiumEvents jest dokładnie pinowany; app/src/CSS/karty/nawigacja/grafiki/native bez zmian. Minimalny projekt selektora Wszystkie/Moje grupy/Publiczne i search tylko Publiczne w [PUBLIC_MATCH_DISCOVERY_STAGE1.md](PUBLIC_MATCH_DISCOVERY_STAGE1.md), do zatwierdzenia. Nie tworzono kopii ekranów ani pozornego filtrowania klienta.
+
+Faktyczne PASS:34realSQL/ACL/RLS na NOWEJnetworknonefixture (Auth/Storage schematy testowe,nieGoTrue);345Vitest/54pliki, w tym10EdgeMock;TS/strictEdge/lint;4buildyLIVE/Premiumfinance/Androidweb/demo+izolacja16;55visualsource. **FAIL/BLOCK:** verify_consolidation42≠41; pełny runtime Unexpected migration/model activation; policy0/37PASS przez preemptujący kontrakt; Stage3Bverify_sources odrzuca handler. Guardów/workflow/pinów/approvalJSON nie zmieniono. Nie deklarujemy gotowości do merge ani hostowanegoPASS.
+
+Dwie nowe SQLfixture zatrzymane/zachowane, żadnych migracji istniejących baz/Cloud/deployu/telefonu/merge. NOT RUN: noweUI/Chromium/POCO/realGoTrueEdgeHTTP/hostowaneCI. Przed integracją wymagane zatwierdzenie minimalnegoUI i osobny review rozszerzenia kontraktu backendu41→42/handlera oraz snapshotuCI. Publikacja iDraftPR do bazyStage3B do zapisania w dzienniku po próbie.
+
+---
+
 # Etap 3B — izolowane CI przygotowane; pełny przebieg GitHub NOT RUN
 
 2026-10-30 07:08 Europe/Warsaw — `chore/slm-v1-integration-ci-stage3b`, baza dokładnie45d9a4dfba838ebf9ed70f73a1b2044352df8ecd. Nowy workflow `lineup-integration.yml` rozdziela SQL/RLS oraz realne GoTrue/Edge/UI na dwa efemeryczne Ubuntu; frontendowy workflow3A niezmieniony. Opt-in wymaga obu repo variables SLM_FREE_CI_ENABLED i SLM_INTEGRATION_CI_ENABLED; manual dodatkowo dwóch potwierdzeń. Nie aktywowano CI ani płatnych zasobów.

@@ -304,7 +304,7 @@ export function createHandler(env: Environment) {
         const allowed = prefix === 'groups_'
           ? ['name','description','query','group_id','user_id','phone','id','request_id','accept','organizer','share_full_name','confirm_nickname']
           : prefix === 'matches_'
-          ? ['event_id','guest_name','guest_phone','list','participant_id','user_id','name','group_id','date','time','starts_at','location','address','duration_minutes','capacity','cost_cents','visibility','expected_version','absent','reason','request_id','offset','scope','period']
+          ? ['event_id','guest_name','guest_phone','list','participant_id','user_id','name','group_id','date','time','starts_at','location','address','duration_minutes','capacity','cost_cents','visibility','expected_version','absent','reason','request_id','offset','scope','period',...(action === 'matches_list' ? ['query'] : [])]
           : ['group_id','event_id','user_id','participant_id','payment_id','request_id','amount_cents','expected_amount_cents','expected_version','reason','payable','absent'];
         const payload = Object.fromEntries(allowed.filter(key => Object.hasOwn(body, key)).map(key => [key, body[key]]));
         const r = await call('/rest/v1/rpc/' + rpc, 'POST', {
@@ -342,6 +342,8 @@ export function createHandler(env: Environment) {
             throw new ApiError(400, 'invalid_input', 'Sprawd? wymagane pola i poprawno?? danych.');
           throw new ApiError(503, 'service_unavailable', 'Nie uda?o si? potwierdzi? operacji. Pon?w z tym samym identyfikatorem.');
         }
+        if (action === 'matches_list' && (Object.hasOwn(payload, 'query') || payload.scope === 'groups') && r.data?.public_discovery_version !== 1)
+          throw new ApiError(503, 'discovery_unavailable', 'Wyszukiwanie wymaga aktualnego backendu. Spróbuj ponownie po aktualizacji.');
         return respond(r.data);
       }
       if (action.startsWith('settlements_')) {
