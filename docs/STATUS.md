@@ -6,7 +6,7 @@ Preflight przed DB sprawdza repo/PR→main/ref/pełneSHA i rodziców merge, host
 
 Faktyczne PASS Cloud:22Python kontraktu startu;3 oczekiwane odmowy lokalnych runnerów bez nowych kontenerów; porównanie rzeczywistego checkoutu do przypiętych źródeł;335Vitest/53pliki;TS/strictEdge/lint;37policy;verify41migracji/55visual/10granic;4buildyLIVE/Premium-finance-local/Androidweb/demo+izolacja16; statycznyYAML/Bash/Python/JS. **SQL/RLS i rzeczywiste GoTrue/Edge/UI oraz hostowane Actions NOT RUN** — bez udawania środowiskaCI w Cloud. Żadna baza nie powstała i nie została zmieniona. actionlint niedostępny; realne czasy/obrazy/limity runnera pozostają do pierwszej zatwierdzonej próby.
 
-Raport: [SLM_V1_INTEGRATION_CI_STAGE3B.md](SLM_V1_INTEGRATION_CI_STAGE3B.md). Publikacja/PR zostaną potwierdzone w dzienniku. Następny krok: review helpera/workflow/wskaźnika, limit/opt-in i rzeczywisty przebieg, osobne wyniki obu suite. Brak merge/deployu/Cloud/telefonu; STOP po3B.
+Raport: [SLM_V1_INTEGRATION_CI_STAGE3B.md](SLM_V1_INTEGRATION_CI_STAGE3B.md). Gałąź wypchnięta; commit konfiguracji `dc44ccc21a7de25149dceca1976a83be4bbb7a4a`. API POST DraftPR do main oraz GET Actions/variables: **Forbidden**, PR nie powstał i brak hostowanego PASS. [Porównanie](https://github.com/psuda87/sunday-league-mates/compare/main...chore/slm-v1-integration-ci-stage3b?expand=1). Końcowy zapis publikacji osobnym commitem docs. Następny krok: review helpera/workflow/wskaźnika, limit/opt-in i rzeczywisty przebieg, osobne wyniki obu suite. Brak merge/deployu/Cloud/telefonu; STOP po3B.
 
 ---
 

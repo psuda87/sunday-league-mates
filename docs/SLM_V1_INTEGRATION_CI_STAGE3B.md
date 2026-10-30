@@ -147,3 +147,24 @@ bezpłatnego limitu, utworzenie PR do main i jeden rzeczywisty przebieg obu suit
 Uzyskać osobno wyniki SQL-RLS i GoTrue-Edge-UI. Dopiero potem rozpatrywać wymagane
 checki i odbiór POCO na osobno uzgodnionym backendzie. Brak merge lub zgody Cloud.
 Wynik publikacji i prób API zapisano w `docs/ODPOWIEDZI_CODEX.txt`.
+
+## Historia integracji i ograniczenie przypięcia
+
+Ta ścieżka testuje konkretny zatwierdzony snapshot, nie dowolny przyszły kod.
+Zmiana aplikacji albo runnerów wymaga nowego review źródeł i wskaźnika, nie
+przepisania wzorca na HEAD. Przy późniejszej integracji należy zachować historię
+bazy45d9a4d i implementacji8646868 (np. zwykły merge po zgodzie właściciela).
+Squash/rebase usuwający ich przodkostwo spowoduje prawidłową odmowę guarda;
+nie należy wtedy wyłączać kontroli. Źródłowe referencje zachować także dla
+historycznych porównań Premium. W tej sesji nie wykonywano żadnej integracji.
+
+## Publikacja i aktualny status GitHub
+
+Gałąź opublikowano zwykłym pushem. Commit konfiguracji ze wskaźnikiem i
+raportem: `dc44ccc21a7de25149dceca1976a83be4bbb7a4a`; niezmienny kod startowy:8646868. Próba utworzenia
+Draft PR do main zwróciła **Forbidden** — PR nie powstał, numeru brak.
+[Porównanie i ręczne utworzenie Draft PR](https://github.com/psuda87/sunday-league-mates/compare/main...chore/slm-v1-integration-ci-stage3b?expand=1). Odczyty Actions runs
+oraz zmiennych opt-in także zwróciły Forbidden. Nie zmieniono ustawień i nie
+zlecono workflow_dispatch. Nowy workflow nie reaguje na push. Nie potwierdzono
+hostowanego przebiegu ani pozostałego limitu; przygotowanie nie jest zgodą
+na płatne zasoby. Ten zapis publikacji tworzy osobny końcowy commit docs.
