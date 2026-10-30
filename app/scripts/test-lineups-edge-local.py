@@ -20,6 +20,7 @@ import subprocess
 import threading
 import time
 import uuid
+import lineups_ci
 
 ROOT = Path(__file__).resolve().parents[2]
 PG_IMAGE = 'postgres@sha256:266d3c257594e195b309ae9d1805e54c788f1d7b375f56bf6c367aac6c917e7b'
@@ -30,6 +31,8 @@ NAME = 'slm-lineups-edge-' + uuid.uuid4().hex[:12]
 SOURCE = ROOT / '.cache' / NAME
 SECRET = secrets.token_hex(32)
 started = []
+CI_MODE = lineups_ci.requested()
+CI_SUITE = None
 passed = 0
 
 
@@ -53,6 +56,8 @@ def start(name, image, env, args=(), mount=None):
     argv = ['docker', 'run', '--detach', '--pull=never', '--name', name,
             '--label', 'slm.fixture=lineups-edge-stage2a', '--network',
             'none' if name == NAME else 'container:' + NAME]
+    if CI_MODE:
+        argv += lineups_ci.options(CI_SUITE, image)
     for key, value in env.items():
         argv += ['-e', key + '=' + value]
     if mount:
@@ -160,17 +165,22 @@ def parallel(jobs):
 
 
 def main(verify_ui=None):
-    branch = command(['git', '-C', str(ROOT), 'branch', '--show-current']).decode().strip()
-    if branch == 'feat/premium-lineups-stage2b' and verify_ui is not None:
-        # The dependent UI runner may reuse the fixture ONLY with the exact
-        # Stage2A backend. This does not authorize a different schema or Auth.
-        paths = sorted((ROOT / 'app/supabase/migrations').glob('*.sql'))
-        paths += [ROOT / 'app/supabase/functions/accounts/handler.ts']
-        for path in paths:
-            canonical = command(['git', '-C', str(ROOT), 'show', '3b00ec268a19f64516daebbf0b238d796e826cd1:' + path.relative_to(ROOT).as_posix()])
-            assert path.read_bytes().replace(b'\r\n', b'\n') == canonical.replace(b'\r\n', b'\n'), 'Stage2A backend source changed'
+    global CI_SUITE
+    CI_SUITE = 'ui' if verify_ui is not None else 'edge'
+    if CI_MODE:
+        lineups_ci.context(CI_SUITE)
     else:
-        assert branch == 'feat/premium-lineups-stage2a', 'Reviewed Stage 2A branch required'
+        branch = command(['git', '-C', str(ROOT), 'branch', '--show-current']).decode().strip()
+        if branch == 'feat/premium-lineups-stage2b' and verify_ui is not None:
+            # The dependent UI runner may reuse the fixture ONLY with the exact
+            # Stage2A backend. This does not authorize a different schema or Auth.
+            paths = sorted((ROOT / 'app/supabase/migrations').glob('*.sql'))
+            paths += [ROOT / 'app/supabase/functions/accounts/handler.ts']
+            for path in paths:
+                canonical = command(['git', '-C', str(ROOT), 'show', '3b00ec268a19f64516daebbf0b238d796e826cd1:' + path.relative_to(ROOT).as_posix()])
+                assert path.read_bytes().replace(b'\r\n', b'\n') == canonical.replace(b'\r\n', b'\n'), 'Stage2A backend source changed'
+        else:
+            assert branch == 'feat/premium-lineups-stage2a', 'Reviewed Stage 2A branch required'
     context = json.loads(command(['docker', 'context', 'inspect']))[0]
     host = context['Endpoints']['docker']['Host'] if os.environ.get('DOCKER_CONTEXT') else os.environ.get('DOCKER_HOST', context['Endpoints']['docker']['Host'])
     assert host.startswith(('unix://', 'npipe://')), 'Local Docker socket required'

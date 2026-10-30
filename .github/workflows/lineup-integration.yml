@@ -1,0 +1,99 @@
+name: SLM isolated integration checks
+
+# Separate from frontend checks. Requires owner opt-in for quota AND new fixtures.
+# Skipped jobs are NOT a SQL/RLS or real Edge/UI PASS. No paid runner fallback.
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      confirm_free_allowance:
+        description: Included allowance verified and paid overages blocked
+        type: boolean
+        required: true
+        default: false
+      confirm_fixture_migrations:
+        description: Authorize migration replay ONLY in new disposable local fixtures
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: slm-integration-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  integration:
+    name: SLM isolated ${{ matrix.suite == 'sql' && 'SQL-RLS' || 'GoTrue-Edge-UI' }}
+    if: >-
+      github.repository == 'psuda87/sunday-league-mates' &&
+      vars.SLM_FREE_CI_ENABLED == 'true' && vars.SLM_INTEGRATION_CI_ENABLED == 'true' &&
+      (github.event_name == 'pull_request' ||
+      (inputs.confirm_free_allowance == true && inputs.confirm_fixture_migrations == true))
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [sql, ui]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GIT_TERMINAL_PROMPT: '0'
+      PYTHONDONTWRITEBYTECODE: '1'
+      CYPRESS_INSTALL_BINARY: '0'
+      SLM_CI_SUITE: ${{ matrix.suite }}
+      SLM_FREE_CI_ENABLED: ${{ vars.SLM_FREE_CI_ENABLED }}
+      SLM_INTEGRATION_CI_ENABLED: ${{ vars.SLM_INTEGRATION_CI_ENABLED }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+      - name: Verify event, exact commit, approved sources, empty local Docker and resources
+        id: preflight
+        run: python3 -B app/scripts/lineups_ci.py verify --suite "$SLM_CI_SUITE"
+      - name: Positive and negative launch-contract tests (no database)
+        run: python3 -B -m unittest discover -s app/scripts -p test_lineups_ci_context.py -v
+      - name: Install locked UI dependencies without lifecycle scripts
+        if: matrix.suite == 'ui'
+        working-directory: app
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Find existing hosted Chrome (no browser download or paid fallback)
+        if: matrix.suite == 'ui'
+        run: |
+          browser=$(command -v google-chrome || command -v chromium || true)
+          test -n "$browser" && test -x "$browser"
+          echo "SLM_CHROME_PATH=$browser" >> "$GITHUB_ENV"
+      - name: Pull only pinned fixture images after repeat validation (no database yet)
+        run: python3 -B app/scripts/lineups_ci.py prepare-images --suite "$SLM_CI_SUITE"
+      - name: Real SQL-RLS, PostgREST, concurrency and restart (Auth schema fixture)
+        if: matrix.suite == 'sql'
+        id: sql
+        run: python3 -B app/scripts/test-lineups-local.py
+      - name: Real GoTrue-Edge-PostgREST-PostgreSQL and Chromium UI
+        if: matrix.suite == 'ui'
+        id: ui
+        run: python3 -B app/scripts/test-lineups-ui-local.py
+      - name: Stop only this run's owned fixtures; never prune or reset databases
+        if: always() && steps.preflight.outcome == 'success'
+        run: python3 -B app/scripts/lineups_ci.py cleanup --suite "$SLM_CI_SUITE"
+      - name: Record separate outcomes without publishing raw logs or credentials
+        if: always()
+        env:
+          PREFLIGHT: ${{ steps.preflight.outcome }}
+          SQL_RESULT: ${{ steps.sql.outcome }}
+          UI_RESULT: ${{ steps.ui.outcome }}
+        run: |
+          {
+            echo "## Isolated suite: $SLM_CI_SUITE"
+            echo "Commit: $GITHUB_SHA"
+            echo "Preflight: $PREFLIGHT; SQL/RLS: $SQL_RESULT; real GoTrue/Edge/UI: $UI_RESULT"
+            echo 'Skipped/not-run is not PASS; failed assertions preserve the failing job status.'
+            echo 'No Cloud, existing databases or production secrets. Kong/Storage/native Android NOT TESTED.'
+          } >> "$GITHUB_STEP_SUMMARY"

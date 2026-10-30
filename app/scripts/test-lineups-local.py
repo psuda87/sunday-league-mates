@@ -3,12 +3,21 @@ Real SQL/RLS/concurrent transactions; Auth/JWT schema fixtures, not GoTrue/Edge 
 """
 from pathlib import Path
 import base64,concurrent.futures,hashlib,hmac,json,os,re,secrets,subprocess,threading,time,uuid
+import lineups_ci
 ROOT=Path(__file__).resolve().parents[2]
-assert subprocess.check_output(['git','branch','--show-current'],cwd=ROOT,text=True).strip()=='feat/premium-lineups-stage2a'
+CI_MODE=lineups_ci.requested()
+if CI_MODE:
+ lineups_ci.context('sql')
+else:
+ assert subprocess.check_output(['git','branch','--show-current'],cwd=ROOT,text=True).strip()=='feat/premium-lineups-stage2a'
 host=os.environ.get('DOCKER_HOST') or subprocess.check_output(['docker','context','inspect','--format','{{.Endpoints.docker.Host}}'],text=True).strip()
 assert host.startswith(('unix://','npipe://')), 'Local Docker socket required'
 CONTAINER='slm-lineups-stage2a-'+uuid.uuid4().hex[:12]
-subprocess.run(['docker','run','--detach','--name',CONTAINER,'--network','none','--label','slm.fixture=lineups-stage2a','-e','POSTGRES_HOST_AUTH_METHOD=trust','postgres:17-alpine'],check=True,stdout=subprocess.DEVNULL)
+def start_fixture(name,image,args):
+ argv=['run','--detach','--name',name]+(lineups_ci.options('sql',image)+['--pull=never'] if CI_MODE else [])+args+[image]
+ if CI_MODE:lineups_ci.docker(*argv)
+ else:subprocess.run(['docker']+argv,check=True,stdout=subprocess.DEVNULL)
+start_fixture(CONTAINER,lineups_ci.PG_IMAGE if CI_MODE else 'postgres:17-alpine',['--network','none','--label','slm.fixture=lineups-stage2a','-e','POSTGRES_HOST_AUTH_METHOD=trust'])
 print('Retained isolated fixture: '+CONTAINER,flush=True)
 passed=0
 rest_started=False
@@ -160,7 +169,7 @@ try:
  # Real local PostgREST/JWT over loopback INSIDE the network-none fixture namespace.
  # These are locally signed synthetic tokens, NOT GoTrue-issued sessions or Edge HTTP.
  sql('create role authenticator login noinherit;grant anon,authenticated,service_role to authenticator;')
- subprocess.run(['docker','run','--detach','--name',REST,'--network','container:'+CONTAINER,'-e','PGRST_DB_URI=postgresql://authenticator@127.0.0.1/postgres','-e','PGRST_DB_SCHEMAS=public','-e','PGRST_DB_ANON_ROLE=anon','-e','PGRST_JWT_SECRET='+JWT_SECRET,REST_IMAGE],check=True,stdout=subprocess.DEVNULL)
+ start_fixture(REST,REST_IMAGE,['--network','container:'+CONTAINER,'-e','PGRST_DB_URI=postgresql://authenticator@127.0.0.1/postgres','-e','PGRST_DB_SCHEMAS=public','-e','PGRST_DB_ANON_ROLE=anon','-e','PGRST_JWT_SECRET='+JWT_SECRET])
  rest_started=True
  for _ in range(100):
   if rest(1,'authenticated','')[0]==200:break

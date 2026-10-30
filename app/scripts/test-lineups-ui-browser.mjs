@@ -13,7 +13,10 @@ import {tmpdir} from 'node:os';
 const bootstrap = JSON.parse(readFileSync(0, 'utf8'));
 assert.match(bootstrap.proxy, /^http:\/\/127\.0\.0\.1:\d+$/);
 const app = path.resolve('app'), root = path.join(app, '.cache/lineup-stage2b');
-const out = path.resolve('docs/ui/lineups-stage2b');
+// Hosted CI writes synthetic evidence outside tracked screenshots; local path unchanged.
+const out = process.env.GITHUB_ACTIONS === 'true'
+  ? path.join(process.env.RUNNER_TEMP, 'slm-lineups-stage2b-evidence')
+  : path.resolve('docs/ui/lineups-stage2b');
 // Chrome may install managed extensions containing their own *.test.js files.
 // Keep its profile OUTSIDE the repository and Vitest discovery tree.
 const profileDir = await fs.mkdtemp(path.join(tmpdir(), 'slm-lineups-stage2b-chrome-'));
