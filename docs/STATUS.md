@@ -1,5 +1,7 @@
 # Public Match Discovery — Etap2C
 
+Publikacja: [Draft PR #29](https://github.com/psuda87/sunday-league-mates/pull/29) do Stage2B/fd4fccd, open/draft/clean, bez merge. Raport3041da0 wypchnięty; GitHub API:0 workflow runs dla tego SHA, hosted NOT RUN. PR28 nadal Draft. Końcowe potwierdzenie publikacji osobnym commitem docs.
+
 2026-10-30 19:48 Europe/Warsaw — `chore/public-discovery-stage2c` od dokładnego fd4fccdc1c22caa5f217625809689f336139a122. Aplikacja/backend/Premium3.18/Auth/finanse/składy/Android i dotychczasowe piny bez zmian. Niezależne porównanie potwierdziło backend24a59e1, runtimeae2fd95, zapisany diff2B oraz55 plików/manifest.
 
 KontraktCI: dokładny overlay18 plików43f69a6 nad6d96391/45d9a4, SourceTests26, dwa oczekiwania42 wCI. Implementacja d7b36eee379acf5036f8ea8aaeeea5f7791c8a04; osobny pointer cb63962e0ff4ccfbc4fb7157e4627beeee5ae8d5. Workflow, repo/event/SHA/ancestry/hostedLinux/localDocker/opt-in i sekrety zachowane. Nie dispatchowano ani nie włączano Actions.

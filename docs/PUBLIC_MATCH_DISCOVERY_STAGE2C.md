@@ -68,3 +68,9 @@ Pozostałe powtarzalne dowody: [60 mutacji guardów](review/test_stage2c_guards.
 [Pełna mapa zależności i konsekwencje squash/rebase](PUBLIC_MATCH_DISCOVERY_INTEGRATION_MAP.md). Aktualizowany kontrakt CI jest lokalnie zweryfikowany, a jego nowe przypięcie jest zapisane; **nie oznacza to GitHub-hosted PASS ani zatwierdzenia właściciela**. Potrzebny review d7b36ee/cb63962, wybór integracji zachowującej ancestry i ewentualny osobno autoryzowany hosted run po potwierdzeniu darmowego limitu.
 
 Do review zmieniono tylko: `app/scripts/lineups_ci.py`, `lineups-ci-approval.json`, `test_lineups_ci_context.py`, po jednej oczekiwanej liczbie w `test-lineups-local.py` i `test-lineups-edge-local.py`; dokumentację, historyczny patch i narzędzia testowe w docs/review. Nie aktualizowano manifestu55, runtime/backend pinów Premium, workflow, Auth lub innych źródeł aplikacji. Chronologia: `docs/ODPOWIEDZI_CODEX.txt`.
+
+## Publikacja
+
+Zwykły push `chore/public-discovery-stage2c` potwierdzony. KodCI/testy d7b36ee, osobny pointer cb63962, raport/dowody `3041da0fc5bb5bbb40a6fda531367b366ebaa0cd`. Utworzono [Draft PR #29](https://github.com/psuda87/sunday-league-mates/pull/29) do `feat/public-match-discovery-stage2b`/fd4fccd. Odczyt API: open/draft, merged=false, mergeable=true/clean. PR28 także open/draft, niezmieniony HEADfd4fccd i baza audytu. Dla3041da0 GitHub Actions API zwróciło **0 workflow runs**; nie jest to hosted PASS. Końcowy commit dokumentacyjny jedynie zapisuje potwierdzenie publikacji.
+
+[Porównanie do Stage2B](https://github.com/psuda87/sunday-league-mates/compare/feat/public-match-discovery-stage2b...chore/public-discovery-stage2c). Następny krok: review kontraktu/pointera, wybór zachowującej ancestry integracji według mapy oraz osobno autoryzowany hosted run we właściwym kontekście. Zatrzymano po etapie, bez merge/deploy/Cloud/APK.
