@@ -23,11 +23,11 @@ def require(value, label):
 
 require(os.environ.get('GITHUB_ACTIONS') != 'true', 'Separate local discovery runner; CI requires owner source review')
 branch = subprocess.check_output(['git', 'branch', '--show-current'], cwd=ROOT, text=True).strip()
-require(branch in ('feat/public-match-discovery', 'audit/public-match-discovery-backend'), 'Discovery or exact audit branch required')
-if branch == 'audit/public-match-discovery-backend':
+require(branch in ('feat/public-match-discovery', 'audit/public-match-discovery-backend', 'feat/public-match-discovery-stage2b'), 'Discovery or exact audit branch required')
+if branch in ('audit/public-match-discovery-backend', 'feat/public-match-discovery-stage2b'):
     require(subprocess.run(['git', 'merge-base', '--is-ancestor', AUDIT_BASE, 'HEAD'], cwd=ROOT, capture_output=True).returncode == 0, 'Exact audit base ancestry required')
     for name in ('app/supabase/migrations/' + MIGRATION, 'app/supabase/functions/accounts/handler.ts'):
-        require((ROOT / name).read_bytes() == subprocess.check_output(['git', 'show', AUDIT_BASE + ':' + name], cwd=ROOT), 'Audit backend source changed')
+        require((ROOT / name).read_bytes().replace(b'\r\n',b'\n') == subprocess.check_output(['git', 'show', AUDIT_BASE + ':' + name], cwd=ROOT).replace(b'\r\n',b'\n'), 'Audit backend source changed')
 require(subprocess.run(['git', 'merge-base', '--is-ancestor', BASE, 'HEAD'], cwd=ROOT, capture_output=True).returncode == 0, 'Exact approved base ancestry required')
 endpoint = subprocess.check_output(['docker', 'context', 'inspect', '--format', '{{.Endpoints.docker.Host}}'], text=True).strip()
 require(endpoint.startswith(('unix://', 'npipe://')) and (not os.environ.get('DOCKER_HOST') or os.environ['DOCKER_HOST'].startswith(('unix://', 'npipe://'))), 'Local Docker socket required')
@@ -37,7 +37,7 @@ sources = ROOT / 'app/supabase/migrations'
 historical = subprocess.check_output(['git', 'ls-tree', '-r', '--name-only', BASE, '--', 'app/supabase/migrations'], cwd=ROOT, text=True).splitlines()
 require(len(historical) == 41 and sorted(p.name for p in sources.glob('*.sql')) == sorted([p.split('/')[-1] for p in historical] + [MIGRATION]), 'Exact historical41 plus discovery migration required')
 for name in historical:
-    require((ROOT / name).read_bytes() == subprocess.check_output(['git', 'show', BASE + ':' + name], cwd=ROOT), 'Historical migration changed')
+    require((ROOT / name).read_bytes().replace(b'\r\n',b'\n') == subprocess.check_output(['git', 'show', BASE + ':' + name], cwd=ROOT).replace(b'\r\n',b'\n'), 'Historical migration changed')
 subprocess.run(['docker', 'image', 'inspect', IMAGE], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 NAME = 'slm-public-discovery-' + uuid.uuid4().hex[:12]
 passed = 0

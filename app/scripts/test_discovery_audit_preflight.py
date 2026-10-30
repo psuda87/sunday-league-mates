@@ -26,14 +26,14 @@ class LaunchTests(unittest.TestCase):
                 return b'corrupted source'
             if args[0] != 'git':
                 raise AssertionError('No real Docker or other command allowed')
-            return REAL_OUTPUT(args, **kwargs)
+            return REAL_RUN(args, stdout=subprocess.PIPE, check=True, **kwargs).stdout
         def run(args, **kwargs):
             if args[:3] == ['git','merge-base','--is-ancestor']:
                 return SimpleNamespace(returncode=0 if ancestor else 1)
             if args[0] != 'git':
                 raise AssertionError('No Docker process allowed')
             return REAL_RUN(args, **kwargs)
-        with patch.dict(os.environ, env or {}, clear=True), patch.object(subprocess, 'check_output', side_effect=output), \
+        with patch.dict(os.environ, {'PATH':os.environ.get('PATH',''),'SystemRoot':os.environ.get('SystemRoot',''),**(env or {})}, clear=True), patch.object(subprocess, 'check_output', side_effect=output), \
              patch.object(subprocess, 'run', side_effect=run):
             scope={'__file__':str(RUNNER)}
             exec(compile(PREFIX,str(RUNNER),'exec'),scope)
@@ -43,6 +43,11 @@ class LaunchTests(unittest.TestCase):
         scope=self.run_prefix()
         self.assertEqual(scope['AUDIT_BASE'],'24a59e104bfe80b4d2f41cbd0ad02b58fc546040')
         self.assertEqual(len(scope['historical']),41)
+
+    def test_exact_stage2b_branch_uses_same_source_and_ancestry_checks(self):
+        self.run_prefix(branch='feat/public-match-discovery-stage2b')
+        with self.assertRaises(RuntimeError):
+            self.run_prefix(branch='feat/public-match-discovery-stage2b',tamper='app/supabase/functions/accounts/handler.ts')
 
     def test_original_discovery_branch_is_retained(self):
         self.run_prefix(branch='feat/public-match-discovery')

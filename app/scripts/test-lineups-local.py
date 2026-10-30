@@ -9,7 +9,11 @@ CI_MODE=lineups_ci.requested()
 if CI_MODE:
  lineups_ci.context('sql')
 else:
- assert subprocess.check_output(['git','branch','--show-current'],cwd=ROOT,text=True).strip()=='feat/premium-lineups-stage2a'
+ branch=subprocess.check_output(['git','branch','--show-current'],cwd=ROOT,text=True).strip()
+ if branch=='feat/public-match-discovery-stage2b':
+  import discovery_local
+  discovery_local.verify()
+ else:assert branch=='feat/premium-lineups-stage2a'
 host=os.environ.get('DOCKER_HOST') or subprocess.check_output(['docker','context','inspect','--format','{{.Endpoints.docker.Host}}'],text=True).strip()
 assert host.startswith(('unix://','npipe://')), 'Local Docker socket required'
 CONTAINER='slm-lineups-stage2a-'+uuid.uuid4().hex[:12]
@@ -17,7 +21,7 @@ def start_fixture(name,image,args):
  argv=['run','--detach','--name',name]+(lineups_ci.options('sql',image)+['--pull=never'] if CI_MODE else [])+args+[image]
  if CI_MODE:lineups_ci.docker(*argv)
  else:subprocess.run(['docker']+argv,check=True,stdout=subprocess.DEVNULL)
-start_fixture(CONTAINER,lineups_ci.PG_IMAGE if CI_MODE else 'postgres:17-alpine',['--network','none','--label','slm.fixture=lineups-stage2a','-e','POSTGRES_HOST_AUTH_METHOD=trust'])
+start_fixture(CONTAINER,lineups_ci.PG_IMAGE if CI_MODE else lineups_ci.PG_IMAGE,['--network','none','--label','slm.fixture=lineups-stage2a','-e','POSTGRES_HOST_AUTH_METHOD=trust'])
 print('Retained isolated fixture: '+CONTAINER,flush=True)
 passed=0
 rest_started=False
@@ -95,7 +99,7 @@ try:
  sql("alter table auth.users add column aud text,add column role text,add column raw_user_meta_data jsonb default '{}'::jsonb,add column deleted_at timestamptz,add column raw_app_meta_data jsonb default '{}'::jsonb;")
  migrations=sorted((ROOT/'app/supabase/migrations').glob('*.sql'))
  for file in migrations:sql(file.read_text())
- check(len(migrations)==41,'41 canonical source migrations replayed, no Auth18')
+ check(len(migrations)==(42 if not CI_MODE and branch=='feat/public-match-discovery-stage2b' else 41),str(len(migrations))+' canonical source migrations replayed, no Auth18')
  sql((ROOT/'app/supabase/tests/match_lineups.sql').read_text());check(True,'RLS/ACL/invoker/search_path contracts')
  for i,(u,sid) in enumerate(zip(users,sessions)):
   sql(f"insert into auth.users(id,email) values('{u}','{u}@fixture.invalid');select public.slm_account_provision('{u}','Lineup_{i:03d}','+48910000{i:03d}','{u}@fixture.invalid',null,null,false);update public.slm_account_security set must_change_password=false where user_id='{u}';insert into auth.sessions(id,user_id) values('{sid}','{u}');select public.slm_account_accept_session('{u}','{sid}',1);")
