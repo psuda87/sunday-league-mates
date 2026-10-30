@@ -1,3 +1,12 @@
+# Bieżący stan po porządkach i uruchomieniu LIVE
+
+30.10.2026: **162→48 kontenerów; 140→6 działających; usunięto114** wyłącznie rozpoznanych odtwarzalnych usług testowych SLM. Wszystkie31 kontenerów PostgreSQL,65 wolumenów,14 obrazów i15 nazw sieci zachowane.42 historyczne kontenery baz/mail/log pozostają zatrzymane. Nie usunięto plików bucketów Storage, cache, snippets, źródeł ani konfiguracji. Wszystkie ID sieci SLM bez zmian; ID systemowego bridge zmieniło się poza poleceniami tego zadania, przyczyna nieustalona.
+
+Działa jeden istniejący stos `slm-main-stabilization`, sześć usług, API55321,41 migracji. Domyślny helper cleanup tylko planuje; rozpoznaje projekty przez allowlistę/etykiety/config/repo i blokuje współdzieloną sieć z nieznanym aktywnym kontenerem. Obecny plan:0 usuwań/42 zachowania/0 nieznanych. Bez prune, kasowania wolumenów/baz, nowych kontenerów ani zmian Cloud. Prywatne archiwa istnieją pod ignorowanym `.cache/live-backend`, ACL właściciela.
+
+[Pełna lista ID, powodów i kontroli](docker/local-live-cleanup-2026-10-29.json), [uruchomienie backendu](LOCAL_LIVE_BACKEND.md). Poniżej historyczna inwentaryzacja wcześniejszego zadania; jej liczby nie opisują już aktualnego stanu.
+
+---
 # Docker — inwentaryzacja i ograniczone porządki SLM
 
 2026-10-29, Europe/Warsaw. Lokalny Docker Desktop, odczyt wszystkich projektów widocznych w bieżącym silniku. Bez Cloud, uruchamiania backendów, resetu lub ingerencji w inne repozytoria. Gałąź `chore/android-studio-workflow` od Stage2B/58a9bab.

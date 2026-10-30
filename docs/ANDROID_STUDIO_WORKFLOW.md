@@ -1,3 +1,10 @@
+# Aktualne środowisko Android LIVE — 30.10.2026
+
+Główne środowisko bieżącej pracy: `I:\slm\sunday-league-mates\.worktrees\local-live-backend\app\android`, gałąź `chore/local-live-backend`. Backend `slm-main-stabilization` działa na55321 z41 migracjami. APK LIVE używa64321 przez jawne `adb reverse tcp:64321 tcp:55321`. `npm run backend:start`, `backend:status`, następnie `powershell.exe -NoProfile -File scripts/android-studio.ps1 -Mode live -Assemble -Open` z katalogu app. `npm run android:connect -- --serial emulator-5554` sprawdza zainstalowany APK i konfiguruje tylko brakujące, niekonfliktujące przekierowanie; nie instaluje ani nie uruchamia APK. Działa również dla wskazanego telefonu, ale ten odbiór pozostaje osobnym etapem.
+
+Gradle assembleDebug offline i kontrola aktualnych assetów PASS. Emulator Medium_Phone_API_36.1/Android16/WHPX uruchomiony, APK LIVE zainstalowany wyłącznie na emulatorze; rzeczywiste logowanie, odtworzenie sesji, mecze/roster/goście/skład6:6 potwierdzone. Wygląd Premium3.18 i zabezpieczenia bez zmian. Natywnego zapisu/konfliktu/offline nie zaliczono;14 browser UI/API i19 HTTP obejmują backend. POCO nie jest wymagany do pracy. Szczegóły, backupy, wyniki i dalsze ograniczenia: [LOCAL_LIVE_BACKEND.md](LOCAL_LIVE_BACKEND.md). Poniżej poprzedni workflow, w tym odrębne offline UI; nie mylić jego ścieżki i wariantu z obecnym LIVE.
+
+---
 # Android Studio — codzienny workflow SLM
 
 2026-10-29, Europe/Warsaw. Gałąź techniczna `chore/android-studio-workflow`, utworzona z **58a9babf257876e47cf6db269a0bf05d2e1db1f4** Stage 2B. PR27 pozostaje zależnym Draft PR, bez merge. Praca Codexa/React w VS Code; instalacja, Run i debug natywny przez Android Studio. Docker nie jest potrzebny do UI.

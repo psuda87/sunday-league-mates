@@ -1,3 +1,14 @@
+# Android LIVE i lokalny backend — wykonane
+
+2026-10-30 18:59 Europe/Warsaw — `chore/local-live-backend`, osobny worktree `.worktrees/local-live-backend`, baza4503cb2/Stage2B58a9bab. Istniejący Supabase `slm-main-stabilization` uruchomiony: Kong55321, sześć usług. Po prywatnym backupie zastosowano atomowo istniejącą migrację składów20261029140000: dokładnie41; zastane dane zachowane. Aktualne Edge wdrożone wyłącznie lokalnie, bez zmian produkcyjnego Auth/RLS/finansów/UI/strażników. Cztery nowe fikcyjne konta za zgodą właściciela, stare hasła/konta niezmienione.
+
+Docker162→48, running140→6:114 odtwarzalnych kontenerów SLM usuniętych; wszystkie31 kontenerów PostgreSQL,65 wolumenów i14 obrazów zachowane;42 historyczne kontenery danych/mail/log zatrzymane. Wszystkie sieci SLM zachowane; systemowy bridge ma inny ID przy końcowym odczycie, przyczyna nieustalona, bez poleceń usuwania sieci w tym zadaniu.
+
+PASS faktycznie lokalnie:19 rzeczywistych HTTP,14 browser UI/API,2 kontrole restartu;335 Vitest/53 pliki, lint, TS/strict Edge,37 policy, verify41/55/10, build i LIVE Capacitor/Gradle assembleDebug offline, android:check. Emulator Android16/API36.1: APK zainstalowany i uruchomiony; logowanie, odtworzenie sesji, mecze/roster/goście i zapisany skład6:6 odczytane z prawdziwej lokalnej bazy. ADB forwarding Auth200/accounts401. Brak natywnego testu zapisu/konfliktu/offline; browser/API te scenariusze pokrywają. POCO/Android12 osobno, jego brak nie blokuje dalszej pracy; nie instalowano APK na fizycznym telefonie.
+
+Projekt Android Studio: `I:\slm\sunday-league-mates\.worktrees\local-live-backend\app\android`. Polecenia i granice: [LOCAL_LIVE_BACKEND.md](LOCAL_LIVE_BACKEND.md). Nowy build LIVE zachowuje SHA2568742579e…859c63 oraz Premium3.18. Brak nowych kontenerów/Cloud/merge/resetów. Sześć zmian właściciela w głównym worktree zachowano. Niewykonane w tym zadaniu: Cypress, nowe pełne fixturesSQL, CI, upload Storage/push i fizyczny telefon. Następny krok: rozwój/test przez ten projekt Android Studio; później osobny odbiór Android12. Chronologia: `docs/ODPOWIEDZI_CODEX.txt`.
+
+---
 # Android Studio — workflow gotowy; odbiór nowego APK niewykonany
 
 2026-10-29 22:16 Europe/Warsaw — `chore/android-studio-workflow` od dokładnego Stage 2B/58a9bab. Projekt: `I:\slm\sunday-league-mates\.worktrees\android-studio-workflow\app\android`. VS Code/Codex: kod w tym worktree; Android Studio: build i późniejszy Run właściciela. `npm run android:ui` (domyślne demo 3.18, bez sieci/Dockera), `android:live` (lokalny 64321), `android:check` (aktualność źródeł i native assets). PowerShell obsługuje Assemble/Open/CheckOnly bez instalacji. Ta sama aplikacja i istniejące UI; konfiguracje chronione, hashe, CI, SQL, Auth, finanse i składy bez zmian.

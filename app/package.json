@@ -4,6 +4,12 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
+    "backend:start": "python -X utf8 scripts/local-live-backend.py start",
+    "backend:status": "python -X utf8 scripts/local-live-backend.py status",
+    "backend:prepare": "python -X utf8 scripts/local-live-backend.py prepare",
+    "backend:test": "node scripts/test-local-live.mjs",
+    "backend:test:browser": "node scripts/test-local-live-browser.mjs",
+    "android:connect": "python -X utf8 scripts/connect-android-live.py",
     "android:ui": "node scripts/android-studio-prepare.mjs ui",
     "android:check": "node scripts/android-studio-state.mjs",
     "android:live": "node scripts/android-studio-prepare.mjs live",
