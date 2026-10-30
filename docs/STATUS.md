@@ -1,3 +1,15 @@
+# Etap 3B — izolowane CI przygotowane; pełny przebieg GitHub NOT RUN
+
+2026-10-30 07:08 Europe/Warsaw — `chore/slm-v1-integration-ci-stage3b`, baza dokładnie45d9a4dfba838ebf9ed70f73a1b2044352df8ecd. Nowy workflow `lineup-integration.yml` rozdziela SQL/RLS oraz realne GoTrue/Edge/UI na dwa efemeryczne Ubuntu; frontendowy workflow3A niezmieniony. Opt-in wymaga obu repo variables SLM_FREE_CI_ENABLED i SLM_INTEGRATION_CI_ENABLED; manual dodatkowo dwóch potwierdzeń. Nie aktywowano CI ani płatnych zasobów.
+
+Preflight przed DB sprawdza repo/PR→main/ref/pełneSHA i rodziców merge, hostedLinux, opt-in i brak zewnętrznych konfiguracji, immutable źródła całego app/backendu/41migracji/handlera, dokładny zestaw plików oraz pusty lokalny Docker i zasoby. Kod startowy przypięty do8646868d2b7d7cfa10f4003f8bd79372d60ea933 przez osobny approval JSON. Lokalne branch guardy zachowane; nie fałszowano zmiennych GitHub ani nazw gałęzi. Kontenery nowe/networknone/limity zasobów, obrazy po digestach, cleanup tylko własnych etykiet bez reset/prune/remove. UI/Auth/finanse/składy/backend, istniejące guardy i41migracji bez zmian.
+
+Faktyczne PASS Cloud:22Python kontraktu startu;3 oczekiwane odmowy lokalnych runnerów bez nowych kontenerów; porównanie rzeczywistego checkoutu do przypiętych źródeł;335Vitest/53pliki;TS/strictEdge/lint;37policy;verify41migracji/55visual/10granic;4buildyLIVE/Premium-finance-local/Androidweb/demo+izolacja16; statycznyYAML/Bash/Python/JS. **SQL/RLS i rzeczywiste GoTrue/Edge/UI oraz hostowane Actions NOT RUN** — bez udawania środowiskaCI w Cloud. Żadna baza nie powstała i nie została zmieniona. actionlint niedostępny; realne czasy/obrazy/limity runnera pozostają do pierwszej zatwierdzonej próby.
+
+Raport: [SLM_V1_INTEGRATION_CI_STAGE3B.md](SLM_V1_INTEGRATION_CI_STAGE3B.md). Publikacja/PR zostaną potwierdzone w dzienniku. Następny krok: review helpera/workflow/wskaźnika, limit/opt-in i rzeczywisty przebieg, osobne wyniki obu suite. Brak merge/deployu/Cloud/telefonu; STOP po3B.
+
+---
+
 # Etap 3A — integracja i frontendowe CI przygotowane, bez merge
 
 2026-10-29 23:51 Europe/Warsaw — `chore/slm-v1-integration-ready` od dokładnego58a9babf257876e47cf6db269a0bf05d2e1db1f4. Dodano minimalny `.github/workflows/main-pr-checks.yml` dla PR do main i manual dispatch; korzysta z frontendowego zakresu PR26, bez starszego backendu40. Wymaga jawnego opt-in `SLM_FREE_CI_ENABLED=true` po potwierdzeniu bezpłatnego limitu; ręczne uruchomienie wymaga dodatkowego potwierdzenia. SKIPPED nie oznacza PASS. Nie zmieniono ustawień GitHub ani nie aktywowano płatnych usług.
