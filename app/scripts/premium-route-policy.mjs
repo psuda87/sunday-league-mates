@@ -17,7 +17,7 @@ export const LINEUPS_MIGRATION='app/supabase/migrations/20261029140000_match_lin
 // Owner authorized exact backend activation for discovery Stage2B; no broader exemptions.
 export const DISCOVERY_SOURCE='24a59e104bfe80b4d2f41cbd0ad02b58fc546040';
 export const DISCOVERY_MIGRATION='app/supabase/migrations/20261030090000_public_match_discovery.sql';
-export const DISCOVERY_UI='e5fd8d7a22ce6104a319cea527ef2b6351d09a4d';
+export const DISCOVERY_UI='ae2fd9550b3688f80bfc69d811eb2423743b8329';
 const discoveryUi=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/usePremiumEvents.ts','app/src/events/premiumContracts.ts']);
 const lineupStage1=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/PremiumTeams.tsx','app/src/events/lineupEditor.ts','app/src/events/LineupPlayerProfile.tsx']);
 const lineupStage2b=new Set(['app/src/events/PremiumTeams.tsx','app/src/events/lineupEditor.ts','app/src/events/lineupContracts.ts','app/src/events/usePremiumLineup.ts']);
