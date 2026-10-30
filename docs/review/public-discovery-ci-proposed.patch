@@ -1,0 +1,93 @@
+--- a/app/scripts/lineups_ci.py
++++ b/app/scripts/lineups_ci.py
+@@ -20,6 +20,11 @@
+ BRANCH = 'chore/slm-v1-integration-ci-stage3b'
+ WORKFLOW = '.github/workflows/lineup-integration.yml'
+ APPROVAL = 'app/scripts/lineups-ci-approval.json'
++# INACTIVE PROPOSAL: exact discovery delta; activation needs owner review and a later CI implementation pin.
++STAGE3B_IMPLEMENTATION='6d96391298bbe18c582dc5c6ffda74c7045cfba3'
++DISCOVERY_IMPLEMENTATION='43f69a62c85dd354695f6fcb4531c85fb03651cf'
++DISCOVERY_OVERLAY={'app/supabase/tests/public_match_discovery.sql', 'app/scripts/discovery_local.py', 'app/scripts/test-discovery-ui-local.py', 'app/scripts/test_discovery_audit_preflight.py', 'app/scripts/verify-consolidation.mjs', 'app/supabase/functions/accounts/handler.ts', 'app/scripts/test-public-discovery-local.py', 'app/src/events/PremiumEvents.tsx', 'app/supabase/migrations/20261030090000_public_match_discovery.sql', 'app/scripts/verify-premium-policy-cases.mjs', 'app/scripts/test-discovery-ui-browser.mjs', 'app/src/events/discoveryUi.test.tsx', 'app/supabase/functions/accounts/discovery.test.ts', 'app/scripts/premium-route-policy.mjs', 'app/src/events/usePremiumEvents.ts', 'app/scripts/test-lineups-edge-local.py', 'app/scripts/test-lineups-local.py', 'app/src/events/premiumContracts.ts'}
++
+ CHANGED = {'app/scripts/test-lineups-local.py', 'app/scripts/test-lineups-edge-local.py',
+            'app/scripts/test-lineups-ui-browser.mjs'}
+ ADDED = {'app/scripts/lineups_ci.py', 'app/scripts/test_lineups_ci_context.py'}
+@@ -102,6 +107,21 @@
+         return files
+
+ 
++def verify_discovery_overlay(root, original, approved):
++    candidate = archive(root, DISCOVERY_IMPLEMENTATION)
++    candidate.pop(APPROVAL, None)
++    delta = {name for name in set(original) | set(candidate) if original.get(name) != candidate.get(name)}
++    require(delta == DISCOVERY_OVERLAY, 'Discovery delta differs from exact reviewed file set')
++    require(set(approved) == set(candidate), 'CI implementation added or removed an application input')
++    for name, data in candidate.items():
++        # The owner pins the NEW CI gate implementation in the second commit.
++        # Its checkout bytes are still checked against that immutable approval below.
++        if name in ('app/scripts/test-lineups-local.py', 'app/scripts/test-lineups-edge-local.py'):
++            data = data.replace(b"42 if not CI_MODE and branch", b"42 if CI_MODE or branch")
++        if name != 'app/scripts/lineups_ci.py':
++            require(approved.get(name) == data, 'Unreviewed discovery overlay source: ' + name)
++
++
+ def verify_sources(root=ROOT, base=BASE):
+     pointer = root / APPROVAL
+     require(pointer.is_file() and not pointer.is_symlink(), 'Missing regular CI approval pointer')
+@@ -112,16 +132,19 @@
+         require(subprocess.run(['git', '-C', str(root), 'merge-base', '--is-ancestor', ref, 'HEAD'],
+                                capture_output=True).returncode == 0, 'Approved history missing')
+     baseline, approved = archive(root, base), archive(root, implementation)
+-    # The pointer is metadata, not executable input. A later reviewed launch
+-    # implementation may already contain the prior pointer; never compare a
+-    # pointer to itself or require a self-referential commit SHA.
+     approved.pop(APPROVAL, None)
+-    require(set(approved) == set(baseline) | ADDED, 'Implementation app file set changed')
++    original = archive(root, STAGE3B_IMPLEMENTATION)
++    original.pop(APPROVAL, None)
++    for ref in (STAGE3B_IMPLEMENTATION, DISCOVERY_IMPLEMENTATION):
++        require(subprocess.run(['git', '-C', str(root), 'merge-base', '--is-ancestor', ref, implementation],
++                               capture_output=True).returncode == 0, 'Reviewed discovery/CI ancestry missing')
++    require(set(original) == set(baseline) | ADDED, 'Stage3B implementation file set changed')
+     for name, data in baseline.items():
+         if name not in CHANGED:
+-            require(approved.get(name) == data, 'Frozen application/backend source changed: ' + name)
++            require(original.get(name) == data, 'Historical application/backend source changed: ' + name)
++    verify_discovery_overlay(root, original, approved)
+     migrations = {p for p in approved if p.startswith('app/supabase/migrations/') and p.endswith('.sql')}
+-    require(len(migrations) == 41, 'Exact 41 migrations required')
++    require(len(migrations) == 42, 'Exact 42 reviewed migrations required')
+     for name, data in approved.items():
+         path = root / name
+         require(path.is_file() and not path.is_symlink() and path.read_bytes() == data,
+@@ -203,7 +226,7 @@
+     memory = Path('/proc/meminfo').read_text()
+     validate_resources(os.cpu_count() or 0, shutil.disk_usage(ROOT).free,
+                        int(re.search(r'MemTotal:\s+(\d+)', memory).group(1)))
+-    print('PASS CI preflight: exact commit/event, approved app/backend/41 migrations, isolated empty local Docker', flush=True)
++    print('PASS CI preflight: exact commit/event, approved app/backend/42 migrations, isolated empty local Docker', flush=True)
+
+ 
+ def options(suite, image):
+--- a/app/scripts/test-lineups-local.py
++++ b/app/scripts/test-lineups-local.py
+@@ -99,7 +99,7 @@
+  sql("alter table auth.users add column aud text,add column role text,add column raw_user_meta_data jsonb default '{}'::jsonb,add column deleted_at timestamptz,add column raw_app_meta_data jsonb default '{}'::jsonb;")
+  migrations=sorted((ROOT/'app/supabase/migrations').glob('*.sql'))
+  for file in migrations:sql(file.read_text())
+- check(len(migrations)==(42 if not CI_MODE and branch=='feat/public-match-discovery-stage2b' else 41),str(len(migrations))+' canonical source migrations replayed, no Auth18')
++ check(len(migrations)==(42 if CI_MODE or branch=='feat/public-match-discovery-stage2b' else 41),str(len(migrations))+' canonical source migrations replayed, no Auth18')
+  sql((ROOT/'app/supabase/tests/match_lineups.sql').read_text());check(True,'RLS/ACL/invoker/search_path contracts')
+  for i,(u,sid) in enumerate(zip(users,sessions)):
+   sql(f"insert into auth.users(id,email) values('{u}','{u}@fixture.invalid');select public.slm_account_provision('{u}','Lineup_{i:03d}','+48910000{i:03d}','{u}@fixture.invalid',null,null,false);update public.slm_account_security set must_change_password=false where user_id='{u}';insert into auth.sessions(id,user_id) values('{sid}','{u}');select public.slm_account_accept_session('{u}','{sid}',1);")
+--- a/app/scripts/test-lineups-edge-local.py
++++ b/app/scripts/test-lineups-edge-local.py
+@@ -238,7 +238,7 @@
+     sql('grant select on auth.users,auth.sessions to service_role;'
+         'grant execute on all functions in schema auth to anon,authenticated,service_role;')
+     migrations = sorted((ROOT / 'app/supabase/migrations').glob('*.sql'))
+-    assert len(migrations) == (42 if not CI_MODE and branch == 'feat/public-match-discovery-stage2b' else 41), 'Expected exact reviewed migration set'
++    assert len(migrations) == (42 if CI_MODE or branch == 'feat/public-match-discovery-stage2b' else 41), 'Expected exact reviewed migration set'
+     for file in migrations:
+         sql(file.read_text(encoding='utf-8'))
+     check(True, str(len(migrations))+' canonical migrations replay on real GoTrue Auth schema')

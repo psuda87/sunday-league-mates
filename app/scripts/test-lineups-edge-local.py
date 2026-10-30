@@ -171,7 +171,10 @@ def main(verify_ui=None):
         lineups_ci.context(CI_SUITE)
     else:
         branch = command(['git', '-C', str(ROOT), 'branch', '--show-current']).decode().strip()
-        if branch == 'feat/premium-lineups-stage2b' and verify_ui is not None:
+        if branch == 'feat/public-match-discovery-stage2b':
+            import discovery_local
+            discovery_local.verify()
+        elif branch == 'feat/premium-lineups-stage2b' and verify_ui is not None:
             # The dependent UI runner may reuse the fixture ONLY with the exact
             # Stage2A backend. This does not authorize a different schema or Auth.
             paths = sorted((ROOT / 'app/supabase/migrations').glob('*.sql'))
@@ -235,10 +238,10 @@ Deno.serve(async(req:Request)=>{
     sql('grant select on auth.users,auth.sessions to service_role;'
         'grant execute on all functions in schema auth to anon,authenticated,service_role;')
     migrations = sorted((ROOT / 'app/supabase/migrations').glob('*.sql'))
-    assert len(migrations) == 41, 'Expected exact reviewed migration set'
+    assert len(migrations) == (42 if not CI_MODE and branch == 'feat/public-match-discovery-stage2b' else 41), 'Expected exact reviewed migration set'
     for file in migrations:
         sql(file.read_text(encoding='utf-8'))
-    check(True, '41 canonical migrations replay on real GoTrue Auth schema')
+    check(True, str(len(migrations))+' canonical migrations replay on real GoTrue Auth schema')
     sql('create role authenticator login noinherit;grant anon,authenticated,service_role to authenticator;')
     start(NAME + '-rest', REST_IMAGE, {
         'PGRST_DB_URI': 'postgresql://authenticator@127.0.0.1/postgres', 'PGRST_DB_SCHEMAS': 'public',

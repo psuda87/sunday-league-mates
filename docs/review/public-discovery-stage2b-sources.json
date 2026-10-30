@@ -1,0 +1,27 @@
+{
+  "implementation": "43f69a62c85dd354695f6fcb4531c85fb03651cf",
+  "ui_pin": "ae2fd9550b3688f80bfc69d811eb2423743b8329",
+  "backend_pin": "24a59e104bfe80b4d2f41cbd0ad02b58fc546040",
+  "frozen_visual_files_unchanged": 55,
+  "changed_files": [
+    "app/scripts/discovery_local.py",
+    "app/scripts/premium-route-policy.mjs",
+    "app/scripts/test-discovery-ui-browser.mjs",
+    "app/scripts/test-discovery-ui-local.py",
+    "app/scripts/test-lineups-edge-local.py",
+    "app/scripts/test-lineups-local.py",
+    "app/scripts/test-public-discovery-local.py",
+    "app/scripts/test_discovery_audit_preflight.py",
+    "app/scripts/verify-consolidation.mjs",
+    "app/scripts/verify-premium-policy-cases.mjs",
+    "app/src/events/PremiumEvents.tsx",
+    "app/src/events/discoveryUi.test.tsx",
+    "app/src/events/premiumContracts.ts",
+    "app/src/events/usePremiumEvents.ts"
+  ],
+  "runtime_sha256_lf": {
+    "app/src/events/PremiumEvents.tsx": "187c77a9a03cb1b96c7437179d7c4d4a934ed84404a22691986805edbeda026f",
+    "app/src/events/usePremiumEvents.ts": "56aff5a40e403c187bdd4e9f4c3ebbf6312b2462f7be0354a4d2895d7f468c26",
+    "app/src/events/premiumContracts.ts": "2b05306709e6d43aa7e3e03025f866b61ad758218c3f8011ee9cf7a0ed3d1e59"
+  }
+}

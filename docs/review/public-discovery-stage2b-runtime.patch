@@ -1,0 +1,139 @@
+diff --git a/app/src/events/PremiumEvents.tsx b/app/src/events/PremiumEvents.tsx
+index 1621e1a..6ba8abe 100644
+--- a/app/src/events/PremiumEvents.tsx
++++ b/app/src/events/PremiumEvents.tsx
+@@ -40,7 +40,7 @@ export default function PremiumEvents({data,userId,onGroups,manager}:{manager?:S
+     return <li className="slm-live-entry" key={p.id} data-entry={p.id}><span className="slm-roster-avatar" aria-hidden="true">{p.display_name.split(' ').slice(0,2).map(n=>n[0]).join('').toUpperCase()}</span><div className="slm-demo-person-meta"><strong>{p.display_name}</strong><small>{p.member_id?'Zawodnik':`Gość · odpowiada: ${p.responsible_name}`}{p.absent?' · Nieobecny':''}</small>{p.contact_phone&&<a className="slm-call" href={'tel:'+p.contact_phone}>Zadzwoń</a>}{manages&&!closed&&p.status!=='withdrawn'&&<details><summary>Zarządzaj udziałem</summary><IonButton size="small" fill="clear" disabled={writeDisabled} onClick={()=>{void data.act('withdraw',{participant_id:p.id});}}>Wycofaj {p.member_id?'udział':'gościa'}</IonButton>{!p.member_id&&p.status==='reserve'&&full&&hasPlace&&<IonButton size="small" fill="clear" disabled={writeDisabled||blocked} onClick={()=>{void data.act('move_guest',{participant_id:p.id,list:'registered'});}}>Potwierdź miejsce dla gościa</IonButton>}</details>}</div></li>;
+   }
+   const ownAction=e&&d&&e.access!=='none'&&<><IonButton className="slm-match-cta" expand="block" disabled={writeDisabled||closed||(own?.status!=='registered'&&(!full||blocked||own?.status==='reserve'&&!hasPlace))} onClick={()=>{void data.act(own?.status==='registered'?'withdraw':hasPlace?'join':'reserve',own?.status==='registered'?{participant_id:own.id}:{});}}>{closed?'ZAPISY ZAMKNIĘTE':own?.status==='registered'?'WYCOFAJ ZAPIS':blocked?'BLOKADA · ZALEGŁOŚCI':own?.status==='reserve'?hasPlace?'POTWIERDŹ WOLNE MIEJSCE':'JESTEŚ NA REZERWIE':hasPlace?'ZAPISZ SIĘ NA MECZ':'DOŁĄCZ DO REZERWY'}</IonButton>{own?.status==='registered'&&!closed&&<p className="slm-muted">Po 17:00 rezygnacja może pozostawić obowiązek opłaty do czasu rozliczenia zastępstwa.</p>}{own?.status==='reserve'&&!closed&&<IonButton fill="clear" disabled={writeDisabled} onClick={()=>{void data.act('withdraw',{participant_id:own.id});}}>Opuść rezerwę</IonButton>}{own?.status==='reserve'&&hasPlace&&!closed&&<p role="status">Zwolniło się miejsce. Potwierdź udział, aby je zająć. Rezerwa nie awansuje automatycznie.</p>}{blocked&&<p>Nowe zapisy na płatne mecze są zablokowane z powodu zaległości. Możesz nadal wycofać swój udział.</p>}</>;
+-  const filtered=visiblePremiumEvents(data.events,data.groups,data.serverNow,filter,data.activeGroup);
++  const filtered=data.discoveryEnabled?data.events:visiblePremiumEvents(data.events,data.groups,data.serverNow,filter,data.activeGroup);
+   if(finance&&manager)return <section ref={area} className="slm-premium-events"><PremiumScrollHeader title="Rozliczenia" onBack={()=>setFinance(false)}/><PremiumGroupFinance manager={manager} userId={userId} initialGroup={data.groups.some(g=>g.id===data.activeGroup)?data.activeGroup:undefined}/></section>;
+   return <section ref={area} className="slm-premium-events" aria-label="Mecze" aria-busy={writeDisabled}>
+     {data.creating&&data.serverNow?<>{messages}<EventForm onBack={data.back} onSave={input=>data.create(input)} live={{groups:data.organizers,initial:premiumDefaults(data.serverNow,data.organizers.some(g=>g.id===data.activeGroup)?data.activeGroup:data.organizers[0]?.id),busy:data.busy}}/></>:<>
+@@ -54,19 +54,20 @@ export default function PremiumEvents({data,userId,onGroups,manager}:{manager?:S
+         <ParticipantGroup title="Rezerwa" emptyText="Rezerwa jest pusta." description="Kolejność zgłoszeń. Zajęcie wolnego miejsca wymaga potwierdzenia.">{d.participants.filter(p=>p.status==='reserve').map(participant)}</ParticipantGroup>
+         {d.participants.some(p=>p.status==='withdrawn')&&<ParticipantGroup title="Wycofane wpisy" emptyText="Brak wpisów.">{d.participants.filter(p=>p.status==='withdrawn').map(participant)}</ParticipantGroup>}
+       </>,full?<PremiumTeams key={e.id} eventId={e.id} participants={d.participants} cancelled={e.status==='cancelled'} canEdit={data.groups.some(g=>g.id===e.group_id)} profileContext={manager?{manager,userId,groupId:e.group_id}:undefined}/>:<p>Składy niedostępne bez pełnego dostępu do meczu.</p>,manager?<PremiumFinance key={`${userId}:${e.group_id}:${e.id}`} manager={manager} userId={userId} groupId={e.group_id} eventId={e.id} manage={!!e.can_manage||data.groups.some(g=>g.id===e.group_id&&g.admin_id===userId)} onChanged={()=>{void data.recheckFinancial?.();}}/>:<p>Rozliczenia wymagają aktywnej sesji.</p>]}/>}</>
+-    :!data.loading&&!data.error&&<section className="slm-matches-screen">
+-      <div className="slm-events-controls"><label>Aktywna grupa<select aria-label="Aktywna grupa" value={data.activeGroup} onChange={ev=>data.selectGroup(ev.target.value)}><option value="">Wszystkie dostępne</option><option value="public">Publiczne</option><option value="mine">Moje mecze</option>{data.groups.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></label>
++    :<section className="slm-matches-screen">
++      <div className="slm-events-controls"><label>Aktywna grupa<select aria-label="Aktywna grupa" value={data.activeGroup} onChange={ev=>data.selectGroup(ev.target.value)}><option value="">Wszystkie</option><option value="groups" disabled={!data.discoveryEnabled}>Moje grupy</option><option value="public" disabled={!data.discoveryEnabled}>Publiczne</option><option value="mine">Moje mecze</option>{data.groups.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></label>
++      {data.activeGroup==='public'&&<label className="slm-player-search">Szukaj meczu lub grupy<input type="search" value={data.search??''} maxLength={100} onChange={ev=>data.changeSearch(ev.target.value)}/></label>}
+       {!data.groups.length&&<section className="slm-group-empty"><h2>Znajdź swoją ekipę</h2><p>Utwórz grupę albo przyjmij zaproszenie, aby grać razem.</p><button type="button" className="slm-group-primary" onClick={onGroups}>Przejdź do grup</button></section>}
+       {manager&&<IonButton fill="outline" onClick={()=>setFinance(true)}>Moje rozliczenia grupowe</IonButton>}</div>
+       <MatchFilters value={filter} onChange={value=>{if(data.changeFilter)data.changeFilter(value);else{setLocalFilter(value);if(data.offset)void data.refresh();}}}/>
+-      <div className="slm-match-list">{filtered.map(m=><div key={m.id} data-event={m.id}>
++      <div className="slm-match-list">{!data.loading&&!data.error&&filtered.map(m=><div key={m.id} data-event={m.id}>
+         <p className="slm-event-label"><span>{m.group_name}</span></p>
+         <MatchHero compact title="Mecz" match={m.access==='full'?heroMatch(m):{starts_at:m.starts_at,location:m.location,status:m.status}}
+           displayName={m.name} badge={badge(m)} onOpen={m.access==='none'?undefined:()=>{void data.open(m.id);}} openDisabled={writeDisabled}/>
+         {m.access==='none'&&<p className="slm-events-private-note">Szczegóły tylko dla członków grupy.</p>}
+       </div>)}</div>
+-      {!filtered.length&&<p role="status">Brak meczów w tym widoku.{data.offset>0?' Sprawdź pozostałe strony.':''}</p>}
+-      {(data.offset>0||data.events.length===100)&&<div className="slm-group-actions"><button type="button" disabled={writeDisabled||!data.offset} onClick={()=>{void data.refresh(Math.max(0,data.offset-100));}}>Poprzednia strona</button><button type="button" disabled={writeDisabled||data.events.length<100} onClick={()=>{void data.refresh(data.offset+100);}}>Następna strona</button></div>}
++      {!data.loading&&!data.error&&!filtered.length&&<p role="status">Brak meczów w tym widoku.{data.offset>0?' Sprawdź pozostałe strony.':''}</p>}
++      {(data.offset>0||data.hasMore)&&<div className="slm-group-actions"><button type="button" disabled={writeDisabled||!data.offset} onClick={()=>{void data.refresh(Math.max(0,data.offset-100));}}>Poprzednia strona</button><button type="button" disabled={writeDisabled||!data.hasMore||data.nextOffset===null} onClick={()=>{if(data.nextOffset!==null)void data.refresh(data.nextOffset);}}>Następna strona</button></div>}
+     </section>}
+     </>}
+   </section>;
+diff --git a/app/src/events/premiumContracts.ts b/app/src/events/premiumContracts.ts
+index b169b69..1c00d9c 100644
+--- a/app/src/events/premiumContracts.ts
++++ b/app/src/events/premiumContracts.ts
+@@ -26,11 +26,16 @@ export function eventSummary(value:unknown):EventSummary {
+   for(const key of ['own_history','current_group_member'])if(r[key]!==undefined&&typeof r[key]!=='boolean')throw Error('Invalid event privacy flags');
+   return r as unknown as EventSummary;
+ }
+-export function matchList(value:unknown){
++export function matchList(value:unknown,requireDiscovery=false,offset=0){
+   const r=row(value);if(!Array.isArray(r.events)||!text(r.server_now)||!Number.isFinite(Date.parse(String(r.server_now))))throw Error('Invalid match list');
+   if(r.member_creation_enabled!==undefined&&typeof r.member_creation_enabled!=='boolean')throw Error('Invalid creation capability');
+   const events=r.events.map(eventSummary);if(new Set(events.map(e=>e.id)).size!==events.length)throw Error('Duplicate match identifiers');
+-  return {events,server_now:r.server_now as string,memberCreationEnabled:r.member_creation_enabled===true};
++  const discovery=r.public_discovery_version===1;
++  if(requireDiscovery&&!discovery)throw Error('Discovery backend unavailable');
++  if(discovery&&(r.offset!==offset||r.limit!==100||events.length>100||typeof r.has_more!=='boolean'||
++    (r.has_more?(events.length!==100||r.next_offset!==offset+100):r.next_offset!==null)))throw Error('Invalid discovery page');
++  return {events,server_now:r.server_now as string,memberCreationEnabled:r.member_creation_enabled===true,
++    discovery,hasMore:discovery?r.has_more===true:events.length===100,nextOffset:discovery?(r.next_offset as number|null):(events.length===100?offset+100:null)};
+ }
+ export function matchDetail(value:unknown,id:string):MatchDetail {
+   const r=row(value),event=eventSummary(r.event);
+diff --git a/app/src/events/usePremiumEvents.ts b/app/src/events/usePremiumEvents.ts
+index 57e3b2a..b9e6960 100644
+--- a/app/src/events/usePremiumEvents.ts
++++ b/app/src/events/usePremiumEvents.ts
+@@ -10,41 +10,44 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
+   const [events,setEvents]=useState<EventSummary[]>([]),[groups,setGroups]=useState<GroupSummary[]>([]),[detail,setDetail]=useState<MatchDetail|null>(null);
+   const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[serverNow,setServerNow]=useState('');
+   const [listFilter,setListFilter]=useState<'upcoming'|'history'|'mine'>('upcoming');
+-  const query=useRef<Record<string,string>>({scope:'all',period:'upcoming'}),requestedQuery=useRef('');
++  const query=useRef<Record<string,string>>({scope:'all',period:'upcoming'});
++  const [search,setSearch]=useState(''),[discoveryEnabled,setDiscoveryEnabled]=useState(false),[hasMore,setHasMore]=useState(false),[nextOffset,setNextOffset]=useState<number|null>(null);
++  const debounce=useRef<ReturnType<typeof setTimeout>|null>(null);
+   const [memberCreationEnabled,setMemberCreationEnabled]=useState(false);
+   const [activeGroup,setActiveGroup]=useState(''),[offset,setOffset]=useState(0),[creating,setCreating]=useState(false);
+-  const alive=useRef(true),epoch=useRef(0),detailEpoch=useRef(0),flight=useRef(false),refreshFlight=useRef<Promise<boolean>|null>(null),keys=useRef(new Map<string,string>());
++  const alive=useRef(true),epoch=useRef(0),detailEpoch=useRef(0),flight=useRef(false),refreshFlight=useRef<{key:string;promise:Promise<boolean>}|null>(null),keys=useRef(new Map<string,string>());
+   const authorized=useCallback(()=>alive.current&&manager.getSnapshot().phase==='ready'&&manager.getSnapshot().session?.user_id===userId,[manager,userId]);
+   const refresh=useCallback((page=0):Promise<boolean>=>{
+-    if(refreshFlight.current)return requestedQuery.current===JSON.stringify(query.current)?refreshFlight.current:refreshFlight.current.then(()=>refresh(page));
+-    const values={...query.current};requestedQuery.current=JSON.stringify(values);
++    const values={...query.current},key=JSON.stringify([values,page]);
++    if(refreshFlight.current?.key===key)return refreshFlight.current.promise;
+     const ticket=++epoch.current;setLoading(true);setError('');
+     const pending=(async()=>{
+       try{
++        if([...(values.query??'')].length>100)throw Error('Invalid search');
+         const [a,b]=await Promise.all([manager.call('matches_list',{...values,offset:page}),manager.call<{groups:unknown[]}>('groups_list')]);
+-        const list=matchList(a);if(!Array.isArray(b.groups))throw Error('Invalid groups');const ownGroups=b.groups.map(summary);
++        const list=matchList(a,values.scope==='public'||values.scope==='groups',page);if(!Array.isArray(b.groups))throw Error('Invalid groups');const ownGroups=b.groups.map(summary);
+         if(authorized()&&ticket===epoch.current&&values.scope==='group'&&!ownGroups.some(g=>g.id===values.group_id)){
+           // Membership may have changed during background/resume or a group refresh.
+           // Reset both the visible selector and its server query, then fetch the new scope.
+           query.current={...query.current,scope:'all',group_id:''};setActiveGroup('');setEvents([]);setGroups(ownGroups);
+           queueMicrotask(()=>{if(authorized())void refresh();});return true;
+         }
+-        if(authorized()&&ticket===epoch.current){setEvents(list.events);setGroups(ownGroups);setMemberCreationEnabled(list.memberCreationEnabled);setServerNow(list.server_now);setOffset(page);setActiveGroup(previous=>['public','mine'].includes(previous)||ownGroups.some(g=>g.id===previous)?previous:'');return true;}
++        if(authorized()&&ticket===epoch.current){setEvents(list.events);setGroups(ownGroups);setDiscoveryEnabled(list.discovery);setHasMore(list.hasMore);setNextOffset(list.nextOffset);setMemberCreationEnabled(list.memberCreationEnabled);setServerNow(list.server_now);setOffset(page);setActiveGroup(previous=>['public','groups','mine'].includes(previous)||ownGroups.some(g=>g.id===previous)?previous:'');return true;}
+         return false;
+       }catch(e){if(authorized()&&ticket===epoch.current){setEvents([]);setGroups([]);setDetail(null);setError(matchError(e));}return false;}
+       finally{if(alive.current&&ticket===epoch.current)setLoading(false);}
+-    })();refreshFlight.current=pending;
+-    void pending.finally(()=>{if(refreshFlight.current===pending)refreshFlight.current=null;});return pending;
++    })();const request={key,promise:pending};refreshFlight.current=request;
++    void pending.finally(()=>{if(refreshFlight.current===request)refreshFlight.current=null;});return pending;
+   },[manager,authorized]);
+-  const invalidate=useCallback(()=>{epoch.current++;detailEpoch.current++;},[]);
+-  useEffect(()=>{alive.current=true;refreshFlight.current=null;void refresh();const changed=()=>{detailEpoch.current++;setDetail(null);void refresh();};window.addEventListener('slm-groups-changed',changed);return()=>{alive.current=false;invalidate();window.removeEventListener('slm-groups-changed',changed);};},[refresh,invalidate]);
++  const invalidate=useCallback(()=>{epoch.current++;detailEpoch.current++;refreshFlight.current=null;},[]);
++  useEffect(()=>{alive.current=true;refreshFlight.current=null;query.current={scope:'all',period:'upcoming'};setSearch('');setActiveGroup('');setOffset(0);setListFilter('upcoming');setEvents([]);setGroups([]);setDetail(null);setDiscoveryEnabled(false);void refresh();const changed=()=>{invalidate();setDetail(null);setEvents([]);setOffset(0);void refresh();};window.addEventListener('slm-groups-changed',changed);return()=>{alive.current=false;invalidate();if(debounce.current)clearTimeout(debounce.current);window.removeEventListener('slm-groups-changed',changed);};},[refresh,invalidate]);
+   // Native gallery continuation may keep the shell mounted while Auth rechecks.
+   // Never reuse a pre-suspend roster after that check: memberships may have changed.
+-  useEffect(()=>{let previous=manager.getSnapshot().phase;return manager.subscribe(()=>{
+-    const phase=manager.getSnapshot().phase;if(phase===previous)return;previous=phase;
+-    if(phase!=='ready'){invalidate();setEvents([]);setGroups([]);setDetail(null);setLoading(true);}
++  useEffect(()=>{let previous=manager.getSnapshot();return manager.subscribe(()=>{
++    const current=manager.getSnapshot(),phase=current.phase;if(phase===previous.phase&&current.session?.user_id===previous.session?.user_id)return;previous=current;
++    if(phase!=='ready'||current.session?.user_id!==userId){invalidate();if(debounce.current)clearTimeout(debounce.current);query.current={scope:'all',period:'upcoming'};setSearch('');setActiveGroup('');setOffset(0);setListFilter('upcoming');setDiscoveryEnabled(false);setHasMore(false);setNextOffset(null);setEvents([]);setGroups([]);setDetail(null);setLoading(true);}
+     else{refreshFlight.current=null;void refresh();}
+-  });},[manager,refresh,invalidate]);
++  });},[manager,userId,refresh,invalidate]);
+   const open=useCallback(async(id:string)=>{
+     const ticket=++detailEpoch.current;setDetail(null);setLoading(true);setError('');setCreating(false);
+     try{const d=matchDetail(await manager.call('matches_detail',{event_id:id}),id);if(authorized()&&ticket===detailEpoch.current){setDetail(d);setServerNow(d.server_now);return true;}return false;}
+@@ -75,8 +78,10 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
+   // New member creation is activated only by the versioned server contract.
+   const organizers=memberCreationEnabled?groups:groups.filter(g=>g.admin_id===userId||g.organizer);
+   function beginCreate(){back();if(organizers.length)setCreating(true);}
+-  function selectGroup(id:string){back();const next=['public','mine'].includes(id)||groups.some(g=>g.id===id)?id:'';setActiveGroup(next);query.current={...query.current,scope:next==='public'||next==='mine'?next:next?'group':'all',group_id:groups.some(g=>g.id===next)?next:''};epoch.current++;setEvents([]);void refresh();}
+-  function changeFilter(value:'upcoming'|'history'|'mine'){setListFilter(value);query.current={...query.current,period:value==='history'?'history':'upcoming'};if(value==='mine'){setActiveGroup('mine');query.current.scope='mine';}epoch.current++;setEvents([]);void refresh();}
+-  return {listFilter,changeFilter,recheckFinancial,events,groups,detail,loading,busy,error,notice,serverNow,activeGroup,offset,creating,organizers,refresh,open,back,act,create,beginCreate,selectGroup};
++  function resetPage(){invalidate();if(debounce.current)clearTimeout(debounce.current);setOffset(0);setHasMore(false);setNextOffset(null);setEvents([]);}
++  function selectGroup(id:string){back();resetPage();if(listFilter==='mine')setListFilter('upcoming');const next=['public','groups','mine'].includes(id)||groups.some(g=>g.id===id)?id:'';setActiveGroup(next);setSearch('');query.current={...query.current,scope:['public','groups','mine'].includes(next)?next:next?'group':'all',group_id:groups.some(g=>g.id===next)?next:''};delete query.current.query;void refresh();}
++  function changeSearch(value:string){if(query.current.scope!=='public')return;resetPage();setSearch(value);query.current={...query.current,query:value};setLoading(true);setError('');if([...value].length>100){setLoading(false);setError('Wpisz najwyżej 100 znaków.');return;}debounce.current=setTimeout(()=>{debounce.current=null;if(authorized())void refresh();},300);}
++  function changeFilter(value:'upcoming'|'history'|'mine'){resetPage();setListFilter(value);query.current={...query.current,period:value==='history'?'history':'upcoming'};if(value==='mine'){setActiveGroup('mine');setSearch('');delete query.current.query;query.current.scope='mine';}void refresh();}
++  return {listFilter,changeFilter,search,changeSearch,discoveryEnabled,hasMore,nextOffset,recheckFinancial,events,groups,detail,loading,busy,error,notice,serverNow,activeGroup,offset,creating,organizers,refresh,open,back,act,create,beginCreate,selectGroup};
+ }
+ export type PremiumEventsController=ReturnType<typeof usePremiumEvents>;

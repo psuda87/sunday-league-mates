@@ -26,11 +26,16 @@ export function eventSummary(value:unknown):EventSummary {
   for(const key of ['own_history','current_group_member'])if(r[key]!==undefined&&typeof r[key]!=='boolean')throw Error('Invalid event privacy flags');
   return r as unknown as EventSummary;
 }
-export function matchList(value:unknown){
+export function matchList(value:unknown,requireDiscovery=false,offset=0){
   const r=row(value);if(!Array.isArray(r.events)||!text(r.server_now)||!Number.isFinite(Date.parse(String(r.server_now))))throw Error('Invalid match list');
   if(r.member_creation_enabled!==undefined&&typeof r.member_creation_enabled!=='boolean')throw Error('Invalid creation capability');
   const events=r.events.map(eventSummary);if(new Set(events.map(e=>e.id)).size!==events.length)throw Error('Duplicate match identifiers');
-  return {events,server_now:r.server_now as string,memberCreationEnabled:r.member_creation_enabled===true};
+  const discovery=r.public_discovery_version===1;
+  if(requireDiscovery&&!discovery)throw Error('Discovery backend unavailable');
+  if(discovery&&(r.offset!==offset||r.limit!==100||events.length>100||typeof r.has_more!=='boolean'||
+    (r.has_more?(events.length!==100||r.next_offset!==offset+100):r.next_offset!==null)))throw Error('Invalid discovery page');
+  return {events,server_now:r.server_now as string,memberCreationEnabled:r.member_creation_enabled===true,
+    discovery,hasMore:discovery?r.has_more===true:events.length===100,nextOffset:discovery?(r.next_offset as number|null):(events.length===100?offset+100:null)};
 }
 export function matchDetail(value:unknown,id:string):MatchDetail {
   const r=row(value),event=eventSummary(r.event);

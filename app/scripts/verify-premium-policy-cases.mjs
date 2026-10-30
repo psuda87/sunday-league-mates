@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {verifyPremiumRuntime,APPROVED,LINEUPS_MIGRATION} from './premium-route-policy.mjs';
+import {verifyPremiumRuntime,APPROVED,LINEUPS_MIGRATION,DISCOVERY_MIGRATION} from './premium-route-policy.mjs';
 const root=fileURLToPath(new URL('../../',import.meta.url));
 const read=p=>readFileSync(root+'/'+p,'utf8');
 test('actual source graph passes',()=>assert.equal(verifyPremiumRuntime(root).frozen,55));
@@ -29,6 +29,14 @@ for(const [label,path,mutate] of [
  ['original pitch geometry changed','app/src/ui/PremiumPitch.tsx',s=>s.replace('M4 80H96','M4 90H96')],
  ['BottomNav restyled','app/src/demo/DemoBottomNav.tsx',s=>s.replace('slm-demo-nav-notch','slm-demo-nav-notch-altered')],
  ['Ultimate component replaced','app/src/ui/UltimatePlayerCard.tsx',()=>"export default function Card(){return null;}"],
+ ['discovery debounce removed','app/src/events/usePremiumEvents.ts',s=>s.replace('},300);','},0);')],
+ ['discovery version ignored','app/src/events/premiumContracts.ts',s=>s.replace('r.public_discovery_version===1','true')],
+ ['discovery field always shown','app/src/events/PremiumEvents.tsx',s=>s.replace("data.activeGroup==='public'&&",'true&&')],
+ ['discovery privilege elevated',DISCOVERY_MIGRATION,s=>s.replace('security invoker','security definer')],
+ ['discovery search filter disabled',DISCOVERY_MIGRATION,s=>s.replace("v_query='' or (e.visibility='public' and","true or (e.visibility='public' and")],
+ ['discovery ACL exposed',DISCOVERY_MIGRATION,s=>s.replace('to service_role;','to authenticated,service_role;')],
+ ['discovery actor forged','app/supabase/functions/accounts/handler.ts',s=>s.replace('p_user: ctx.id, p_session: ctx.sid, p_action: action.slice(prefix.length)','p_user: body.user_id, p_session: ctx.sid, p_action: action.slice(prefix.length)')],
+ ['discovery version gate removed','app/supabase/functions/accounts/handler.ts',s=>s.replace("action === 'matches_list' && (Object.hasOwn(payload, 'query')","false && (Object.hasOwn(payload, 'query')")],
  ['lineup table RLS disabled',LINEUPS_MIGRATION,s=>s.replace('enable row level security','disable row level security')],
  ['lineup service RPC exposed',LINEUPS_MIGRATION,s=>s.replace('to service_role;','to authenticated,service_role;')],
  ['lineup no-op always writes',LINEUPS_MIGRATION,s=>s.replace('if changed then','if true then')],
