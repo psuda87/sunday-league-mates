@@ -11,6 +11,7 @@ import uuid
 
 ROOT = Path(__file__).resolve().parents[2]
 BASE = 'e04d9a47560de36657da76f12ae63e20ef2299cb'
+AUDIT_BASE = '24a59e104bfe80b4d2f41cbd0ad02b58fc546040'
 MIGRATION = '20261030090000_public_match_discovery.sql'
 IMAGE = 'postgres@sha256:266d3c257594e195b309ae9d1805e54c788f1d7b375f56bf6c367aac6c917e7b'
 
@@ -21,7 +22,12 @@ def require(value, label):
 
 
 require(os.environ.get('GITHUB_ACTIONS') != 'true', 'Separate local discovery runner; CI requires owner source review')
-require(subprocess.check_output(['git', 'branch', '--show-current'], cwd=ROOT, text=True).strip() == 'feat/public-match-discovery', 'Discovery branch required')
+branch = subprocess.check_output(['git', 'branch', '--show-current'], cwd=ROOT, text=True).strip()
+require(branch in ('feat/public-match-discovery', 'audit/public-match-discovery-backend'), 'Discovery or exact audit branch required')
+if branch == 'audit/public-match-discovery-backend':
+    require(subprocess.run(['git', 'merge-base', '--is-ancestor', AUDIT_BASE, 'HEAD'], cwd=ROOT, capture_output=True).returncode == 0, 'Exact audit base ancestry required')
+    for name in ('app/supabase/migrations/' + MIGRATION, 'app/supabase/functions/accounts/handler.ts'):
+        require((ROOT / name).read_bytes() == subprocess.check_output(['git', 'show', AUDIT_BASE + ':' + name], cwd=ROOT), 'Audit backend source changed')
 require(subprocess.run(['git', 'merge-base', '--is-ancestor', BASE, 'HEAD'], cwd=ROOT, capture_output=True).returncode == 0, 'Exact approved base ancestry required')
 endpoint = subprocess.check_output(['docker', 'context', 'inspect', '--format', '{{.Endpoints.docker.Host}}'], text=True).strip()
 require(endpoint.startswith(('unix://', 'npipe://')) and (not os.environ.get('DOCKER_HOST') or os.environ['DOCKER_HOST'].startswith(('unix://', 'npipe://'))), 'Local Docker socket required')
@@ -98,7 +104,12 @@ try:
         sql((ROOT / name).read_text())
     before = sql("select pg_get_functiondef('slm_private.matches_dispatch_core(uuid,uuid,text,jsonb)'::regprocedure)")
     untouched = sql("select string_agg(pg_get_functiondef(p.oid),E'\\n' order by p.oid) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname in ('public','slm_private') and (p.proname like '%finance%' or p.proname like '%account%' or p.proname like '%groups%' or p.proname like '%lineup%')")
+    catalog = sql("select jsonb_agg(to_jsonb(p) order by schemaname,tablename,policyname) from pg_policies p")
+    broken = (sources / MIGRATION).read_text().replace("if p_action='list' then", "if p_action='UNREVIEWED' then", 1)
+    sql(broken, expected='match_list_contract_changed')
+    check(sql("select to_regprocedure('slm_private.match_discovery_list(uuid,uuid,jsonb)') is null") == 't' and sql("select pg_get_functiondef('slm_private.matches_dispatch_core(uuid,uuid,text,jsonb)'::regprocedure)") == before, 'migration mismatch rolls back atomically, no partial helper or dispatcher')
     sql((sources / MIGRATION).read_text())
+    check(sql("select jsonb_agg(to_jsonb(p) order by schemaname,tablename,policyname) from pg_policies p") == catalog, 'all preexisting RLS policy definitions unchanged')
     check(sql("select string_agg(pg_get_functiondef(p.oid),E'\\n' order by p.oid) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname in ('public','slm_private') and (p.proname like '%finance%' or p.proname like '%account%' or p.proname like '%groups%' or p.proname like '%lineup%')") == untouched, 'Auth/group/finance/lineup functions unchanged by migration42')
     after = sql("select pg_get_functiondef('slm_private.matches_dispatch_core(uuid,uuid,text,jsonb)'::regprocedure)")
     a = before.index(" if p_action='list' then\n"); b = before.index(" if p_action<>'create' then", a)
@@ -207,6 +218,43 @@ try:
     write(1, 'groups', 'leave', group_id=ga)
     check(previous in ids(rpc(1, 'matches', 'list', {'scope':'mine','period':'history'}))
           and previous not in ids(rpc(1, 'matches', 'list', {'scope':'groups','period':'history'})), 'legacy own history survives leaving; groups means current memberships only')
+    # Independent audit: closed-world DTO and direct/indirect cross-group probes.
+    allowed_card = {'id','group_id','group_name','created_by','name','visibility','starts_at','location','status','access',
+                    'duration_minutes','capacity','cost_cents','total_cost','hourly_rate','minimum_players',
+                    'registered_count','reserve_count','registration_open','decision_required','approved_at','version',
+                    'settlements_active','can_manage','can_edit','current_group_member','own_history','own_participation'}
+    check(set(card) == allowed_card and card['can_manage'] is False and card['can_edit'] is False,
+          'closed-world public DTO has only existing summary fields, no organizer/finance privilege')
+    for scope_body in ({}, {'scope':'all'}, {'scope':'public'}, {'scope':'mine'}, {'scope':'groups'}, {'scope':'group','group_id':gb}):
+        check(private not in ids(feed(3, **scope_body)), 'foreign private absent across list scope ' + str(scope_body.get('scope','default')))
+    rpc(3, 'matches', 'detail', dict(event_id=private), expected='not_found')
+    rpc(3, 'matches', 'join', dict(event_id=private, request_id=str(uuid.uuid4())), expected='forbidden')
+    for role in ('anon', 'authenticated'):
+        sql(f"begin;set local role {role};select slm_private.match_discovery_list('{users[2]}','{sessions[2]}','{{}}');", expected='permission denied')
+    check(True, 'private detail/signup and direct helper ACL reject outsiders and client roles')
+    for bad in ({'limit':100000}, {'offset': True}, {'offset': None}, {'scope':None}, {'period':[]},
+                {'query':{}}, {'query':'x'*101}, {'group_id':private,'scope':'group','query':'secret'}, {'p_user':users[2]}):
+        rpc(3, 'matches', 'list', {**dict(scope='public'), **bad}, expected='invalid_input')
+    check(True, 'extra limit, null/boolean/types and forged actor search rejected')
+    rpc(0, 'group_finance', 'account', dict(group_id=gb,user_id=users[2]), expected='forbidden')
+    rpc(0, 'lineups', 'get', dict(event_id=public), expected='not_found')
+    check(True, 'administrator of a different group gains no finance or lineup access')
+    sql(f"update public.slm_account_security set must_change_password=true where user_id='{users[3]}'")
+    rpc(3, 'matches', 'list', expected='session_invalid')
+    sql(f"update public.slm_account_security set must_change_password=false where user_id='{users[3]}';delete from auth.sessions where id='{sessions[3]}'")
+    rpc(3, 'matches', 'list', expected='session_invalid')
+    sql(f"insert into auth.sessions(id,user_id) values('{sessions[3]}','{users[3]}');select public.slm_account_accept_session('{users[3]}','{sessions[3]}',1)")
+    check(True, 'SQL independently denies temporary-password and revoked live sessions')
+    closed = create(2, gb, 'Close public fixture', 'public')
+    check(closed in ids(feed(3,scope='public',query='Close public fixture')), 'public match initially discoverable')
+    sql(f"update public.slm_matches set visibility='private' where id='{closed}'")
+    check(not ids(feed(3,scope='public',query='Close public fixture')) and closed not in ids(feed(3)), 'closing public match removes outsider search and default feed immediately')
+    rpc(3, 'matches', 'detail', dict(event_id=closed), expected='not_found')
+    check(True, 'known event UUID cannot bypass closed visibility')
+    write(1, 'groups', 'leave', group_id=gc)
+    check(own2 not in ids(feed(1,scope='groups')), 'revoked group membership immediately removes private cards')
+    rpc(1, 'matches', 'detail', dict(event_id=own2), expected='not_found')
+    check(True, 'revoked member cannot use previous private event UUID')
     sql((ROOT / 'app/supabase/tests/premium_match_visibility.sql').read_text())
     check(True, 'existing visibility/RLS regression still passes')
     print(f'RESULT {passed} PASS: real SQL/RLS on42 source migrations; Auth/Storage fixtures, GoTrue/Edge HTTP and Premium UI NOT TESTED.', flush=True)

@@ -1,3 +1,20 @@
+# Public Match Discovery — audyt backendu Etap 2A
+
+2026-10-30 — `audit/public-match-discovery-backend`, baza `24a59e104bfe80b4d2f41cbd0ad02b58fc546040`.
+**Backend PASS w badanym zakresie; integracja BLOCK do osobnej akceptacji kontraktów.**
+Migracja 42 i handler są bajtowo niezmienione. Nie znaleziono nowej luki wymagającej poprawki.
+Zachowano UI Premium 3.18, Auth, finanse, składy, CI i 41 historycznych migracji.
+
+- PASS: 52 SQL/RLS na nowej izolowanej fixture; 352 Vitest /54 pliki; 8 nowych testów preflight; 23 istniejące testy CI; TypeScript, strict Edge, lint; 4 buildy i izolacja demo16; kontrola wyglądu55.
+- FAIL/BLOCK aktywnych kontroli: consolidation42≠41, runtime, policy0/37 i Stage3B source gate. Nie zmieniono aktywnych strażników ani approval JSON.
+- Nieaktywny patch w docs/review dopuszcza dokładnie migrację42 i handler z24a59e1. Test kopii w/tmp:42 PASS (stare37+5), odmowa zmiany obu backendów. To propozycja, nie zgoda właściciela ani PASS aktywnego CI.
+- WARN: offset bez snapshotu przy zmianach danych; celowa zmiana kolejności READ; dziedziczona globalna blokada i brak testu obciążeniowego.
+- NOT RUN: real GoTrue/Edge HTTP, hosted Actions, nowe UI/Chromium i POCO. UI wyszukiwania nadal niezaimplementowane.
+
+[Raport audytu](PUBLIC_MATCH_DISCOVERY_BACKEND_AUDIT.md). Dwie nowe fixture zatrzymano i zachowano; istniejące bazy i Supabase Cloud nietknięte. Bez merge i deployu. Następny krok: osobna akceptacja dokładnego patcha i osobny przegląd aktualizacji CI do42; UI po odrębnej zgodzie.
+
+---
+
 # Public match discovery — backend Etapu1 lokalnie PASS, UI/kontrakty BLOCKED
 
 2026-10-30 08:23 Europe/Warsaw — `feat/public-match-discovery`, baza dokładniee04d9a47560de36657da76f12ae63e20ef2299cb. Przygotowano nową migrację20261030090000_public_match_discovery.sql (42 po zachowanych41) i whitelistę query wyłącznie matches_list z fail-closed503 dla starego SQL bez markera wersji. Reuse istniejącego dispatcher/session/summary/RLS: all/grupy/public, szukanie tylko publicznych po nazwie meczu/grupy, literalnie/case-insensitive, limit100+has_more/next_offset, serwerowe predykaty przed paginacją. Prywatne obce mecze i dane grup/profili/finansów/składów nadal niedostępne; brak automatycznego członkostwa. Nie zmieniono Auth, finansów i mutacji zapisów/składów.

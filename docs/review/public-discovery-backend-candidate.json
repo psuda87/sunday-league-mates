@@ -1,0 +1,16 @@
+{
+  "status": "PROPOSAL_ONLY_OWNER_ACCEPTANCE_REQUIRED",
+  "stage3b_base": "e04d9a47560de36657da76f12ae63e20ef2299cb",
+  "backend_source": "24a59e104bfe80b4d2f41cbd0ad02b58fc546040",
+  "backend": {
+    "app/supabase/migrations/20261030090000_public_match_discovery.sql": "85e51f5e5bd8ff3a60b588a53ce397921a36439f1d5aa9859913dc179e1dc669",
+    "app/supabase/functions/accounts/handler.ts": "36aae4dc733242458619fee14b72c88421f9694add8968efd0ac1553f43d6502"
+  },
+  "test_inputs_for_separate_ci_review": {
+    "app/scripts/test-public-discovery-local.py": "5ea6767f2fb9f0bce7eac4937c006a971d1e6f108b87c9013bfc9092cee03dfd",
+    "app/scripts/test_discovery_audit_preflight.py": "274962745ce2c9c5b16135ef000e6bab407847efc4735adf6b7bd0ea0ba35f4b",
+    "app/supabase/functions/accounts/discovery.test.ts": "4509b9f3ed1cfaa960b5046e7dd1a6d564cb9c42b638282b5d076aaea41260b0",
+    "app/supabase/tests/public_match_discovery.sql": "f08d5fc33f5e624b725458cbacd875c7fdded6bb8debf6dbfe24afd5b2f9fe15"
+  },
+  "note": "Not consumed by any guard or workflow. No CI pointer repin authorized. Backend hashes cover whole files, including unchanged Auth/finance branches of handler."
+}

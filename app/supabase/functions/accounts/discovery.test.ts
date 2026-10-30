@@ -3,18 +3,19 @@ import { webcrypto } from 'node:crypto';
 import { createHandler } from './handler';
 
 afterEach(() => vi.unstubAllGlobals());
-async function request(extra: Record<string, unknown> = {}, error?: string, authenticated = true, temporary = false, discoveryVersion = 1) {
+async function request(extra: Record<string, unknown> = {}, error?: string, authenticated = true, temporary = false, discoveryVersion: unknown = 1, fault?: 'network' | 'rate') {
   vi.stubGlobal('crypto', webcrypto);
   const user = webcrypto.randomUUID(), sid = webcrypto.randomUUID();
   const token = 'x.' + btoa(JSON.stringify({ sub: user, session_id: sid, exp: Math.floor(Date.now() / 1000) + 3600 })) + '.x';
   const reply = (data: unknown) => new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
   const rpc = vi.fn(async (body: Record<string, unknown>) => {
     expect(body.p_user).toBe(user); expect(body.p_session).toBe(sid);
+    if (fault === 'network') throw new TypeError('Synthetic disconnected transport');
     return error ? new Response(JSON.stringify({ message: error }), { status: 400 }) : reply({ events: [], ...(discoveryVersion ? { public_discovery_version: discoveryVersion } : {}) });
   });
   vi.stubGlobal('fetch', vi.fn(async (input: string | URL | Request, options: RequestInit = {}) => {
     const url = String(input);
-    if (url.includes('slm_account_rate')) return reply(true);
+    if (url.includes('slm_account_rate')) return reply(fault !== 'rate');
     if (url.endsWith('/auth/v1/user')) return authenticated ? reply({ id: user }) : new Response('{}', { status: 401 });
     if (url.includes('slm_account_context')) return reply({ user_id: user, role: 'member', must_change_password: temporary });
     if (url.endsWith('/rest/v1/rpc/slm_matches_dispatch')) return rpc(JSON.parse(options.body as string));
@@ -62,4 +63,25 @@ it('fails closed instead of presenting an old unfiltered backend reply as succes
   }
   const legacy = await request({}, undefined, true, false, 0);
   expect(legacy.response.status).toBe(200);
+});
+
+it.each([2, '1', true, null])('rejects incompatible capability marker %s', async version => {
+  const { response } = await request({ query: 'fixture' }, undefined, true, false, version);
+  expect(response.status).toBe(503);
+  expect((await response.json()).code).toBe('discovery_unavailable');
+});
+it('does not return a success or fixture data after transport loss', async () => {
+  const { response } = await request({ query: 'fixture' }, undefined, true, false, 1, 'network');
+  expect(response.status).toBe(503);
+  const body = await response.json();
+  expect(body.code).toBe('service_unavailable'); expect(body).not.toHaveProperty('events');
+});
+it('applies rate limiting before search even when forged authority is supplied', async () => {
+  const { response, rpc } = await request({ query: 'fixture', role: 'admin', p_user: 'forged' }, undefined, true, false, 1, 'rate');
+  expect(response.status).toBe(429); expect(rpc).not.toHaveBeenCalled();
+});
+it('forwards invalid search parameters for server validation without silently truncating or paginating locally', async () => {
+  const { response, rpc } = await request({ query: 'x'.repeat(101), offset: -1 }, 'invalid_input');
+  expect(response.status).toBe(400);
+  expect(rpc.mock.calls[0][0]).toMatchObject({ p_body: { query: 'x'.repeat(101), offset: -1 } });
 });
