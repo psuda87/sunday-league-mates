@@ -1,5 +1,7 @@
 # Android/formularze — punkt kontrolny polish-stats
 
+2026-10-31 09:09 Europe/Warsaw — po zgłoszeniu braku działania APK uruchomiono Docker Desktop i wznowiono wyłącznie sześć istniejących usług slm-main-stabilization. Backend nadal41 migracji, bez migracji/resetu/zmian źródeł/Cloud. Przywrócono ADB emulator-5554 tcp64321→host55321; faktyczne HTTP z emulatora: Auth200, accounts401 bez sesji. Ponowny cold start APK zakończony powodzeniem; wizualnie potwierdzono odtworzoną sesję i listę meczów z lokalnego API. Podstawowy LIVE odczyt działa. Pełne discovery42 i pozostałe niezaimplementowane funkcje nadal niegotowe. Bez instalacji APK i operacji na POCO; zrzut zawierający zastane dane pozostawiono wyłącznie w ignorowanym cache.
+
 2026-10-31 Europe/Warsaw, `feat/slm-v1-polish-stats` od RC1575bef. Commity implementacji f2edf56 (native insets) i 3f181e9 (formularz gościa/selektor). PASS: build/TS, lint, strict Edge, Vitest372, Cypress/Chrome6 (fixture UI bez backendu), Gradle debug+test APK i AndroidJUnitRunner2 na emulatorze. Wszystkie55 zamrożonych plików bez zmian. APK SHA256 b0ad205c53b32ad40f7f0301004077962cca5b0de1ff0f126a1e7e089b6fd748, lokalne API64321, bez potwierdzonego LIVE.
 
 Publikacja: Draft PR #31 do RC1575bef, raport f27668c wypchnięty. GitHub potwierdził draft/open/unmerged; zero workflow runs dla f27668c, hosted NOT RUN. Możliwość technicznego merge historii nie usuwa poniższej blokady kontraktów.

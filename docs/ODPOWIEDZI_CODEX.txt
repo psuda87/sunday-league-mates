@@ -1010,3 +1010,7 @@ BLOCK integracji: Premium policy45/45 FAIL oraz consolidation/source guards odrz
 
 [2026-10-31 08:57:34 Europe/Warsaw]
 Publikacja punktu kontrolnego: https://github.com/psuda87/sunday-league-mates/pull/31 — Draft do feat/slm-v1-release-candidate (1575bef). Raport f27668c166c07c924f9eea43b645e4772f158eef wypchnięty. GitHub potwierdził draft=true, merged=false, mergeable=true; zero Actions runs dla tego SHA, więc hosted NOT RUN. Integracja nadal BLOCK przez niezmienione guardy. Gole, oceny, edycja grup i profil pozostają TODO. Wyniki i zakres w docs/SLM_V1_POLISH_STATS_REPORT.md; źródła implementacji f2edf56 i 3f181e9. Zatrzymano wyłącznie własny serwer Vite5178; inne worktree i zmiany użytkownika zachowane.
+
+
+[2026-10-31 09:09:51 Europe/Warsaw]
+Uruchomiłem Docker Desktop i sześć istniejących usług SLM. Naprawiłem brakujące przekierowanie emulatora64321 do backendu55321. PASS: Auth200/accounts401 przez rzeczywistą sieć emulatora, cold start APK oraz odtworzona sesja i lista meczów z lokalnego API. Aplikacja w emulatorze ponownie działa. Backend nadal41 migracji; pełne discovery wymaga42. Nie migrowałem ani nie resetowałem bazy, nie zmieniałem Cloud, nie instalowałem APK i nie dotykałem POCO. Zaktualizowano docs/STATUS.md i raport; zrzut z zastanymi danymi pozostaje prywatnie w ignorowanym cache.
