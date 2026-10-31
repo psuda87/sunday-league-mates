@@ -18,6 +18,10 @@ export const LINEUPS_MIGRATION='app/supabase/migrations/20261029140000_match_lin
 export const DISCOVERY_SOURCE='24a59e104bfe80b4d2f41cbd0ad02b58fc546040';
 export const DISCOVERY_MIGRATION='app/supabase/migrations/20261030090000_public_match_discovery.sql';
 export const DISCOVERY_UI='ae2fd9550b3688f80bfc69d811eb2423743b8329';
+// PR31 reviewed controls only; prior discovery/lineup approvals remain unchanged.
+export const POLISH_UI='3f181e906dcad95ba570e62d71fb9e666e9836e0';
+export const POLISH_ANDROID='f2edf565abd2f3f67a0cc3a28d6c01c5e93806f8';
+const polishUi=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/premiumEvents.css','app/src/events/GuestForm.tsx']);
 const discoveryUi=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/usePremiumEvents.ts','app/src/events/premiumContracts.ts']);
 const lineupStage1=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/PremiumTeams.tsx','app/src/events/lineupEditor.ts','app/src/events/LineupPlayerProfile.tsx']);
 const lineupStage2b=new Set(['app/src/events/PremiumTeams.tsx','app/src/events/lineupEditor.ts','app/src/events/lineupContracts.ts','app/src/events/usePremiumLineup.ts']);
@@ -49,7 +53,8 @@ export function verifyPremiumRuntime(root,overrides={}){
  assert.equal(digest(read('app/src/auth/tokenStore.ts')),digest(git(APPROVED,'app/src/auth/tokenStore.ts')),'Secure vault namespace changed');
  const bindings={
   'app/src/events/PremiumWorld.tsx':['../demo/App','./PremiumEvents','./usePremiumEvents'],
-  'app/src/events/PremiumEvents.tsx':['../ui/MatchHero','../ui/MatchTabs','./PremiumTeams','../finance/PremiumFinance','./PremiumScrollHeader'],
+  'app/src/events/PremiumEvents.tsx':['../ui/MatchHero','../ui/MatchTabs','./PremiumTeams','../finance/PremiumFinance','./PremiumScrollHeader','./GuestForm'],
+  'app/src/events/GuestForm.tsx':['react','../../supabase/functions/_shared/phone'],
   'app/src/events/PremiumTeams.tsx':['../ui/PremiumPitch','./lineupEditor','./LineupPlayerProfile','./usePremiumLineup'],
   'app/src/events/usePremiumLineup.ts':['../auth/api','./lineupEditor','./lineupContracts'],
   'app/src/events/lineupContracts.ts':['../auth/api','./premiumContracts','./lineupEditor'],
@@ -66,8 +71,11 @@ export function verifyPremiumRuntime(root,overrides={}){
  }
  // These reviewed controllers are part of the approved runtime, not spare files next to a replacement.
  for(const path of ['app/src/events/PremiumWorld.tsx','app/src/events/PremiumEvents.tsx','app/src/events/PremiumTeams.tsx','app/src/events/PremiumScrollHeader.tsx','app/src/ui/PremiumPitch.tsx','app/src/finance/PremiumFinance.tsx','app/src/finance/premiumFinance.css','app/src/events/premiumEvents.css','app/src/events/lineupEditor.ts','app/src/events/LineupPlayerProfile.tsx','app/src/events/lineupContracts.ts','app/src/events/usePremiumLineup.ts'])
-  assert.equal(digest(read(path)),digest(git(discoveryUi.has(path)?DISCOVERY_UI:lineupStage2b.has(path)?LINEUPS_STAGE2B:lineupStage1.has(path)?LINEUP_STAGE1:APPROVED,path)),'Approved runtime replaced/condition changed: '+path);
- for(const path of discoveryUi)assert.equal(digest(read(path)),digest(git(DISCOVERY_UI,path)),'Unreviewed discovery UI: '+path);
+  assert.equal(digest(read(path)),digest(git(polishUi.has(path)?POLISH_UI:discoveryUi.has(path)?DISCOVERY_UI:lineupStage2b.has(path)?LINEUPS_STAGE2B:lineupStage1.has(path)?LINEUP_STAGE1:APPROVED,path)),'Approved runtime replaced/condition changed: '+path);
+ for(const path of discoveryUi)assert.equal(digest(read(path)),digest(git(polishUi.has(path)?POLISH_UI:DISCOVERY_UI,path)),'Unreviewed discovery UI: '+path);
+ for(const path of polishUi)assert.equal(digest(read(path)),digest(git(POLISH_UI,path)),'Unreviewed PR31 control: '+path);
+ for(const path of ['app/android/app/src/main/java/pl/psuda87/slm/MainActivity.java','app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java','app/android/app/src/androidTest/java/pl/psuda87/slm/SlmWindowInsetsTest.java'])
+  assert.equal(digest(read(path)),digest(git(POLISH_ANDROID,path)),'Unreviewed PR31 native source: '+path);
  assert.equal(digest(read('app/src/groups/PremiumGroups.tsx')),digest(git(MAIN,'app/src/groups/PremiumGroups.tsx')),'Group UI wrapper replaced');
  const old=git(MAIN,'app/src/auth/B1App.tsx');
  const expected=old.replace("import WorldApp from '../demo/App';","import WorldApp from '../events/PremiumWorld';").replace("<WorldApp key={owner??'none'}","<WorldApp key={owner??'none'} manager={manager} userId={owner??''}");
