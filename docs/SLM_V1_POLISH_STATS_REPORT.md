@@ -1,5 +1,54 @@
 # SLM — poprawki Androida i formularzy, bezpieczny punkt kontrolny
 
+## Aktualizacja 31.10.2026 — odblokowanie guardów PR #31
+
+**PASS wszystkich obowiązujących guardów w kanonicznym środowisku. PR #31 gotowy do dalszej integracji z RC po decyzji właściciela, nadal Draft, bez merge.** To ocena poprawek Android/formularzy, nie ukończenie modułu goli/ocen. Historyczne BLOCK i wyniki poniżej opisują stan przed tą aktualizacją.
+
+Przy rozpoczęciu aktualny lokalny/zdalny HEAD i API PR wskazywały `5a8669156b87c1d7c4e7da03fcc30349852d21d8`, nie starszy616a8c6. Baza PR bez zmian: RC1575bef. Worktree czysty; sześć niezacommitowanych zmian właściciela w głównym ui-beta zachowano. Przeczytano aktualne AGENTS i procedurę Stage2C. Polecenie właściciela autoryzuje niniejszy osobny review kontraktów, bez zmiany zasad wdrażania.
+
+### Wynik audytu rzeczywistych źródeł
+
+- `PremiumEvents.tsx`: różnica dotyczy wyłącznie importu/wydzielenia formularza i przeniesienia jego stanu. Warunki full-access, własnego registered entry, otwartych zapisów, blokady finansowej i wolnego miejsca zachowane. Kontrakt `guest_name/guest_phone/list` oraz istniejący `data.act('guest', body)` pozostają. Właściciel, odpowiedzialny finansowo i request_id nadal pochodzą z dotychczasowego kontrolera/serwera.
+- `GuestForm.tsx`: wspólny, istniejący normalizer bez SDK/sieci/sekretów, polski numer i ograniczenie długości przed wywołaniem API. Blokada duplikacji przez ref, zachowany szkic po błędzie, brak fałszywego sukcesu. Historyczne zagraniczne kontakty nie są edytowane przez nowy formularz. Błąd nie publikuje szczegółów serwera. Key meczu i zachowane panele MatchTabs oddzielają szkice bez utraty przy zmianie zakładki.
+- `premiumEvents.css`: osiem dodanych linii ograniczonych do kontrolek selektora i `.slm-guest-form`. Zamrożone55 źródeł, manifest, boisko, karty, nawigacja, motywy, logo bez zmian. Zmiany wyglądu są dokładnie wcześniej zamówionymi korektami kontrolek, nie rozszerzeniem wyjątków UI.
+- `MainActivity`/`SlmWindowInsets`: jeden natywny listener zastępuje listener decor Capacitor, odczytuje rzeczywiste system bars/cutout/IME i przekazuje obsłużone insets jako zero. Brak sumowania kolejnych paddingów; dolny odstęp max(nav,IME). Brak mostu do Auth lub dodatkowej ścieżki API. Oryginalne2 testy instrumentacyjne sprawdzają syntetyczne przejścia oraz rzeczywiste położenie WebView po page commit. To nie pełny odbiór wszystkich klawiatur/Android12; regresję trzeba powtórzyć przy zmianie Capacitor.
+- Testy Cypress używają rzeczywistych komponentów/CSS z jawnym fikcyjnym kontrolerem bez API. Nowe HTML/TSX to dokładnie przypięte fixture dev/test, nie nowe produkcyjne wejście. Żaden Vite config, entrypoint, CSP, logging, Keystore, workflow, Auth/RLS/finance/lineup/discovery controller lub handler nie zmienił się w tej aktualizacji. Nie znaleziono rzeczywistego naruszenia blokującego zatwierdzenie tego zakresu.
+
+### Co blokowało i co zmieniono
+
+1. Policy porównywał PremiumEvents do ae2fd95, CSS do a82397b; nowy GuestForm i native nie miały osobnego przypięcia. To oczekiwany drift po zmianie, nie powód wyłączenia kontroli. W `704e4a8f2c787c8644e8a8999f99e06bb7b91a7b` dodano dokładny `POLISH_UI=3f181e906dcad95ba570e62d71fb9e666e9836e0` dla **trzech** źródeł (PremiumEvents, premiumEvents.css, GuestForm) i `POLISH_ANDROID=f2edf565abd2f3f67a0cc3a28d6c01c5e93806f8` dla **trzech** plików (MainActivity, SlmWindowInsets, test). Dodano wiązanie importu GuestForm i wspólnego normalizera. Discovery pin pozostaje dla usePremiumEvents/premiumContracts; wszystkie poprzednie piny zachowane.
+2. `verify:consolidation` kończył się FAIL przy wywołaniu tego samego runtime policy, choć historia42 i frozen55 już przechodziły. Nie wymagał zmiany własnego skryptu ani `consolidation-sources.json`; po precyzyjnym zatwierdzeniu policy przechodzi całość. Nie zmieniono ani jednego hasha manifestu55.
+3. Source CI porównywał całe app do d7b36ee; blokował native, nowe pliki i zmienione runtime. W `7c45656ab89105ba53a53e7c1f2fd7049b762666` dodano **dokładny overlay12** z704e4a8: 10 plików aplikacji/testów PR31 i 2 pliki policy/testów. Pełna lista i SHA256 w [pr31-guard-evidence.json](review/pr31-guard-evidence.json). Najpierw wciąż weryfikowany jest oryginalny Stage3B, następnie dawny overlay discovery18 i niezmieniona implementacja Stage2C/d7b36ee; dopiero na końcu PR31. Wszystkie pliki poza12 muszą pozostać identyczne; nowe/missing/ignored/symlink wejścia nadal odrzucane. Gate i jego SourceTests pozostają przypinane osobną implementacją jak wcześniej, bez dopuszczenia arbitralnej zmiany runtime/policy przez sam repin.
+4. Osobny commit wskaźnika **`6e9ce9d09a7f590ff17f6e7241848cdeccca327e`** ustawia `lineups-ci-approval.json` implementation na7c45656. Base45d9a4 niezmieniony. To końcowy commit aktywacji kontraktów; późniejsze commity tej aktualizacji zawierają wyłącznie raport/dowody. Nie squashować ani rebase’ować tej historii. Pełny końcowy SHA publikacji dokumentacji podano w odpowiedzi i aktualnym HEAD PR31.
+
+Wszystkie funkcje walidacji kontekstu GitHub, repo, SHA/event/parents, opt-in bezpłatnego limitu, hosted Linux/X64, local/empty Docker, zasobów, ścieżek, label cleanup i CLI są zgodne AST z5a86691. Zmieniono wyłącznie verify_sources i dodano jeden helper dokładnego overlay. Workflow/triggery/sekrety/ustawienia Actions bez zmian. Nie fałszowano zmiennych GitHub.
+
+### Faktyczne wyniki tej aktualizacji
+
+| Kontrola | Wynik |
+|---|---|
+| Premium policy | **PASS53/53**: wszystkie istniejące45 plus8 nowych negatywnych, żadnego usunięcia asercji |
+| verify:consolidation | **PASS42 migracje /55 frozen /11 import boundaries** |
+| SourceTests i launch-contract Linux | **PASS29/29**, stare26 i3 nowe przypadki: repin nowych źródeł, rozszerzenie/pominięcie overlay, ancestry PR31 i Stage2C |
+| Rzeczywisty source guard | **PASS** w zwykłym klonie Git wewnątrz offline Linux oraz osobnym kanonicznym klonie Windows |
+| Negatywne Premium/consolidation | **PASS60**, mutacje w prywatnej kopii: każda z41 historycznych migracji,42, dodatkowa43, handler/Auth/finance/lineups/UI |
+| Negatywne rzeczywistego CI source | **PASS69 odmów**, wszystkie42 migracje, extra43, wszystkie12 źródeł overlay, CI/testy, Auth/vault, finanse, składy, discovery, UI, manifesty i workflow. Baseline PASS przed/po; końcowy klon czysty |
+| TypeScript / ESLint / strict Edge | **PASS**, wykonane ponownie |
+| Vitest | **PASS372/372,56 plików**, wykonane ponownie |
+| Build aplikacji | **PASS**, wykonany ponownie |
+| Chromium | **PASS6/6**, ponownie Chrome156,320/360/390,Light/Dark,zmniejszony viewport; test UI bez backendu |
+| Android instrumentation/Gradle | **NOT RUN ponownie**: implementacja Androida i testy identyczne z poprzednim zakresem zPASS2/build; tych wcześniejszych wyników nie liczymy jako nowych |
+| SQL/RLS/HTTP/Cloud/POCO | **NOT RUN**: brak zmian SQL/Edge/API; nie dotykano baz, Cloud ani urządzenia |
+| GitHub-hosted | **NOT RUN**, aktualny stan sprawdzany przy publikacji; brak dispatch lub zmiany opt-in |
+
+W mieszanym roboczym checkout Windows pierwszy bezpośredni byte-check zgłosił LF/CRLF. Nie dodano normalizacji do guardów i nie zmieniano globalnego Git config. Osobny nowy klon z lokalnym `core.autocrlf=false` ma PASS tej samej implementacji; zwykły klon Linux ma PASS wraz z realnymi symlink/ancestry tests. Nie maskowano różnicy przez zmienianie asercji. Pierwotne45 FAIL wynikało dodatkowo z konstrukcji testów: każdy negatywny wymaga najpierw PASS baseline; po zatwierdzeniu dokładnych źródeł wszystkie45 przechodzą.
+
+Izolacja Linux: istniejący lokalny tools image522be6c, network none, read-only root/evidence, tmpfs klon, cap-drop ALL/no-new-privileges, bez socketu Dockera, bazy i sekretów. [Odtwarzalny checker](review/pr31-linux-source-check.py). Inne worktree/bazy i sześć zastanych usług zachowano.
+
+**Pozostałe ograniczenia produktu nie są blokadą tych guardów:** backend lokalny nadal41 (pełne discovery wymaga42), statystyki/gole/oceny/edycja grup/telefon Premium pozostają TODO. PR31 zawiera ukończone poprawki i ich kontrakty; nie implementuje tych modułów. Ostateczne merge nadal wymaga decyzji właściciela.
+
+---
+
 31.10.2026, Europe/Warsaw. **WARN: ukończony zakres Android/formularze. BLOCK: integracja przy obecnych przypięciach. Zadanie grup/statystyk nie jest ukończone.**
 
 Gałąź `feat/slm-v1-polish-stats`, osobny worktree `.worktrees/slm-v1-polish-stats`, baza: aktualny lokalny i zdalny RC `1575bef77f0b24a8c74373018895b7b872ebc06a`. Historia RC zachowana; bez squash/rebase/merge. Zastane sześć zmian właściciela na `feat/ui-beta` oraz inne worktree pozostawiono. Porównano źródła RC, ui-beta, profil/privacy i visual-parity; nie znaleziono gotowego produkcyjnego modułu goli/ocen do bezpiecznego przeniesienia. Nie importowano Auth #18.
