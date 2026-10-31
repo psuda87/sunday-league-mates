@@ -2,6 +2,8 @@
 
 2026-10-31 Europe/Warsaw, `feat/slm-v1-polish-stats` od RC1575bef. Commity implementacji f2edf56 (native insets) i 3f181e9 (formularz gościa/selektor). PASS: build/TS, lint, strict Edge, Vitest372, Cypress/Chrome6 (fixture UI bez backendu), Gradle debug+test APK i AndroidJUnitRunner2 na emulatorze. Wszystkie55 zamrożonych plików bez zmian. APK SHA256 b0ad205c53b32ad40f7f0301004077962cca5b0de1ff0f126a1e7e089b6fd748, lokalne API64321, bez potwierdzonego LIVE.
 
+Publikacja: Draft PR #31 do RC1575bef, raport f27668c wypchnięty. GitHub potwierdził draft/open/unmerged; zero workflow runs dla f27668c, hosted NOT RUN. Możliwość technicznego merge historii nie usuwa poniższej blokady kontraktów.
+
 BLOCK integracji: istniejące przypięcia runtime i całego app w CI odrzucają zmiany; Premium policy45/45 FAIL, pełne verify:consolidation FAIL na runtime, source guard FAIL na MainActivity. Żadnych zmian guardów/hashów. Telefon/prywatność profilu, edycja grup/minimum, gole/oceny są TODO, nie gotową funkcją. Brak nowych migracji (nadal42), brak wdrożonych Edge/migracji/Cloud lub zmian istniejących baz. Docker nie odpowiadał; SQL/HTTP/LIVE i Android12/POCO NOT RUN. Następny krok: review dokładnego diffu i kontraktów, potem nowa fixture i osobny etap backendu. Raport:docs/SLM_V1_POLISH_STATS_REPORT.md. Chronologia:docs/ODPOWIEDZI_CODEX.txt.
 
 ---

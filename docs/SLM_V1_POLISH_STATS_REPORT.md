@@ -81,3 +81,7 @@ Zrzuty [Light](ui/polish-stats/guest-form-light.png), [Dark](ui/polish-stats/gue
 Przed tym backendem uruchomić świeżą izolowaną fixture, odtworzyć 42 historyczne migracje, a dopiero potem dodawać/testować kolejny etap. Potrzebne testy SQL/RLS/HTTP dla IDOR, obcej prywatnej grupy, nieaktywnego członka, rzeczywistego udziału/nieobecności, wyścigów, replay/konflikt request_id, zamknięcia okna i wycieku pojedynczych ocen. Nie zostawiono częściowej migracji ani niepodłączonego backendu.
 
 Cloud i istniejące lokalne bazy nietknięte. Brak deployu, merge do main, płatnych usług i operacji na POCO. Odpowiedzi chronologiczne: `docs/ODPOWIEDZI_CODEX.txt`.
+
+## Publikacja
+
+Wypchnięto gałąź i utworzono [Draft PR #31](https://github.com/psuda87/sunday-league-mates/pull/31) do RC. GitHub potwierdził bazę `1575bef77f0b24a8c74373018895b7b872ebc06a`, HEAD raportu `f27668c166c07c924f9eea43b645e4772f158eef`, draft=true, merged=false i mergeable=true. Mergeable oznacza tylko możliwość połączenia historii, **nie zaliczenie guardów ani zgodę na integrację**. API Actions dla tego SHA zwróciło zero przebiegów: hosted NOT RUN. Kolejny commit dopisuje wyłącznie to potwierdzenie publikacji.
