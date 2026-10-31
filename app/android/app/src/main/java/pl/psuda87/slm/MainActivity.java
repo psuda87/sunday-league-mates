@@ -8,5 +8,8 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(SlmPushConfigurationPlugin.class);
         super.onCreate(savedInstanceState);
+        // The approved web UI has a mix of Ionic safe-area and CSS env() users.
+        // Keep one native inset owner instead of relying on WebView version.
+        SlmWindowInsets.install(getWindow());
     }
 }

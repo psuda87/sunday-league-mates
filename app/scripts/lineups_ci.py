@@ -25,6 +25,21 @@ STAGE3B_IMPLEMENTATION='6d96391298bbe18c582dc5c6ffda74c7045cfba3'
 DISCOVERY_IMPLEMENTATION='43f69a62c85dd354695f6fcb4531c85fb03651cf'
 DISCOVERY_OVERLAY={'app/supabase/tests/public_match_discovery.sql', 'app/scripts/discovery_local.py', 'app/scripts/test-discovery-ui-local.py', 'app/scripts/test_discovery_audit_preflight.py', 'app/scripts/verify-consolidation.mjs', 'app/supabase/functions/accounts/handler.ts', 'app/scripts/test-public-discovery-local.py', 'app/src/events/PremiumEvents.tsx', 'app/supabase/migrations/20261030090000_public_match_discovery.sql', 'app/scripts/verify-premium-policy-cases.mjs', 'app/scripts/test-discovery-ui-browser.mjs', 'app/src/events/discoveryUi.test.tsx', 'app/supabase/functions/accounts/discovery.test.ts', 'app/scripts/premium-route-policy.mjs', 'app/src/events/usePremiumEvents.ts', 'app/scripts/test-lineups-edge-local.py', 'app/scripts/test-lineups-local.py', 'app/src/events/premiumContracts.ts'}
 
+
+# PR31: retain the prior CI approval and review only this exact additive delta.
+STAGE2C_IMPLEMENTATION='d7b36eee379acf5036f8ea8aaeeea5f7791c8a04'
+POLISH_IMPLEMENTATION='704e4a8f2c787c8644e8a8999f99e06bb7b91a7b'
+POLISH_OVERLAY={
+    'app/android/app/src/main/java/pl/psuda87/slm/MainActivity.java',
+    'app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java',
+    'app/android/app/src/androidTest/java/pl/psuda87/slm/SlmWindowInsetsTest.java',
+    'app/src/events/PremiumEvents.tsx', 'app/src/events/premiumEvents.css',
+    'app/src/events/GuestForm.tsx', 'app/src/events/GuestForm.test.tsx',
+    'app/cypress/fixtures/guest-layout.html', 'app/cypress/fixtures/guest-layout.tsx',
+    'app/cypress/guest-layout.cy.ts', 'app/scripts/premium-route-policy.mjs',
+    'app/scripts/verify-premium-policy-cases.mjs',
+}
+
 CHANGED = {'app/scripts/test-lineups-local.py', 'app/scripts/test-lineups-edge-local.py',
            'app/scripts/test-lineups-ui-browser.mjs'}
 ADDED = {'app/scripts/lineups_ci.py', 'app/scripts/test_lineups_ci_context.py'}
@@ -122,6 +137,19 @@ def verify_discovery_overlay(root, original, approved):
             require(approved.get(name) == data, 'Unreviewed discovery overlay source: ' + name)
 
 
+def verify_polish_overlay(root, previous, approved):
+    candidate = archive(root, POLISH_IMPLEMENTATION)
+    candidate.pop(APPROVAL, None)
+    delta = {name for name in set(previous) | set(candidate) if previous.get(name) != candidate.get(name)}
+    require(delta == POLISH_OVERLAY, 'PR31 delta differs from exact reviewed file set')
+    require(set(approved) == set(candidate), 'PR31 CI implementation added or removed an application input')
+    for name, data in candidate.items():
+        # As before: only CI gate/test updates can be approved by the subsequent
+        # implementation pointer; runtime, policy and every test input stay pinned.
+        if name not in ('app/scripts/lineups_ci.py', 'app/scripts/test_lineups_ci_context.py'):
+            require(approved.get(name) == data, 'Unreviewed PR31 source: ' + name)
+
+
 def verify_sources(root=ROOT, base=BASE):
     pointer = root / APPROVAL
     require(pointer.is_file() and not pointer.is_symlink(), 'Missing regular CI approval pointer')
@@ -135,14 +163,17 @@ def verify_sources(root=ROOT, base=BASE):
     approved.pop(APPROVAL, None)
     original = archive(root, STAGE3B_IMPLEMENTATION)
     original.pop(APPROVAL, None)
-    for ref in (STAGE3B_IMPLEMENTATION, DISCOVERY_IMPLEMENTATION):
+    for ref in (STAGE3B_IMPLEMENTATION, DISCOVERY_IMPLEMENTATION, STAGE2C_IMPLEMENTATION, POLISH_IMPLEMENTATION):
         require(subprocess.run(['git', '-C', str(root), 'merge-base', '--is-ancestor', ref, implementation],
                                capture_output=True).returncode == 0, 'Reviewed discovery/CI ancestry missing')
     require(set(original) == set(baseline) | ADDED, 'Stage3B implementation file set changed')
     for name, data in baseline.items():
         if name not in CHANGED:
             require(original.get(name) == data, 'Historical application/backend source changed: ' + name)
-    verify_discovery_overlay(root, original, approved)
+    previous = archive(root, STAGE2C_IMPLEMENTATION)
+    previous.pop(APPROVAL, None)
+    verify_discovery_overlay(root, original, previous)
+    verify_polish_overlay(root, previous, approved)
     migrations = {p for p in approved if p.startswith('app/supabase/migrations/') and p.endswith('.sql')}
     require(len(migrations) == 42, 'Exact 42 reviewed migrations required')
     for name, data in approved.items():
