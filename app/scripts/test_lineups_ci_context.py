@@ -4,6 +4,7 @@ We never manufacture GitHub environment variables to launch an integration run.
 Positive metadata examples are passed directly to the pure validator.
 """
 import copy
+from contextlib import ExitStack
 import json
 from pathlib import Path
 import shutil
@@ -173,6 +174,19 @@ class SourceTests(unittest.TestCase):
             cls.write(cls.template,name,"42 if CI_MODE or branch=='fixture' else 41")
         cls.write(cls.template,'app/scripts/lineups_ci.py','reviewed Stage2C CI gate\n')
         cls.write(cls.template,'app/scripts/test_lineups_ci_context.py','reviewed Stage2C source tests\n')
+        cls.stage2c = cls.commit(cls.template, 'reviewed Stage2C CI implementation')
+        cls.polish_overlay = {
+            'app/src/view.tsx', 'app/src/events/GuestForm.tsx',
+            'app/src/events/premiumEvents.css', 'app/cypress/guest-layout.cy.ts',
+            'app/android/app/src/main/java/pl/psuda87/slm/MainActivity.java',
+            'app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java',
+            'app/scripts/premium-route-policy.mjs', 'app/scripts/verify-premium-policy-cases.mjs',
+        }
+        for name in cls.polish_overlay:
+            cls.write(cls.template, name, 'exact reviewed PR31 source\n')
+        cls.polish = cls.commit(cls.template, 'reviewed PR31 runtime and policy')
+        cls.write(cls.template,'app/scripts/lineups_ci.py','reviewed PR31 CI gate\n')
+        cls.write(cls.template,'app/scripts/test_lineups_ci_context.py','reviewed PR31 source tests\n')
         cls.implementation = cls.commit(cls.template, 'reviewed CI implementation')
         cls.write(cls.template, ci.APPROVAL, json.dumps({'base': cls.base, 'implementation': cls.implementation}))
         cls.commit(cls.template, 'approval pointer')
@@ -202,8 +216,14 @@ class SourceTests(unittest.TestCase):
         self.root = Path(tempfile.mkdtemp(prefix='case-', dir=self.temp.name))
         shutil.copytree(self.template, self.root, dirs_exist_ok=True)
 
-    def verify(self):
-        with patch.object(ci,'STAGE3B_IMPLEMENTATION',self.stage3b), patch.object(ci,'DISCOVERY_IMPLEMENTATION',self.discovery), patch.object(ci,'DISCOVERY_OVERLAY',self.overlay):
+    def verify(self, **overrides):
+        pins = dict(STAGE3B_IMPLEMENTATION=self.stage3b, DISCOVERY_IMPLEMENTATION=self.discovery,
+                    DISCOVERY_OVERLAY=self.overlay, STAGE2C_IMPLEMENTATION=self.stage2c,
+                    POLISH_IMPLEMENTATION=self.polish, POLISH_OVERLAY=self.polish_overlay)
+        pins.update(overrides)
+        with ExitStack() as stack:
+            for name, value in pins.items():
+                stack.enter_context(patch.object(ci, name, value))
             return ci.verify_sources(self.root, self.base)
 
     def test_exact_approved_sources_pass_without_docker(self):
@@ -303,12 +323,36 @@ class SourceTests(unittest.TestCase):
     def test_discovery_ancestry_is_required_even_with_identical_tree(self):
         tree=self.command(self.root,'rev-parse',self.discovery+'^{tree}')
         orphan=self.command(self.root,'commit-tree',tree,'-m','same reviewed tree without approved ancestry')
-        with patch.object(ci,'STAGE3B_IMPLEMENTATION',self.stage3b), patch.object(ci,'DISCOVERY_IMPLEMENTATION',orphan), patch.object(ci,'DISCOVERY_OVERLAY',self.overlay):
-            with self.assertRaisesRegex(RuntimeError,'ancestry missing'):ci.verify_sources(self.root,self.base)
+        with self.assertRaisesRegex(RuntimeError,'ancestry missing'):
+            self.verify(DISCOVERY_IMPLEMENTATION=orphan)
 
     def test_declared_overlay_cannot_expand_to_unapproved_file(self):
-        with patch.object(ci,'STAGE3B_IMPLEMENTATION',self.stage3b), patch.object(ci,'DISCOVERY_IMPLEMENTATION',self.discovery), patch.object(ci,'DISCOVERY_OVERLAY',self.overlay|{'app/src/auth/sessionManager.ts'}):
-            with self.assertRaises(RuntimeError):ci.verify_sources(self.root,self.base)
+        with self.assertRaises(RuntimeError):
+            self.verify(DISCOVERY_OVERLAY=self.overlay|{'app/src/auth/sessionManager.ts'})
+
+    def test_pr31_all_new_inputs_remain_pinned_after_pointer_repin(self):
+        for name in self.polish_overlay:
+            with self.subTest(name=name):
+                before=(self.root/name).read_bytes()
+                self.write(self.root,name,'unreviewed PR31 change')
+                bad=self.commit(self.root,'unauthorized PR31 repin')
+                self.write(self.root,ci.APPROVAL,json.dumps({'base':self.base,'implementation':bad}))
+                with self.assertRaises(RuntimeError):self.verify()
+                (self.root/name).write_bytes(before)
+
+    def test_pr31_overlay_cannot_expand_or_omit_inputs(self):
+        for overlay in (self.polish_overlay|{'app/src/auth/sessionManager.ts'},
+                        self.polish_overlay-{'app/src/events/GuestForm.tsx'}):
+            with self.subTest(overlay=overlay), self.assertRaises(RuntimeError):
+                self.verify(POLISH_OVERLAY=overlay)
+
+    def test_pr31_and_prior_ci_ancestry_required_for_identical_trees(self):
+        for name,ref in (('POLISH_IMPLEMENTATION',self.polish),('STAGE2C_IMPLEMENTATION',self.stage2c)):
+            tree=self.command(self.root,'rev-parse',ref+'^{tree}')
+            orphan=self.command(self.root,'commit-tree',tree,'-m','same tree without reviewed history')
+            with self.subTest(name=name), self.assertRaisesRegex(RuntimeError,'ancestry missing'):
+                self.verify(**{name:orphan})
+
 
 if __name__ == '__main__':
     unittest.main()
