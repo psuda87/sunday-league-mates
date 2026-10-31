@@ -1,3 +1,11 @@
+# Android/formularze — punkt kontrolny polish-stats
+
+2026-10-31 Europe/Warsaw, `feat/slm-v1-polish-stats` od RC1575bef. Commity implementacji f2edf56 (native insets) i 3f181e9 (formularz gościa/selektor). PASS: build/TS, lint, strict Edge, Vitest372, Cypress/Chrome6 (fixture UI bez backendu), Gradle debug+test APK i AndroidJUnitRunner2 na emulatorze. Wszystkie55 zamrożonych plików bez zmian. APK SHA256 b0ad205c53b32ad40f7f0301004077962cca5b0de1ff0f126a1e7e089b6fd748, lokalne API64321, bez potwierdzonego LIVE.
+
+BLOCK integracji: istniejące przypięcia runtime i całego app w CI odrzucają zmiany; Premium policy45/45 FAIL, pełne verify:consolidation FAIL na runtime, source guard FAIL na MainActivity. Żadnych zmian guardów/hashów. Telefon/prywatność profilu, edycja grup/minimum, gole/oceny są TODO, nie gotową funkcją. Brak nowych migracji (nadal42), brak wdrożonych Edge/migracji/Cloud lub zmian istniejących baz. Docker nie odpowiadał; SQL/HTTP/LIVE i Android12/POCO NOT RUN. Następny krok: review dokładnego diffu i kontraktów, potem nowa fixture i osobny etap backendu. Raport:docs/SLM_V1_POLISH_STATS_REPORT.md. Chronologia:docs/ODPOWIEDZI_CODEX.txt.
+
+---
+
 # Najnowszy RC uruchomiony w emulatorze
 
 2026-10-30 21:16 Europe/Warsaw — Android Studio otwarte z `.worktrees/slm-v1-release-candidate/app/android`; istniejący AVD Medium_Phone_API_36.1 uruchomiony z widocznym oknem, bez wipe danych. APK RC SHA256 ca6de17a63b6de01f461b49bde95c8b2403edc6c809115b3a369cf585f70e1fc zainstalowany przez install -r wyłącznie na emulator-5554 (ro.kernel.qemu=1), MainActivity uruchomiona i na pierwszym planie. Potwierdzono wizualnie ekran Mecze z fikcyjnymi lokalnymi danymi i odtworzoną sesją.
