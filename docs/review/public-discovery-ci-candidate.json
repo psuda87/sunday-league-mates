@@ -22,5 +22,15 @@
     "app/supabase/migrations/20261030090000_public_match_discovery.sql": "85e51f5e5bd8ff3a60b588a53ce397921a36439f1d5aa9859913dc179e1dc669",
     "app/supabase/tests/public_match_discovery.sql": "f08d5fc33f5e624b725458cbacd875c7fdded6bb8debf6dbfe24afd5b2f9fe15"
   },
-  "activation": "Apply proposed patch, commit reviewed CI code, then separately repin ONLY implementation in lineups-ci-approval.json to that future commit. No Actions dispatch or repository-variable change."
+  "activation": "Apply proposed patch, commit reviewed CI code, then separately repin ONLY implementation in lineups-ci-approval.json to that future commit. No Actions dispatch or repository-variable change.",
+  "integration_review_base": "fd4fccdc1c22caa5f217625809689f336139a122",
+  "proposed_patch_sha256": "befbd366448fdfbc1f923e4786e552859054e7287815ea2788dae51fa4251a80",
+  "proposed_ci_files_sha256_lf": {
+    "app/scripts/lineups_ci.py": "5395491eb0bd6e3de0ca426866526311815fc1d8dbd37e5699c6954cf0de607d",
+    "app/scripts/test-lineups-local.py": "9311a3b9d284acac3e474fbf8d0b45e6be1cdad03c134c46c5c6774c6360752b",
+    "app/scripts/test-lineups-edge-local.py": "78d6d71744ad40a4cfcd6623a24e8e6810ff2167c01eb505a91df716096ac423",
+    "app/scripts/test_lineups_ci_context.py": "bb88acb0fb0c986adce82a5b3b5ff7f13eb75538f167c511333fea9b26d01ad9"
+  },
+  "fixture_update": "Exact three-fragment transformation of test_lineups_ci_context.py; same 23 tests, synthetic Stage3B/discovery/42 history, reviewed CI helper repin instead of arbitrary runner update. No test removal/skip. This is separate from the immutable 18-file discovery overlay.",
+  "verification": "INACTIVE: 33 overlay checks + complete verify_sources positive/negative checks + all23 proposed launch-contract tests in temporary local Git fixtures. No GitHub environment, Docker, workflow or repository-variable activation."
 }

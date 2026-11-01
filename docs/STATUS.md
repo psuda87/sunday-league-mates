@@ -1,3 +1,15 @@
+# Public Match Discovery — przegląd integracyjny Cloud
+
+2026-11-01 23:03 UTC — `review/public-match-discovery-integration` od zdalnego HEAD2B `fd4fccdc1c22caa5f217625809689f336139a122` (również ref PR28). Początkowo czysty checkout. **PASS źródeł/frontendu; WARN ograniczeń; BLOCK aktywacji CI i merge do decyzji właściciela/odbioru backendu.** Backend identyczny z24a59e1; UI i aktywne piny2B bez zmian w tym review. Manifest55, Auth, finanse, składy, workflow/approval JSON i migracje nietknięte.
+
+Faktyczne PASS w Cloud:361Vitest/55 plików; TSapp/strictEdge/lint;45policy;42dokładne SQL/55visual/10granic;23stare testy launch CI;9 preflight;4buildyLIVE/Premium-finance/Androidweb/demo+izolacja16. Docker read-only dostępny, ale lokalny runner prawidłowo odmawia gałęzi review przed DB. SQL/RLS, realGoTrue/Edge/Chromium/Cypress/Windows/native/POCO i hostedActions **NOT RUN tej sesji**; nie zaliczano historycznych testów Windows.
+
+Znaleziono lukę w walidacji propozycji CI: po patchu stare fixture23 testów zgłaszały15 błędów (brak nowej historii/41→42). Poprawiono WYŁĄCZNIE nieaktywne materiały docs/review: ścisła adaptacja fixture,4 przyszłe pliki CI z SHA256, test pełnego verify_sources. PASS33overlay +40pełnych kontroli/odmów +23proponowane launch-contract. Nie pomijano testów ani nie poszerzano wyjątków UI/Auth/finansów. Aktywny CI nadal celowo BLOCK na starym pinie6d96391.
+
+[Raport](PUBLIC_MATCH_DISCOVERY_INTEGRATION_REVIEW.md). Do decyzji właściciela: dokładne piny backend24a59e1/UIae2fd95 i guardy2B; poprawiony patch CI i osobny przyszły implementation SHA; darmowy limit/opt-in/izolowany realny odbiór42; dopiero potem jawna decyzja integracyjna z zachowaniem historii. Bez merge/deploy/DB/Cloud/telefonu/zmian repo variables. Offset bez snapshotu/globalna blokada/brak load test pozostają WARN.
+
+---
+
 # Public Match Discovery — Etap 2B
 
 Publikacja: [Draft PR #28](https://github.com/psuda87/sunday-league-mates/pull/28), base audit/public-match-discovery-backend/ddd3a3e, open/draft, mergeable clean, bez merge. Kod43f69a6, raport/dowody eeb6940; zwykły push potwierdzony. Końcowe potwierdzenie osobnym commitem dokumentacyjnym, CI nieaktywowane.

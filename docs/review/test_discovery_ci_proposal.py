@@ -1,5 +1,6 @@
 """Verify INACTIVE CI patch in a temporary directory. No CI environment/DB/Actions launch."""
 import ast
+import hashlib
 import json
 from pathlib import Path
 import shutil
@@ -11,11 +12,15 @@ PATCH=ROOT/'docs/review/public-discovery-ci-proposed.patch'
 def git(*args):return subprocess.check_output(['git','-C',str(ROOT),*args])
 with tempfile.TemporaryDirectory(prefix='slm-discovery-ci-proposal-') as folder:
     temp=Path(folder)
-    for name in ('lineups_ci.py','test-lineups-local.py','test-lineups-edge-local.py'):
+    for name in ('lineups_ci.py','test-lineups-local.py','test-lineups-edge-local.py','test_lineups_ci_context.py'):
         dest=temp/'app/scripts'/name;dest.parent.mkdir(parents=True,exist_ok=True)
         dest.write_bytes((ROOT/'app/scripts'/name).read_bytes().replace(b'\r\n',b'\n'))
     result=subprocess.run(['git','-c','core.autocrlf=false','apply',str(PATCH)],cwd=temp,capture_output=True)
     assert result.returncode==0,result.stderr.decode(errors='replace')
+    manifest=json.loads((ROOT/'docs/review/public-discovery-ci-candidate.json').read_text())
+    assert hashlib.sha256(PATCH.read_bytes()).hexdigest()==manifest['proposed_patch_sha256']
+    for path,digest in manifest['proposed_ci_files_sha256_lf'].items():
+        assert hashlib.sha256((temp/path).read_bytes()).hexdigest()==digest,path
     source=(temp/'app/scripts/lineups_ci.py').read_text()
     scope={'__name__':'inactive_ci_proposal','__file__':str(ROOT/'app/scripts/lineups_ci.py')}
     exec(compile(source,'inactive_ci_proposal','exec'),scope)
@@ -26,10 +31,17 @@ with tempfile.TemporaryDirectory(prefix='slm-discovery-ci-proposal-') as folder:
         path='app/scripts/'+name
         approved[path]=approved[path].replace(b'42 if not CI_MODE and branch',b'42 if CI_MODE or branch')
         assert approved[path].replace(b'\r\n',b'\n')==(temp/path).read_bytes()
+    path='app/scripts/test_lineups_ci_context.py'
+    approved[path]=scope['expected_source_tests'](approved[path])
+    assert approved[path].replace(b'\r\n',b'\n')==(temp/path).read_bytes()
+    def cases(text):
+        return sorted(n.name for n in ast.walk(ast.parse(text)) if isinstance(n,ast.FunctionDef) and n.name.startswith('test_'))
+    assert cases(candidate[path].decode())==cases(approved[path].decode())
+    assert len(cases(approved[path].decode()))==23
     scope['verify_discovery_overlay'](ROOT,original,approved)
     passed=1
     # Tamper every explicitly pinned delta, plus unchanged Auth/finance/history.
-    paths=scope['DISCOVERY_OVERLAY']|{'app/src/auth/sessionManager.ts','app/src/finance/PremiumFinance.tsx',
+    paths=scope['DISCOVERY_OVERLAY']|{'app/scripts/test_lineups_ci_context.py','app/src/auth/sessionManager.ts','app/src/finance/PremiumFinance.tsx',
         'app/supabase/migrations/20261013185250_slm_auth_proof_setup.sql'}
     for path in paths:
         bad=dict(approved);bad[path]=bad.get(path,b'')+b'\n// unauthorized modification\n'

@@ -12,10 +12,52 @@
  CHANGED = {'app/scripts/test-lineups-local.py', 'app/scripts/test-lineups-edge-local.py',
             'app/scripts/test-lineups-ui-browser.mjs'}
  ADDED = {'app/scripts/lineups_ci.py', 'app/scripts/test_lineups_ci_context.py'}
-@@ -102,6 +107,21 @@
+@@ -102,6 +107,65 @@
          return files
 
- 
+
++def expected_source_tests(data):
++    # Exact source-only fixture adaptation. No tests are removed or disabled.
++    replacements = (
++        (
++            b"        cls.implementation = cls.commit(cls.template, 'implementation')",
++            b'        # The Stage3B source archive remains independently checked against base.\n'
++            b'        # Preserve the actual old test source so the proposed exact transformation\n'
++            b'        # is exercised inside the synthetic Git fixture as well.\n'
++            b"        source_tests='app/scripts/test_lineups_ci_context.py'\n"
++            b"        cls.write(cls.template,source_tests,ci.git(ci.ROOT,'show',ci.DISCOVERY_IMPLEMENTATION+':'+source_tests).decode())\n"
++            b"        cls.stage3b = cls.commit(cls.template, 'Stage3B implementation')\n"
++            b'        for name in ci.DISCOVERY_OVERLAY:\n'
++            b"            value='42 if not CI_MODE and branch' if name in ('app/scripts/test-lineups-local.py','app/scripts/test-lineups-edge-local.py') else 'reviewed discovery fixture source\\n'\n"
++            b'            cls.write(cls.template,name,value)\n'
++            b"        cls.discovery = cls.commit(cls.template, 'exact discovery overlay')\n"
++            b"        for name in ('app/scripts/test-lineups-local.py','app/scripts/test-lineups-edge-local.py'):\n"
++            b'            path=cls.template/name\n'
++            b"            path.write_bytes(path.read_bytes().replace(b'42 if not CI_MODE and branch',b'42 if CI_MODE or branch'))\n"
++            b'        path=cls.template/source_tests\n'
++            b'        path.write_bytes(ci.expected_source_tests(path.read_bytes()))\n'
++            b"        cls.write(cls.template,'app/scripts/lineups_ci.py','reviewed discovery CI implementation fixture\\n')\n"
++            b"        cls.implementation = cls.commit(cls.template, 'reviewed CI implementation')",
++        ),
++        (
++            b'    def verify(self):\n        return ci.verify_sources(self.root, self.base)',
++            b'    def verify(self):\n'
++            b"        with patch.object(ci,'STAGE3B_IMPLEMENTATION',self.stage3b), patch.object(ci,'DISCOVERY_IMPLEMENTATION',self.discovery):\n"
++            b'            return ci.verify_sources(self.root, self.base)',
++        ),
++        (
++            b"        self.write(self.root, 'app/scripts/test-lineups-edge-local.py', 'new reviewed launch wrapper')",
++            b'        # Only the explicitly reviewed CI gate may be repinned here. Runner\n'
++            b'        # changes are constrained by the exact 41-to-42 transformation.\n'
++            b"        self.write(self.root, 'app/scripts/lineups_ci.py', 'new reviewed CI gate')",
++        ),
++    )
++    for old,new in replacements:
++        require(data.count(old)==1,'Legacy CI test fixture contract changed')
++        data=data.replace(old,new)
++    return data
++
++
 +def verify_discovery_overlay(root, original, approved):
 +    candidate = archive(root, DISCOVERY_IMPLEMENTATION)
 +    candidate.pop(APPROVAL, None)
@@ -27,6 +69,8 @@
 +        # Its checkout bytes are still checked against that immutable approval below.
 +        if name in ('app/scripts/test-lineups-local.py', 'app/scripts/test-lineups-edge-local.py'):
 +            data = data.replace(b"42 if not CI_MODE and branch", b"42 if CI_MODE or branch")
++        if name == 'app/scripts/test_lineups_ci_context.py':
++            data = expected_source_tests(data)
 +        if name != 'app/scripts/lineups_ci.py':
 +            require(approved.get(name) == data, 'Unreviewed discovery overlay source: ' + name)
 +
@@ -34,7 +78,7 @@
  def verify_sources(root=ROOT, base=BASE):
      pointer = root / APPROVAL
      require(pointer.is_file() and not pointer.is_symlink(), 'Missing regular CI approval pointer')
-@@ -112,16 +132,19 @@
+@@ -112,16 +176,19 @@
          require(subprocess.run(['git', '-C', str(root), 'merge-base', '--is-ancestor', ref, 'HEAD'],
                                 capture_output=True).returncode == 0, 'Approved history missing')
      baseline, approved = archive(root, base), archive(root, implementation)
@@ -60,14 +104,14 @@
      for name, data in approved.items():
          path = root / name
          require(path.is_file() and not path.is_symlink() and path.read_bytes() == data,
-@@ -203,7 +226,7 @@
+@@ -203,7 +270,7 @@
      memory = Path('/proc/meminfo').read_text()
      validate_resources(os.cpu_count() or 0, shutil.disk_usage(ROOT).free,
                         int(re.search(r'MemTotal:\s+(\d+)', memory).group(1)))
 -    print('PASS CI preflight: exact commit/event, approved app/backend/41 migrations, isolated empty local Docker', flush=True)
 +    print('PASS CI preflight: exact commit/event, approved app/backend/42 migrations, isolated empty local Docker', flush=True)
 
- 
+
  def options(suite, image):
 --- a/app/scripts/test-lineups-local.py
 +++ b/app/scripts/test-lineups-local.py
@@ -91,3 +135,51 @@
      for file in migrations:
          sql(file.read_text(encoding='utf-8'))
      check(True, str(len(migrations))+' canonical migrations replay on real GoTrue Auth schema')
+--- a/app/scripts/test_lineups_ci_context.py
++++ b/app/scripts/test_lineups_ci_context.py
+@@ -160,7 +160,23 @@
+         for name in ci.CHANGED | ci.ADDED:
+             cls.write(cls.template, name, 'reviewed launch implementation fixture\n')
+         cls.write(cls.template, ci.WORKFLOW, 'reviewed workflow fixture\n')
+-        cls.implementation = cls.commit(cls.template, 'implementation')
++        # The Stage3B source archive remains independently checked against base.
++        # Preserve the actual old test source so the proposed exact transformation
++        # is exercised inside the synthetic Git fixture as well.
++        source_tests='app/scripts/test_lineups_ci_context.py'
++        cls.write(cls.template,source_tests,ci.git(ci.ROOT,'show',ci.DISCOVERY_IMPLEMENTATION+':'+source_tests).decode())
++        cls.stage3b = cls.commit(cls.template, 'Stage3B implementation')
++        for name in ci.DISCOVERY_OVERLAY:
++            value='42 if not CI_MODE and branch' if name in ('app/scripts/test-lineups-local.py','app/scripts/test-lineups-edge-local.py') else 'reviewed discovery fixture source\n'
++            cls.write(cls.template,name,value)
++        cls.discovery = cls.commit(cls.template, 'exact discovery overlay')
++        for name in ('app/scripts/test-lineups-local.py','app/scripts/test-lineups-edge-local.py'):
++            path=cls.template/name
++            path.write_bytes(path.read_bytes().replace(b'42 if not CI_MODE and branch',b'42 if CI_MODE or branch'))
++        path=cls.template/source_tests
++        path.write_bytes(ci.expected_source_tests(path.read_bytes()))
++        cls.write(cls.template,'app/scripts/lineups_ci.py','reviewed discovery CI implementation fixture\n')
++        cls.implementation = cls.commit(cls.template, 'reviewed CI implementation')
+         cls.write(cls.template, ci.APPROVAL, json.dumps({'base': cls.base, 'implementation': cls.implementation}))
+         cls.commit(cls.template, 'approval pointer')
+
+@@ -190,7 +206,8 @@
+         shutil.copytree(self.template, self.root, dirs_exist_ok=True)
+
+     def verify(self):
+-        return ci.verify_sources(self.root, self.base)
++        with patch.object(ci,'STAGE3B_IMPLEMENTATION',self.stage3b), patch.object(ci,'DISCOVERY_IMPLEMENTATION',self.discovery):
++            return ci.verify_sources(self.root, self.base)
+
+     def test_exact_approved_sources_pass_without_docker(self):
+         with patch.object(ci, 'docker', side_effect=AssertionError('No Docker allowed in contract tests')):
+@@ -267,7 +284,9 @@
+             self.verify()
+
+     def test_reviewed_runner_update_can_repin_after_prior_pointer_exists(self):
+-        self.write(self.root, 'app/scripts/test-lineups-edge-local.py', 'new reviewed launch wrapper')
++        # Only the explicitly reviewed CI gate may be repinned here. Runner
++        # changes are constrained by the exact 41-to-42 transformation.
++        self.write(self.root, 'app/scripts/lineups_ci.py', 'new reviewed CI gate')
+         new = self.commit(self.root, 'reviewed launch update retains an old pointer in history')
+         self.write(self.root, ci.APPROVAL, json.dumps({'base': self.base, 'implementation': new}))
+         self.assertEqual(self.verify(), new)
