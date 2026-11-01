@@ -176,3 +176,11 @@ materiały CI w docs/review. Zero zmian app/, aktywnych guardów/workflow/pointe
 Auth, RLS/migracji, finansów, składów, CSS/assets/native lub manifestu55.
 Bez merge, rebase, deployu, płatnych zasobów, zmian repo variables, produkcyjnych
 sekretów i Supabase Cloud. SHA implementacji review/publikacji dopisany poniżej.
+
+## Publikacja
+
+Commit raportu/poprawki propozycji/testów: `ea034e37a22e5cd20c5d87952f20a3f713382ef1`. Zwykły push
+`review/public-match-discovery-integration` potwierdzony odczytem zdalnego refu.
+[Dokładny diff review](https://github.com/psuda87/sunday-league-mates/compare/feat/public-match-discovery-stage2b...review/public-match-discovery-integration?expand=1).
+Końcowe potwierdzenie publikacji jest osobnym commitem dokumentacyjnym, bez
+zmian źródeł lub wyników. PR/Actions/merge/deploy nie wykonywano.
