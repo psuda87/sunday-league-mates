@@ -1,0 +1,13 @@
+{
+  "apk": "I:\\slm\\sunday-league-mates\\.worktrees\\slm-2.0-rc\\.cache\\slm2\\slm-2.0-rc-debug.apk",
+  "sha256": "bdffa9c03976472efd3dfdb1bd05e47526c71acb77ffeb75dfffb7dd8a8b5fc7",
+  "size_bytes": 7869642,
+  "application_id": "pl.psuda87.slm",
+  "endpoint": "http://127.0.0.1:64321/functions/v1/accounts",
+  "variant": "debug local Premium Stage3",
+  "logging": "none",
+  "webview_debug": false,
+  "native_insets_present": true,
+  "version_name": "1.0",
+  "version_code": 1
+}
