@@ -21,6 +21,10 @@ export const DISCOVERY_UI='ae2fd9550b3688f80bfc69d811eb2423743b8329';
 // PR31 reviewed controls only; prior discovery/lineup approvals remain unchanged.
 export const POLISH_UI='3f181e906dcad95ba570e62d71fb9e666e9836e0';
 export const POLISH_ANDROID='f2edf565abd2f3f67a0cc3a28d6c01c5e93806f8';
+// Owner-requested RC fixes: exact tested sources only, no manifest/hash expansion.
+export const MINIMUM_PHONE_SOURCE='51c980befd6a5f28c3471c89392a8a04672aaf0b';
+export const MINIMUM_MIGRATION='app/supabase/migrations/20261102180613_configurable_match_minimum.sql';
+export const MINIMUM_PHONE_RUNTIME=new Set(['app/src/demo/EventForm.tsx','app/src/events/PremiumEvents.tsx','app/src/events/usePremiumEvents.ts','app/src/events/premiumContracts.ts','app/src/events/premiumForm.ts','app/src/auth/profileAdapter.ts','app/src/auth/useOwnProfile.ts','app/src/ui/personalProfile.ts','app/src/profile/PremiumIdentityEditor.tsx','app/src/profile/PhoneEditor.tsx','app/supabase/functions/accounts/handler.ts','app/vite.demo.config.ts']);
 const polishUi=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/premiumEvents.css','app/src/events/GuestForm.tsx']);
 const discoveryUi=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/usePremiumEvents.ts','app/src/events/premiumContracts.ts']);
 const lineupStage1=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/PremiumTeams.tsx','app/src/events/lineupEditor.ts','app/src/events/LineupPlayerProfile.tsx']);
@@ -41,20 +45,26 @@ export function verifyPremiumRuntime(root,overrides={}){
   const current=original.files[path].text?read(path):Object.hasOwn(overrides,path)?overrides[path]:readFileSync(root+'/'+path);
   const expected=digest(raw);
   assert.equal(manifest.files[path].sha256,expected,'Unapproved contract hash: '+path);
-  assert.equal(digest(current),expected,'Unapproved visual source: '+path);
+  assert.equal(digest(current),path==='app/src/demo/EventForm.tsx'?digest(git(MINIMUM_PHONE_SOURCE,path)):expected,'Unapproved visual source: '+path);
  }
+ // The one frozen presentation change is exactly the requested minimum field.
+ const form=git(MINIMUM_PHONE_SOURCE,'app/src/demo/EventForm.tsx');
+ assert.equal(form.replace("{field('minimum','Minimum zawodników','number',{min:1,max:100,step:1})}","{live?<p>Minimum zawodników: 10</p>:field('minimum','Minimum zawodników','number',{min:1,step:1})}"),git(APPROVED,'app/src/demo/EventForm.tsx'),'Minimum form exception exceeded its exact field');
  const mainSteps=execFileSync('git',['ls-tree','-r','--name-only',MAIN,'--','app/supabase/migrations'],{cwd:root,encoding:'utf8'}).trim().split('\n');
  const added=['20261028174603_premium_match_membership_visibility.sql','20261028174920_premium_member_creation_finance_guard.sql','20261028175508_premium_match_feed_filters.sql','20261028181054_premium_group_admin_only_finance.sql'].map(n=>'app/supabase/migrations/'+n);
- assert.deepEqual(readdirSync(root+'/app/supabase/migrations').filter(n=>n.endsWith('.sql')).sort(),[...mainSteps,...added,'app/supabase/migrations/20261028204500_restore_pr16_match_name_projection.sql',LINEUPS_MIGRATION,DISCOVERY_MIGRATION].map(p=>p.split('/').at(-1)).sort(),'Unexpected migration/model activation');
+ assert.deepEqual(readdirSync(root+'/app/supabase/migrations').filter(n=>n.endsWith('.sql')).sort(),[...mainSteps,...added,'app/supabase/migrations/20261028204500_restore_pr16_match_name_projection.sql',LINEUPS_MIGRATION,DISCOVERY_MIGRATION,MINIMUM_MIGRATION].map(p=>p.split('/').at(-1)).sort(),'Unexpected migration/model activation');
  for(const p of [...mainSteps,...added])assert.equal(digest(read(p)),digest(git(added.includes(p)?APPROVED:MAIN,p)),'Historical migration overwritten: '+p);
  assert.equal(digest(read(LINEUPS_MIGRATION)),digest(git(LINEUPS_STAGE2A,LINEUPS_MIGRATION)),'Unreviewed Stage 2A backend source: '+LINEUPS_MIGRATION);
- for(const p of [DISCOVERY_MIGRATION,'app/supabase/functions/accounts/handler.ts'])
-  assert.equal(digest(read(p)),digest(git(DISCOVERY_SOURCE,p)),'Unreviewed discovery backend source: '+p);
+ for(const p of [DISCOVERY_MIGRATION,'app/supabase/functions/accounts/handler.ts',MINIMUM_MIGRATION])
+  assert.equal(digest(read(p)),digest(git(p===DISCOVERY_MIGRATION?DISCOVERY_SOURCE:MINIMUM_PHONE_SOURCE,p)),'Unreviewed discovery backend source: '+p);
+ for(const p of MINIMUM_PHONE_RUNTIME)assert.equal(digest(read(p)),digest(git(MINIMUM_PHONE_SOURCE,p)),'Unreviewed minimum/phone runtime: '+p);
  assert.equal(digest(read('app/src/auth/tokenStore.ts')),digest(git(APPROVED,'app/src/auth/tokenStore.ts')),'Secure vault namespace changed');
  const bindings={
   'app/src/events/PremiumWorld.tsx':['../demo/App','./PremiumEvents','./usePremiumEvents'],
   'app/src/events/PremiumEvents.tsx':['../ui/MatchHero','../ui/MatchTabs','./PremiumTeams','../finance/PremiumFinance','./PremiumScrollHeader','./GuestForm'],
   'app/src/events/GuestForm.tsx':['react','../../supabase/functions/_shared/phone'],
+  'app/src/profile/PremiumIdentityEditor.tsx':['./PhoneEditor'],
+  'app/src/profile/PhoneEditor.tsx':['react','../../supabase/functions/_shared/phone'],
   'app/src/events/PremiumTeams.tsx':['../ui/PremiumPitch','./lineupEditor','./LineupPlayerProfile','./usePremiumLineup'],
   'app/src/events/usePremiumLineup.ts':['../auth/api','./lineupEditor','./lineupContracts'],
   'app/src/events/lineupContracts.ts':['../auth/api','./premiumContracts','./lineupEditor'],
@@ -71,9 +81,9 @@ export function verifyPremiumRuntime(root,overrides={}){
  }
  // These reviewed controllers are part of the approved runtime, not spare files next to a replacement.
  for(const path of ['app/src/events/PremiumWorld.tsx','app/src/events/PremiumEvents.tsx','app/src/events/PremiumTeams.tsx','app/src/events/PremiumScrollHeader.tsx','app/src/ui/PremiumPitch.tsx','app/src/finance/PremiumFinance.tsx','app/src/finance/premiumFinance.css','app/src/events/premiumEvents.css','app/src/events/lineupEditor.ts','app/src/events/LineupPlayerProfile.tsx','app/src/events/lineupContracts.ts','app/src/events/usePremiumLineup.ts'])
-  assert.equal(digest(read(path)),digest(git(polishUi.has(path)?POLISH_UI:discoveryUi.has(path)?DISCOVERY_UI:lineupStage2b.has(path)?LINEUPS_STAGE2B:lineupStage1.has(path)?LINEUP_STAGE1:APPROVED,path)),'Approved runtime replaced/condition changed: '+path);
- for(const path of discoveryUi)assert.equal(digest(read(path)),digest(git(polishUi.has(path)?POLISH_UI:DISCOVERY_UI,path)),'Unreviewed discovery UI: '+path);
- for(const path of polishUi)assert.equal(digest(read(path)),digest(git(POLISH_UI,path)),'Unreviewed PR31 control: '+path);
+  assert.equal(digest(read(path)),digest(git(MINIMUM_PHONE_RUNTIME.has(path)?MINIMUM_PHONE_SOURCE:polishUi.has(path)?POLISH_UI:discoveryUi.has(path)?DISCOVERY_UI:lineupStage2b.has(path)?LINEUPS_STAGE2B:lineupStage1.has(path)?LINEUP_STAGE1:APPROVED,path)),'Approved runtime replaced/condition changed: '+path);
+ for(const path of discoveryUi)assert.equal(digest(read(path)),digest(git(MINIMUM_PHONE_RUNTIME.has(path)?MINIMUM_PHONE_SOURCE:polishUi.has(path)?POLISH_UI:DISCOVERY_UI,path)),'Unreviewed discovery UI: '+path);
+ for(const path of polishUi)assert.equal(digest(read(path)),digest(git(MINIMUM_PHONE_RUNTIME.has(path)?MINIMUM_PHONE_SOURCE:POLISH_UI,path)),'Unreviewed PR31 control: '+path);
  for(const path of ['app/android/app/src/main/java/pl/psuda87/slm/MainActivity.java','app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java','app/android/app/src/androidTest/java/pl/psuda87/slm/SlmWindowInsetsTest.java'])
   assert.equal(digest(read(path)),digest(git(POLISH_ANDROID,path)),'Unreviewed PR31 native source: '+path);
  assert.equal(digest(read('app/src/groups/PremiumGroups.tsx')),digest(git(MAIN,'app/src/groups/PremiumGroups.tsx')),'Group UI wrapper replaced');

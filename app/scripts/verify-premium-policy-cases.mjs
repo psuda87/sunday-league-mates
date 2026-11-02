@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {verifyPremiumRuntime,APPROVED,LINEUPS_MIGRATION,DISCOVERY_MIGRATION} from './premium-route-policy.mjs';
+import {verifyPremiumRuntime,APPROVED,LINEUPS_MIGRATION,DISCOVERY_MIGRATION,MINIMUM_MIGRATION} from './premium-route-policy.mjs';
 const root=fileURLToPath(new URL('../../',import.meta.url));
 const read=p=>readFileSync(root+'/'+p,'utf8');
 test('actual source graph passes',()=>assert.equal(verifyPremiumRuntime(root).frozen,55));
@@ -43,7 +43,7 @@ for(const [label,path,mutate] of [
  ['lineup CAS removed',LINEUPS_MIGRATION,s=>s.replace("raise exception 'lineup_version_conflict';",'null;')],
  ['lineup scope check removed',LINEUPS_MIGRATION,s=>s.replace('group_id=e.group_id and user_id=p_user','group_id=e.group_id')],
  ['lineup API author forged','app/supabase/functions/accounts/handler.ts',s=>s.replace('p_user:ctx.id,p_session:ctx.sid,p_action:action.slice(8)','p_user:body.user_id,p_session:ctx.sid,p_action:action.slice(8)')],
- ['cards replaced in rendering','app/src/events/PremiumEvents.tsx',s=>s.replace('<MatchHero compact','<section compact')],
+ ['cards replaced in rendering','app/src/events/PremiumEvents.tsx',s=>s.replace('<MatchHero minimum={m.minimum_players} compact','<section minimum={m.minimum_players} compact')],
  ['Android HTML uses a different entry','app/android-stage3/index.html',s=>s.replace('./main.tsx','../demo/main.tsx')],
  ['main switches to demo','app/src/App.tsx',()=>"export {default} from './ui/Demo';"],
  ['contract hash self-approval','app/scripts/premium318-contract.json',s=>{const j=JSON.parse(s);j.files['app/src/ui/UltimatePlayerCard.tsx'].sha256='0'.repeat(64);return JSON.stringify(j);}],
@@ -60,4 +60,12 @@ for(const [label,path,mutate] of [
  ['native padding accumulates','app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java',s=>s.replace('bars.top, bars.right','bars.top + view.getPaddingTop(), bars.right')],
  ['native assertions weakened','app/android/app/src/androidTest/java/pl/psuda87/slm/SlmWindowInsetsTest.java',s=>s.replace('assertNotNull(actual);','')],
  ['frozen list shrinks','app/scripts/premium318-contract.json',s=>{const j=JSON.parse(s);delete j.files['app/src/ui/UltimatePlayerCard.tsx'];return JSON.stringify(j);}],
+ ['minimum migration altered',MINIMUM_MIGRATION,s=>s.replace('v_count<e.minimum_players','v_count<10')],
+ ['minimum control disabled','app/src/demo/EventForm.tsx',s=>s.replace("{min:1,max:100,step:1}","{min:10,max:10,step:1}")],
+ ['minimum API payload ignored','app/src/events/usePremiumEvents.ts',s=>s.replace('minimum_players:input.minimum','minimum_players:10')],
+ ['minimum contract accepts zero','app/src/events/premiumContracts.ts',s=>s.replace('Number(r.minimum_players)<1','Number(r.minimum_players)<0')],
+ ['phone uses unverified session mutation','app/src/auth/profileAdapter.ts',s=>s.replace("manager.changeSession('identifiers'","manager.call('identifiers'")],
+ ['phone password printed as text','app/src/profile/PhoneEditor.tsx',s=>s.replace('type="password"','type="text"')],
+ ['phone pending guard removed','app/src/profile/PhoneEditor.tsx',s=>s.replace('if(flight.current||binding.saving)return','if(binding.saving)return')],
+ ['phone expands demo to Auth','app/vite.demo.config.ts',s=>s.replace("'src/profile/PhoneEditor.tsx'","'src/auth/sessionManager.ts'")],
 ])test('rejects '+label,()=>{verifyPremiumRuntime(root);const source=read(path),changed=mutate(source);assert.notEqual(changed,source,'Mutation must exercise a real source change');assert.throws(()=>verifyPremiumRuntime(root,{[path]:changed}));});
