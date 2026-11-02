@@ -1,0 +1,106 @@
+2026-11-02 Europe/Warsaw; local Windows/Docker; actual sanitized acceptance output.
+SQL/RLS final attempt:
+PASS migration mismatch rolls back atomically, no partial helper or dispatcher
+PASS all preexisting RLS policy definitions unchanged
+PASS Auth/group/finance/lineup functions unchanged by migration42
+PASS only list branch changed; every mutation/detail byte preserved
+PASS service-only invoker ACL/RLS/search_path and no Auth18
+PASS default feed is current groups plus future public, no foreign private/history/cancelled
+PASS groups scope aggregates actual memberships across two groups
+PASS new user without groups discovers only future public
+PASS public scope includes own and foreign public only
+PASS foreign group UUID cannot expose private rows
+PASS case-insensitive public search by organizing group name
+PASS public search by match name
+PASS Polish case and outer whitespace handled by server
+PASS wildcards and SQL-like input are literal text
+PASS private names are not searchable, no-results list is empty
+PASS empty search resets to bounded public feed
+PASS invalid scopes/query/types/offsets and actor injection fail closed
+PASS non-object list payloads reject safely
+PASS inactive account and mismatched actor/session denied
+PASS counts include registered guest but reserve does not occupy capacity
+PASS summary reuses safe DTO without group/private roster/finance details
+PASS public discovery grants no private group/profile/finance/lineup API access
+PASS authenticated SQL client cannot bypass table ACL or forge service RPC actor
+PASS discovery reads never create group membership
+PASS first page bounded at100 with explicit capability and next offset
+PASS all public results page without omissions, duplicate IDs or private displacement
+PASS search predicate precedes limit and excludes matching private fixtures
+PASS stable timestamp/UUID ordering across repeated and shifted pages
+PASS out-of-range offset yields empty page
+PASS read/list operations do not alter finance ledger
+PASS group history does not include unrelated public history
+PASS unchanged signup API still rejects full, ended and cancelled public matches
+PASS explicit public reserve uses existing rules without group membership
+PASS public participant on reserve still has no private profile or lineup access
+PASS legacy own history survives leaving; groups means current memberships only
+PASS closed-world public DTO has only existing summary fields, no organizer/finance privilege
+PASS foreign private absent across list scope default
+PASS foreign private absent across list scope all
+PASS foreign private absent across list scope public
+PASS foreign private absent across list scope mine
+PASS foreign private absent across list scope groups
+PASS foreign private absent across list scope group
+PASS private detail/signup and direct helper ACL reject outsiders and client roles
+PASS extra limit, null/boolean/types and forged actor search rejected
+PASS administrator of a different group gains no finance or lineup access
+PASS SQL independently denies temporary-password and revoked live sessions
+PASS public match initially discoverable
+PASS closing public match removes outsider search and default feed immediately
+PASS known event UUID cannot bypass closed visibility
+PASS revoked group membership immediately removes private cards
+PASS revoked member cannot use previous private event UUID
+PASS existing visibility/RLS regression still passes
+RESULT 52 PASS: real SQL/RLS on42 source migrations; Auth/Storage fixtures, GoTrue/Edge HTTP and Premium UI NOT TESTED.
+Stopped and retained fixture: slm-public-discovery-589116290d1d
+
+Real HTTP final attempt:
+PASS 42 canonical migrations replay on real GoTrue Auth schema
+PASS four real GoTrue sessions accepted through unchanged accounts login
+PASS real Edge GET exposes five roster entries including three guests
+PASS ordinary member commits shared A/B over real GoTrue/Edge/PostgREST
+PASS HTTP no-op preserves author timestamp and version
+PASS HTTP retry returns original receipt
+PASS real Edge denies private outsider read/write and forged author
+PASS two GoTrue clients race through Edge: one commit and one HTTP409
+PASS real Edge rejects stale roster and foreign assignment
+PASS GoTrue JWT cannot bypass table ACL or invoke service RPC directly
+PASS same GoTrue client reads identical persisted snapshot after isolated backend restart
+PASS DISCOVERY HTTP: marker/page100 after privacy filtering
+PASS DISCOVERY HTTP: page5 and end metadata
+PASS DISCOVERY HTTP: 105 unique public rows; 120 earlier matching private rows excluded
+PASS DISCOVERY HTTP: marker/page100 after privacy filtering
+PASS DISCOVERY HTTP: page5 and end metadata
+PASS DISCOVERY HTTP: 105 unique public rows; 120 earlier matching private rows excluded
+PASS DISCOVERY HTTP: private name not searchable
+PASS DISCOVERY HTTP: Polish Unicode and wildcard characters searched literally
+PASS DISCOVERY HTTP: SQL-like query remains literal
+PASS DISCOVERY HTTP: empty query remains bounded
+PASS DISCOVERY HTTP: no-group client gets no groups results
+PASS DISCOVERY HTTP: foreign private rows absent in scope all
+PASS DISCOVERY HTTP: foreign private rows absent in scope mine
+PASS DISCOVERY HTTP: foreign private rows absent in scope group
+PASS DISCOVERY HTTP: invalid query/scope/type/offset rejected
+PASS DISCOVERY HTTP: invalid query/scope/type/offset rejected
+PASS DISCOVERY HTTP: invalid query/scope/type/offset rejected
+PASS DISCOVERY HTTP: invalid query/scope/type/offset rejected
+PASS DISCOVERY HTTP: invalid query/scope/type/offset rejected
+PASS DISCOVERY HTTP: client cannot enlarge page using limit
+PASS DISCOVERY HTTP: search grants no membership, private detail, lineup or finance access
+PASS DISCOVERY HTTP: direct REST cannot reveal foreign private match
+GoTrue expiry probe: HTTP 403, expiry reason=True
+PASS DISCOVERY HTTP: real GoTrue explicitly rejects expired signed-token negative fixture
+PASS DISCOVERY HTTP: expired-token denial does not rely on revoking original live session
+PASS DISCOVERY HTTP: accepted member sees own private match
+PASS DISCOVERY HTTP: leave removes private discovery/detail while original GoTrue token stays valid
+PASS DISCOVERY HTTP: admin membership revoke removes access without client relogin
+PASS DISCOVERY HTTP: GoTrue token still valid after fixture application-session revoke
+PASS DISCOVERY HTTP: revoked application session cannot search using a still-valid GoTrue JWT
+PASS DISCOVERY HTTP: new real login can discover without membership
+PASS DISCOVERY HTTP: real logout prevents further public search with the old token
+PASS live GoTrue token loses lineup access immediately after leaving group
+PASS revoked real application session cannot read lineup
+RESULT 44 PASS; real GoTrue-issued JWT -> accounts Edge -> PostgREST -> PostgreSQL. Kong/Storage/Android not tested; browser result above.
+ACCEPTANCE PASS: 31 discovery/security checks + 13 existing core checks; browser NOT RUN.
+Stopped/retained only NEW fixture: slm-lineups-edge-33add891f202, slm-lineups-edge-33add891f202-auth, slm-lineups-edge-33add891f202-rest, slm-lineups-edge-33add891f202-edge
