@@ -1,0 +1,174 @@
+{
+  "checked_date": "2026-11-02 Europe/Warsaw",
+  "pull_requests": [
+    {
+      "number": 18,
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "base": "main",
+      "base_sha": "134c52b1aee0d0804cc0cf71f151f95040e7a38f",
+      "head": "feat/account-model-foundation",
+      "head_sha": "845d35e1bc644be5935d3658ed1e3a57cd74b518",
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "merge_commit_sha": "ad05c77309ea8405e252e5140b073edf502ec6d2"
+    },
+    {
+      "number": 20,
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "head": "448a2967489040162bfc6653c197af9afe9dcb55",
+      "base": "feat/account-model-foundation"
+    },
+    {
+      "number": 21,
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "head": "4b7e740261e4937e80470079a8d5d43e153de883",
+      "base": "feat/premium-real-events-stage1"
+    },
+    {
+      "number": 22,
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "head": "74b1595d7a8dc79d50ba451df6afe2ea6da95e55",
+      "base": "feat/premium-real-finance-stage2"
+    },
+    {
+      "number": 23,
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "head": "a82397b130ca2296511247e848139edb79308a87",
+      "base": "test/android-premium-real-stage3"
+    },
+    {
+      "number": 24,
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "base": "main",
+      "base_sha": "134c52b1aee0d0804cc0cf71f151f95040e7a38f",
+      "head": "chore/main-stabilization",
+      "head_sha": "39ef2e3937b781439864029a92c12de315024263",
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "merge_commit_sha": "d0c5e70bb172ea8cd11adc7393dcd51f8e9999d7"
+    },
+    {
+      "number": 28,
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "base": "audit/public-match-discovery-backend",
+      "base_sha": "ddd3a3e2eaefdf449bc83c34c6335f42a2da4aab",
+      "head": "feat/public-match-discovery-stage2b",
+      "head_sha": "fd4fccdc1c22caa5f217625809689f336139a122",
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "merge_commit_sha": "313a5260a39039e1eaf7003bf1ec746b14544a4f"
+    },
+    {
+      "number": 29,
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "base": "feat/public-match-discovery-stage2b",
+      "base_sha": "fd4fccdc1c22caa5f217625809689f336139a122",
+      "head": "chore/public-discovery-stage2c",
+      "head_sha": "e246c514af0fbca79dee892d9aa0e31b937a83c3",
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "merge_commit_sha": "c65c9ea497dee1c9525379b37e096ed67b4e5070"
+    },
+    {
+      "number": 30,
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "base": "main",
+      "base_sha": "134c52b1aee0d0804cc0cf71f151f95040e7a38f",
+      "head": "feat/slm-v1-release-candidate",
+      "head_sha": "1575bef77f0b24a8c74373018895b7b872ebc06a",
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "merge_commit_sha": "e73041ab60873cc420a2c2169aec14ffa4a1128b"
+    },
+    {
+      "number": 31,
+      "state": "open",
+      "draft": true,
+      "merged": false,
+      "base": "feat/slm-v1-release-candidate",
+      "base_sha": "1575bef77f0b24a8c74373018895b7b872ebc06a",
+      "head": "feat/slm-v1-polish-stats",
+      "head_sha": "1b3aed659749f1084cab8cd4f47f99a54a50c8b9",
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "merge_commit_sha": "8ef2b444156e2695b668d4d25d8a3de606ed5bae"
+    }
+  ],
+  "hosted_runs": [
+    {
+      "sha": "1575bef77f0b24a8c74373018895b7b872ebc06a",
+      "total": 2,
+      "runs": [
+        {
+          "id": 41124734493,
+          "event": "pull_request",
+          "status": "completed",
+          "conclusion": "skipped",
+          "url": "https://github.com/psuda87/sunday-league-mates/actions/runs/41124734493"
+        },
+        {
+          "id": 41124734722,
+          "event": "pull_request",
+          "status": "completed",
+          "conclusion": "skipped",
+          "url": "https://github.com/psuda87/sunday-league-mates/actions/runs/41124734722"
+        }
+      ]
+    },
+    {
+      "sha": "e73041ab60873cc420a2c2169aec14ffa4a1128b",
+      "total": 0,
+      "runs": []
+    },
+    {
+      "sha": "ae6bb4be2eafb9e5a8e70ef695242b40cc5d54cc",
+      "total": 0,
+      "runs": []
+    }
+  ],
+  "source_gate": {
+    "checkouts": [
+      "1575bef77f0b24a8c74373018895b7b872ebc06a",
+      "e73041ab60873cc420a2c2169aec14ffa4a1128b",
+      "ae6bb4be2eafb9e5a8e70ef695242b40cc5d54cc"
+    ],
+    "implementation": "d7b36eee379acf5036f8ea8aaeeea5f7791c8a04",
+    "result": "PASS",
+    "execution": "local offline Linux Docker tool; not GitHub-hosted",
+    "contract_tests": 26,
+    "real_source_denials": 10,
+    "mutation_checkout": "e73041ab60873cc420a2c2169aec14ffa4a1128b",
+    "tool_image": "sha256:522be6ca97cc065e5448f5890da98a9f2f102fe28b17ec7d2acbbe9ed17d8aea",
+    "container": "slm-integration-history-check-20261102",
+    "final_state": "exited",
+    "network": "none",
+    "published_ports": {}
+  },
+  "policy_tests": 45,
+  "consolidation": {
+    "migrations": 42,
+    "visual_files": 55,
+    "import_boundaries": 10,
+    "result": "PASS"
+  },
+  "new_backend_fixtures": "NOT RUN; exact backend unchanged from acceptance ae6bb4b",
+  "proposed_future_documentation_merge": "NOT CREATED; requires owner approval and subsequent gate on actual SHA"
+}
