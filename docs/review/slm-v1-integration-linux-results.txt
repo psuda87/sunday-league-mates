@@ -1,0 +1,24 @@
+LOCAL OFFLINE LINUX TOOL CHECK; GitHub-hosted NOT RUN; no database fixture
+Python 3.12.16
+git version 2.47.3
+EXACT CHECKOUT acceptance ae6bb4be2eafb9e5a8e70ef695242b40cc5d54cc
+PASS source gate d7b36eee379acf5036f8ea8aaeeea5f7791c8a04
+EXACT CHECKOUT rc 1575bef77f0b24a8c74373018895b7b872ebc06a
+PASS source gate d7b36eee379acf5036f8ea8aaeeea5f7791c8a04
+EXACT CHECKOUT pr30-merge e73041ab60873cc420a2c2169aec14ffa4a1128b
+ok
+Ran 26 tests in 1.769s
+OK
+PASS actual checkout verify_sources; implementation=d7b36eee379acf5036f8ea8aaeeea5f7791c8a04
+PASS actual source guard rejects app/supabase/migrations/20261028204500_restore_pr16_match_name_projection.sql
+PASS actual source guard rejects app/supabase/functions/accounts/handler.ts
+PASS actual source guard rejects app/src/auth/sessionManager.ts
+PASS actual source guard rejects app/src/finance/PremiumFinance.tsx
+PASS actual source guard rejects app/src/events/usePremiumLineup.ts
+PASS actual source guard rejects app/src/events/PremiumEvents.tsx
+PASS actual source guard rejects app/src/ui/UltimatePlayerCard.tsx
+PASS actual source guard rejects app/scripts/lineups_ci.py
+PASS actual source guard rejects app/scripts/test_lineups_ci_context.py
+PASS actual source guard rejects unapproved43
+{"local_linux": "PASS", "hosted_github": "NOT RUN", "synthetic_tests": 26, "actual_source_denials": 10, "checkout": "e73041ab60873cc420a2c2169aec14ffa4a1128b", "implementation": "d7b36eee379acf5036f8ea8aaeeea5f7791c8a04"}
+PASS three exact source gates; Linux26/26 and10 actual denials on fetched PR30 merge; all clones clean

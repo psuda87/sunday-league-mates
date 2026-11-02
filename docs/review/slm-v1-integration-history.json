@@ -1,0 +1,80 @@
+{
+  "ancestry_edges": [
+    [
+      "134c52b1aee0d0804cc0cf71f151f95040e7a38f",
+      "39ef2e3937b781439864029a92c12de315024263"
+    ],
+    [
+      "39ef2e3937b781439864029a92c12de315024263",
+      "b30908e15cedff6ffa1a4ca76f0fb514e04302a7"
+    ],
+    [
+      "b30908e15cedff6ffa1a4ca76f0fb514e04302a7",
+      "7ad5c75414cf669d4471f3122e93073dab9aa8d7"
+    ],
+    [
+      "7ad5c75414cf669d4471f3122e93073dab9aa8d7",
+      "3b00ec268a19f64516daebbf0b238d796e826cd1"
+    ],
+    [
+      "3b00ec268a19f64516daebbf0b238d796e826cd1",
+      "58a9babf257876e47cf6db269a0bf05d2e1db1f4"
+    ],
+    [
+      "58a9babf257876e47cf6db269a0bf05d2e1db1f4",
+      "45d9a4dfba838ebf9ed70f73a1b2044352df8ecd"
+    ],
+    [
+      "45d9a4dfba838ebf9ed70f73a1b2044352df8ecd",
+      "e04d9a47560de36657da76f12ae63e20ef2299cb"
+    ],
+    [
+      "e04d9a47560de36657da76f12ae63e20ef2299cb",
+      "24a59e104bfe80b4d2f41cbd0ad02b58fc546040"
+    ],
+    [
+      "24a59e104bfe80b4d2f41cbd0ad02b58fc546040",
+      "ddd3a3e2eaefdf449bc83c34c6335f42a2da4aab"
+    ],
+    [
+      "ddd3a3e2eaefdf449bc83c34c6335f42a2da4aab",
+      "fd4fccdc1c22caa5f217625809689f336139a122"
+    ],
+    [
+      "fd4fccdc1c22caa5f217625809689f336139a122",
+      "d7b36eee379acf5036f8ea8aaeeea5f7791c8a04"
+    ],
+    [
+      "d7b36eee379acf5036f8ea8aaeeea5f7791c8a04",
+      "cb63962e0ff4ccfbc4fb7157e4627beeee5ae8d5"
+    ],
+    [
+      "cb63962e0ff4ccfbc4fb7157e4627beeee5ae8d5",
+      "e246c514af0fbca79dee892d9aa0e31b937a83c3"
+    ],
+    [
+      "e246c514af0fbca79dee892d9aa0e31b937a83c3",
+      "ae6bb4be2eafb9e5a8e70ef695242b40cc5d54cc"
+    ]
+  ],
+  "rc": "1575bef77f0b24a8c74373018895b7b872ebc06a",
+  "acceptance": "ae6bb4be2eafb9e5a8e70ef695242b40cc5d54cc",
+  "fetched_pr30_merge": "e73041ab60873cc420a2c2169aec14ffa4a1128b",
+  "merge_parents": [
+    "134c52b1aee0d0804cc0cf71f151f95040e7a38f",
+    "1575bef77f0b24a8c74373018895b7b872ebc06a"
+  ],
+  "merge_tree_identical_rc": true,
+  "app_workflows_instructions_identical_three": true,
+  "auth18_excluded_three": true,
+  "merge_base_rc_acceptance": "e246c514af0fbca79dee892d9aa0e31b937a83c3",
+  "rc_only_commits": [
+    "1575bef77f0b24a8c74373018895b7b872ebc06a docs(android): clarify APK identity and included feature scope",
+    "b5d7bce596dc8d75dad045203e4a2826e5ca1611 docs(android): confirm latest RC running in visible emulator",
+    "a3338b0d0c4ed8e5f5aba2f2fea9b21ce7a54e67 docs(rc): confirm draft PR30 and skipped hosted checks",
+    "01538e35e24d241f99f0840ca355da11abd62e72 docs(rc): prepare integrated SLM candidate Cloud audit and Android test handoff"
+  ],
+  "acceptance_only_commits": [
+    "ae6bb4be2eafb9e5a8e70ef695242b40cc5d54cc test(discovery): record isolated backend42 acceptance"
+  ]
+}
