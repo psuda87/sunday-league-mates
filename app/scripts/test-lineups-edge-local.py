@@ -174,6 +174,9 @@ def main(verify_ui=None):
         if branch == 'feat/public-match-discovery-stage2b':
             import discovery_local
             discovery_local.verify()
+        elif branch == 'fix/slm2-minimum-phone':
+            # Exact full-checkout approval, not a general local branch bypass.
+            lineups_ci.verify_sources()
         elif branch == 'feat/premium-lineups-stage2b' and verify_ui is not None:
             # The dependent UI runner may reuse the fixture ONLY with the exact
             # Stage2A backend. This does not authorize a different schema or Auth.
@@ -238,9 +241,11 @@ Deno.serve(async(req:Request)=>{
     sql('grant select on auth.users,auth.sessions to service_role;'
         'grant execute on all functions in schema auth to anon,authenticated,service_role;')
     migrations = sorted((ROOT / 'app/supabase/migrations').glob('*.sql'))
-    assert len(migrations) == (42 if CI_MODE or branch == 'feat/public-match-discovery-stage2b' else 41), 'Expected exact reviewed migration set'
+    assert len(migrations) == (43 if CI_MODE or branch == 'fix/slm2-minimum-phone' else 42 if branch == 'feat/public-match-discovery-stage2b' else 41), 'Expected exact reviewed migration set'
     for file in migrations:
         sql(file.read_text(encoding='utf-8'))
+    if len(migrations) == 43:
+        sql((ROOT / 'app/supabase/tests/minimum_phone.sql').read_text(encoding='utf-8'))
     check(True, str(len(migrations))+' canonical migrations replay on real GoTrue Auth schema')
     sql('create role authenticator login noinherit;grant anon,authenticated,service_role to authenticator;')
     start(NAME + '-rest', REST_IMAGE, {

@@ -9,6 +9,7 @@ export interface PersonalProfileData {
 export interface PersonalProfileBinding {
  phase:'loading'|'ready'|'missing'|'error';profile:PersonalProfileData|null;
  changeAlias?:(login:string,currentPassword:string)=>Promise<boolean>;
+ changePhone?:(phone:string,currentPassword:string)=>Promise<boolean>;
  photo?:PersonalPhotoBinding;saveNumber?:(number:number)=>Promise<boolean>;
  saveIdentity?:(draft:IdentityDraft)=>Promise<boolean>;
  saving:boolean;notice:string;reload:()=>void;save:(fullName:string,number?:number)=>Promise<boolean>;

@@ -45,7 +45,15 @@ export function useOwnProfile(manager:SessionManager,userId:string|null,selectio
   finally{if(ticket===generation.current){flight.current=false;setSaving(false);}}
  }
  useEffect(()=>{const reload=()=>setRevision(v=>v+1);window.addEventListener('slm-profile-changed',reload);return()=>window.removeEventListener('slm-profile-changed',reload);},[]);
- return {...current,photo,saveIdentity,saveNumber,changeAlias,saving:current.phase==='ready'&&saving,reload:()=>setRevision(v=>v+1),
+ async function changePhone(phone:string,currentPassword:string){
+  const auth=manager.getSnapshot();
+  if(flight.current||!adapter||current.phase!=='ready'||auth.phase!=='ready'||auth.session?.user_id!==userId)return false;
+  const ticket=generation.current;flight.current=true;setSaving(true);
+  try{const profile=await adapter.changePhone(phone,currentPassword);if(ticket!==generation.current)return false;setState({owner:userId,phase:'ready',profile,notice:'Zmieniono i potwierdzono numer telefonu.'});return true;}
+  catch{if(ticket===generation.current)setState(previous=>({...previous,notice:'Nie potwierdzono zmiany telefonu. Sprawdź obecne hasło i unikalność numeru; przy przerwanym połączeniu ponów odczyt profilu.'}));return false;}
+  finally{if(ticket===generation.current){flight.current=false;setSaving(false);}}
+ }
+ return {...current,photo,saveIdentity,saveNumber,changeAlias,changePhone,saving:current.phase==='ready'&&saving,reload:()=>setRevision(v=>v+1),
   async save(fullName,number){
    const auth=manager.getSnapshot();
    if(flight.current||!adapter||!current.profile||current.phase!=='ready'||auth.phase!=='ready'||auth.session?.user_id!==userId)return false;

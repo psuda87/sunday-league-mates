@@ -10,6 +10,25 @@ import DemoProfile from '../demo/Profile';
 import { initialWorld } from '../demo/data';
 import type { PersonalProfileBinding } from '../ui/personalProfile';
 afterEach(cleanup);
+
+it.each([false,true])('changes own phone using existing secure backend, email=%s',async email_account=>{
+ let stored={...profile(),email_account,nickname:'Testowy'};
+ const fresh:Session={access_token:'fresh-access',refresh_token:'fresh-refresh',expires_in:3600,user_id:'own',role:'member',must_change_password:false};
+ const request=vi.fn(async(action:string,body?:Record<string,unknown>)=>{
+  if(action==='identifiers'||action==='save_email_profile'){stored={...stored,phone:String(body!.phone)};return action==='identifiers'?fresh:stored;}
+  return stored;
+ });
+ const m=manager(request);await m.signIn('own','initial-password');
+ const saved=await profileAdapter(m,'own').changePhone('+48 000 000 222','current-password');
+ expect(saved?.phone).toBe('+48000000222');
+ expect(request).toHaveBeenCalledWith(email_account?'save_email_profile':'identifiers',email_account?{nickname:'Testowy',phone:'+48000000222',current_password:'current-password'}:{login:'Fikcyjny',phone:'+48000000222',current_password:'current-password'});
+ expect(saved?.login).toBe('Fikcyjny');
+});
+it('does not report phone success when the explicit server read-back is unchanged',async()=>{
+ const request=vi.fn(async()=>({...profile(),email_account:true,nickname:'Testowy'}));
+ const m=manager(request);await m.signIn('own','initial-password');
+ await expect(profileAdapter(m,'own').changePhone('000000222','current-password')).rejects.toThrow('profile_readback_mismatch');
+});
 const profile=(id='own')=>({user_id:id,login:'Fikcyjny',phone:'+48000000999',full_name:'Testowy Zawodnik',display_as:'full_name' as const,display_name:'Testowy Zawodnik'});
 function manager(request:(action:string,values?:Record<string,unknown>)=>Promise<unknown>,id='own'){
  const session:Session={access_token:'test-access',refresh_token:'test-refresh',expires_in:3600,user_id:id,role:'member',must_change_password:false};

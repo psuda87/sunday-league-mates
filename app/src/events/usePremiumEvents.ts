@@ -14,6 +14,7 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
   const [search,setSearch]=useState(''),[discoveryEnabled,setDiscoveryEnabled]=useState(false),[hasMore,setHasMore]=useState(false),[nextOffset,setNextOffset]=useState<number|null>(null);
   const debounce=useRef<ReturnType<typeof setTimeout>|null>(null);
   const [memberCreationEnabled,setMemberCreationEnabled]=useState(false);
+  const [minimumEnabled,setMinimumEnabled]=useState(false);
   const [activeGroup,setActiveGroup]=useState(''),[offset,setOffset]=useState(0),[creating,setCreating]=useState(false);
   const alive=useRef(true),epoch=useRef(0),detailEpoch=useRef(0),flight=useRef(false),refreshFlight=useRef<{key:string;promise:Promise<boolean>}|null>(null),keys=useRef(new Map<string,string>());
   const authorized=useCallback(()=>alive.current&&manager.getSnapshot().phase==='ready'&&manager.getSnapshot().session?.user_id===userId,[manager,userId]);
@@ -32,7 +33,7 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
           query.current={...query.current,scope:'all',group_id:''};setActiveGroup('');setEvents([]);setGroups(ownGroups);
           queueMicrotask(()=>{if(authorized())void refresh();});return true;
         }
-        if(authorized()&&ticket===epoch.current){setEvents(list.events);setGroups(ownGroups);setDiscoveryEnabled(list.discovery);setHasMore(list.hasMore);setNextOffset(list.nextOffset);setMemberCreationEnabled(list.memberCreationEnabled);setServerNow(list.server_now);setOffset(page);setActiveGroup(previous=>['public','groups','mine'].includes(previous)||ownGroups.some(g=>g.id===previous)?previous:'');return true;}
+        if(authorized()&&ticket===epoch.current){setEvents(list.events);setGroups(ownGroups);setDiscoveryEnabled(list.discovery);setHasMore(list.hasMore);setNextOffset(list.nextOffset);setMemberCreationEnabled(list.memberCreationEnabled);setMinimumEnabled(list.minimumEnabled);setServerNow(list.server_now);setOffset(page);setActiveGroup(previous=>['public','groups','mine'].includes(previous)||ownGroups.some(g=>g.id===previous)?previous:'');return true;}
         return false;
       }catch(e){if(authorized()&&ticket===epoch.current){setEvents([]);setGroups([]);setDetail(null);setError(matchError(e));}return false;}
       finally{if(alive.current&&ticket===epoch.current)setLoading(false);}
@@ -45,7 +46,7 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
   // Never reuse a pre-suspend roster after that check: memberships may have changed.
   useEffect(()=>{let previous=manager.getSnapshot();return manager.subscribe(()=>{
     const current=manager.getSnapshot(),phase=current.phase;if(phase===previous.phase&&current.session?.user_id===previous.session?.user_id)return;previous=current;
-    if(phase!=='ready'||current.session?.user_id!==userId){invalidate();if(debounce.current)clearTimeout(debounce.current);query.current={scope:'all',period:'upcoming'};setSearch('');setActiveGroup('');setOffset(0);setListFilter('upcoming');setDiscoveryEnabled(false);setHasMore(false);setNextOffset(null);setEvents([]);setGroups([]);setDetail(null);setLoading(true);}
+    if(phase!=='ready'||current.session?.user_id!==userId){invalidate();if(debounce.current)clearTimeout(debounce.current);query.current={scope:'all',period:'upcoming'};setSearch('');setActiveGroup('');setOffset(0);setListFilter('upcoming');setDiscoveryEnabled(false);setMinimumEnabled(false);setHasMore(false);setNextOffset(null);setEvents([]);setGroups([]);setDetail(null);setLoading(true);}
     else{refreshFlight.current=null;void refresh();}
   });},[manager,userId,refresh,invalidate]);
   const open=useCallback(async(id:string)=>{
@@ -70,8 +71,26 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
   }
   async function create(input:EventInput){
     await work(async()=>{
-      const result=await mutate<{event_id:string}>('matches_create',{group_id:input.groupId,name:input.name.trim()||'Mecz',visibility:input.visibility,starts_at:input.startsAt,location:input.location,address:input.address,duration_minutes:input.durationMinutes,capacity:input.capacity,cost_cents:input.costCents});
+      if(input.minimum!==10&&!minimumEnabled)throw Error('Minimum backend unavailable');
+      const result=await mutate<{event_id:string}>('matches_create',eventPayload(input));
+      await confirmMinimum(result.event_id,input);
       if(!authorized())return;setCreating(false);await refresh();await open(result.event_id);
+    });
+  }
+  function eventPayload(input:EventInput){return {group_id:input.groupId,name:input.name.trim()||'Mecz',visibility:input.visibility,starts_at:input.startsAt,location:input.location,address:input.address,duration_minutes:input.durationMinutes,minimum_players:input.minimum,capacity:input.capacity,cost_cents:input.costCents};}
+  async function confirmMinimum(id:string,input:EventInput){
+    const confirmed=matchDetail(await manager.call('matches_detail',{event_id:id}),id);
+    if(confirmed.event.minimum_players!==input.minimum||confirmed.event.capacity!==input.capacity)throw Error('Minimum readback failed');
+  }
+  async function edit(input:EventInput){
+    const event=detail?.event;if(!event?.can_edit)return false;
+    return work(async()=>{
+      if(input.minimum!==event.minimum_players&&event.match_minimum_version!==1)throw Error('Minimum backend unavailable');
+      await mutate('matches_edit',{...eventPayload(input),event_id:event.id,expected_version:event.version});
+      await confirmMinimum(event.id,input);
+      if(!authorized())return;
+      if(!await open(event.id)||!await refresh(offset))throw Error('Readback failed');
+      if(authorized())setNotice('Zmiany meczu zostały zapisane i odczytane.');
     });
   }
   async function recheckFinancial(){const id=detail?.event.id;if(!id)return;const ticket=++detailEpoch.current;try{const d=matchDetail(await manager.call('matches_detail',{event_id:id}),id);if(authorized()&&ticket===detailEpoch.current)setDetail(d);}catch{if(authorized()){setDetail(null);setError('Nie potwierdzono uprawnień po zmianie finansów. Odśwież mecz.');}}}
@@ -82,6 +101,6 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
   function selectGroup(id:string){back();resetPage();if(listFilter==='mine')setListFilter('upcoming');const next=['public','groups','mine'].includes(id)||groups.some(g=>g.id===id)?id:'';setActiveGroup(next);setSearch('');query.current={...query.current,scope:['public','groups','mine'].includes(next)?next:next?'group':'all',group_id:groups.some(g=>g.id===next)?next:''};delete query.current.query;void refresh();}
   function changeSearch(value:string){if(query.current.scope!=='public')return;resetPage();setSearch(value);query.current={...query.current,query:value};setLoading(true);setError('');if([...value].length>100){setLoading(false);setError('Wpisz najwyżej 100 znaków.');return;}debounce.current=setTimeout(()=>{debounce.current=null;if(authorized())void refresh();},300);}
   function changeFilter(value:'upcoming'|'history'|'mine'){resetPage();setListFilter(value);query.current={...query.current,period:value==='history'?'history':'upcoming'};if(value==='mine'){setActiveGroup('mine');setSearch('');delete query.current.query;query.current.scope='mine';}void refresh();}
-  return {listFilter,changeFilter,search,changeSearch,discoveryEnabled,hasMore,nextOffset,recheckFinancial,events,groups,detail,loading,busy,error,notice,serverNow,activeGroup,offset,creating,organizers,refresh,open,back,act,create,beginCreate,selectGroup};
+  return {listFilter,changeFilter,search,changeSearch,discoveryEnabled,hasMore,nextOffset,recheckFinancial,events,groups,detail,loading,busy,error,notice,serverNow,activeGroup,offset,creating,organizers,refresh,open,back,act,create,edit,beginCreate,selectGroup};
 }
 export type PremiumEventsController=ReturnType<typeof usePremiumEvents>;
