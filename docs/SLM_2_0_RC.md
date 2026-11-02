@@ -102,3 +102,7 @@ Odtworzenie APK: `npm run build:android-stage3`, ustaw w procesie `SLM_ANDROID_S
 - [ ] Logout, powrót/tło i drugie konto: brak starego feedu lub szkicu.
 
 **Rzeczywiste warunki rozpoczęcia testów POCO:** podłączyć/autoryzować USB, wykonać wskazaną instalację i reverse, użyć nowych lokalnych danych logowania. APK i backend już są przygotowane; nie blokuje ich Cloud lub stary backend41. Test szablonowy Android pozostaje znanym błędem testów, nie blokadą instalacji/logowania. [Zrzut emulatora LIVE](ui/slm2-rc/android-live.png), pozostałe bezpieczne zrzuty w ui/slm2-rc. Chronologia: `docs/ODPOWIEDZI_CODEX.txt`.
+
+## Publikacja
+
+Gałąź wypchnięta, pakiet/instrukcja w `ecf37e6087726e2e66a8292dba45217160cadc35`. Utworzono jeden nowy [Draft PR32 → main](https://github.com/psuda87/sunday-league-mates/pull/32); API: open/draft, merged=false, mergeable=true/clean, base main134c52b. Starszych Draft PR nie zmieniano ani nie zamykano. Dla ecf37e6 hostowane run41491555489 i41491555508 są completed/**skipped**: GitHub-hosted **NOT RUN**, nie PASS. Nie aktywowano Actions/opt-in ani dispatch. Końcowy commit dopisuje wyłącznie tę informację; końcowy SHA należy odczytać z HEAD release/slm-2.0-rc.
