@@ -51,5 +51,13 @@ for(const [label,path,mutate] of [
  ['Vite redirects Premium entry','app/vite.b1.config.ts',s=>s.replace("'./b1'","'./demo'")],
  ['build script bypass','app/package.json',s=>{const j=JSON.parse(s);j.scripts.build='vite build --config other.ts';return JSON.stringify(j);}],
  ['alternate build alias','app/package.json',s=>{const j=JSON.parse(s);j.scripts['build:evil']='vite other';return JSON.stringify(j);}],
+ ['guest normalization removed','app/src/events/GuestForm.tsx',s=>s.replace('normalizePolishPhone(phone)','phone')],
+ ['guest duplicate guard removed','app/src/events/GuestForm.tsx',s=>s.replace('disabled||flight.current','disabled')],
+ ['guest financial copy changed','app/src/events/GuestForm.tsx',s=>s.replace('finansowo','automatycznie')],
+ ['guest import redirected','app/src/events/PremiumEvents.tsx',s=>s.replace("'./GuestForm'","'../demo/GuestForm'")],
+ ['control CSS escapes scope','app/src/events/premiumEvents.css',s=>s.replace('.slm-guest-form input','input')],
+ ['native inset installation removed','app/android/app/src/main/java/pl/psuda87/slm/MainActivity.java',s=>s.replace('SlmWindowInsets.install(getWindow());','')],
+ ['native padding accumulates','app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java',s=>s.replace('bars.top, bars.right','bars.top + view.getPaddingTop(), bars.right')],
+ ['native assertions weakened','app/android/app/src/androidTest/java/pl/psuda87/slm/SlmWindowInsetsTest.java',s=>s.replace('assertNotNull(actual);','')],
  ['frozen list shrinks','app/scripts/premium318-contract.json',s=>{const j=JSON.parse(s);delete j.files['app/src/ui/UltimatePlayerCard.tsx'];return JSON.stringify(j);}],
 ])test('rejects '+label,()=>{verifyPremiumRuntime(root);const source=read(path),changed=mutate(source);assert.notEqual(changed,source,'Mutation must exercise a real source change');assert.throws(()=>verifyPremiumRuntime(root,{[path]:changed}));});

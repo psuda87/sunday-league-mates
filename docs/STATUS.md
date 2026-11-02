@@ -1,3 +1,17 @@
+# Android/formularze — punkt kontrolny polish-stats
+
+2026-10-31 — PR31 guard review: **PASS**, kontrakty odblokowane bez zmiany aplikacji. Policy704e4a8 (dokładne UI3f181e9/nativef2edf56), CI implementacja7c45656 i osobny wskaźnik6e9ce9d; wcześniejsze piny i42 migracje/frozen55 bez zmian. Faktycznie ponowione: policy53 (stare45+8), consolidation42/55/11, LinuxSourceTests29, source guard Linux i kanoniczny Windows PASS,60 Premium/consolidation i69 source mutacji odrzuconych, TS/lint/Edge/Vitest372/build/Chrome6 PASS. GitHub-hosted NOT RUN. Android/SQL/HTTP niepowtarzane (implementacja niezmieniona); Cloud/bazy/POCO nietknięte. PR31 gotowy do dalszej integracji po decyzji właściciela, nadal Draft, bez merge. Raport:docs/SLM_V1_POLISH_STATS_REPORT.md. Poniższe wcześniejsze BLOCK kontraktów zostało usunięte; TODO produktu nadal aktualne.
+
+2026-10-31 09:09 Europe/Warsaw — po zgłoszeniu braku działania APK uruchomiono Docker Desktop i wznowiono wyłącznie sześć istniejących usług slm-main-stabilization. Backend nadal41 migracji, bez migracji/resetu/zmian źródeł/Cloud. Przywrócono ADB emulator-5554 tcp64321→host55321; faktyczne HTTP z emulatora: Auth200, accounts401 bez sesji. Ponowny cold start APK zakończony powodzeniem; wizualnie potwierdzono odtworzoną sesję i listę meczów z lokalnego API. Podstawowy LIVE odczyt działa. Pełne discovery42 i pozostałe niezaimplementowane funkcje nadal niegotowe. Bez instalacji APK i operacji na POCO; zrzut zawierający zastane dane pozostawiono wyłącznie w ignorowanym cache.
+
+2026-10-31 Europe/Warsaw, `feat/slm-v1-polish-stats` od RC1575bef. Commity implementacji f2edf56 (native insets) i 3f181e9 (formularz gościa/selektor). PASS: build/TS, lint, strict Edge, Vitest372, Cypress/Chrome6 (fixture UI bez backendu), Gradle debug+test APK i AndroidJUnitRunner2 na emulatorze. Wszystkie55 zamrożonych plików bez zmian. APK SHA256 b0ad205c53b32ad40f7f0301004077962cca5b0de1ff0f126a1e7e089b6fd748, lokalne API64321, bez potwierdzonego LIVE.
+
+Publikacja: Draft PR #31 do RC1575bef, raport f27668c wypchnięty. GitHub potwierdził draft/open/unmerged; zero workflow runs dla f27668c, hosted NOT RUN. Możliwość technicznego merge historii nie usuwa poniższej blokady kontraktów.
+
+BLOCK integracji: istniejące przypięcia runtime i całego app w CI odrzucają zmiany; Premium policy45/45 FAIL, pełne verify:consolidation FAIL na runtime, source guard FAIL na MainActivity. Żadnych zmian guardów/hashów. Telefon/prywatność profilu, edycja grup/minimum, gole/oceny są TODO, nie gotową funkcją. Brak nowych migracji (nadal42), brak wdrożonych Edge/migracji/Cloud lub zmian istniejących baz. Docker nie odpowiadał; SQL/HTTP/LIVE i Android12/POCO NOT RUN. Następny krok: review dokładnego diffu i kontraktów, potem nowa fixture i osobny etap backendu. Raport:docs/SLM_V1_POLISH_STATS_REPORT.md. Chronologia:docs/ODPOWIEDZI_CODEX.txt.
+
+---
+
 # Najnowszy RC uruchomiony w emulatorze
 
 2026-10-30 21:16 Europe/Warsaw — Android Studio otwarte z `.worktrees/slm-v1-release-candidate/app/android`; istniejący AVD Medium_Phone_API_36.1 uruchomiony z widocznym oknem, bez wipe danych. APK RC SHA256 ca6de17a63b6de01f461b49bde95c8b2403edc6c809115b3a369cf585f70e1fc zainstalowany przez install -r wyłącznie na emulator-5554 (ro.kernel.qemu=1), MainActivity uruchomiona i na pierwszym planie. Potwierdzono wizualnie ekran Mecze z fikcyjnymi lokalnymi danymi i odtworzoną sesją.
