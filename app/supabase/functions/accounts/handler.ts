@@ -295,6 +295,9 @@ export function createHandler(env: Environment) {
       if (scoped) {
         await rate('scoped:' + ctx.id, 90);
         const [prefix, rpc] = scoped;
+        if (['matches_create','matches_edit'].includes(action) && Object.hasOwn(body,'minimum_players') &&
+            (!Number.isSafeInteger(body.minimum_players) || Number(body.minimum_players)<1 || Number(body.minimum_players)>1000))
+          throw new ApiError(400,'invalid_minimum','Minimum zawodników musi być dodatnią liczbą całkowitą, nie większą niż limit miejsc.');
         if ((action === 'groups_phone' || action === 'matches_guest' || action === 'matches_edit_guest')) {
           const key = action === 'groups_phone' ? 'phone' : 'guest_phone';
           if (body[key] !== undefined && typeof body[key] !== 'string')
@@ -306,6 +309,7 @@ export function createHandler(env: Environment) {
           : prefix === 'matches_'
           ? ['event_id','guest_name','guest_phone','list','participant_id','user_id','name','group_id','date','time','starts_at','location','address','duration_minutes','capacity','cost_cents','visibility','expected_version','absent','reason','request_id','offset','scope','period',...(action === 'matches_list' ? ['query'] : [])]
           : ['group_id','event_id','user_id','participant_id','payment_id','request_id','amount_cents','expected_amount_cents','expected_version','reason','payable','absent'];
+        if (['matches_create','matches_edit'].includes(action)) allowed.push('minimum_players');
         const payload = Object.fromEntries(allowed.filter(key => Object.hasOwn(body, key)).map(key => [key, body[key]]));
         const r = await call('/rest/v1/rpc/' + rpc, 'POST', {
           p_user: ctx.id, p_session: ctx.sid, p_action: action.slice(prefix.length), p_body: payload,
@@ -336,6 +340,7 @@ export function createHandler(env: Environment) {
             const messages:Record<string,string>={session_invalid:'Sesja wygasła. Zaloguj się ponownie.',forbidden:'Brak uprawnień do tej operacji.',not_found:'Grupa lub profil nie istnieje albo nie masz dostępu.',request_processed:'Zgłoszenie zostało już rozpatrzone. Odśwież grupę.',already_member:'Ta osoba już należy do grupy.',idempotency_conflict:'Identyfikator dotyczy innej operacji. Odśwież dane.',group_archived:'Grupa jest zarchiwizowana.'};
             if(messages[code]&&errors[code])throw new ApiError(errors[code][0],code,messages[code]);
           }
+          if (code === 'invalid_minimum') throw new ApiError(400,code,'Minimum zawodników musi być dodatnią liczbą całkowitą, nie większą niż limit miejsc.');
           if (code === 'invalid_group' || code === 'invalid_input' || code === 'request_required') throw new ApiError(400, code, 'Sprawdź nazwę, opis i wymagane pola.');
           if (errors[code]) throw new ApiError(errors[code][0], code, errors[code][1]);
           if (r.data?.code === '22P02' || r.data?.code === '23514' || r.data?.code === '23502')
@@ -465,7 +470,7 @@ export function createHandler(env: Environment) {
         const nickname = field(body, 'nickname', 48).trim();
         if (!nickname) throw new ApiError(400, 'invalid_input', 'Podaj pseudonim.');
         const rawPhone = field(body, 'phone', 32).trim();
-        const phone = rawPhone ? normalizePhone(rawPhone) : '';
+        const phone = rawPhone ? normalizePhone(rawPhone, identity.phone as string) : '';
         if (phone !== identity.phone) await verifyPassword(ctx, password(body, 'current_password'));
         await db('rpc/slm_email_profile_save', 'POST', { p_user: ctx.id, p_session: ctx.sid,
           p_nickname: nickname, p_phone: phone, p_number: null });
@@ -502,7 +507,8 @@ export function createHandler(env: Environment) {
         const phone = action === 'identifiers' ? normalizePhone(field(body, 'phone'), a.phone as string) : null;
         if (action === 'identifiers') {
           const conflicts = await db(`slm_aliases?or=(login_normalized.eq.${encodeURIComponent(login!.toLowerCase())},phone.eq.${encodeURIComponent(phone!)})`);
-          if (conflicts.some((row: Row) => row.user_id !== ctx.id))
+          const contacts = await db(`slm_player_profiles?contact_phone=eq.${encodeURIComponent(phone!)}&select=user_id`);
+          if ([...conflicts,...contacts].some((row: Row) => row.user_id !== ctx.id))
             throw new ApiError(409, 'identifier_taken', 'Login lub numer telefonu jest już zajęty.');
         }
         const op = await rpc('begin', { p_actor: ctx.id, p_session: ctx.sid, p_target: ctx.id,
