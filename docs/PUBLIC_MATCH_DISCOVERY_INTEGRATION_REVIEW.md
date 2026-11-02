@@ -1,5 +1,63 @@
 # Public Match Discovery — przegląd integracyjny Cloud
 
+## Aktualizacja 2026-11-02 — ponowny niezależny przegląd, faktyczne środowisko Windows
+
+**PASS ponowionych kontroli źródeł/frontendu i nieaktywnego overlay CI; WARN środowiska; BLOCK aktywnego source gate Stage2B.** Nie aktywowano CI, nie zmieniono repo variables ani aplikacji. Poniższy pierwotny raport Cloud pozostaje historycznym zapisem wcześniejszej sesji, nie nowymi wynikami z Windows.
+
+### Stan Git i kontynuacja istniejącej pracy
+
+Stage2B nadal `fd4fccdc1c22caa5f217625809689f336139a122`. Gałąź żądana przez właściciela **już istniała** na origin pod `22b2e61936adba117452a108eedda147aff4ae4e`, z przeglądem `ea034e3` i poprawionymi materiałami CI. Nowy oddzielny worktree kontynuuje tę historię przez zwykłe przesunięcie fast-forward lokalnej referencji — bez merge, resetu, force push, powielania implementacji lub nadpisania zdalnej gałęzi. Zastane zmiany i inne worktree zachowano.
+
+Narzędzia dostępne w tej sesji wskazywały lokalny PowerShell/Windows i `I:\slm\sunday-league-mates`, a nie Cloud Linux. Nowych wyników nie przypisujemy do Cloud. Zainstalowane zależności udostępniono przez junction dopiero po sprawdzeniu identycznego package.json/package-lock względem dostępnego RC. Bez instalacji dodatkowych narzędzi. Docker nie odpowiadał i nie został uruchomiony; próba utworzenia symlinka w nowym katalogu tymczasowym potwierdziła WinError1314.
+
+### Ponowiony review rzeczywistego kodu
+
+- Migracja42 i handler nadal odpowiadają dokładnie24a59e1; każda z41 migracji Stage3B pozostaje identyczna. Migracja zastępuje wyłącznie oczekiwaną gałąź list dispatchera; nie dodaje tabel/polityk/grantów do klientów i nie zmienia mutacji Auth/finance/lineups.
+- Prześledzono session_valid, match_feed_visible, match_summary oraz Edge actor/session → scoped RPC. Helper SECURITY INVOKER, pusty search_path, EXECUTE tylko service_role. RLS nie stanowi ochrony przed service_role: ochronę stanowią aktualna sesja, predykaty widoczności i uprawnienia w wywoływanej funkcji. Listowanie/scope/query filtrują przed LIMIT101/OFFSET, następnie emitują100 rekordów i has_more/next_offset. Prywatne obce wydarzenia nie są kandydatami wyszukiwania.
+- Query jest literalne (position/lower, bez interpolowanego SQL lub wzorców LIKE), max100 znaków, wyłącznie public. Deterministyczne starts_at+UUID nie usuwa znanej granicy offsetów przy równoczesnej zmianie danych. Publiczny wynik nie tworzy członkostwa ani dostępu do finansów/składów/profili grupy.
+- Trzy rzeczywiste runtime nadal odpowiadają ae2fd95. Sprawdzono generacje i in-flight refresh, zmianę scope/query, debounce300ms, reset strony, odrzucenie spóźnionego wyniku, walidację markera1/metadanych strony, clear przy zmianie fazy sesji/użytkownika. B1/SessionManager nadal ukrywa chronione dane podczas recheck; brak demo fallback. Utrata członkostwa wybranej grupy resetuje zarówno selektor, jak i query serwera.
+- Manifest55, CSS, karty, header, nawigacja i Ultimate są niezmienione. Opublikowane runtime.patch i active-pins.patch porównano z faktycznym git diff audytddd3a3e→43f69a6: zgodne. Nie stwierdzono nowego istotnego błędu runtime wymagającego zmiany przypiętych źródeł.
+
+### CI i ograniczenia guardów
+
+Nieaktywny patch poprawiony wcześniej w ea034e3 nie został zastosowany do app. Ponowiono33 pozytywne/negatywne kontrole z kanonicznego klonu testowego (`core.autocrlf=false` wyłącznie w nowym klonie), w tym hash patcha i czterech przyszłych źródeł, zachowanie23 nazw przypadków, dokładny overlay18 oraz niezmienione walidatory repo/event/SHA/ancestry/local Docker/resources/cleanup. Nie aktualizowano manifestów pod wynik testu.
+
+Wykonano również60 niezależnych kontroli aktualnych Premium/consolidation w nowej kopii tymczasowej. Odrzucono dodatkową migrację43, zmianę każdej z41 historycznych migracji,42/handlera, Auth/vault, finansów, składów i UI. Znana granica: sam runtime policy nie przypina treści migracji restore_pr16 z20261028204500, natomiast obowiązujący consolidation ją odrzuca; nie przypisujemy pojedynczemu policy ochrony, której nie zapewnia. Checker: [test_discovery_runtime_guards.mjs](review/test_discovery_runtime_guards.mjs).
+
+Aktywny source gate faktycznie odrzucił checkout na `app/scripts/premium-route-policy.mjs`, ponieważ pointer wciąż wskazuje Stage3B/6d96391. Jest to oczekiwany **BLOCK**, nie PASS ani nowa regresja. Nie przestawiono wskaźnika. Historyczne40 kontroli pełnego proposed verify_sources +23 proposed launch-contract z wcześniejszego Cloud **nie były ponawiane** w tej sesji: pełne testy wymagają m.in. rzeczywistego symlinka, którego ten Windows nie umożliwia. Nie pomijano asercji, nie fałszowano GitHub env.
+
+Istnieje już także osobna gałąź Stage2C `chore/public-discovery-stage2c`/e246c51 z implementacją CI d7b36ee i osobnym pointerem cb63962. Nie przenoszono jej wstecz do Stage2B. Przed integracją właściciel powinien wybrać zachowanie istniejącej historii Stage2C albo osobną aktywację propozycji z tego review; nie stosować dwóch konkurencyjnych kontraktów ani historycznego patcha2A do już przypiętego backendu.
+
+### Testy faktycznie wykonane w tej kontynuacji
+
+| Kontrola | Wynik 2026-11-02 |
+|---|---|
+| TypeScript aplikacji / strict Edge / ESLint | **PASS**, TS w buildach |
+| Vitest | **PASS361/55 plików**, w tym testy Edge/discovery i UI/controller |
+| Premium policy | **PASS45/45** |
+| Consolidation/visual/imports | **PASS42/55/10** |
+| Backend/UI/historia/manifest/patche | **PASS**, rzeczywiste porównania Git i treści |
+| Negatywne Premium/consolidation | **PASS60**, prywatna kopia i przywracanie stanu |
+| Negatywne preflight bez Dockera | **PASS9** |
+| Nieaktywny CI overlay | **PASS33**, kanoniczny klon testowy, bez CI launch |
+| Buildy web | **PASS6**: default, premium-local, live-local, premium-finance-local, android-stage3, demo; izolacja demo16 |
+| Aktywny CI source gate | **BLOCK oczekiwany**, brak aktywacji kontraktu discovery |
+| Pełny proposed gate40 i active/proposed launch-contract23 | **NOT RUN ponownie**, brak właściwego Linux/symlink; wcześniejsze Cloud wyniki oddzielnie poniżej |
+| SQL/RLS, real GoTrue/Edge/PostgREST, nowy Chromium | **NOT RUN**; Docker niedostępny, brak nowej bezpiecznej fixture |
+| Native Gradle, Windows UI/Android Studio i telefon | **NOT RUN**; web Android build nie jest testem APK/telefonu |
+| GitHub-hosted/Actions, deploy/migracje/Cloud | **NOT RUN**, brak dispatch/aktywacji/płatnych zasobów |
+
+### Werdykt i dokładne decyzje przed integracją
+
+1. Zatwierdzić dokładne źródła backend24a59e1 (2 pliki), runtimeae2fd95 (3 pliki) i aktywne zmiany trzech guardów Stage2B; bez zmiany55 i rozszerzenia zakresu na inne moduły.
+2. Wybrać kontrakt CI: zachować już istniejący stos Stage2C/d7b36ee→cb63962 po jego review albo osobno zatwierdzić poprawioną nieaktywną propozycję i pełne testy w Linux, commit implementacji, potem osobny pointer. Ta sesja nie aktywuje żadnej opcji ani Actions.
+3. Przed uznaniem całej integracji za odebraną zapewnić odbiór izolowanego backendu42, w tym brak obcych prywatnych wyników, RLS/HTTP, leave/revoke oraz sesje/wyścigi. Wyniki Windows/Cloud historycznych testów nie są dowodem wykonania tych scenariuszy teraz. Osobny hosted run tylko po decyzji o darmowym limicie/opt-in; nie jest konieczne automatyczne uruchamianie Actions w tym zadaniu.
+4. Wydać osobną decyzję o merge dopiero po rozstrzygnięciu powyższego; zachować ancestry i pełne źródłowe SHA. Żadnej zgody na deploy/migracje Cloud nie wywodzić z technicznego PASS.
+
+Pozostają znane ryzyka: offset bez snapshotu, globalny advisory lock/koszt skanowania i brak bieżącego testu obciążenia/odbioru rzeczywistego backendu. **Nie ma nowej poprawki aplikacji:** kontynuacja dodaje ten raport i odtwarzalny test negatywny, a wcześniej przygotowane poprawki CI pozostają wyłącznie w docs/review. App, workflowy, aktywne piny, zmienne repo i sekrety bez zmian.
+
+---
+
 2026-11-01 UTC. **PASS kontroli źródeł/frontendu; WARN ograniczeń; BLOCK aktywacji
 CI i integracji bez decyzji właściciela oraz odbioru rzeczywistego backendu.**
 Nie jest to zgoda na merge, deploy lub zmianę Supabase Cloud.
