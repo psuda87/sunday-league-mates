@@ -1,0 +1,98 @@
+{
+  "reviewed_pr_head": "5a8669156b87c1d7c4e7da03fcc30349852d21d8",
+  "rc_base": "1575bef77f0b24a8c74373018895b7b872ebc06a",
+  "runtime_ui": "3f181e906dcad95ba570e62d71fb9e666e9836e0",
+  "runtime_android": "f2edf565abd2f3f67a0cc3a28d6c01c5e93806f8",
+  "reviewed_policy": "704e4a8f2c787c8644e8a8999f99e06bb7b91a7b",
+  "ci_implementation": "7c45656ab89105ba53a53e7c1f2fd7049b762666",
+  "ci_pointer_commit": "6e9ce9d09a7f590ff17f6e7241848cdeccca327e",
+  "prior_ci": "d7b36eee379acf5036f8ea8aaeeea5f7791c8a04",
+  "prior_discovery": "43f69a62c85dd354695f6fcb4531c85fb03651cf",
+  "exact_overlay": [
+    {
+      "path": "app/android/app/src/androidTest/java/pl/psuda87/slm/SlmWindowInsetsTest.java",
+      "git_blob_sha256": "d0111150ee9c5266fd3bd99a2556fd4f95512d4336555108852fcc716d367a4d"
+    },
+    {
+      "path": "app/android/app/src/main/java/pl/psuda87/slm/MainActivity.java",
+      "git_blob_sha256": "f49c1bc77ab8ab72a6b2e56f8a5b7ae3b78cbc7f12b99c783104a480b6f23beb"
+    },
+    {
+      "path": "app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java",
+      "git_blob_sha256": "4348704493d28d65a95e19890388b2797b705a15c7d01aae96aa24a92625ef5e"
+    },
+    {
+      "path": "app/cypress/fixtures/guest-layout.html",
+      "git_blob_sha256": "4bca3a3415b235ba702b97f96c93da72d04337514bffe2ac5273830161743391"
+    },
+    {
+      "path": "app/cypress/fixtures/guest-layout.tsx",
+      "git_blob_sha256": "1ef7e1d962bd7fa4c25fff24336a3b51547703f1ede0094b97c849162b6487bf"
+    },
+    {
+      "path": "app/cypress/guest-layout.cy.ts",
+      "git_blob_sha256": "fc1d86747de6ce2d939c3683bb2f806812a12d1b0b0a9eb94aa2dc105b4a1420"
+    },
+    {
+      "path": "app/scripts/premium-route-policy.mjs",
+      "git_blob_sha256": "ad0b918eed85250010c1f69e31832813e4f392428cd3e5f6ad870ea067024ca7"
+    },
+    {
+      "path": "app/scripts/verify-premium-policy-cases.mjs",
+      "git_blob_sha256": "f5a2a61c35224cd3935955acf6a4dde4cf4337cfd56f1345ac6b52498537d4d3"
+    },
+    {
+      "path": "app/src/events/GuestForm.test.tsx",
+      "git_blob_sha256": "1f667ef87c8ed16024a38227300f1f81518f95efe7ceddaf337aafff22bde214"
+    },
+    {
+      "path": "app/src/events/GuestForm.tsx",
+      "git_blob_sha256": "67dd0f970aeb2c46d58959e5092893c7c9af8a7a6cd0c0d5c2a33749db98cef4"
+    },
+    {
+      "path": "app/src/events/PremiumEvents.tsx",
+      "git_blob_sha256": "b7b23a499f630e29095630f4ff3b78d3fa173d5b36dcf285a23b6fda68bd4c50"
+    },
+    {
+      "path": "app/src/events/premiumEvents.css",
+      "git_blob_sha256": "0187241a28e611ebcdf06001f814a5ec616c7767f8af12926065e7d77f2b79cd"
+    }
+  ],
+  "results": {
+    "premium_policy": {
+      "pass": 53,
+      "existing": 45,
+      "new": 8
+    },
+    "consolidation": {
+      "migrations": 42,
+      "frozen_ui": 55,
+      "import_boundaries": 11
+    },
+    "linux_source_contract_tests": 29,
+    "actual_linux_source_denials": 69,
+    "actual_premium_consolidation_checks": 60,
+    "vitest": 372,
+    "cypress_chrome": 6,
+    "lint": "PASS",
+    "typescript": "PASS",
+    "strict_edge": "PASS",
+    "default_build": "PASS",
+    "source_linux_ordinary_clone": "PASS",
+    "source_windows_autocrlf_false_clone": "PASS",
+    "github_hosted": "NOT RUN",
+    "android_repeated_in_this_review": "NOT RUN (implementation unchanged)",
+    "database_tests": "NOT RUN (SQL/Edge unchanged)"
+  },
+  "linux_tools_image": "sha256:522be6ca97cc065e5448f5890da98a9f2f102fe28b17ec7d2acbbe9ed17d8aea",
+  "container_isolation": [
+    "network none",
+    "read-only root",
+    "read-only evidence mounts",
+    "tmpfs clone",
+    "cap-drop ALL",
+    "no-new-privileges",
+    "no Docker socket",
+    "no database"
+  ]
+}

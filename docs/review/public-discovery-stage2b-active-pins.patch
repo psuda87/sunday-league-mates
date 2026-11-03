@@ -1,0 +1,102 @@
+diff --git a/app/scripts/premium-route-policy.mjs b/app/scripts/premium-route-policy.mjs
+index 5726e94..7df487b 100644
+--- a/app/scripts/premium-route-policy.mjs
++++ b/app/scripts/premium-route-policy.mjs
+@@ -14,6 +14,11 @@ export const LINEUPS_STAGE2A='b46b7b91796b96acfc809799e09a5a6898b99342';
+ // general routing exemptions; every byte of these four sources is checked.
+ export const LINEUPS_STAGE2B='f47cd80ad49aa6df0faf0dcb04093f2fa1adfbcd';
+ export const LINEUPS_MIGRATION='app/supabase/migrations/20261029140000_match_lineups.sql';
++// Owner authorized exact backend activation for discovery Stage2B; no broader exemptions.
++export const DISCOVERY_SOURCE='24a59e104bfe80b4d2f41cbd0ad02b58fc546040';
++export const DISCOVERY_MIGRATION='app/supabase/migrations/20261030090000_public_match_discovery.sql';
++export const DISCOVERY_UI='ae2fd9550b3688f80bfc69d811eb2423743b8329';
++const discoveryUi=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/usePremiumEvents.ts','app/src/events/premiumContracts.ts']);
+ const lineupStage1=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/PremiumTeams.tsx','app/src/events/lineupEditor.ts','app/src/events/LineupPlayerProfile.tsx']);
+ const lineupStage2b=new Set(['app/src/events/PremiumTeams.tsx','app/src/events/lineupEditor.ts','app/src/events/lineupContracts.ts','app/src/events/usePremiumLineup.ts']);
+ const historyCache=new Map();
+@@ -36,10 +41,11 @@ export function verifyPremiumRuntime(root,overrides={}){
+  }
+  const mainSteps=execFileSync('git',['ls-tree','-r','--name-only',MAIN,'--','app/supabase/migrations'],{cwd:root,encoding:'utf8'}).trim().split('\n');
+  const added=['20261028174603_premium_match_membership_visibility.sql','20261028174920_premium_member_creation_finance_guard.sql','20261028175508_premium_match_feed_filters.sql','20261028181054_premium_group_admin_only_finance.sql'].map(n=>'app/supabase/migrations/'+n);
+- assert.deepEqual(readdirSync(root+'/app/supabase/migrations').filter(n=>n.endsWith('.sql')).sort(),[...mainSteps,...added,'app/supabase/migrations/20261028204500_restore_pr16_match_name_projection.sql',LINEUPS_MIGRATION].map(p=>p.split('/').at(-1)).sort(),'Unexpected migration/model activation');
++ assert.deepEqual(readdirSync(root+'/app/supabase/migrations').filter(n=>n.endsWith('.sql')).sort(),[...mainSteps,...added,'app/supabase/migrations/20261028204500_restore_pr16_match_name_projection.sql',LINEUPS_MIGRATION,DISCOVERY_MIGRATION].map(p=>p.split('/').at(-1)).sort(),'Unexpected migration/model activation');
+  for(const p of [...mainSteps,...added])assert.equal(digest(read(p)),digest(git(added.includes(p)?APPROVED:MAIN,p)),'Historical migration overwritten: '+p);
+- for(const p of [LINEUPS_MIGRATION,'app/supabase/functions/accounts/handler.ts'])
+-  assert.equal(digest(read(p)),digest(git(LINEUPS_STAGE2A,p)),'Unreviewed Stage 2A backend source: '+p);
++ assert.equal(digest(read(LINEUPS_MIGRATION)),digest(git(LINEUPS_STAGE2A,LINEUPS_MIGRATION)),'Unreviewed Stage 2A backend source: '+LINEUPS_MIGRATION);
++ for(const p of [DISCOVERY_MIGRATION,'app/supabase/functions/accounts/handler.ts'])
++  assert.equal(digest(read(p)),digest(git(DISCOVERY_SOURCE,p)),'Unreviewed discovery backend source: '+p);
+  assert.equal(digest(read('app/src/auth/tokenStore.ts')),digest(git(APPROVED,'app/src/auth/tokenStore.ts')),'Secure vault namespace changed');
+  const bindings={
+   'app/src/events/PremiumWorld.tsx':['../demo/App','./PremiumEvents','./usePremiumEvents'],
+@@ -60,7 +66,8 @@ export function verifyPremiumRuntime(root,overrides={}){
+  }
+  // These reviewed controllers are part of the approved runtime, not spare files next to a replacement.
+  for(const path of ['app/src/events/PremiumWorld.tsx','app/src/events/PremiumEvents.tsx','app/src/events/PremiumTeams.tsx','app/src/events/PremiumScrollHeader.tsx','app/src/ui/PremiumPitch.tsx','app/src/finance/PremiumFinance.tsx','app/src/finance/premiumFinance.css','app/src/events/premiumEvents.css','app/src/events/lineupEditor.ts','app/src/events/LineupPlayerProfile.tsx','app/src/events/lineupContracts.ts','app/src/events/usePremiumLineup.ts'])
+-  assert.equal(digest(read(path)),digest(git(lineupStage2b.has(path)?LINEUPS_STAGE2B:lineupStage1.has(path)?LINEUP_STAGE1:APPROVED,path)),'Approved runtime replaced/condition changed: '+path);
++  assert.equal(digest(read(path)),digest(git(discoveryUi.has(path)?DISCOVERY_UI:lineupStage2b.has(path)?LINEUPS_STAGE2B:lineupStage1.has(path)?LINEUP_STAGE1:APPROVED,path)),'Approved runtime replaced/condition changed: '+path);
++ for(const path of discoveryUi)assert.equal(digest(read(path)),digest(git(DISCOVERY_UI,path)),'Unreviewed discovery UI: '+path);
+  assert.equal(digest(read('app/src/groups/PremiumGroups.tsx')),digest(git(MAIN,'app/src/groups/PremiumGroups.tsx')),'Group UI wrapper replaced');
+  const old=git(MAIN,'app/src/auth/B1App.tsx');
+  const expected=old.replace("import WorldApp from '../demo/App';","import WorldApp from '../events/PremiumWorld';").replace("<WorldApp key={owner??'none'}","<WorldApp key={owner??'none'} manager={manager} userId={owner??''}");
+diff --git a/app/scripts/verify-consolidation.mjs b/app/scripts/verify-consolidation.mjs
+index 2716add..b08caea 100644
+--- a/app/scripts/verify-consolidation.mjs
++++ b/app/scripts/verify-consolidation.mjs
+@@ -3,7 +3,7 @@ import {createHash} from 'node:crypto';
+ import {execFileSync} from 'node:child_process';
+ import assert from 'node:assert/strict';
+ import {fileURLToPath} from 'node:url';
+-import {LINEUPS_STAGE2A,LINEUPS_MIGRATION} from './premium-route-policy.mjs';
++import {LINEUPS_STAGE2A,LINEUPS_MIGRATION,DISCOVERY_SOURCE,DISCOVERY_MIGRATION} from './premium-route-policy.mjs';
+ const repo=fileURLToPath(new URL('../../',import.meta.url));
+ const manifest=JSON.parse(readFileSync(new URL('./consolidation-sources.json',import.meta.url),'utf8'));
+ assert.equal(execFileSync('git',['merge-base',manifest.main,'HEAD'],{cwd:repo,encoding:'utf8'}).trim(),manifest.main,'Must retain current main ancestry');
+@@ -11,7 +11,12 @@ for(const [path,expected] of Object.entries({...manifest.main_migrations,...mani
+  const value=readFileSync(repo+path,'utf8').replace(/\r\n/g,'\n');
+  assert.equal(createHash('sha256').update(value).digest('hex'),expected,'Protected main source modified: '+path);
+ }
+-assert.equal(readdirSync(repo+'app/supabase/migrations').filter(p=>p.endsWith('.sql')).length,41);
++const discoveryBase='e04d9a47560de36657da76f12ae63e20ef2299cb';
++const historical=execFileSync('git',['ls-tree','-r','--name-only',discoveryBase,'--','app/supabase/migrations'],{cwd:repo,encoding:'utf8'}).trim().split('\n');
++assert.equal(historical.length,41,'Exact Stage3B migration baseline');
++assert.deepEqual(readdirSync(repo+'app/supabase/migrations').filter(p=>p.endsWith('.sql')).sort(),[...historical,DISCOVERY_MIGRATION].map(p=>p.split('/').at(-1)).sort(),'Unexpected migration/model activation');
++for(const path of historical)assert.equal(readFileSync(repo+path,'utf8').replace(/\r\n/g,'\n'),execFileSync('git',['show',discoveryBase+':'+path],{cwd:repo,encoding:'utf8'}).replace(/\r\n/g,'\n'),'Stage3B migration changed: '+path);
++for(const path of [DISCOVERY_MIGRATION,'app/supabase/functions/accounts/handler.ts'])assert.equal(readFileSync(repo+path,'utf8').replace(/\r\n/g,'\n'),execFileSync('git',['show',DISCOVERY_SOURCE+':'+path],{cwd:repo,encoding:'utf8'}).replace(/\r\n/g,'\n'),'Unreviewed discovery backend source: '+path);
+ const lineupMigration=readFileSync(repo+LINEUPS_MIGRATION,'utf8').replace(/\r\n/g,'\n');
+ assert.equal(lineupMigration,execFileSync('git',['show',LINEUPS_STAGE2A+':'+LINEUPS_MIGRATION],{cwd:repo,encoding:'utf8'}).replace(/\r\n/g,'\n'),'Unreviewed lineup migration');
+ for(const path of ['vercel.json','app/vercel.json']){
+@@ -20,4 +25,4 @@ for(const path of ['vercel.json','app/vercel.json']){
+ }
+ const prepare=readFileSync(new URL('./prepare-edge-local.py',import.meta.url),'utf8');
+ assert(!/premium318-live|\.worktrees|B22_LOCAL_ONLY/.test(prepare),'Local prep must use canonical sources only');
+-console.log('PASS consolidation: historical main sources unchanged, 41 versioned steps including pinned lineups, main ancestry, deployment disabled, canonical local preparation.');
++console.log('PASS consolidation: historical main sources unchanged, 42 exact versioned steps including pinned lineups and discovery, main ancestry, deployment disabled, canonical local preparation.');
+diff --git a/app/scripts/verify-premium-policy-cases.mjs b/app/scripts/verify-premium-policy-cases.mjs
+index 0a80640..a4bdd83 100644
+--- a/app/scripts/verify-premium-policy-cases.mjs
++++ b/app/scripts/verify-premium-policy-cases.mjs
+@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
+ import {readFileSync} from 'node:fs';
+ import {execFileSync} from 'node:child_process';
+ import {fileURLToPath} from 'node:url';
+-import {verifyPremiumRuntime,APPROVED,LINEUPS_MIGRATION} from './premium-route-policy.mjs';
++import {verifyPremiumRuntime,APPROVED,LINEUPS_MIGRATION,DISCOVERY_MIGRATION} from './premium-route-policy.mjs';
+ const root=fileURLToPath(new URL('../../',import.meta.url));
+ const read=p=>readFileSync(root+'/'+p,'utf8');
+ test('actual source graph passes',()=>assert.equal(verifyPremiumRuntime(root).frozen,55));
+@@ -29,6 +29,14 @@ for(const [label,path,mutate] of [
+  ['original pitch geometry changed','app/src/ui/PremiumPitch.tsx',s=>s.replace('M4 80H96','M4 90H96')],
+  ['BottomNav restyled','app/src/demo/DemoBottomNav.tsx',s=>s.replace('slm-demo-nav-notch','slm-demo-nav-notch-altered')],
+  ['Ultimate component replaced','app/src/ui/UltimatePlayerCard.tsx',()=>"export default function Card(){return null;}"],
++ ['discovery debounce removed','app/src/events/usePremiumEvents.ts',s=>s.replace('},300);','},0);')],
++ ['discovery version ignored','app/src/events/premiumContracts.ts',s=>s.replace('r.public_discovery_version===1','true')],
++ ['discovery field always shown','app/src/events/PremiumEvents.tsx',s=>s.replace("data.activeGroup==='public'&&",'true&&')],
++ ['discovery privilege elevated',DISCOVERY_MIGRATION,s=>s.replace('security invoker','security definer')],
++ ['discovery search filter disabled',DISCOVERY_MIGRATION,s=>s.replace("v_query='' or (e.visibility='public' and","true or (e.visibility='public' and")],
++ ['discovery ACL exposed',DISCOVERY_MIGRATION,s=>s.replace('to service_role;','to authenticated,service_role;')],
++ ['discovery actor forged','app/supabase/functions/accounts/handler.ts',s=>s.replace('p_user: ctx.id, p_session: ctx.sid, p_action: action.slice(prefix.length)','p_user: body.user_id, p_session: ctx.sid, p_action: action.slice(prefix.length)')],
++ ['discovery version gate removed','app/supabase/functions/accounts/handler.ts',s=>s.replace("action === 'matches_list' && (Object.hasOwn(payload, 'query')","false && (Object.hasOwn(payload, 'query')")],
+  ['lineup table RLS disabled',LINEUPS_MIGRATION,s=>s.replace('enable row level security','disable row level security')],
+  ['lineup service RPC exposed',LINEUPS_MIGRATION,s=>s.replace('to service_role;','to authenticated,service_role;')],
+  ['lineup no-op always writes',LINEUPS_MIGRATION,s=>s.replace('if changed then','if true then')],

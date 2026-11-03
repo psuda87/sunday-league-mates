@@ -1,0 +1,80 @@
+name: SLM frontend PR checks
+
+# Prepared in Stage 3A. No paid usage is authorized by adding this file.
+# Skipped (quota opt-in missing) is NOT evidence of a passing check.
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      confirm_free_allowance:
+        description: Owner verified included Actions allowance and blocked paid overages
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: slm-frontend-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: SLM frontend checks (no database)
+    if: >-
+      github.repository == 'psuda87/sunday-league-mates' &&
+      vars.SLM_FREE_CI_ENABLED == 'true' &&
+      (github.event_name == 'pull_request' || inputs.confirm_free_allowance == true)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GIT_TERMINAL_PROMPT: '0'
+      CYPRESS_INSTALL_BINARY: '0'
+    defaults:
+      run:
+        working-directory: app
+        shell: bash
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+      - name: Record the actual tested revision
+        run: git log -1 --format='%H %s'
+      - name: Install locked dependencies without lifecycle scripts
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: TypeScript application and strict Edge contracts
+        run: |
+          npx --no-install tsc --noEmit
+          npm run typecheck:edge
+      - name: ESLint
+        run: npm run lint -- .
+      - name: Full Vitest (controlled transports are not SQL or real Edge E2E)
+        run: npm run test.unit -- --run --maxWorkers=2
+      - name: Existing Premium visual, runtime, migration and negative-policy guards
+        run: |
+          npm run verify:consolidation
+          npm run test:premium-policy
+      - name: Default LIVE, explicit Premium and Android web, isolated demo
+        run: |
+          npm run build
+          npm run build:premium-local
+          npm run build:premium-finance-local
+          npm run build:android-stage3
+          npm run build:demo
+      - name: State the verification boundary even after a failure
+        if: always()
+        run: |
+          {
+            echo '## Stage 3A: frontend and source contracts only'
+            echo "Tested commit: $(git rev-parse HEAD)"
+            echo 'SQL/RLS, real GoTrue/Edge/browser, native APK and POCO: NOT RUN by this workflow.'
+            echo 'No database is started or migrated. Demo isolation is checked by build:demo.'
+            echo 'See docs/SLM_V1_INTEGRATION_READY.md for the separate backend acceptance gate.'
+          } >> "$GITHUB_STEP_SUMMARY"

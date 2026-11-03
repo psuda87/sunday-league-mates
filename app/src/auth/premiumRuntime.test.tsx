@@ -1,0 +1,46 @@
+import {afterEach,expect,it,vi} from 'vitest';
+import {cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react';
+import B1App from './B1App';
+import {SessionManager} from './sessionManager';
+import {AccountError} from './api';
+import type {Session} from './api';
+import {uid} from '../events/lineupFixture.test-support';
+// Transport fixture only: the actual Auth gate, Premium shell, controllers and cards render.
+afterEach(()=>{cleanup();window.history.replaceState(null,'','/');});
+it('actual B1 entry renders API match, original pitch/profile/nav and hides data offline',async()=>{
+ const now='2030-01-01T00:00:00Z';
+ const group={id:'real-group',name:'Runtime API group',description:'',admin_id:'someone-else',organizer:false,member_count:1,pending_count:0};
+ const event={id:uid(900),group_id:group.id,group_name:group.name,created_by:'owner',name:'Runtime API match',visibility:'private',starts_at:'2030-01-03T17:00:00Z',location:'API venue',status:'scheduled',access:'full',own_participation:true,duration_minutes:90,capacity:10,cost_cents:27000,minimum_players:10,registered_count:3,reserve_count:0,registration_open:true,decision_required:false,can_manage:false,can_edit:true,version:1};
+ const participant={id:uid(1),member_id:'owner',responsible_user_id:'owner',display_name:'Runtime Owner',responsible_name:'Runtime Owner',status:'registered',absent:false,contact_phone:null,joined_at:now,guest_name:null,guest_phone:null};
+ const session:Session={access_token:'fixture-access',refresh_token:'fixture-refresh',user_id:'owner',role:'member',expires_in:3600,must_change_password:false};
+ let offline=false;
+ const request=vi.fn(async(action:string)=>{
+  if(offline)throw new AccountError('offline','network_error');
+  if(action==='refresh')return session;
+  if(action==='profile')return {user_id:'owner',login:'runtime@example.invalid',phone:'',full_name:'Runtime Owner',nickname:'Runtime Owner',first_name:'Runtime',display_as:'nickname',display_name:'Runtime Owner',jersey_number:27,email_account:true};
+  if(action==='profile_photo_get')return {image_data_url:null,revision:null,cleanup_pending:false};
+  if(action==='groups_list')return {groups:[group]};
+  if(action==='groups_inbox')return {requests:[]};
+  if(action==='matches_list')return {events:[event],server_now:now,member_creation_enabled:true};
+  if(action==='matches_detail')return {event,participants:[participant,{...participant,id:uid(2),member_id:'two'},{...participant,id:uid(3),member_id:'three'}],server_now:now,can_register_paid:true};
+  if(action==='lineups_get')return {event_id:event.id,version:0,event_version:1,roster_version:'a'.repeat(64),saved_roster_version:null,team_a:[],team_b:[],unassigned:[uid(1),uid(2),uid(3)],stale_entry_ids:[],last_change:null};
+  throw Error('Unexpected transport action: '+action);
+ });
+ const manager=new SessionManager({read:async()=>'saved',write:async()=>{},clear:async()=>{}},async<T,>(a:string)=>await request(a) as T);
+ const {container}=render(<B1App manager={manager}/>);
+ await screen.findByText('Runtime API match');
+ expect(container.querySelector('.slm-match-compact .slm-stadium')).toBeTruthy();
+ expect(screen.getByRole('button',{name:'Utwórz mecz'})).toBeTruthy();
+ fireEvent.click(container.querySelector('.slm-card-link')!);
+ fireEvent.click(await screen.findByRole('tab',{name:/Składy/}));
+ await screen.findByText('Brak zapisanego składu');
+ expect(container.querySelectorAll('.slm-pitch-token')).toHaveLength(0);
+ expect(screen.getByRole('button',{name:'Zapisz'})).toBeDisabled();expect(request.mock.calls.some(c=>c[0]==='lineups_save')).toBe(false);
+ fireEvent.click(screen.getByRole('button',{name:'Profil'}));
+ await waitFor(()=>expect(container.querySelector('.slm-ultimate-card')).toHaveTextContent('Runtime Owner'));
+ expect(screen.getByLabelText('Numer koszulki 27')).toBeTruthy();
+ offline=true;fireEvent(window,new Event('offline'));
+ await screen.findByRole('heading',{name:'Brak połączenia'});
+ expect(container.querySelector('.slm-ultimate-card')).toBeNull();
+ expect(container.querySelector('.slm-match-compact')).toBeNull();
+});

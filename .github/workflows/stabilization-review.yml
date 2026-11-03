@@ -1,0 +1,58 @@
+name: SLM consolidation review
+# Private-repository free allowance is unverified. No automatic push/PR dispatch.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_free_allowance:
+        description: Owner verified sufficient included Actions minutes; no paid usage
+        type: boolean
+        required: true
+        default: false
+permissions:
+  contents: read
+jobs:
+  review:
+    if: inputs.confirm_free_allowance && github.ref == 'refs/heads/chore/main-stabilization'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GIT_TERMINAL_PROMPT: '0'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+      - run: npm ci
+        working-directory: app
+      - name: Types, lint, Auth/profile/navigation/render tests, approval guard
+        working-directory: app
+        run: |
+          npx tsc --noEmit
+          npm run typecheck:edge
+          npm run lint
+          npm run test.unit -- --run
+          npm run verify:consolidation
+          npm run test:premium-policy
+      - name: Default LIVE, opt-in Premium/Android web and isolated demo builds
+        working-directory: app
+        run: |
+          npm run build
+          npm run build:premium-finance-local
+          npm run build:demo
+          npm run build:android-stage3
+      - name: Dedicated local Supabase; never linked, Cloud or POCO
+        run: |
+          mkdir -p .cache
+          node app/scripts/prepare-stabilization-local.mjs
+          npx --yes --package=supabase@2.121.0 supabase start --workdir .cache/stabilization-stack --exclude studio,realtime,imgproxy,logflare,vector,supavisor,mailpit,postgres-meta > .cache/start-private.log 2>&1
+          node app/scripts/test-premium-behavior-http.mjs
+          node app/scripts/test-premium-finance-authority-http.mjs
+          node app/scripts/test-stabilization-profile-http.mjs
+          node app/scripts/test-stabilization-sql.mjs
+      - name: Real HTTP mobile browser (320/360/390, Light/Dark, pitch and history)
+        run: |
+          (cd app && npx vite --config vite.stabilization.config.ts > ../.cache/vite.log 2>&1) &
+          node app/scripts/stabilization-browser.mjs

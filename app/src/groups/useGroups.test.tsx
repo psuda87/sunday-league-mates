@@ -8,7 +8,7 @@ import type { GroupBinding } from './model';
 afterEach(()=>{cleanup();window.history.replaceState(null,'','/');});
 const group:GroupSummary={id:'group-real',name:'Real API group',description:'',admin_id:'owner',organizer:true,member_count:2,pending_count:1};
 const detail:GroupDetail={group,members:[{user_id:'owner',nickname:'Owner',full_name:null,contact_phone:null,jersey_number:0,organizer:true,joined_at:'2026-10-01',share_full_name:false}],requests:[]};
-function mock(call:(action:string,body?:Record<string,unknown>)=>Promise<unknown>){return {call:vi.fn(call),getSnapshot:()=>({phase:'ready',session:{user_id:'owner'}})} as unknown as SessionManager;}
+function mock(call:(action:string,body?:Record<string,unknown>)=>Promise<unknown>){const state={phase:'ready',session:{user_id:'owner'}};return {call:vi.fn(call),subscribe:()=>()=>{},getSnapshot:()=>state} as unknown as SessionManager;}
 it('uses server counts and UUIDs without importing any demo world or inventing memberships',()=>{
  const world=groupWorld('owner',[group],[],null);
  expect(world).not.toHaveProperty('games');expect(world.groupState.groups.map(g=>g.id)).toEqual(['group-real']);
@@ -26,13 +26,13 @@ it('clears private group state on failed refresh and permits retry without a dem
  const {result}=renderHook(()=>useGroups(manager,'owner'));
  await waitFor(()=>expect(result.current.binding.loading).toBe(false));expect(result.current.binding.counts['group-real']).toBe(2);
  broken=true;await act(()=>result.current.binding.refresh());
- expect(result.current.world.groupState.groups).toEqual([]);expect(result.current.binding.error).toBe('Connection unavailable');
+ expect(result.current.world.groupState.groups).toEqual([]);expect(result.current.binding.error).toContain('Nie udało się potwierdzić danych grup');
  broken=false;await act(()=>result.current.binding.refresh());expect(result.current.world.groupState.groups[0].id).toBe('group-real');
 });
 it('refuses an older backend contract instead of inventing zero counts or demo groups',async()=>{
  const manager=mock(async action=>action==='groups_list'?{groups:[{id:'group-real',name:'Old backend',description:'',admin_id:'owner',organizer:true}]}:{requests:[]});
  const {result}=renderHook(()=>useGroups(manager,'owner'));await waitFor(()=>expect(result.current.binding.loading).toBe(false));
- expect(result.current.binding.error).toContain('Backend');expect(result.current.world.groupState.groups).toEqual([]);
+ expect(result.current.binding.error).toContain('Nie udało się potwierdzić danych grup');expect(result.current.world.groupState.groups).toEqual([]);
 });
 it('does not return a late create result to a view that has logged out or unmounted',async()=>{
  let finish:(value:unknown)=>void=()=>{};
@@ -84,7 +84,7 @@ it('retains server consent after refresh/reopen, scopes writes and retains old v
  await act(()=>result.current.binding.open(group.id));act(()=>result.current.binding.consent(true));
  await waitFor(()=>expect(result.current.binding.busy).toBe(false));expect(result.current.binding.shareFullName).toBe(true);
  await act(()=>result.current.binding.refresh());await act(()=>result.current.binding.open(group.id));expect(result.current.binding.shareFullName).toBe(true);
- broken=true;act(()=>result.current.binding.consent(false));await waitFor(()=>expect(result.current.binding.error).toBe('Save failed'));
+ broken=true;act(()=>result.current.binding.consent(false));await waitFor(()=>expect(result.current.binding.error).toContain('Nie udało się potwierdzić danych grup'));
  expect(result.current.binding.shareFullName).toBe(true);expect(stored).toBe(true);
  expect(manager.call).toHaveBeenCalledWith('groups_consent',expect.objectContaining({group_id:group.id,share_full_name:true}));
 });

@@ -1,0 +1,459 @@
+{
+  "project": "hjtcyybkxebvdropchac",
+  "history": [
+    {
+      "name": "slm_auth_proof_setup",
+      "version": "20261013185250",
+      "statements_md5": "742f446e509fdccf039faec36e0e6561",
+      "statement_count": 1
+    },
+    {
+      "name": "accounts_module",
+      "version": "20261013191910",
+      "statements_md5": "2f973205455d5080900bda0720e7f573",
+      "statement_count": 1
+    },
+    {
+      "name": "accounts_session_hardening",
+      "version": "20261013193036",
+      "statements_md5": "cbe122306e0e2a653b79ec5b3be52c4d",
+      "statement_count": 1
+    },
+    {
+      "name": "accounts_recovery_and_permissions",
+      "version": "20261013193844",
+      "statements_md5": "8f3fedfec6bf3ffeefd89bc8cb243726",
+      "statement_count": 1
+    },
+    {
+      "name": "events_module",
+      "version": "20261013212841",
+      "statements_md5": "b23cbb9cf3176391027493f207c72feb",
+      "statement_count": 1
+    },
+    {
+      "name": "events_edit_validation",
+      "version": "20261013213423",
+      "statements_md5": "046229e35b0936929b5cda1cfa0b1aea",
+      "statement_count": 1
+    },
+    {
+      "name": "events_finite_costs",
+      "version": "20261013213917",
+      "statements_md5": "e73439c84465238c56798a330bd01995",
+      "statement_count": 1
+    }
+  ],
+  "objects": [
+    {
+      "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "name": "slm_account_audit",
+      "schema": "public",
+      "force_rls": false
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "name": "slm_account_rate_limits",
+      "schema": "public",
+      "force_rls": false
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "name": "slm_account_security",
+      "schema": "public",
+      "force_rls": false
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "name": "slm_account_sessions",
+      "schema": "public",
+      "force_rls": false
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "name": "slm_aliases",
+      "schema": "public",
+      "force_rls": false
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "name": "slm_auth_proof_accounts",
+      "schema": "public",
+      "force_rls": false
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "name": "slm_auth_proof_protected",
+      "schema": "public",
+      "force_rls": false
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "name": "slm_auth_proof_sessions",
+      "schema": "public",
+      "force_rls": false
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "name": "slm_event_history",
+      "schema": "public",
+      "force_rls": false
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,authenticated=r/postgres}",
+      "rls": true,
+      "name": "slm_event_participants",
+      "schema": "public",
+      "force_rls": false
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,authenticated=r/postgres}",
+      "rls": true,
+      "name": "slm_events",
+      "schema": "public",
+      "force_rls": false
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres,authenticated=r/postgres}",
+      "rls": true,
+      "name": "slm_profiles",
+      "schema": "public",
+      "force_rls": false
+    },
+    {
+      "acl": "{postgres=arwdDxtm/postgres,service_role=arwdDxtm/postgres}",
+      "rls": true,
+      "name": "slm_roles",
+      "schema": "public",
+      "force_rls": false
+    }
+  ],
+  "storage": [],
+  "policies": [
+    {
+      "name": "owner_access",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "slm_auth_proof_protected",
+      "schema": "public",
+      "command": "ALL"
+    },
+    {
+      "name": "password_gate",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "slm_auth_proof_protected",
+      "schema": "public",
+      "command": "ALL"
+    },
+    {
+      "name": "participants_member_read",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "slm_event_participants",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "events_member_read",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "slm_events",
+      "schema": "public",
+      "command": "SELECT"
+    },
+    {
+      "name": "members_read_profiles",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "slm_profiles",
+      "schema": "public",
+      "command": "SELECT"
+    }
+  ],
+  "postgres": "17.11",
+  "functions": [
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "args": "p_user uuid, p_session uuid, p_version bigint",
+      "name": "slm_account_accept_session",
+      "config": [
+        "search_path=\"\""
+      ],
+      "schema": "public",
+      "definition_md5": "2292a265f7c209bc2dc3607d75d2c0f2",
+      "security_definer": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "args": "p_actor uuid, p_session uuid, p_target uuid, p_kind text",
+      "name": "slm_account_begin",
+      "config": [
+        "search_path=\"\""
+      ],
+      "schema": "public",
+      "definition_md5": "00294199c89ccd23ad0c74e042b7fccf",
+      "security_definer": false
+    },
+    {
+      "acl": "{postgres=X/postgres,supabase_auth_admin=X/postgres}",
+      "args": "event jsonb",
+      "name": "slm_account_block_email",
+      "config": [
+        "search_path=\"\""
+      ],
+      "schema": "public",
+      "definition_md5": "dd8c79a2bdc6f8a6320761247b1332b7",
+      "security_definer": false
+    },
+    {
+      "acl": "{postgres=X/postgres,supabase_auth_admin=X/postgres}",
+      "args": "event jsonb",
+      "name": "slm_account_block_sms",
+      "config": [
+        "search_path=\"\""
+      ],
+      "schema": "public",
+      "definition_md5": "6662af2564ee32b8a021d76468f1309f",
+      "security_definer": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "args": "p_user uuid, p_session uuid",
+      "name": "slm_account_context",
+      "config": [
+        "search_path=\"\""
+      ],
+      "schema": "public",
+      "definition_md5": "db172392d6946f60a17ce7371dcf0a18",
+      "security_definer": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "args": "p_user uuid, p_operation uuid, p_session uuid, p_login text, p_phone text, p_actor uuid",
+      "name": "slm_account_finish",
+      "config": [
+        "search_path=\"\""
+      ],
+      "schema": "public",
+      "definition_md5": "e324562c6c5bf14bebf109870a793e13",
+      "security_definer": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "args": "p_user uuid, p_expected_operation uuid",
+      "name": "slm_account_prepare_recovery",
+      "config": [
+        "search_path=\"\""
+      ],
+      "schema": "public",
+      "definition_md5": "d7e2083e9afac51526984a802979d926",
+      "security_definer": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "args": "p_user uuid, p_login text, p_phone text, p_email text, p_actor uuid, p_actor_session uuid, p_admin boolean",
+      "name": "slm_account_provision",
+      "config": [
+        "search_path=\"\""
+      ],
+      "schema": "public",
+      "definition_md5": "cf0758a1aea6770d13194274c8cd3338",
+      "security_definer": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "args": "p_key text, p_limit integer, p_seconds integer",
+      "name": "slm_account_rate",
+      "config": [
+        "search_path=\"\""
+      ],
+      "schema": "public",
+      "definition_md5": "1de292d415eb3403c0538f811aafc259",
+      "security_definer": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "args": "p_user uuid, p_session uuid",
+      "name": "slm_account_revoke_session",
+      "config": [
+        "search_path=\"\""
+      ],
+      "schema": "public",
+      "definition_md5": "76f0f2b9985d52c2b88d333c470f2667",
+      "security_definer": false
+    },
+    {
+      "acl": "{postgres=X/postgres,supabase_auth_admin=X/postgres}",
+      "args": "event jsonb",
+      "name": "slm_auth_proof_block_email",
+      "config": [
+        "search_path=\"\""
+      ],
+      "schema": "public",
+      "definition_md5": "f783efb4b141a80a6c8342559b2f08ba",
+      "security_definer": false
+    },
+    {
+      "acl": "{postgres=X/postgres,supabase_auth_admin=X/postgres}",
+      "args": "event jsonb",
+      "name": "slm_auth_proof_block_sms",
+      "config": [
+        "search_path=\"\""
+      ],
+      "schema": "public",
+      "definition_md5": "18afb5a3d4a50e4413e09634fb3d547c",
+      "security_definer": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "args": "p_user uuid, p_session uuid, p_action text, p_body jsonb",
+      "name": "slm_events_dispatch",
+      "config": [
+        "search_path=\"\""
+      ],
+      "schema": "public",
+      "definition_md5": "b5dc21e835398a164e2c242b02ac8825",
+      "security_definer": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "args": "p_user uuid, p_session uuid",
+      "name": "auth_session_exists",
+      "config": [
+        "search_path=\"\""
+      ],
+      "schema": "slm_private",
+      "definition_md5": "79e01b492354f5dc09bebb5985b72731",
+      "security_definer": true
+    },
+    {
+      "acl": "{postgres=X/postgres,authenticated=X/postgres}",
+      "args": "",
+      "name": "current_session_valid",
+      "config": [
+        "search_path=\"\""
+      ],
+      "schema": "slm_private",
+      "definition_md5": "6ebddf33dd85a4adfa08791ad905ee00",
+      "security_definer": true
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "args": "p_event slm_events, p_now timestamp with time zone",
+      "name": "event_summary",
+      "config": [
+        "search_path=\"\""
+      ],
+      "schema": "slm_private",
+      "definition_md5": "e13d5cd1a591d27e55fd70649c157a3b",
+      "security_definer": false
+    },
+    {
+      "acl": "{postgres=X/postgres,service_role=X/postgres}",
+      "args": "p_user uuid, p_session uuid, p_allow_temporary boolean",
+      "name": "session_valid",
+      "config": [
+        "search_path=\"\""
+      ],
+      "schema": "slm_private",
+      "definition_md5": "21f5f74f6dde63b13767c823ddbb5ade",
+      "security_definer": true
+    }
+  ],
+  "columns": [
+    {
+      "table": "slm_account_audit",
+      "signature": "c44ae945171ed17faf7f4050bd099f5c"
+    },
+    {
+      "table": "slm_account_rate_limits",
+      "signature": "bbc0e52a70862ce5ac31f17545b0f1cf"
+    },
+    {
+      "table": "slm_account_security",
+      "signature": "b9501838bef8e9fbe88820c8cfcfd143"
+    },
+    {
+      "table": "slm_account_sessions",
+      "signature": "dc58dae4599ed299886a1b728deb1dbd"
+    },
+    {
+      "table": "slm_aliases",
+      "signature": "0d483190f261374a21c955ffa7c5f57a"
+    },
+    {
+      "table": "slm_auth_proof_accounts",
+      "signature": "ecaca20148ef2713aba708389b8142eb"
+    },
+    {
+      "table": "slm_auth_proof_protected",
+      "signature": "c16d483029676a2714b12e32c94f5d8b"
+    },
+    {
+      "table": "slm_auth_proof_sessions",
+      "signature": "a435c8198af4b202945b8615322333e2"
+    },
+    {
+      "table": "slm_event_history",
+      "signature": "a21eba71e4ab5b1478b451e93c0c836e"
+    },
+    {
+      "table": "slm_event_participants",
+      "signature": "e775b37e784b76f940d01d926716ceed"
+    },
+    {
+      "table": "slm_events",
+      "signature": "c8b30c6f8543f8eb6a8c5688edcc79a9"
+    },
+    {
+      "table": "slm_profiles",
+      "signature": "fd325e530eabe479582b1b8603d29bf3"
+    },
+    {
+      "table": "slm_roles",
+      "signature": "007c65b1f6d5a2dfe921aaf208166e93"
+    }
+  ],
+  "policy_signatures": [
+    {
+      "table": "slm_auth_proof_protected",
+      "policy": "owner_access",
+      "signature": "a100217ac3a8d3b7a6076e34239d0012"
+    },
+    {
+      "table": "slm_auth_proof_protected",
+      "policy": "password_gate",
+      "signature": "5b2f16065d897f1b3ff0ea8dbc1a600e"
+    },
+    {
+      "table": "slm_event_participants",
+      "policy": "participants_member_read",
+      "signature": "d09fee9d8553a01ffc834992ae444d1a"
+    },
+    {
+      "table": "slm_events",
+      "policy": "events_member_read",
+      "signature": "b411fd50083202ead0f59ea1f27654e5"
+    },
+    {
+      "table": "slm_profiles",
+      "policy": "members_read_profiles",
+      "signature": "b411fd50083202ead0f59ea1f27654e5"
+    }
+  ]
+}

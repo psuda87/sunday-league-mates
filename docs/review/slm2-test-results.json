@@ -1,0 +1,39 @@
+{
+  "code_merge": "a4ddd11d477d415d097ec5f18d444c003e7a2f3a",
+  "rc_base": "1575bef77f0b24a8c74373018895b7b872ebc06a",
+  "pr31": "1b3aed659749f1084cab8cd4f47f99a54a50c8b9",
+  "acceptance_head": "ba6ef3069b565092a0675ac5ae907742bd78d89b",
+  "backend_unchanged_from": "ae6bb4be2eafb9e5a8e70ef695242b40cc5d54cc",
+  "types_lint_strict_edge": "PASS",
+  "vitest": 372,
+  "policy": 53,
+  "consolidation": [
+    42,
+    55,
+    11
+  ],
+  "linux_source_tests": 29,
+  "actual_source_denials": 69,
+  "cypress": 6,
+  "chromium_lineups": 14,
+  "chromium_discovery": 14,
+  "new_fixture_core_http_before_service_callback": 11,
+  "relay_checks": 9,
+  "android_insets": {
+    "passed": 2,
+    "failed": 0
+  },
+  "full_android_instrumentation": {
+    "passed": 2,
+    "failed": 1,
+    "failure": "Historical ExampleInstrumentedTest expects com.getcapacitor.app, actual pl.psuda87.slm"
+  },
+  "native_apk_login_feed": "PASS emulator-5554 against NEW backend42",
+  "poco": "NOT RUN",
+  "github_hosted": "NOT RUN",
+  "cloud": "NOT RUN",
+  "new_backend_fixture": "slm-lineups-edge-36d8854dc0af",
+  "new_backend_fixture_running": true,
+  "api_relay": "http://127.0.0.1:55421",
+  "apk_api": "http://127.0.0.1:64321/functions/v1/accounts"
+}

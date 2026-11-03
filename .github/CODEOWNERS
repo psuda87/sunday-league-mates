@@ -1,0 +1,6 @@
+# Review ownership; enforcement requires separately approved GitHub branch rules.
+/app/scripts/*premium* @psuda87
+/app/scripts/verify-*.mjs @psuda87
+/app/scripts/consolidation-sources.json @psuda87
+/.github/ @psuda87
+/app/supabase/ @psuda87

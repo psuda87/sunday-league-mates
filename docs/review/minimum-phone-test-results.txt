@@ -1,0 +1,141 @@
+SLM minimum43 / own-phone: actual local execution evidence; GitHub-hosted NOT RUN.
+App source51c980b; policy0d82b09; CI023dc9b; pointer2de6e5e.
+SQL/API/Linux executed2026-11-02; web/TS/lint/strictEdge/Gradle repeated2026-11-03.
+
+--- Vitest387 ---
+ Test Files  59 passed (59)
+      Tests  387 passed (387)
+
+--- Premium policy61 ---
+ℹ tests 61
+ℹ pass 61
+ℹ fail 0
+ℹ skipped 0
+
+--- Consolidation ---
+PASS consolidation: 42 historical steps unchanged + exact minimum migration43, pinned runtime, main ancestry, deployment disabled, canonical local preparation.
+PASS Premium source contract: 55 files; frozen 3.18 + accepted card 30772de + existing B1/B2 bindings.
+PASS approved entry/runtime: 13 import boundaries, immutable approvals and candidate exclusion.
+
+--- Real SQL/RLS51 ---
+PASS 43 canonical source migrations replayed, no Auth18
+PASS minimum/phone schema, RLS and privileged RPC contracts
+PASS RLS/ACL/invoker/search_path contracts
+PASS member GET is read-only, empty version0, 11 real roster IDs
+PASS GET never inserts lineup
+PASS outsider/other group admin denied read and write
+PASS inactive member cannot read or save
+PASS former member denied
+PASS empty first save is no-op, no author/row
+PASS duplicate/cross-side/null/type/foreign/malformed/oversized IDs rejected
+PASS author/scope injection rejected in SQL payload
+PASS ordinary member saves shared 6:5 including nine guests
+PASS second member reads committed common lineup
+PASS request cache stores no personal name
+PASS no-op and array order changes preserve author/time/version
+PASS retry preserves same outcome, canonical ordering idempotent
+PASS same request UUID cannot change payload
+PASS point-and-swap commits once with verified actor2
+PASS author name honors existing explicit group consent
+PASS idempotent replay reprojects revoked consent, no cached surname leak
+PASS admin/ordinary name projections keep PR16 boundaries
+PASS single-person transfer 6:5 to5:6
+PASS historical retry does not roll back a newer lineup
+PASS stale lineup/roster versions rejected atomically
+PASS two real concurrent users: one commit and one conflict
+PASS concurrent identical retries yield one state version and one request record
+PASS lineup changes never alter financial ledger
+PASS creator/member gains no finance authority
+PASS roster changes conflict and reserve cannot enter lineup
+PASS public foreign match participant rejected
+PASS GET reports stale stored assignment without mutating history
+PASS current roster cleanup is explicit versioned write
+PASS RLS denies rows even with temporary test SELECT grant; direct REST/RPC impersonation denied
+PASS mismatched actor/session rejected
+PASS real PostgREST HTTP read returns committed lineup
+PASS real REST client cannot read protected table
+PASS real REST client cannot execute forged service RPC
+PASS real HTTP dispatcher rejects outsider
+PASS two concurrent real HTTP writes produce one commit and one version conflict
+PASS real HTTP retry does not create another version
+PASS ended match read allowed but new writes closed
+PASS cancelled match rejects new writes without deleting lineup
+PASS retry of committed larger lineup survives later capacity reduction without rewriting current state
+PASS former author fallback never reveals surname on retry
+PASS archived group denies operations
+PASS existing regression SQL premium_match_visibility.sql
+PASS existing regression SQL premium_admin_finance.sql
+PASS existing regression SQL premium_profile_name.sql
+PASS existing regression SQL settlements.sql
+PASS existing regression SQL integration-contracts.sql
+PASS committed teams/version/author/time survive real PostgreSQL restart
+RESULT 51 PASS; real PostgreSQL transactions/RLS/concurrency. Auth schema fixture and locally signed JWT; real PostgREST HTTP tested, GoTrue/Edge HTTP NOT TESTED.
+
+--- Real GoTrue/Edge47 ---
+PASS 43 canonical migrations replay on real GoTrue Auth schema
+PASS four real GoTrue sessions accepted through unchanged accounts login
+PASS real Edge GET exposes five roster entries including three guests
+PASS ordinary member commits shared A/B over real GoTrue/Edge/PostgREST
+PASS HTTP no-op preserves author timestamp and version
+PASS HTTP retry returns original receipt
+PASS real Edge denies private outsider read/write and forged author
+PASS two GoTrue clients race through Edge: one commit and one HTTP409
+PASS real Edge rejects stale roster and foreign assignment
+PASS GoTrue JWT cannot bypass table ACL or invoke service RPC directly
+PASS same GoTrue client reads identical persisted snapshot after isolated backend restart
+PASS MINIMUM/PHONE: schema constraints, RLS, table ACL and cross-model uniqueness remain enforced
+PASS MINIMUM/PHONE: create persists independent minimum/capacity/address
+PASS MINIMUM/PHONE: list advertises exact minimum capability
+PASS MINIMUM/PHONE: omitted create minimum defaults to10
+PASS MINIMUM/PHONE: invalid minimum rejected by Edge/SQL
+PASS MINIMUM/PHONE: invalid minimum rejected by Edge/SQL
+PASS MINIMUM/PHONE: invalid minimum rejected by Edge/SQL
+PASS MINIMUM/PHONE: invalid minimum rejected by Edge/SQL
+PASS MINIMUM/PHONE: invalid minimum rejected by Edge/SQL
+PASS MINIMUM/PHONE: invalid minimum rejected by Edge/SQL
+PASS MINIMUM/PHONE: invalid minimum rejected by Edge/SQL
+PASS MINIMUM/PHONE: players and guests both count towards minimum; no pre17 decision
+PASS MINIMUM/PHONE: edit persists minimum and identical retry is idempotent
+PASS MINIMUM/PHONE: stale edit cannot overwrite newer minimum
+PASS MINIMUM/PHONE: direct REST/RLS cannot reveal foreign private minimum or event
+PASS MINIMUM/PHONE: edit remains creator/member only; private outsider denied
+PASS MINIMUM/PHONE: old client omission does not reset custom minimum
+PASS MINIMUM/PHONE: after17 actual custom threshold prompts a decision without auto-cancel
+PASS MINIMUM/PHONE: after17 withdrawal below custom14 retains the original financial responsibility rule
+PASS MINIMUM/PHONE: changing minimum never changes the administrator decision/status
+PASS MINIMUM/PHONE: wrong current password cannot change contact
+PASS MINIMUM/PHONE: shared Polish validator enforced by real Edge
+PASS MINIMUM/PHONE: email contact stores canonical +48
+PASS MINIMUM/PHONE: duplicate contact leaves victim and caller unchanged
+PASS MINIMUM/PHONE: legacy conflict with email contact rejected before invalidating session
+PASS MINIMUM/PHONE: wrong password never starts alias change
+PASS MINIMUM/PHONE: legacy phone rotates accepted session and preserves account/login
+PASS MINIMUM/PHONE: new phone signs into same account; old alias/session denied
+PASS MINIMUM/PHONE: knowing another phone and own password cannot take over the account
+PASS MINIMUM/PHONE: reverse-model contact collision denied
+PASS MINIMUM/PHONE: authenticated client cannot invoke privileged phone RPC
+PASS MINIMUM/PHONE: authenticated client cannot invoke privileged phone RPC
+PASS MINIMUM/PHONE: profile subject comes from verified session, not body target
+PASS MINIMUM/PHONE: logout blocks stale own-profile access
+MINIMUM_PHONE_RESULT 34 PASS; real GoTrue/Edge/PostgreSQL; no Cloud/existing DB mutation
+PASS live GoTrue token loses lineup access immediately after leaving group
+PASS revoked real application session cannot read lineup
+RESULT 47 PASS; real GoTrue-issued JWT -> accounts Edge -> PostgREST -> PostgreSQL. Kong/Storage/Android not tested; browser result above.
+
+--- Linux SourceTests32 and source denials87 ---
+Ran 32 tests in 3.903s
+OK
+PASS baseline source gate 023dc9bfe5aef7f2ec2339495101870f4f364f6a
+PASS 87 actual source denials; Linux32 tests; clean clone; HEAD=2de6e5e8669dd9aa36ac980ba8ab2e86beb88349; hosted NOT RUN
+
+--- Native Gradle ---
+BUILD SUCCESSFUL in 37s
+
+2026-11-03 emulator5554: targeted SlmWindowInsetsTest via adb instrument OK(2 tests),39.286s.
+testDebugUnitTest:1 test/0 failures/0 errors. apksigner verify PASS.
+APK sha256:2c7aa0f44802d1f2bb08525999041538e8b1c7eb30baf07da413592d9c887c4d.
+NOT RUN hosted Actions/POCO. Windows SourceTests31PASS +WinError1314 symlink; unweakened Linux32PASS.
+
+2026-11-03: owned43 resume PASS; PG/Auth ordering and short-lived service JWT renewal, database/key/accounts retained.
+Emulator actual email login/feed13of15; native edit/preview/save minimum12 and independent API readback PASS; sample restored13 by authorized CAS.
+Emulator own phone +48/current-password save and independent profile readback/email login PASS; editor closed after confirmation.

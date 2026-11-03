@@ -2,6 +2,7 @@ import type { SessionManager } from './sessionManager';
 import { legacyAccountUiAdapter } from './uiAdapter';
 import { profileProblems } from '../account-ui/model';
 import type { IdentityDraft,PersonalProfileData } from '../ui/personalProfile';
+import { normalizePhoneUpdate } from '../../supabase/functions/_shared/phone';
 
 export function fullNameProblem(fullName:string){
  return profileProblems({nickname:'Profil',fullName,phone:''})[0]??'';
@@ -19,6 +20,20 @@ export function profileAdapter(manager:SessionManager,userId:string){
   return {...(typeof p.email_account==='boolean'?{email_account:p.email_account}:{}),nickname:p.nickname,first_name:p.first_name,group_scope:p.group_scope,jersey_number:p.jersey_number??null,user_id:userId,login:p.login,phone:p.phone,full_name:p.full_name,display_as:p.display_as,display_name:p.display_name};
  }
  return {
+  async changePhone(phone:string,currentPassword:string){
+   const before=validate(await existing.readProfile());
+   if(!before||!currentPassword)throw Error('phone_change_requires_password');
+   const normalized=phone.trim()===''&&before.email_account===true?'':normalizePhoneUpdate(phone,before.phone);
+   if(normalized===before.phone)return before;
+   if(before.email_account===false){
+    await manager.changeSession('identifiers',{login:before.login,phone:normalized,current_password:currentPassword});
+   }else if(before.email_account===true){
+    await manager.call('save_email_profile',{nickname:before.nickname||before.login,phone:normalized,current_password:currentPassword});
+   }else throw Error('phone_contract_unavailable');
+   const confirmed=validate(await existing.readProfile());
+   if(!confirmed||confirmed.phone!==normalized||confirmed.login!==before.login)throw Error('profile_readback_mismatch');
+   return confirmed;
+  },
   async saveIdentity(draft:IdentityDraft){
    validate(await manager.call('save_premium_profile',draft as unknown as Record<string,unknown>));
    const result=validate(await existing.readProfile());

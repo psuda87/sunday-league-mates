@@ -1,0 +1,109 @@
+Actual local results,2026-11-03; GitHub-hosted NOT RUN.
+Source589e643 / policy3e1c62c / CI2f4aded / pointer8c94e8c.
+
+Vitest
+ Test Files  62 passed (62)
+      Tests  395 passed (395)
+
+Policy
+ℹ pass 71
+ℹ fail 0
+
+Source Linux
+Ran 35 tests in 8.800s
+OK
+PASS baseline source gate 2f4adedfbaeb2dd1e69f8dc22c62823fc2f0c168
+PASS 107 actual source denials; Linux35 tests; clean clone; HEAD=8c94e8c84e80665c0ba975fd4559ff265446a7aa; hosted NOT RUN
+
+SQL
+PASS 43 historical migrations before admin44
+PASS minimum/phone schema, RLS and privileged RPC contracts
+PASS RLS/ACL/invoker/search_path contracts
+PASS member GET is read-only, empty version0, 11 real roster IDs
+PASS GET never inserts lineup
+PASS outsider/other group admin denied read and write
+PASS inactive member cannot read or save
+PASS former member denied
+PASS empty first save is no-op, no author/row
+PASS duplicate/cross-side/null/type/foreign/malformed/oversized IDs rejected
+PASS author/scope injection rejected in SQL payload
+PASS ordinary member saves shared 6:5 including nine guests
+PASS second member reads committed common lineup
+PASS request cache stores no personal name
+PASS no-op and array order changes preserve author/time/version
+PASS retry preserves same outcome, canonical ordering idempotent
+PASS same request UUID cannot change payload
+PASS point-and-swap commits once with verified actor2
+PASS author name honors existing explicit group consent
+PASS idempotent replay reprojects revoked consent, no cached surname leak
+PASS admin/ordinary name projections keep PR16 boundaries
+PASS single-person transfer 6:5 to5:6
+PASS historical retry does not roll back a newer lineup
+PASS stale lineup/roster versions rejected atomically
+PASS two real concurrent users: one commit and one conflict
+PASS concurrent identical retries yield one state version and one request record
+PASS lineup changes never alter financial ledger
+PASS creator/member gains no finance authority
+PASS roster changes conflict and reserve cannot enter lineup
+PASS public foreign match participant rejected
+PASS GET reports stale stored assignment without mutating history
+PASS current roster cleanup is explicit versioned write
+PASS RLS denies rows even with temporary test SELECT grant; direct REST/RPC impersonation denied
+PASS mismatched actor/session rejected
+PASS real PostgREST HTTP read returns committed lineup
+PASS real REST client cannot read protected table
+PASS real REST client cannot execute forged service RPC
+PASS real HTTP dispatcher rejects outsider
+PASS two concurrent real HTTP writes produce one commit and one version conflict
+PASS real HTTP retry does not create another version
+PASS ended match read allowed but new writes closed
+PASS cancelled match rejects new writes without deleting lineup
+PASS retry of committed larger lineup survives later capacity reduction without rewriting current state
+PASS former author fallback never reveals surname on retry
+PASS archived group denies operations
+PASS existing regression SQL premium_match_visibility.sql
+PASS existing regression SQL premium_admin_finance.sql
+PASS existing regression SQL premium_profile_name.sql
+PASS existing regression SQL settlements.sql
+PASS existing regression SQL integration-contracts.sql
+PASS committed teams/version/author/time survive real PostgreSQL restart
+PASS 44 upgrade preserves invoker/RLS/ACL and requires current group administrator
+RESULT 52 PASS; real PostgreSQL transactions/RLS/concurrency. Auth schema fixture and locally signed JWT; real PostgREST HTTP tested, GoTrue/Edge HTTP NOT TESTED.
+
+HTTP
+PASS 43 historical migrations before admin44
+PASS four real GoTrue sessions accepted through unchanged accounts login
+PASS real Edge GET exposes five roster entries including three guests
+PASS ordinary member commits shared A/B over real GoTrue/Edge/PostgREST
+PASS HTTP no-op preserves author timestamp and version
+PASS HTTP retry returns original receipt
+PASS real Edge denies private outsider read/write and forged author
+PASS two GoTrue clients race through Edge: one commit and one HTTP409
+PASS real Edge rejects stale roster and foreign assignment
+PASS GoTrue JWT cannot bypass table ACL or invoke service RPC directly
+PASS same GoTrue client reads identical persisted snapshot after isolated backend restart
+PASS new fixture upgraded43-to44; existing member-write regression preserved before permission change
+PASS ADMIN44 only current group administrator receives write capability
+PASS ADMIN44 ordinary creator/member cannot write or change author/version
+PASS ADMIN44 other-group administrator cannot read private lineup or write
+PASS ADMIN44 non-creator group administrator writes shared lineup
+PASS ADMIN44 admin request replay is idempotent
+PASS ADMIN44 no-op preserves version/author/time
+PASS ADMIN44 version, roster and foreign-entry guards still reject invalid writes
+PASS ADMIN44 two actual admin sessions race: one commit and one conflict
+PASS ADMIN44 member sees server assignment, never an administrator RAM draft
+PASS ADMIN44 direct authenticated REST cannot bypass lineup ACL/RLS
+PASS ADMIN44 permission follows current group administrator and old receipts do not bypass revocation
+PASS ADMIN44 successor uses existing lineup API with the same CAS rules
+PASS ADMIN44 authority restored through authorized API; original leave/logout tests still run
+PASS live GoTrue token loses lineup access immediately after leaving group
+PASS revoked real application session cannot read lineup
+RESULT 27 PASS; real GoTrue-issued JWT -> accounts Edge -> PostgREST -> PostgreSQL. Kong/Storage/Android not tested; browser result above.
+
+Native
+OK (5 tests)
+
+Cypress16/Chrome:6PASS after removing ELECTRON_RUN_AS_NODE in test process only.
+Emulator actual HOME/foreground same match+lineup, real chooser cancellation, IME+unsent profile draft,360dp nonoverlap PASS.
+Light/Dark system and tall cutout/landscape screenshots visually inspected after startup; Android native5PASS.
+Existing43 untouched; new isolated44 only. No cloud, POCO or hosted execution.
