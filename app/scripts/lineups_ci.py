@@ -71,7 +71,7 @@ MINIMUM_PHONE_OVERLAY={
 }
 
 MINIMUM_PHONE_CI_IMPLEMENTATION='023dc9bfe5aef7f2ec2339495101870f4f364f6a'
-STABILIZATION_IMPLEMENTATION='2cb4f7355dde815593b56ba22b87bd480e4d4492'
+STABILIZATION_IMPLEMENTATION='315a0794b45386751eedc925b24878425fa59bd9'
 STABILIZATION_OVERLAY={
     'app/android/app/src/androidTest/java/com/getcapacitor/myapp/ExampleInstrumentedTest.java',
     'app/android/app/src/androidTest/java/pl/psuda87/slm/SlmWindowInsetsTest.java',
@@ -87,6 +87,7 @@ STABILIZATION_OVERLAY={
     'app/src/auth/B1App.test.tsx',
     'app/src/auth/B1App.tsx',
     'app/src/auth/premiumRuntime.test.tsx',
+    'app/src/auth/useB1Lifecycle.ts',
     'app/src/events/PremiumEvents.tsx',
     'app/src/events/PremiumTeams.tsx',
     'app/src/events/editResume.test.tsx',
