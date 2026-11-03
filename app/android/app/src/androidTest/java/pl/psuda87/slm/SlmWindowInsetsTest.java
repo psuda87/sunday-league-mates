@@ -3,6 +3,9 @@ package pl.psuda87.slm;
 import static org.junit.Assert.*;
 
 import android.view.View;
+import android.graphics.Rect;
+import androidx.core.view.DisplayCutoutCompat;
+import java.util.Collections;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -14,6 +17,21 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public class SlmWindowInsetsTest {
     private static final int BARS = WindowInsetsCompat.Type.systemBars();
+
+    @Test
+    public void nativeOwnerAlsoConsumesRawCutoutMetadata() {
+        try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
+            scenario.onActivity(activity -> {
+                WindowInsetsCompat input = new WindowInsetsCompat.Builder()
+                    .setDisplayCutout(new DisplayCutoutCompat(new Rect(0, 120, 0, 0),
+                        Collections.singletonList(new Rect(480, 0, 600, 120))))
+                    .build();
+                WindowInsetsCompat forwarded = ViewCompat.dispatchApplyWindowInsets(activity.getWindow().getDecorView(), input);
+                assertNull("WebView must not reserve the native cutout a second time", forwarded.getDisplayCutout());
+                assertEquals(Insets.NONE, forwarded.getInsets(WindowInsetsCompat.Type.displayCutout()));
+            });
+        }
+    }
 
     @Test
     public void resizedAndEdgeToEdgeWindowsReserveKeyboardOnce() {

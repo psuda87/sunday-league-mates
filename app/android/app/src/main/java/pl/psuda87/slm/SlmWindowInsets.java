@@ -45,6 +45,8 @@ final class SlmWindowInsets {
                     Insets.NONE
                 )
                 .setInsetsIgnoringVisibility(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout(), Insets.NONE)
+                // Older WebViews also inspect the raw DisplayCutout object.
+                .setDisplayCutout(null)
                 .build();
         });
         ViewCompat.requestApplyInsets(decor);
