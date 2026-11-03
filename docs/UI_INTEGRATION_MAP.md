@@ -1,3 +1,23 @@
+# Aktualne punkty odniesienia mapy i odbioru — 03.11.2026
+
+Źródłowy main: `1b6ee83356d53b7b34193af88802067dc9b2fede` (44 migracje).
+Bieżąca mapa ekranów, funkcji, wejść LIVE/Premium/demo i powiązań testowych:
+[SCREEN_FUNCTION_CHECKLIST.md](SCREEN_FUNCTION_CHECKLIST.md).
+Jedyny rejestr statusów, SHA, potwierdzeń właściciela i bramek zamknięcia:
+[FUNCTION_ACCEPTANCE_LOG.md](FUNCTION_ACCEPTANCE_LOG.md).
+Nie kopiować statusów odbioru do technicznej tabeli poniżej.
+
+Poniższa mapa z19.10 pozostaje zapisem historycznym integracji, **nie opisem
+aktualnego main**. W szczególności: obecny Premium ma prawdziwe składy z CAS
+(migracja41), zapis tylko administratora grupy44, discovery42 i minimum43.
+Własny profil ma odrębny pseudonim oraz trzy tryby nazwy z prywatnością PR16.
+Dawne zdania „brak backendu składów”, „prywatny basic w feedzie obcych grup” czy
+„organizator jest wymagany do każdego tworzenia” nie mogą służyć za aktualną
+specyfikację. Szczegóły bieżących ekranów i rozbieżności rendererów są w checkliście;
+przechodzący historyczny test nie jest ręcznym odbiorem właściciela.
+
+---
+
 # SLM 1.0 — zgodność Premium 3.18 z backendem
 
 19.10.2026, feat/integration, HEAD 2026754. Docelowa warstwa z ui-beta d0f9fa9

@@ -1,3 +1,13 @@
+# Mapa ekranów i rejestr odbioru funkcji — 2026-11-03 23:18 UTC
+
+Gałąź `docs/screen-function-acceptance` z aktualnego origin/main `1b6ee83356d53b7b34193af88802067dc9b2fede`, początkowo czysty checkout. Wyłącznie dokumentacja po odczycie rzeczywistych wejść/routingu/komponentów/API/44migracji/testów. [Checklista](SCREEN_FUNCTION_CHECKLIST.md):33 konteksty (27 LIVE/Premium,5 przygotowanych ekranów kont,1 panel demo),162 funkcje. [Rejestr](FUNCTION_ACCEPTANCE_LOG.md):161 DO WERYFIKACJI,1 BŁĄD — BUG-SKL-001/S09-F01, automatyczny początkowy podział drużyn zgłoszony przez właściciela. Kod preview istnieje; brak reprodukcji/naprawy w tym zadaniu.
+
+Premium3.18 pozostaje zaakceptowanym wzorcem wyglądu; nie przenoszono technicznych PASS lub dawnych raportów na akceptację funkcjonalną obecnego main. Stabilne ID, zależności, katalog17 pakietów testów, pola SHA/potwierdzenie/regresja i procedura funkcja→poprawka→testy→odbiór właściciela→osobna zgoda na merge→zamknięcie. Istniejąca UI_INTEGRATION_MAP rozszerzona o aktualny indeks i oznaczenie historycznej tabeli; TODO wskazuje tę samą sprawę, bez drugiego rejestru statusów.
+
+Weryfikacja tej pracy: wyłącznie spójność dokumentów/ID/linków/countów i zakresu Git. Testy aplikacji/SQL/build/lint/telefon NOT RUN; nie są potrzebne do oceny zmiany samych dokumentów i nie zatwierdzają funkcji. Bez zmian app/migracji/CI/guardów/UI/SupabaseCloud/merge/deploy. Publikacja i wynik utworzenia PR do main zapisane po próbie; brak zgody na merge.
+
+---
+
 # Android/formularze — punkt kontrolny polish-stats
 
 2026-10-31 — PR31 guard review: **PASS**, kontrakty odblokowane bez zmiany aplikacji. Policy704e4a8 (dokładne UI3f181e9/nativef2edf56), CI implementacja7c45656 i osobny wskaźnik6e9ce9d; wcześniejsze piny i42 migracje/frozen55 bez zmian. Faktycznie ponowione: policy53 (stare45+8), consolidation42/55/11, LinuxSourceTests29, source guard Linux i kanoniczny Windows PASS,60 Premium/consolidation i69 source mutacji odrzuconych, TS/lint/Edge/Vitest372/build/Chrome6 PASS. GitHub-hosted NOT RUN. Android/SQL/HTTP niepowtarzane (implementacja niezmieniona); Cloud/bazy/POCO nietknięte. PR31 gotowy do dalszej integracji po decyzji właściciela, nadal Draft, bez merge. Raport:docs/SLM_V1_POLISH_STATS_REPORT.md. Poniższe wcześniejsze BLOCK kontraktów zostało usunięte; TODO produktu nadal aktualne.
