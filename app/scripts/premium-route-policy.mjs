@@ -25,9 +25,9 @@ export const POLISH_ANDROID='f2edf565abd2f3f67a0cc3a28d6c01c5e93806f8';
 export const MINIMUM_PHONE_SOURCE='51c980befd6a5f28c3471c89392a8a04672aaf0b';
 export const MINIMUM_MIGRATION='app/supabase/migrations/20261102180613_configurable_match_minimum.sql';
 export const MINIMUM_PHONE_RUNTIME=new Set(['app/src/demo/EventForm.tsx','app/src/events/PremiumEvents.tsx','app/src/events/usePremiumEvents.ts','app/src/events/premiumContracts.ts','app/src/events/premiumForm.ts','app/src/auth/profileAdapter.ts','app/src/auth/useOwnProfile.ts','app/src/ui/personalProfile.ts','app/src/profile/PremiumIdentityEditor.tsx','app/src/profile/PhoneEditor.tsx','app/supabase/functions/accounts/handler.ts','app/vite.demo.config.ts']);
-export const STABILIZATION_SOURCE='67513cd4e9d1ee2ebec3d85c6ba72cebacea272f';
+export const STABILIZATION_SOURCE='8fa5310fe2e37bdcd22b84d18d93083d0d48a45a';
 export const ADMIN_MIGRATION='app/supabase/migrations/20261103190639_group_admin_lineup_writes.sql';
-export const STABILIZATION_RUNTIME=new Set(['app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java', 'app/android/app/src/androidTest/java/pl/psuda87/slm/SlmWindowInsetsTest.java', 'app/android/app/src/androidTest/java/com/getcapacitor/myapp/ExampleInstrumentedTest.java', 'app/capacitor.config.ts', 'app/src/auth/B1App.tsx', 'app/src/events/PremiumEvents.tsx', 'app/src/events/PremiumTeams.tsx', 'app/src/events/lineupContracts.ts', 'app/src/events/premiumEvents.css', 'app/src/events/usePremiumEvents.ts', 'app/src/events/usePremiumLineup.ts', 'app/src/groups/PremiumGroups.tsx', 'app/src/groups/useGroups.ts', 'app/src/native/focusVisibility.ts']);
+export const STABILIZATION_RUNTIME=new Set(['app/supabase/functions/accounts/handler.ts','app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java', 'app/android/app/src/androidTest/java/pl/psuda87/slm/SlmWindowInsetsTest.java', 'app/android/app/src/androidTest/java/com/getcapacitor/myapp/ExampleInstrumentedTest.java', 'app/capacitor.config.ts', 'app/src/auth/B1App.tsx', 'app/src/events/PremiumEvents.tsx', 'app/src/events/PremiumTeams.tsx', 'app/src/events/lineupContracts.ts', 'app/src/events/premiumEvents.css', 'app/src/events/usePremiumEvents.ts', 'app/src/events/usePremiumLineup.ts', 'app/src/groups/PremiumGroups.tsx', 'app/src/groups/useGroups.ts', 'app/src/native/focusVisibility.ts']);
 const polishUi=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/premiumEvents.css','app/src/events/GuestForm.tsx']);
 const discoveryUi=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/usePremiumEvents.ts','app/src/events/premiumContracts.ts']);
 const lineupStage1=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/PremiumTeams.tsx','app/src/events/lineupEditor.ts','app/src/events/LineupPlayerProfile.tsx']);
@@ -59,7 +59,7 @@ export function verifyPremiumRuntime(root,overrides={}){
  for(const p of [...mainSteps,...added])assert.equal(digest(read(p)),digest(git(added.includes(p)?APPROVED:MAIN,p)),'Historical migration overwritten: '+p);
  assert.equal(digest(read(LINEUPS_MIGRATION)),digest(git(LINEUPS_STAGE2A,LINEUPS_MIGRATION)),'Unreviewed Stage 2A backend source: '+LINEUPS_MIGRATION);
  for(const p of [DISCOVERY_MIGRATION,'app/supabase/functions/accounts/handler.ts',MINIMUM_MIGRATION])
-  assert.equal(digest(read(p)),digest(git(p===DISCOVERY_MIGRATION?DISCOVERY_SOURCE:MINIMUM_PHONE_SOURCE,p)),'Unreviewed discovery backend source: '+p);
+  assert.equal(digest(read(p)),digest(git(STABILIZATION_RUNTIME.has(p)?STABILIZATION_SOURCE:p===DISCOVERY_MIGRATION?DISCOVERY_SOURCE:MINIMUM_PHONE_SOURCE,p)),'Unreviewed discovery backend source: '+p);
  assert.equal(digest(read(ADMIN_MIGRATION)),digest(git(STABILIZATION_SOURCE,ADMIN_MIGRATION)),'Unreviewed admin44 migration');
  for(const p of STABILIZATION_RUNTIME)assert.equal(digest(read(p)),digest(git(STABILIZATION_SOURCE,p)),'Unreviewed POCO stabilization source: '+p);
  for(const p of MINIMUM_PHONE_RUNTIME)assert.equal(digest(read(p)),digest(git(STABILIZATION_RUNTIME.has(p)?STABILIZATION_SOURCE:MINIMUM_PHONE_SOURCE,p)),'Unreviewed minimum/phone runtime: '+p);
