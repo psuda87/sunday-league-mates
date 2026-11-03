@@ -77,4 +77,5 @@ for(const [label,path,mutate] of [
  ['responsive confirmation removed','app/src/events/premiumEvents.css',s=>s.replace('display:flex;flex-wrap:wrap;gap:8px','display:flex;flex-wrap:nowrap;gap:8px')],
  ['event edit overwrites a resumed version','app/src/events/PremiumEvents.tsx',s=>s.replace('editVersion.current!==e?.version','false')],
  ['logout permits foreground refresh','app/src/auth/useB1Lifecycle.ts',s=>s.replace("mayResume()&&manager.getSnapshot()","true&&manager.getSnapshot()")],
+ ['raw cutout forwarded twice','app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java',s=>s.replace('.setDisplayCutout(null)','')],
 ])test('rejects '+label,()=>{verifyPremiumRuntime(root);const source=read(path),changed=mutate(source);assert.notEqual(changed,source,'Mutation must exercise a real source change');assert.throws(()=>verifyPremiumRuntime(root,{[path]:changed}));});
