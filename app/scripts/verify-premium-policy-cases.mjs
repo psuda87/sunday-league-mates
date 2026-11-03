@@ -75,4 +75,5 @@ for(const [label,path,mutate] of [
  ['focus helper replaced','app/src/native/focusVisibility.ts',s=>s+'\n// unauthorized input handler\n'],
  ['member writes local draft','app/src/events/usePremiumLineup.ts',s=>s.replace('state.snapshot?.can_write === true','true')],
  ['responsive confirmation removed','app/src/events/premiumEvents.css',s=>s.replace('display:flex;flex-wrap:wrap;gap:8px','display:flex;flex-wrap:nowrap;gap:8px')],
+ ['event edit overwrites a resumed version','app/src/events/PremiumEvents.tsx',s=>s.replace('editVersion.current!==e?.version','false')],
 ])test('rejects '+label,()=>{verifyPremiumRuntime(root);const source=read(path),changed=mutate(source);assert.notEqual(changed,source,'Mutation must exercise a real source change');assert.throws(()=>verifyPremiumRuntime(root,{[path]:changed}));});
