@@ -32,7 +32,7 @@ it('edits using current version and persists minimum in the existing API payload
   if(action==='matches_detail')return {event:saved,participants:[],server_now:'2030-01-01T12:00:00Z',can_register_paid:true};
   if(action==='matches_edit'){saved={...saved,minimum_players:Number(body?.minimum_players),version:8};return {event_id:'match'};}
  });
- const manager={call,getSnapshot:()=>({phase:'ready',session:{user_id:'owner'}}),subscribe:()=>()=>{}} as unknown as SessionManager;
+ const snapshot={phase:'ready',session:{user_id:'owner'}};const manager={call,getSnapshot:()=>snapshot,subscribe:()=>()=>{}} as unknown as SessionManager;
  const {result}=renderHook(()=>usePremiumEvents(manager,'owner'));await waitFor(()=>expect(result.current.events).toHaveLength(1));
  await act(()=>result.current.open('match'));
  await act(()=>result.current.edit({...premiumEventInput(eventSummary(event)),minimum:12,startsAt:eventInstant('2099-01-01','18:00')!}));

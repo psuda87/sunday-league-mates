@@ -99,9 +99,11 @@ try:
  sql((ROOT/'app/supabase/tests/support/profile_contract_bootstrap.sql').read_text())
  sql("alter table auth.users add column aud text,add column role text,add column raw_user_meta_data jsonb default '{}'::jsonb,add column deleted_at timestamptz,add column raw_app_meta_data jsonb default '{}'::jsonb;")
  migrations=sorted((ROOT/'app/supabase/migrations').glob('*.sql'))
- for file in migrations:sql(file.read_text())
- check(len(migrations)==(43 if CI_MODE or branch=='fix/slm2-minimum-phone' else 42 if branch=='feat/public-match-discovery-stage2b' else 41),str(len(migrations))+' canonical source migrations replayed, no Auth18')
- if len(migrations)==43:
+ admin_step=next((p for p in migrations if p.name.endswith('_group_admin_lineup_writes.sql')),None)
+ for file in migrations:
+  if file!=admin_step:sql(file.read_text())
+ check(len(migrations)==(44 if CI_MODE or branch=='fix/slm2-minimum-phone' else 42 if branch=='feat/public-match-discovery-stage2b' else 41),('43 historical migrations before admin44' if admin_step else str(len(migrations))+' canonical source migrations replayed, no Auth18'))
+ if len(migrations)>=43:
   sql((ROOT/'app/supabase/tests/minimum_phone.sql').read_text());check(True,'minimum/phone schema, RLS and privileged RPC contracts')
  sql((ROOT/'app/supabase/tests/match_lineups.sql').read_text());check(True,'RLS/ACL/invoker/search_path contracts')
  for i,(u,sid) in enumerate(zip(users,sessions)):
@@ -217,6 +219,8 @@ try:
  if rest_started:
   subprocess.run(['docker','stop',REST],check=True,stdout=subprocess.DEVNULL);rest_started=False
  verify_restart()
+ if admin_step:
+  sql(admin_step.read_text());sql((ROOT/'app/supabase/tests/lineup_admin.sql').read_text());check(True,'44 upgrade preserves invoker/RLS/ACL and requires current group administrator')
  print(f'RESULT {passed} PASS; real PostgreSQL transactions/RLS/concurrency. Auth schema fixture and locally signed JWT; real PostgREST HTTP tested, GoTrue/Edge HTTP NOT TESTED.',flush=True)
 finally:
  if rest_started:subprocess.run(['docker','stop',REST],capture_output=True)

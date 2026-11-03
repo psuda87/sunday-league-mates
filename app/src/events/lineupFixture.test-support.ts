@@ -18,7 +18,7 @@ export function lineupFixture(count = 11, saved = false) {
     duration_minutes: 90, capacity: 20, cost_cents: 0, minimum_players: 10, registered_count: count, reserve_count: 0,
     registration_open: true, decision_required: false, can_manage: false, can_edit: true, current_group_member: true, version: 1};
   const token = () => String(rosterRevision).padStart(64, '0');
-  let snapshot: LineupSnapshot = {event_id: eventId, event_version: 1, version: saved ? 1 : 0, roster_version: token(), saved_roster_version: saved ? token() : null,
+  let snapshot: LineupSnapshot = {can_write:true,event_id: eventId, event_version: 1, version: saved ? 1 : 0, roster_version: token(), saved_roster_version: saved ? token() : null,
     team_a: saved ? people.filter((_, i) => i % 2 === 0).map(p => p.id) : [], team_b: saved ? people.filter((_, i) => i % 2 === 1).map(p => p.id) : [],
     unassigned: [], stale_entry_ids: [], last_change: saved ? {user_id: userId, display_name: 'Autor API', changed_at: '2026-10-29T10:00:00Z'} : null};
   const receipts = new Map<string, unknown>();

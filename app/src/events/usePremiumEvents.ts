@@ -1,4 +1,4 @@
-import { useCallback,useEffect,useRef,useState } from 'react';
+import { useCallback,useEffect,useRef,useState,useSyncExternalStore } from 'react';
 import type { SessionManager } from '../auth/sessionManager';
 import { summary } from '../groups/contracts';
 import type { GroupSummary } from '../groups/model';
@@ -7,6 +7,8 @@ import type { EventSummary,MatchDetail } from './premiumContracts';
 import type { EventInput } from '../demo/eventDraft';
 
 export function usePremiumEvents(manager:SessionManager,userId:string){
+  const auth=useSyncExternalStore(manager.subscribe,manager.getSnapshot);
+  const [verifiedSession,setVerifiedSession]=useState(auth.session);
   const [events,setEvents]=useState<EventSummary[]>([]),[groups,setGroups]=useState<GroupSummary[]>([]),[detail,setDetail]=useState<MatchDetail|null>(null);
   const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[serverNow,setServerNow]=useState('');
   const [listFilter,setListFilter]=useState<'upcoming'|'history'|'mine'>('upcoming');
@@ -41,14 +43,29 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
     void pending.finally(()=>{if(refreshFlight.current===request)refreshFlight.current=null;});return pending;
   },[manager,authorized]);
   const invalidate=useCallback(()=>{epoch.current++;detailEpoch.current++;refreshFlight.current=null;},[]);
+  const route=useRef({eventId:detail?.event.id,offset});route.current={eventId:detail?.event.id,offset};
+  const revalidate=useCallback(async()=>{
+    const session=manager.getSnapshot().session;if(!authorized()||!session)return;
+    const {eventId,offset:page}=route.current;
+    setVerifiedSession(null);
+    const ticket=++detailEpoch.current;
+    try{
+      const [listed,d]=await Promise.all([refresh(page),eventId?manager.call('matches_detail',{event_id:eventId}).then(v=>matchDetail(v,eventId)):null]);
+      if(!authorized()||manager.getSnapshot().session!==session||ticket!==detailEpoch.current)return;
+      if(!listed)return;
+      if(d)setDetail(d);
+      setVerifiedSession(session);
+    }catch(e){if(authorized()&&ticket===detailEpoch.current){setDetail(null);setError(matchError(e));}}
+  },[manager,authorized,refresh]);
   useEffect(()=>{alive.current=true;refreshFlight.current=null;query.current={scope:'all',period:'upcoming'};setSearch('');setActiveGroup('');setOffset(0);setListFilter('upcoming');setEvents([]);setGroups([]);setDetail(null);setDiscoveryEnabled(false);void refresh();const changed=()=>{invalidate();setDetail(null);setEvents([]);setOffset(0);void refresh();};window.addEventListener('slm-groups-changed',changed);return()=>{alive.current=false;invalidate();if(debounce.current)clearTimeout(debounce.current);window.removeEventListener('slm-groups-changed',changed);};},[refresh,invalidate]);
   // Native gallery continuation may keep the shell mounted while Auth rechecks.
   // Never reuse a pre-suspend roster after that check: memberships may have changed.
   useEffect(()=>{let previous=manager.getSnapshot();return manager.subscribe(()=>{
-    const current=manager.getSnapshot(),phase=current.phase;if(phase===previous.phase&&current.session?.user_id===previous.session?.user_id)return;previous=current;
-    if(phase!=='ready'||current.session?.user_id!==userId){invalidate();if(debounce.current)clearTimeout(debounce.current);query.current={scope:'all',period:'upcoming'};setSearch('');setActiveGroup('');setOffset(0);setListFilter('upcoming');setDiscoveryEnabled(false);setMinimumEnabled(false);setHasMore(false);setNextOffset(null);setEvents([]);setGroups([]);setDetail(null);setLoading(true);}
-    else{refreshFlight.current=null;void refresh();}
-  });},[manager,userId,refresh,invalidate]);
+    const current=manager.getSnapshot(),phase=current.phase;if(phase===previous.phase&&current.session===previous.session)return;previous=current;
+    if(phase==='checking'){invalidate();setVerifiedSession(null);if(debounce.current)clearTimeout(debounce.current);return;}
+    if(phase!=='ready'||current.session?.user_id!==userId){invalidate();setVerifiedSession(null);if(debounce.current)clearTimeout(debounce.current);query.current={scope:'all',period:'upcoming'};setSearch('');setActiveGroup('');setOffset(0);setListFilter('upcoming');setDiscoveryEnabled(false);setMinimumEnabled(false);setHasMore(false);setNextOffset(null);setEvents([]);setGroups([]);setDetail(null);setLoading(true);}
+    else{refreshFlight.current=null;void revalidate();}
+  });},[manager,userId,revalidate,invalidate]);
   const open=useCallback(async(id:string)=>{
     const ticket=++detailEpoch.current;setDetail(null);setLoading(true);setError('');setCreating(false);
     try{const d=matchDetail(await manager.call('matches_detail',{event_id:id}),id);if(authorized()&&ticket===detailEpoch.current){setDetail(d);setServerNow(d.server_now);return true;}return false;}
@@ -101,6 +118,6 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
   function selectGroup(id:string){back();resetPage();if(listFilter==='mine')setListFilter('upcoming');const next=['public','groups','mine'].includes(id)||groups.some(g=>g.id===id)?id:'';setActiveGroup(next);setSearch('');query.current={...query.current,scope:['public','groups','mine'].includes(next)?next:next?'group':'all',group_id:groups.some(g=>g.id===next)?next:''};delete query.current.query;void refresh();}
   function changeSearch(value:string){if(query.current.scope!=='public')return;resetPage();setSearch(value);query.current={...query.current,query:value};setLoading(true);setError('');if([...value].length>100){setLoading(false);setError('Wpisz najwyżej 100 znaków.');return;}debounce.current=setTimeout(()=>{debounce.current=null;if(authorized())void refresh();},300);}
   function changeFilter(value:'upcoming'|'history'|'mine'){resetPage();setListFilter(value);query.current={...query.current,period:value==='history'?'history':'upcoming'};if(value==='mine'){setActiveGroup('mine');setSearch('');delete query.current.query;query.current.scope='mine';}void refresh();}
-  return {listFilter,changeFilter,search,changeSearch,discoveryEnabled,hasMore,nextOffset,recheckFinancial,events,groups,detail,loading,busy,error,notice,serverNow,activeGroup,offset,creating,organizers,refresh,open,back,act,create,edit,beginCreate,selectGroup};
+  return {revalidating:auth.phase!=='ready'||verifiedSession!==auth.session,revalidate,listFilter,changeFilter,search,changeSearch,discoveryEnabled,hasMore,nextOffset,recheckFinancial,events,groups,detail,loading,busy,error,notice,serverNow,activeGroup,offset,creating,organizers,refresh,open,back,act,create,edit,beginCreate,selectGroup};
 }
 export type PremiumEventsController=ReturnType<typeof usePremiumEvents>;

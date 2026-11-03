@@ -23,7 +23,10 @@ import { premiumDefaults,premiumEventInput } from './premiumForm';
 import type { PremiumEventsController } from './usePremiumEvents';
 import { matchDate,money } from './model';
 
-export default function PremiumEvents({data,userId,onGroups,manager}:{manager?:SessionManager;data:PremiumEventsController;userId:string;onGroups:()=>void}){
+export default function PremiumEvents(props:Parameters<typeof PremiumEventsScreen>[0]){
+  return <>{props.data.revalidating&&<section role="status"><p>{props.data.error||'Potwierdzanie dostępu do bieżącego widoku…'}</p><button type="button" onClick={()=>{void props.data.revalidate();}}>Ponów odczyt widoku</button></section>}<div hidden={props.data.revalidating}><PremiumEventsScreen {...props}/></div></>;
+}
+function PremiumEventsScreen({data,userId,onGroups,manager}:{manager?:SessionManager;data:PremiumEventsController;userId:string;onGroups:()=>void}){
   const [finance,setFinance]=useState(false);
   const [editing,setEditing]=useState(false);
   const [localFilter,setLocalFilter]=useState<MatchFilter>('upcoming'),[reason,setReason]=useState('');

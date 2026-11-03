@@ -57,7 +57,7 @@ describe('B1 existing Auth into frozen account UI',()=>{
   await screen.findByRole('heading',{name:'Sesja wygasła'});expect(peek()).toBeNull();expect(screen.queryByText('Chroniony świat demo')).toBeNull();
   fireEvent.click(screen.getByRole('button',{name:'Wróć do logowania'}));await screen.findByRole('heading',{name:'Zaloguj się'});
  });
- it('diagnoses resume: hides/unmounts world, shows checking, refreshes then remounts without login',async()=>{
+ it('preserves the hidden RAM screen through verified resume without remounting',async()=>{
   let visibility:DocumentVisibilityState='visible';
   vi.spyOn(document,'visibilityState','get').mockImplementation(()=>visibility);
   let finishRefresh!:(value:Session)=>void;
@@ -66,13 +66,13 @@ describe('B1 existing Auth into frozen account UI',()=>{
   await screen.findByText('Chroniony świat demo');expect(worldLifecycle.mounts).toBe(1);
   visibility='hidden';fireEvent(document,new Event('visibilitychange'));
   await screen.findByRole('heading',{name:'Sprawdzanie sesji'});
-  expect(screen.queryByText('Chroniony świat demo')).toBeNull();expect(worldLifecycle.unmounts).toBe(1);
+  expect(screen.getByText('Chroniony świat demo')).not.toBeVisible();expect(worldLifecycle.unmounts).toBe(0);
   expect(request).toHaveBeenCalledTimes(1);expect(screen.queryByRole('heading',{name:'Zaloguj się'})).toBeNull();
   visibility='visible';fireEvent(document,new Event('visibilitychange'));
   await waitFor(()=>expect(request).toHaveBeenCalledTimes(2));
-  expect(manager.getSnapshot().phase).toBe('checking');expect(screen.queryByText('Chroniony świat demo')).toBeNull();
+  expect(manager.getSnapshot().phase).toBe('checking');expect(screen.getByText('Chroniony świat demo')).not.toBeVisible();
   await act(async()=>{finishRefresh(session());});
-  await screen.findByText('Chroniony świat demo');expect(worldLifecycle.mounts).toBe(2);
+  await waitFor(()=>expect(screen.getByText('Chroniony świat demo')).toBeVisible());expect(worldLifecycle.mounts).toBe(1);
   expect(manager.getSnapshot().phase).toBe('ready');expect(screen.queryByRole('heading',{name:'Zaloguj się'})).toBeNull();
  });
  it('keeps only a pending picker hidden through verification, then drops it on revoked session',async()=>{

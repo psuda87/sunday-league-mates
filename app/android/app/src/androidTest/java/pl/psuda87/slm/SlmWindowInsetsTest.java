@@ -16,6 +16,15 @@ public class SlmWindowInsetsTest {
     private static final int BARS = WindowInsetsCompat.Type.systemBars();
 
     @Test
+    public void resizedAndEdgeToEdgeWindowsReserveKeyboardOnce() {
+        assertEquals(900, SlmWindowInsets.bottomPadding(48, 900, 0));
+        assertEquals(0, SlmWindowInsets.bottomPadding(48, 900, 900));
+        assertEquals(200, SlmWindowInsets.bottomPadding(48, 900, 700));
+        assertEquals(48, SlmWindowInsets.bottomPadding(48, 20, 0));
+        assertEquals(0, SlmWindowInsets.bottomPadding(48, 900, 1000));
+    }
+
+    @Test
     public void appliesCutoutNavigationAndKeyboardWithoutAccumulation() {
         try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
             scenario.onActivity(activity -> {

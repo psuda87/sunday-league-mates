@@ -12,6 +12,7 @@ import { tokenStore } from './tokenStore';
 import { useOwnProfile } from './useOwnProfile';
 import { b1Port } from './b1Port';
 import { useB1Lifecycle } from './useB1Lifecycle';
+import { installFocusVisibility } from '../native/focusVisibility';
 import '../demo/palettes.css';
 import '../pages/Accounts.css';
 
@@ -25,9 +26,12 @@ export default function B1App({manager:provided}:{manager?:SessionManager}){
  useB1Lifecycle(manager,auth);
  const ready=auth.phase==='ready'&&!!auth.session;
  const forced=ready&&auth.session!.must_change_password;
- // Keep only an in-flight native file chooser mounted, hidden by the existing server gate.
- // Normal resume still unmounts. Offline/revocation/another account drops the continuation.
- const owner=ready&&!forced?auth.session!.user_id:auth.phase==='checking'?picker?.owner??null:null;
+ // Preserve RAM navigation only across verification, never across a denied session.
+ const continuation=useRef<string|null>(null);
+ if(ready&&!forced)continuation.current=auth.session!.user_id;
+ else if(auth.phase!=='checking')continuation.current=null;
+ const owner=ready&&!forced?auth.session!.user_id:auth.phase==='checking'?continuation.current:null;
+ useEffect(()=>installFocusVisibility(),[]);
  const personalProfile=useOwnProfile(manager,owner,{
   begin:()=>{if(ready&&!forced)setPicker({owner:auth.session!.user_id,done:false});},
   end:()=>setPicker(previous=>previous?{...previous,done:true}:null),
@@ -49,7 +53,7 @@ export default function B1App({manager:provided}:{manager?:SessionManager}){
  }
  useFrozenBack(()=>{if(!view)return false;if(ready&&!forced)setRequested(null);else if(view==='login'||forced)minimizeFrozenDemo();else navigate('login');return true;},()=>scope.current,15);
  return <>
- {(ready&&!forced||auth.phase==='checking'&&!!picker)&&<div hidden={view!==null} className="slm-demo-world"><WorldApp key={owner??'none'} manager={manager} userId={owner??''} liveAuth personalProfile={personalProfile} groupsView={owner?<PremiumGroups key={owner} manager={manager} userId={owner}/>:undefined} onAccount={next=>{if(next==='password')setRequested('password');}} onLogout={()=>{setRequested(null);void port.signOut();}}/></div>}
+ {owner&&<div hidden={view!==null} className="slm-demo-world"><WorldApp key={owner} manager={manager} userId={owner} liveAuth personalProfile={personalProfile} groupsView={<PremiumGroups key={owner} manager={manager} userId={owner}/>} onAccount={next=>{if(next==='password')setRequested('password');}} onLogout={()=>{setRequested(null);void port.signOut();}}/></div>}
  {view&&<IonPage className="slm-demo slm-account-page"><IonContent ref={scope}><main className="slm-accounts"><div className="slm-account-shell"><header className="slm-account-brand"><span>SUNDAY LEAGUE MATES</span><img src="/assets/branding/slm-logo-primary-transparent.png" width="450" height="505" alt="Sunday League Mates"/></header>
  <AccountScreens key={view} view={view} port={port} onNavigate={navigate} loginOrPhone/>
  <details className="slm-account-appearance"><summary>Wygląd demonstracji</summary><AppearanceSettings enablePalettes/></details>

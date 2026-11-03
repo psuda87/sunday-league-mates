@@ -75,7 +75,7 @@ export function usePremiumLineup(eventId: string, context: LineupProfileContext 
   const acceptPair = useCallback((value: Awaited<ReturnType<typeof pair>>, preserve: boolean) => {
     const old = stateRef.current, {detail, snapshot, baseline} = value;
     const ids = detail.participants.filter(p => p.status === 'registered').map(p => p.id);
-    if (preserve && old.snapshot && (lineupChanged(old.editor.baseline, old.editor.draft) || old.intent)) {
+    if (snapshot.can_write && preserve && old.snapshot?.can_write && (lineupChanged(old.editor.baseline, old.editor.draft) || old.intent)) {
       const rosterChanged = old.snapshot.roster_version !== snapshot.roster_version;
       const versionChanged = old.snapshot.version !== snapshot.version;
       put({...old, detail, lastChange: snapshot.last_change, receivedAt: Date.now(), verifiedFor: sessionStamp, pending: null,
@@ -84,7 +84,7 @@ export function usePremiumLineup(eventId: string, context: LineupProfileContext 
         error: rosterChanged ? 'lineup_roster_conflict' : versionChanged && !old.intent ? 'lineup_version_conflict' : old.error});
       return;
     }
-    const proposal = snapshot.version === 0 ? editLineup(emptyLineup(eventId), {type: 'preview', ids}).draft : undefined;
+    const proposal = snapshot.can_write && snapshot.version === 0 ? editLineup(emptyLineup(eventId), {type: 'preview', ids}).draft : undefined;
     put({...empty(eventId), detail, snapshot, lastChange: snapshot.last_change, receivedAt: Date.now(), verifiedFor: sessionStamp,
       editor: editLineup(emptyLineup(eventId), {type: 'load', eventId, baseline, proposal})});
   }, [eventId, put, sessionStamp]);
@@ -131,14 +131,14 @@ export function usePremiumLineup(eventId: string, context: LineupProfileContext 
     return () => clearTimeout(timer);
   }, [state.detail, state.receivedAt, clock]);
   const verified = ready && binding.current?.key === key && binding.current.manager === manager && state.verifiedFor === sessionStamp;
-  const writable = verified && !state.pending && !state.blocked && !state.intent && !isClosed(state);
+  const writable = verified && state.snapshot?.can_write === true && !state.pending && !state.blocked && !state.intent && !isClosed(state);
   function edit(action: LineupAction) {
     if (!authorized() || flight.current !== null || !writable) return;
     put({...stateRef.current, editor: editLineup(stateRef.current.editor, action), notice: ''});
   }
   async function save() {
     const s = stateRef.current;
-    if (!authorized() || flight.current !== null || !s.snapshot || s.verifiedFor !== sessionStamp || (!s.intent && (isClosed(s) || s.blocked || !lineupChanged(s.editor.baseline, s.editor.draft)))) return;
+    if (!authorized() || flight.current !== null || !s.snapshot?.can_write || s.verifiedFor !== sessionStamp || (!s.intent && (isClosed(s) || s.blocked || !lineupChanged(s.editor.baseline, s.editor.draft)))) return;
     const body: LineupWrite = s.intent?.body ?? {event_id: eventId, expected_version: s.snapshot.version, expected_roster_version: s.snapshot.roster_version,
       team_a: Object.keys(s.editor.draft).filter(id => s.editor.draft[id] === 'a').sort(), team_b: Object.keys(s.editor.draft).filter(id => s.editor.draft[id] === 'b').sort(), request_id: crypto.randomUUID()};
     const ticket = ++epoch.current; flight.current = ticket;

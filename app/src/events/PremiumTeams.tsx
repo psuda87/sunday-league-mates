@@ -74,11 +74,11 @@ export default function PremiumTeams({eventId, participants, cancelled, canEdit 
       <div className="slm-team-actions"><button type="button" disabled={!remote.ready || !!remote.state.pending} onClick={refresh}>Odśwież skład</button></div>
       {confirmRefresh && <div role="alertdialog" aria-labelledby={saveLimit + '-confirm'}>
         <p id={saveLimit + '-confirm'}>Odświeżenie zastąpi lokalny szkic aktualnym składem z serwera. Niezapisane zmiany zostaną utracone. Po niepewnym zapisie serwer mógł już przyjąć żądanie.</p>
-        <button type="button" onClick={() => setConfirmRefresh(false)}>Zachowaj szkic</button>
-        <button type="button" disabled={!!remote.state.pending} onClick={() => {setConfirmRefresh(false); void remote.reload();}}>Pobierz aktualny skład</button>
+        <div className="slm-lineup-confirm-actions"><button type="button" onClick={() => setConfirmRefresh(false)}>Zachowaj szkic</button>
+        <button type="button" disabled={!!remote.state.pending} onClick={() => {setConfirmRefresh(false); void remote.reload();}}>Pobierz aktualny skład</button></div>
       </div>}
       {remote.verified && <>
-        <p className="slm-teams-disclaimer">{snapshot?.version === 0 ? 'Propozycja składu · niezapisana' : 'Zapisany skład · lokalna edycja'}</p>
+        <p className="slm-teams-disclaimer">{snapshot?.version === 0 ? snapshot.can_write?'Propozycja składu · niezapisana':'Brak zapisanego składu' : snapshot?.can_write?'Zapisany skład · lokalna edycja':'Zapisany skład · tylko odczyt'}</p>
         {(cancelled || remote.closed) && <p role="status">{cancelled || remote.state.detail?.event.status === 'cancelled' ? 'Mecz anulowany' : 'Mecz zakończony'} · zapis składu jest zamknięty.</p>}
         {!eligible.length && <div className="slm-teams-empty"><h3>Boisko czeka na drużyny</h3><p>Brak aktualnie zapisanych uczestników.</p></div>}
         <div className="slm-team-score"><span><i aria-hidden="true"/>Drużyna A <strong>{teams.a.length}</strong></span><span><i aria-hidden="true"/>Drużyna B <strong>{teams.b.length}</strong></span></div>

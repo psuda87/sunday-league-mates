@@ -8,7 +8,7 @@ import type { GroupBinding } from './model';
 afterEach(()=>{cleanup();window.history.replaceState(null,'','/');});
 const group:GroupSummary={id:'group-real',name:'Real API group',description:'',admin_id:'owner',organizer:true,member_count:2,pending_count:1};
 const detail:GroupDetail={group,members:[{user_id:'owner',nickname:'Owner',full_name:null,contact_phone:null,jersey_number:0,organizer:true,joined_at:'2026-10-01',share_full_name:false}],requests:[]};
-function mock(call:(action:string,body?:Record<string,unknown>)=>Promise<unknown>){return {call:vi.fn(call),getSnapshot:()=>({phase:'ready',session:{user_id:'owner'}})} as unknown as SessionManager;}
+function mock(call:(action:string,body?:Record<string,unknown>)=>Promise<unknown>){const state={phase:'ready',session:{user_id:'owner'}};return {call:vi.fn(call),subscribe:()=>()=>{},getSnapshot:()=>state} as unknown as SessionManager;}
 it('uses server counts and UUIDs without importing any demo world or inventing memberships',()=>{
  const world=groupWorld('owner',[group],[],null);
  expect(world).not.toHaveProperty('games');expect(world.groupState.groups.map(g=>g.id)).toEqual(['group-real']);

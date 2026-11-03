@@ -181,3 +181,21 @@ it('rejects mismatched identity, unsafe author, overlapping IDs and inconsistent
   expect(() => lineupPair(f.detail(), {...s, event_version: 999}, f.eventId, f.groupId)).toThrow();
   expect(() => lineupPair(f.detail(), s, f.eventId, uid(999))).toThrow();
 });
+
+it('members see only the saved assignment and cannot edit, retry or synthesize an admin draft',async()=>{
+ const f=lineupFixture(11,true),context=await f.context();
+ f.intercept(async(action,body)=>action==='lineups_get'?{...f.read(),can_write:false}:f.handle(action,body,f.userId));
+ render(<PremiumTeams eventId={f.eventId} participants={f.people} cancelled={false} canEdit profileContext={context}/>);
+ await screen.findByText('Zapisany skład · tylko odczyt');
+ expect(screen.getByRole('region',{name:'Drużyna A, 6 osób'})).toBeTruthy();
+ click('Zapisz');click('Zamień zawodników');expect(f.saves()).toHaveLength(0);
+ expect(screen.getByRole('button',{name:'Przenieś zawodnika'})).toBeDisabled();
+});
+it('an old backend without the explicit permission contract is read-only',async()=>{
+ const f=lineupFixture(11,false),context=await f.context();
+ f.intercept(async(action,body)=>action==='lineups_get'?{...f.read(),can_write:undefined}:f.handle(action,body,f.userId));
+ render(<PremiumTeams eventId={f.eventId} participants={f.people} cancelled={false} canEdit profileContext={context}/>);
+ await screen.findByText('Brak zapisanego składu');
+ expect(screen.getByRole('region',{name:'Drużyna A, 0 osób'})).toBeTruthy();
+ expect(screen.getByRole('button',{name:'Zapisz'})).toBeDisabled();expect(f.saves()).toHaveLength(0);
+});
