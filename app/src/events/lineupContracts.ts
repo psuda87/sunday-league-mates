@@ -4,6 +4,7 @@ import type {MatchDetail} from './premiumContracts';
 import type {Assignment} from './lineupEditor';
 
 export interface LineupSnapshot {
+  can_write?: boolean;
   event_id: string; version: number; event_version: number; roster_version: string;
   saved_roster_version: string | null; team_a: string[]; team_b: string[];
   unassigned: string[]; stale_entry_ids: string[];
@@ -26,6 +27,7 @@ const ids = (v: unknown): string[] => {
 };
 export function lineupSnapshot(value: unknown, eventId: string): LineupSnapshot {
   const r = object(value);
+  if(r.can_write!==undefined&&typeof r.can_write!=='boolean')throw Error('Invalid lineup permission');
   if (!uuid(r.event_id) || r.event_id !== eventId || !integer(r.version) || !integer(r.event_version) || !token(r.roster_version) || !(r.saved_roster_version === null || token(r.saved_roster_version))) throw Error('Invalid lineup version');
   const a = ids(r.team_a), b = ids(r.team_b), unassigned = ids(r.unassigned), stale = ids(r.stale_entry_ids);
   if (new Set([...a, ...b]).size !== a.length + b.length) throw Error('Overlapping lineup');
@@ -36,7 +38,7 @@ export function lineupSnapshot(value: unknown, eventId: string): LineupSnapshot 
     last = {user_id: c.user_id, display_name: c.display_name, changed_at: c.changed_at};
   }
   if (r.version === 0 ? last !== null || a.length + b.length > 0 || r.saved_roster_version !== null : !last || r.saved_roster_version === null) throw Error('Invalid saved lineup');
-  return {event_id: r.event_id, version: r.version, event_version: r.event_version, roster_version: r.roster_version,
+  return {can_write:r.can_write===true,event_id: r.event_id, version: r.version, event_version: r.event_version, roster_version: r.roster_version,
     saved_roster_version: r.saved_roster_version, team_a: a, team_b: b, unassigned, stale_entry_ids: stale, last_change: last};
 }
 export function lineupPair(rawDetail: unknown, rawLineup: unknown, eventId: string, groupId: string): {detail: MatchDetail; snapshot: LineupSnapshot; baseline: Assignment} {

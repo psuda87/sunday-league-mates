@@ -8,7 +8,8 @@ const config: CapacitorConfig = {
   // Most natywny nie może logować argumentów SecureStorage (tokenów).
   loggingBehavior: 'none',
   android: { webContentsDebuggingEnabled: false, allowMixedContent: localAndroid },
-  plugins: { PushNotifications: { presentationOptions: [] } }
+  // Native viewport has one inset owner on Android12 and newer WebViews alike.
+  plugins: { SystemBars: { insetsHandling: 'disable' }, PushNotifications: { presentationOptions: [] } }
 };
 
 export default config;

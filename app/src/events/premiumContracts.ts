@@ -5,7 +5,7 @@ export interface EventSummary {
   id:string; group_id:string; group_name:string; created_by:string; name:string;
   visibility:'public'|'private'; starts_at:string; location:string;
   status:'scheduled'|'cancelled'; access:'full'|'own'|'none'; own_participation:boolean;
-  duration_minutes?:number; capacity?:number; cost_cents?:number; minimum_players?:number;
+  duration_minutes?:number; capacity?:number; cost_cents?:number; minimum_players?:number;address?:string;match_minimum_version?:number;
   registered_count?:number|null; reserve_count?:number|null; registration_open?:boolean;
   current_group_member?:boolean; own_history?:boolean; decision_required?:boolean; can_manage?:boolean; can_edit?:boolean; version?:number;
 }
@@ -22,7 +22,10 @@ export function eventSummary(value:unknown):EventSummary {
   if(r.access!=='none'){
     if(!['duration_minutes','capacity','cost_cents','minimum_players','version'].every(k=>integer(r[k]))||!['registration_open','decision_required','can_manage','can_edit'].every(k=>typeof r[k]==='boolean'))throw Error('Incomplete match contract');
     if(r.access==='full'&&(!integer(r.registered_count)||!integer(r.reserve_count)))throw Error('Missing authorized counts');
+    if(Number(r.minimum_players)<1||Number(r.minimum_players)>Number(r.capacity))throw Error('Invalid minimum contract');
   }
+  if(r.match_minimum_version!==undefined&&r.match_minimum_version!==1)throw Error('Unsupported minimum contract');
+  if(r.address!==undefined&&(typeof r.address!=='string'||r.address.length>200))throw Error('Invalid address contract');
   for(const key of ['own_history','current_group_member'])if(r[key]!==undefined&&typeof r[key]!=='boolean')throw Error('Invalid event privacy flags');
   return r as unknown as EventSummary;
 }
@@ -34,7 +37,7 @@ export function matchList(value:unknown,requireDiscovery=false,offset=0){
   if(requireDiscovery&&!discovery)throw Error('Discovery backend unavailable');
   if(discovery&&(r.offset!==offset||r.limit!==100||events.length>100||typeof r.has_more!=='boolean'||
     (r.has_more?(events.length!==100||r.next_offset!==offset+100):r.next_offset!==null)))throw Error('Invalid discovery page');
-  return {events,server_now:r.server_now as string,memberCreationEnabled:r.member_creation_enabled===true,
+  return {events,server_now:r.server_now as string,memberCreationEnabled:r.member_creation_enabled===true,minimumEnabled:r.match_minimum_version===1,
     discovery,hasMore:discovery?r.has_more===true:events.length===100,nextOffset:discovery?(r.next_offset as number|null):(events.length===100?offset+100:null)};
 }
 export function matchDetail(value:unknown,id:string):MatchDetail {

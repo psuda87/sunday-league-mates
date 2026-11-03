@@ -387,3 +387,16 @@ Instrukcja instalacji/uruchomienia i checklista docs/SLM_2_0_RC.md; bezpieczne z
 2026-11-02 18:30 Europe/Warsaw: opublikowano release/slm-2.0-rc/ecf37e6, Draft https://github.com/psuda87/sunday-league-mates/pull/32 →main134c52b, open/draft/clean bez merge. Hostowane2runs skipped, niePASS. Backend42 i APK dostępne lokalnie według raportu; finalnySHA toHEAD gałęzi po dopisaniu publikacji. Żadnych zmian app/guardów po testach. Chronologia docs/ODPOWIEDZI_CODEX.txt.
 
 2026-11-02 18:42 Europe/Warsaw: na release/slm-2.0-rc utworzono w istniejącej WŁASNEJ fixture42 jeden prywatny mecz „SLM RC - 13 uczestnikow”, grupa „SLM 2.0 RC testy”,09.11.2026 18:00 Europe/Warsaw. Odczyt API PASS:13 różnych zapisanych zawodników,0gości,0rezerwy,limit15. Dwa istniejące fikcyjne konta +11 nowych fikcyjnych zawodników; członkostwa zaakceptowane przez ich własne sesje. Bez zmian kodu/Cloud/innych baz/APK; zachowano parametry daty/godziny/miejsca/kosztu/limitu istniejącego testowego meczu. Następny krok: odświeżyć Mecze w lokalnym RC. Chronologia docs/ODPOWIEDZI_CODEX.txt.
+
+
+## 2026-11-03 18:53 Europe/Warsaw — fix/slm2-minimum-phone
+
+Wykonano minimum/default10 i własny telefon PL/+48/hasło, migracja43tylko w nowejfixture; bezCloud/istniejącychbaz/merge/POCO. PASS387Vitest,61policy,consolidation43/55/13,Linux32+87source,SQL51,GoTrueEdge47,TS/lint/strictEdge/web/demo/AndroidAPK/JVM1/insets2. EmulatorLIVE:edycja minimum,zapis telefonu i niezależneAPIreadbackPASS. Backend43/55431wznowiony bezresetu; APK.cache/minimum-phone/slm2-minimum-phone-debug.apk. WindowsWinError1314symlink rozstrzygnięty pełnymLinux; hostedActions/POCONOTRUN. Piny51c980b/0d82b09/023dc9b/2de6e5e,Premium55manifestnietknięty. Raport docs/SLM_2_0_MINIMUM_PHONE.md,chronologia docs/ODPOWIEDZI_CODEX.txt. Następnykrok:DraftPRdoRC,odbiórścisłychpinówprzezwłaściciela,osobnytestPOCO; bezsquash/rebase.
+
+
+2026-11-03 18:57 Europe/Warsaw: opublikowano fix/slm2-minimum-phone, Draft PR33 → release/slm-2.0-rc/fa6bc792, bez merge. Funkcje minimum i telefonu oraz emulator LIVE PASS. APK i backend43/55431 gotowe według docs/SLM_2_0_MINIMUM_PHONE.md. Przed integracją: odbiór ścisłych pinów; test POCO i GitHub-hosted NOT RUN. Pełna chronologia docs/ODPOWIEDZI_CODEX.txt.
+
+
+## 2026-11-03 21:01 Europe/Warsaw — finalna stabilizacja fix/slm2-minimum-phone
+
+Naprawy A–E oraz administratorzy składów/migracja44 wykonane. PASS395Vitest/71policy/Linux35+107/SQL52/HTTP27/Cypress6/JVM1/native5, TS/lint/strictEdge/buildy i rzeczywisty emulator. Premium55 niezmieniony w tej stabilizacji. Backend43 zachowany; nowa fixture44/55441 działa, bez migracji istniejących baz i Cloud. Następnie: sprawdzenie refów merge33→RC i32→main, zwykłe merge tylko poPASS, APK z finalnego main. POCO/hosted/Cloud/Storage/FCM NOTRUN. Szczegóły docs/SLM_2_0_RC.md; chronologia docs/ODPOWIEDZI_CODEX.txt.

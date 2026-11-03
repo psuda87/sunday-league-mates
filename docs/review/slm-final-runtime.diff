@@ -1,0 +1,786 @@
+diff --git a/app/android/app/src/androidTest/java/com/getcapacitor/myapp/ExampleInstrumentedTest.java b/app/android/app/src/androidTest/java/com/getcapacitor/myapp/ExampleInstrumentedTest.java
+index f2c2217..dbb87b3 100644
+--- a/app/android/app/src/androidTest/java/com/getcapacitor/myapp/ExampleInstrumentedTest.java
++++ b/app/android/app/src/androidTest/java/com/getcapacitor/myapp/ExampleInstrumentedTest.java
+@@ -24 +24 @@ public class ExampleInstrumentedTest {
+-        assertEquals("com.getcapacitor.app", appContext.getPackageName());
++        assertEquals("pl.psuda87.slm", appContext.getPackageName());
+diff --git a/app/android/app/src/androidTest/java/pl/psuda87/slm/SlmWindowInsetsTest.java b/app/android/app/src/androidTest/java/pl/psuda87/slm/SlmWindowInsetsTest.java
+index 050c023..36e009d 100644
+--- a/app/android/app/src/androidTest/java/pl/psuda87/slm/SlmWindowInsetsTest.java
++++ b/app/android/app/src/androidTest/java/pl/psuda87/slm/SlmWindowInsetsTest.java
+@@ -5,0 +6,3 @@ import android.view.View;
++import android.graphics.Rect;
++import androidx.core.view.DisplayCutoutCompat;
++import java.util.Collections;
+@@ -17,0 +21,24 @@ public class SlmWindowInsetsTest {
++    @Test
++    public void nativeOwnerAlsoConsumesRawCutoutMetadata() {
++        try (ActivityScenario<MainActivity> scenario = ActivityScenario.launch(MainActivity.class)) {
++            scenario.onActivity(activity -> {
++                WindowInsetsCompat input = new WindowInsetsCompat.Builder()
++                    .setDisplayCutout(new DisplayCutoutCompat(new Rect(0, 120, 0, 0),
++                        Collections.singletonList(new Rect(480, 0, 600, 120))))
++                    .build();
++                WindowInsetsCompat forwarded = ViewCompat.dispatchApplyWindowInsets(activity.getWindow().getDecorView(), input);
++                assertNull("WebView must not reserve the native cutout a second time", forwarded.getDisplayCutout());
++                assertEquals(Insets.NONE, forwarded.getInsets(WindowInsetsCompat.Type.displayCutout()));
++            });
++        }
++    }
++
++    @Test
++    public void resizedAndEdgeToEdgeWindowsReserveKeyboardOnce() {
++        assertEquals(900, SlmWindowInsets.bottomPadding(48, 900, 0));
++        assertEquals(0, SlmWindowInsets.bottomPadding(48, 900, 900));
++        assertEquals(200, SlmWindowInsets.bottomPadding(48, 900, 700));
++        assertEquals(48, SlmWindowInsets.bottomPadding(48, 20, 0));
++        assertEquals(0, SlmWindowInsets.bottomPadding(48, 900, 1000));
++    }
++
+diff --git a/app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java b/app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java
+index 1ef56a4..ccd55bb 100644
+--- a/app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java
++++ b/app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java
+@@ -4,0 +5,2 @@ import android.view.Window;
++import android.os.Build;
++import android.util.DisplayMetrics;
+@@ -24 +26,12 @@ final class SlmWindowInsets {
+-            view.setPadding(bars.left, bars.top, bars.right, Math.max(bars.bottom, ime.bottom));
++            int height;
++            if (Build.VERSION.SDK_INT >= 30) {
++                height = window.getWindowManager().getCurrentWindowMetrics().getBounds().height();
++            } else {
++                DisplayMetrics metrics = new DisplayMetrics();
++                window.getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
++                height = metrics.heightPixels;
++            }
++            // Android12/OEM adjustResize may already exclude the keyboard.
++            // Only reserve the part that is still inside the actual window.
++            int excluded = ime.bottom > 0 && view.getHeight() > 0 ? Math.max(0, height - view.getHeight()) : 0;
++            view.setPadding(bars.left, bars.top, bars.right, bottomPadding(bars.bottom, ime.bottom, excluded));
+@@ -33,0 +47,3 @@ final class SlmWindowInsets {
++                .setInsetsIgnoringVisibility(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout(), Insets.NONE)
++                // Older WebViews also inspect the raw DisplayCutout object.
++                .setDisplayCutout(null)
+@@ -37,0 +54,4 @@ final class SlmWindowInsets {
++
++    static int bottomPadding(int navigation, int keyboard, int alreadyExcluded) {
++        return Math.max(0, Math.max(navigation, keyboard) - alreadyExcluded);
++    }
+diff --git a/app/capacitor.config.ts b/app/capacitor.config.ts
+index ac61350..535c569 100644
+--- a/app/capacitor.config.ts
++++ b/app/capacitor.config.ts
+@@ -11 +11,2 @@ const config: CapacitorConfig = {
+-  plugins: { PushNotifications: { presentationOptions: [] } }
++  // Native viewport has one inset owner on Android12 and newer WebViews alike.
++  plugins: { SystemBars: { insetsHandling: 'disable' }, PushNotifications: { presentationOptions: [] } }
+diff --git a/app/scripts/lineups-ci-approval.json b/app/scripts/lineups-ci-approval.json
+index dd8d291..e583291 100644
+--- a/app/scripts/lineups-ci-approval.json
++++ b/app/scripts/lineups-ci-approval.json
+@@ -3 +3 @@
+-  "implementation": "023dc9bfe5aef7f2ec2339495101870f4f364f6a"
++  "implementation": "2f4adedfbaeb2dd1e69f8dc22c62823fc2f0c168"
+diff --git a/app/scripts/lineups_ci.py b/app/scripts/lineups_ci.py
+index 0c4efdd..50550ee 100644
+--- a/app/scripts/lineups_ci.py
++++ b/app/scripts/lineups_ci.py
+@@ -72,0 +73,41 @@ MINIMUM_PHONE_OVERLAY={
++MINIMUM_PHONE_CI_IMPLEMENTATION='023dc9bfe5aef7f2ec2339495101870f4f364f6a'
++STABILIZATION_IMPLEMENTATION='3e1c62cdcbfc8312dd983228a1ea1ef78f785ee4'
++STABILIZATION_OVERLAY={
++    'app/android/app/src/androidTest/java/com/getcapacitor/myapp/ExampleInstrumentedTest.java',
++    'app/android/app/src/androidTest/java/pl/psuda87/slm/SlmWindowInsetsTest.java',
++    'app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java',
++    'app/capacitor.config.ts',
++    'app/scripts/lineups_ci.py',
++    'app/scripts/premium-route-policy.mjs',
++    'app/scripts/test-lineups-edge-local.py',
++    'app/scripts/test-lineups-local.py',
++    'app/scripts/test_lineups_ci_context.py',
++    'app/scripts/verify-consolidation.mjs',
++    'app/scripts/verify-premium-policy-cases.mjs',
++    'app/src/auth/B1App.test.tsx',
++    'app/src/auth/B1App.tsx',
++    'app/src/auth/premiumRuntime.test.tsx',
++    'app/src/auth/useB1Lifecycle.ts',
++    'app/src/events/PremiumEvents.tsx',
++    'app/src/events/PremiumTeams.tsx',
++    'app/src/events/editResume.test.tsx',
++    'app/src/events/lineupContracts.ts',
++    'app/src/events/lineupFixture.test-support.ts',
++    'app/src/events/minimum.test.tsx',
++    'app/src/events/premium.test.tsx',
++    'app/src/events/premiumEvents.css',
++    'app/src/events/premiumLineupApi.test.tsx',
++    'app/src/events/resume.test.tsx',
++    'app/src/events/usePremiumEvents.ts',
++    'app/src/events/usePremiumLineup.ts',
++    'app/src/groups/PremiumGroups.tsx',
++    'app/src/groups/useGroups.test.tsx',
++    'app/src/groups/useGroups.ts',
++    'app/src/native/focusVisibility.test.ts',
++    'app/src/native/focusVisibility.ts',
++    'app/supabase/functions/accounts/handler.ts',
++    'app/supabase/functions/accounts/lineups.test.ts',
++    'app/supabase/migrations/20261103190639_group_admin_lineup_writes.sql',
++    'app/supabase/tests/lineup_admin.sql',
++}
++
+@@ -193,0 +235,11 @@ def verify_minimum_phone_overlay(root, previous, approved):
++def verify_stabilization_overlay(root, previous, approved):
++    candidate = archive(root, STABILIZATION_IMPLEMENTATION)
++    candidate.pop(APPROVAL, None)
++    delta = {name for name in set(previous) | set(candidate) if previous.get(name) != candidate.get(name)}
++    require(delta == STABILIZATION_OVERLAY, 'Stabilization delta differs from exact reviewed file set')
++    require(set(approved) == set(candidate), 'Stabilization added or removed an application input')
++    for name, data in candidate.items():
++        if name not in ('app/scripts/lineups_ci.py', 'app/scripts/test_lineups_ci_context.py'):
++            require(approved.get(name) == data, 'Unreviewed stabilization source: ' + name)
++
++
+@@ -207 +259 @@ def verify_sources(root=ROOT, base=BASE):
+-    for ref in (STAGE3B_IMPLEMENTATION, DISCOVERY_IMPLEMENTATION, STAGE2C_IMPLEMENTATION, POLISH_IMPLEMENTATION, POLISH_CI_IMPLEMENTATION, MINIMUM_PHONE_IMPLEMENTATION):
++    for ref in (STAGE3B_IMPLEMENTATION, DISCOVERY_IMPLEMENTATION, STAGE2C_IMPLEMENTATION, POLISH_IMPLEMENTATION, POLISH_CI_IMPLEMENTATION, MINIMUM_PHONE_IMPLEMENTATION, MINIMUM_PHONE_CI_IMPLEMENTATION, STABILIZATION_IMPLEMENTATION):
+@@ -220 +272,4 @@ def verify_sources(root=ROOT, base=BASE):
+-    verify_minimum_phone_overlay(root, polish, approved)
++    minimum = archive(root, MINIMUM_PHONE_CI_IMPLEMENTATION)
++    minimum.pop(APPROVAL, None)
++    verify_minimum_phone_overlay(root, polish, minimum)
++    verify_stabilization_overlay(root, minimum, approved)
+@@ -222 +277 @@ def verify_sources(root=ROOT, base=BASE):
+-    require(len(migrations) == 43, 'Exact 43 reviewed migrations required')
++    require(len(migrations) == 44, 'Exact 44 reviewed migrations required')
+@@ -304 +359 @@ def context(suite):
+-    print('PASS CI preflight: exact commit/event, approved app/backend/43 migrations, isolated empty local Docker', flush=True)
++    print('PASS CI preflight: exact commit/event, approved app/backend/44 migrations, isolated empty local Docker', flush=True)
+diff --git a/app/scripts/premium-route-policy.mjs b/app/scripts/premium-route-policy.mjs
+index 1765521..19f539d 100644
+--- a/app/scripts/premium-route-policy.mjs
++++ b/app/scripts/premium-route-policy.mjs
+@@ -27,0 +28,3 @@ export const MINIMUM_PHONE_RUNTIME=new Set(['app/src/demo/EventForm.tsx','app/sr
++export const STABILIZATION_SOURCE='589e643de9310bd8c205ce7b1c473a55fe767464';
++export const ADMIN_MIGRATION='app/supabase/migrations/20261103190639_group_admin_lineup_writes.sql';
++export const STABILIZATION_RUNTIME=new Set(['app/src/auth/useB1Lifecycle.ts','app/supabase/functions/accounts/handler.ts','app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java', 'app/android/app/src/androidTest/java/pl/psuda87/slm/SlmWindowInsetsTest.java', 'app/android/app/src/androidTest/java/com/getcapacitor/myapp/ExampleInstrumentedTest.java', 'app/capacitor.config.ts', 'app/src/auth/B1App.tsx', 'app/src/events/PremiumEvents.tsx', 'app/src/events/PremiumTeams.tsx', 'app/src/events/lineupContracts.ts', 'app/src/events/premiumEvents.css', 'app/src/events/usePremiumEvents.ts', 'app/src/events/usePremiumLineup.ts', 'app/src/groups/PremiumGroups.tsx', 'app/src/groups/useGroups.ts', 'app/src/native/focusVisibility.ts']);
+@@ -55 +58 @@ export function verifyPremiumRuntime(root,overrides={}){
+- assert.deepEqual(readdirSync(root+'/app/supabase/migrations').filter(n=>n.endsWith('.sql')).sort(),[...mainSteps,...added,'app/supabase/migrations/20261028204500_restore_pr16_match_name_projection.sql',LINEUPS_MIGRATION,DISCOVERY_MIGRATION,MINIMUM_MIGRATION].map(p=>p.split('/').at(-1)).sort(),'Unexpected migration/model activation');
++ assert.deepEqual(readdirSync(root+'/app/supabase/migrations').filter(n=>n.endsWith('.sql')).sort(),[...mainSteps,...added,'app/supabase/migrations/20261028204500_restore_pr16_match_name_projection.sql',LINEUPS_MIGRATION,DISCOVERY_MIGRATION,MINIMUM_MIGRATION,ADMIN_MIGRATION].map(p=>p.split('/').at(-1)).sort(),'Unexpected migration/model activation');
+@@ -59,2 +62,4 @@ export function verifyPremiumRuntime(root,overrides={}){
+-  assert.equal(digest(read(p)),digest(git(p===DISCOVERY_MIGRATION?DISCOVERY_SOURCE:MINIMUM_PHONE_SOURCE,p)),'Unreviewed discovery backend source: '+p);
+- for(const p of MINIMUM_PHONE_RUNTIME)assert.equal(digest(read(p)),digest(git(MINIMUM_PHONE_SOURCE,p)),'Unreviewed minimum/phone runtime: '+p);
++  assert.equal(digest(read(p)),digest(git(STABILIZATION_RUNTIME.has(p)?STABILIZATION_SOURCE:p===DISCOVERY_MIGRATION?DISCOVERY_SOURCE:MINIMUM_PHONE_SOURCE,p)),'Unreviewed discovery backend source: '+p);
++ assert.equal(digest(read(ADMIN_MIGRATION)),digest(git(STABILIZATION_SOURCE,ADMIN_MIGRATION)),'Unreviewed admin44 migration');
++ for(const p of STABILIZATION_RUNTIME)assert.equal(digest(read(p)),digest(git(STABILIZATION_SOURCE,p)),'Unreviewed POCO stabilization source: '+p);
++ for(const p of MINIMUM_PHONE_RUNTIME)assert.equal(digest(read(p)),digest(git(STABILIZATION_RUNTIME.has(p)?STABILIZATION_SOURCE:MINIMUM_PHONE_SOURCE,p)),'Unreviewed minimum/phone runtime: '+p);
+@@ -72 +77 @@ export function verifyPremiumRuntime(root,overrides={}){
+-  'app/src/auth/B1App.tsx':['../events/PremiumWorld'],
++  'app/src/auth/B1App.tsx':['../events/PremiumWorld','../native/focusVisibility'],
+@@ -84,3 +89,3 @@ export function verifyPremiumRuntime(root,overrides={}){
+-  assert.equal(digest(read(path)),digest(git(MINIMUM_PHONE_RUNTIME.has(path)?MINIMUM_PHONE_SOURCE:polishUi.has(path)?POLISH_UI:discoveryUi.has(path)?DISCOVERY_UI:lineupStage2b.has(path)?LINEUPS_STAGE2B:lineupStage1.has(path)?LINEUP_STAGE1:APPROVED,path)),'Approved runtime replaced/condition changed: '+path);
+- for(const path of discoveryUi)assert.equal(digest(read(path)),digest(git(MINIMUM_PHONE_RUNTIME.has(path)?MINIMUM_PHONE_SOURCE:polishUi.has(path)?POLISH_UI:DISCOVERY_UI,path)),'Unreviewed discovery UI: '+path);
+- for(const path of polishUi)assert.equal(digest(read(path)),digest(git(MINIMUM_PHONE_RUNTIME.has(path)?MINIMUM_PHONE_SOURCE:POLISH_UI,path)),'Unreviewed PR31 control: '+path);
++  assert.equal(digest(read(path)),digest(git(STABILIZATION_RUNTIME.has(path)?STABILIZATION_SOURCE:MINIMUM_PHONE_RUNTIME.has(path)?MINIMUM_PHONE_SOURCE:polishUi.has(path)?POLISH_UI:discoveryUi.has(path)?DISCOVERY_UI:lineupStage2b.has(path)?LINEUPS_STAGE2B:lineupStage1.has(path)?LINEUP_STAGE1:APPROVED,path)),'Approved runtime replaced/condition changed: '+path);
++ for(const path of discoveryUi)assert.equal(digest(read(path)),digest(git(STABILIZATION_RUNTIME.has(path)?STABILIZATION_SOURCE:MINIMUM_PHONE_RUNTIME.has(path)?MINIMUM_PHONE_SOURCE:polishUi.has(path)?POLISH_UI:DISCOVERY_UI,path)),'Unreviewed discovery UI: '+path);
++ for(const path of polishUi)assert.equal(digest(read(path)),digest(git(STABILIZATION_RUNTIME.has(path)?STABILIZATION_SOURCE:MINIMUM_PHONE_RUNTIME.has(path)?MINIMUM_PHONE_SOURCE:POLISH_UI,path)),'Unreviewed PR31 control: '+path);
+@@ -88,2 +93,2 @@ export function verifyPremiumRuntime(root,overrides={}){
+-  assert.equal(digest(read(path)),digest(git(POLISH_ANDROID,path)),'Unreviewed PR31 native source: '+path);
+- assert.equal(digest(read('app/src/groups/PremiumGroups.tsx')),digest(git(MAIN,'app/src/groups/PremiumGroups.tsx')),'Group UI wrapper replaced');
++  assert.equal(digest(read(path)),digest(git(STABILIZATION_RUNTIME.has(path)?STABILIZATION_SOURCE:POLISH_ANDROID,path)),'Unreviewed PR31 native source: '+path);
++ assert.equal(digest(read('app/src/groups/PremiumGroups.tsx')),digest(git(STABILIZATION_SOURCE,'app/src/groups/PremiumGroups.tsx')),'Group UI wrapper replaced');
+@@ -92 +97,2 @@ export function verifyPremiumRuntime(root,overrides={}){
+- assert.equal(digest(read('app/src/auth/B1App.tsx')),digest(expected),'Auth/Premium gate adapter changed without review');
++ assert.equal(digest(git('94efc95b65476fa4102006a25b9d5b3b1e126b5c','app/src/auth/B1App.tsx')),digest(expected),'Historical gate approval changed');
++ assert.equal(digest(read('app/src/auth/B1App.tsx')),digest(git(STABILIZATION_SOURCE,'app/src/auth/B1App.tsx')),'Auth/Premium gate adapter changed without review');
+@@ -98 +104 @@ export function verifyPremiumRuntime(root,overrides={}){
+-  assert.equal(digest(read(path)),digest(git(APPROVED,path)),'Build/entry configuration changed: '+path);
++  assert.equal(digest(read(path)),digest(git(STABILIZATION_RUNTIME.has(path)?STABILIZATION_SOURCE:APPROVED,path)),'Build/entry configuration changed: '+path);
+diff --git a/app/scripts/test-lineups-edge-local.py b/app/scripts/test-lineups-edge-local.py
+index 8197035..e5b4592 100644
+--- a/app/scripts/test-lineups-edge-local.py
++++ b/app/scripts/test-lineups-edge-local.py
+@@ -244 +244,2 @@ Deno.serve(async(req:Request)=>{
+-    assert len(migrations) == (43 if CI_MODE or branch == 'fix/slm2-minimum-phone' else 42 if branch == 'feat/public-match-discovery-stage2b' else 41), 'Expected exact reviewed migration set'
++    assert len(migrations) == (44 if CI_MODE or branch == 'fix/slm2-minimum-phone' else 42 if branch == 'feat/public-match-discovery-stage2b' else 41), 'Expected exact reviewed migration set'
++    admin_step=next((p for p in migrations if p.name.endswith('_group_admin_lineup_writes.sql')),None)
+@@ -245,0 +247 @@ Deno.serve(async(req:Request)=>{
++        if file==admin_step:continue
+@@ -247 +249 @@ Deno.serve(async(req:Request)=>{
+-    if len(migrations) == 43:
++    if len(migrations) >= 43:
+@@ -249 +251 @@ Deno.serve(async(req:Request)=>{
+-    check(True, str(len(migrations))+' canonical migrations replay on real GoTrue Auth schema')
++    check(True, ('43 historical migrations before admin44' if admin_step else str(len(migrations))+' canonical migrations replay on real GoTrue Auth schema'))
+@@ -268 +270 @@ Deno.serve(async(req:Request)=>{
+-        users.append({'id': user['id'], 'token': login['access_token'], 'session': login})
++        users.append({'id': user['id'], 'token': login['access_token'], 'session': login, 'login':email, 'password':password})
+@@ -338,0 +341,3 @@ Deno.serve(async(req:Request)=>{
++    if admin_step:
++        sql(admin_step.read_text(encoding='utf-8'))
++        check(True,'new fixture upgraded43-to44; existing member-write regression preserved before permission change')
+diff --git a/app/scripts/test-lineups-local.py b/app/scripts/test-lineups-local.py
+index 03f0e39..18de143 100644
+--- a/app/scripts/test-lineups-local.py
++++ b/app/scripts/test-lineups-local.py
+@@ -102,3 +102,5 @@ try:
+- for file in migrations:sql(file.read_text())
+- check(len(migrations)==(43 if CI_MODE or branch=='fix/slm2-minimum-phone' else 42 if branch=='feat/public-match-discovery-stage2b' else 41),str(len(migrations))+' canonical source migrations replayed, no Auth18')
+- if len(migrations)==43:
++ admin_step=next((p for p in migrations if p.name.endswith('_group_admin_lineup_writes.sql')),None)
++ for file in migrations:
++  if file!=admin_step:sql(file.read_text())
++ check(len(migrations)==(44 if CI_MODE or branch=='fix/slm2-minimum-phone' else 42 if branch=='feat/public-match-discovery-stage2b' else 41),('43 historical migrations before admin44' if admin_step else str(len(migrations))+' canonical source migrations replayed, no Auth18'))
++ if len(migrations)>=43:
+@@ -219,0 +222,2 @@ try:
++ if admin_step:
++  sql(admin_step.read_text());sql((ROOT/'app/supabase/tests/lineup_admin.sql').read_text());check(True,'44 upgrade preserves invoker/RLS/ACL and requires current group administrator')
+diff --git a/app/scripts/test_lineups_ci_context.py b/app/scripts/test_lineups_ci_context.py
+index fa4373f..9abe208 100644
+--- a/app/scripts/test_lineups_ci_context.py
++++ b/app/scripts/test_lineups_ci_context.py
+@@ -198,0 +199,9 @@ class SourceTests(unittest.TestCase):
++        cls.minimum_ci = cls.commit(cls.template, 'reviewed minimum CI implementation')
++        cls.stabilization_overlay = {'app/src/view.tsx', 'app/src/events/usePremiumLineup.ts',
++                                    'app/supabase/migrations/00000000000043_admin.sql',
++                                    'app/capacitor.config.ts'}
++        for name in cls.stabilization_overlay:
++            cls.write(cls.template, name, 'exact stabilization source\n')
++        cls.stabilization = cls.commit(cls.template, 'reviewed stabilization sources')
++        cls.write(cls.template,'app/scripts/lineups_ci.py','reviewed stabilization CI gate\n')
++        cls.write(cls.template,'app/scripts/test_lineups_ci_context.py','reviewed stabilization source tests\n')
+@@ -233 +242,2 @@ class SourceTests(unittest.TestCase):
+-                    MINIMUM_PHONE_OVERLAY=self.minimum_overlay)
++                    MINIMUM_PHONE_OVERLAY=self.minimum_overlay, MINIMUM_PHONE_CI_IMPLEMENTATION=self.minimum_ci,
++                    STABILIZATION_IMPLEMENTATION=self.stabilization, STABILIZATION_OVERLAY=self.stabilization_overlay)
+@@ -390,0 +401,22 @@ class SourceTests(unittest.TestCase):
++    def test_stabilization_exact_inputs_and_extra_migration_rejected(self):
++        for name in self.stabilization_overlay | {'app/supabase/migrations/00000000000044_unauthorized.sql'}:
++            with self.subTest(name=name), self.assertRaises(RuntimeError):
++                original=(self.root/name).read_bytes() if (self.root/name).exists() else None
++                try:
++                    self.write(self.root,name,'unauthorized source')
++                    self.verify()
++                finally:
++                    if original is None:(self.root/name).unlink()
++                    else:(self.root/name).write_bytes(original)
++
++    def test_stabilization_overlay_cannot_expand_or_omit_inputs(self):
++        for overlay in (self.stabilization_overlay|{'app/src/auth/sessionManager.ts'},self.stabilization_overlay-{'app/capacitor.config.ts'}):
++            with self.subTest(overlay=overlay), self.assertRaises(RuntimeError):self.verify(STABILIZATION_OVERLAY=overlay)
++
++    def test_stabilization_and_prior_minimum_ci_ancestry_required(self):
++        for name,ref in (('STABILIZATION_IMPLEMENTATION',self.stabilization),('MINIMUM_PHONE_CI_IMPLEMENTATION',self.minimum_ci)):
++            tree=self.command(self.root,'rev-parse',ref+'^{tree}').strip()
++            orphan=self.command(self.root,'commit-tree',tree,'-m','same bytes without approved ancestry').strip()
++            with self.subTest(name=name), self.assertRaises(RuntimeError):self.verify(**{name:orphan})
++
++
+diff --git a/app/scripts/verify-consolidation.mjs b/app/scripts/verify-consolidation.mjs
+index 0601f48..732d055 100644
+--- a/app/scripts/verify-consolidation.mjs
++++ b/app/scripts/verify-consolidation.mjs
+@@ -6 +6 @@ import {fileURLToPath} from 'node:url';
+-import {LINEUPS_STAGE2A,LINEUPS_MIGRATION,DISCOVERY_SOURCE,DISCOVERY_MIGRATION,MINIMUM_PHONE_SOURCE,MINIMUM_MIGRATION,MINIMUM_PHONE_RUNTIME} from './premium-route-policy.mjs';
++import {LINEUPS_STAGE2A,LINEUPS_MIGRATION,DISCOVERY_SOURCE,DISCOVERY_MIGRATION,MINIMUM_PHONE_SOURCE,MINIMUM_MIGRATION,MINIMUM_PHONE_RUNTIME,STABILIZATION_SOURCE,STABILIZATION_RUNTIME,ADMIN_MIGRATION} from './premium-route-policy.mjs';
+@@ -12 +12 @@ for(const [path,expected] of Object.entries({...manifest.main_migrations,...mani
+- const approved=MINIMUM_PHONE_RUNTIME.has(path)?createHash('sha256').update(execFileSync('git',['show',MINIMUM_PHONE_SOURCE+':'+path],{cwd:repo,encoding:'utf8'}).replace(/\r\n/g,'\n')).digest('hex'):expected;
++ const approved=STABILIZATION_RUNTIME.has(path)?createHash('sha256').update(execFileSync('git',['show',STABILIZATION_SOURCE+':'+path],{cwd:repo,encoding:'utf8'}).replace(/\r\n/g,'\n')).digest('hex'):MINIMUM_PHONE_RUNTIME.has(path)?createHash('sha256').update(execFileSync('git',['show',MINIMUM_PHONE_SOURCE+':'+path],{cwd:repo,encoding:'utf8'}).replace(/\r\n/g,'\n')).digest('hex'):expected;
+@@ -18 +18 @@ assert.equal(historical.length,41,'Exact Stage3B migration baseline');
+-assert.deepEqual(readdirSync(repo+'app/supabase/migrations').filter(p=>p.endsWith('.sql')).sort(),[...historical,DISCOVERY_MIGRATION,MINIMUM_MIGRATION].map(p=>p.split('/').at(-1)).sort(),'Unexpected migration/model activation');
++assert.deepEqual(readdirSync(repo+'app/supabase/migrations').filter(p=>p.endsWith('.sql')).sort(),[...historical,DISCOVERY_MIGRATION,MINIMUM_MIGRATION,ADMIN_MIGRATION].map(p=>p.split('/').at(-1)).sort(),'Unexpected migration/model activation');
+@@ -20 +20 @@ for(const path of historical)assert.equal(readFileSync(repo+path,'utf8').replace
+-for(const path of [DISCOVERY_MIGRATION,'app/supabase/functions/accounts/handler.ts',MINIMUM_MIGRATION])assert.equal(readFileSync(repo+path,'utf8').replace(/\r\n/g,'\n'),execFileSync('git',['show',(path===DISCOVERY_MIGRATION?DISCOVERY_SOURCE:MINIMUM_PHONE_SOURCE)+':'+path],{cwd:repo,encoding:'utf8'}).replace(/\r\n/g,'\n'),'Unreviewed discovery backend source: '+path);
++for(const path of [DISCOVERY_MIGRATION,'app/supabase/functions/accounts/handler.ts',MINIMUM_MIGRATION,ADMIN_MIGRATION])assert.equal(readFileSync(repo+path,'utf8').replace(/\r\n/g,'\n'),execFileSync('git',['show',(path===ADMIN_MIGRATION||STABILIZATION_RUNTIME.has(path)?STABILIZATION_SOURCE:path===DISCOVERY_MIGRATION?DISCOVERY_SOURCE:MINIMUM_PHONE_SOURCE)+':'+path],{cwd:repo,encoding:'utf8'}).replace(/\r\n/g,'\n'),'Unreviewed discovery backend source: '+path);
+@@ -29 +29 @@ assert(!/premium318-live|\.worktrees|B22_LOCAL_ONLY/.test(prepare),'Local prep m
+-console.log('PASS consolidation: 42 historical steps unchanged + exact minimum migration43, pinned runtime, main ancestry, deployment disabled, canonical local preparation.');
++console.log('PASS consolidation: 43 historical steps unchanged + exact administrator migration44, pinned runtime, main ancestry, deployment disabled, canonical local preparation.');
+diff --git a/app/scripts/verify-premium-policy-cases.mjs b/app/scripts/verify-premium-policy-cases.mjs
+index 7e182b6..c9d3798 100644
+--- a/app/scripts/verify-premium-policy-cases.mjs
++++ b/app/scripts/verify-premium-policy-cases.mjs
+@@ -6 +6 @@ import {fileURLToPath} from 'node:url';
+-import {verifyPremiumRuntime,APPROVED,LINEUPS_MIGRATION,DISCOVERY_MIGRATION,MINIMUM_MIGRATION} from './premium-route-policy.mjs';
++import {verifyPremiumRuntime,APPROVED,LINEUPS_MIGRATION,DISCOVERY_MIGRATION,MINIMUM_MIGRATION,ADMIN_MIGRATION} from './premium-route-policy.mjs';
+@@ -70,0 +71,10 @@ for(const [label,path,mutate] of [
++ ['admin44 authorization removed',ADMIN_MIGRATION,s=>s.replace("p_action='save' and not exists","false and not exists")],
++ ['resume shows stale screen','app/src/auth/B1App.tsx',s=>s.replace('hidden={view!==null}','hidden={false}')],
++ ['resume retains denied account','app/src/auth/B1App.tsx',s=>s.replace('continuation.current=null','continuation.current="old"')],
++ ['IME gets two inset owners','app/capacitor.config.ts',s=>s.replace("insetsHandling: 'disable'","insetsHandling: 'css'")],
++ ['focus helper replaced','app/src/native/focusVisibility.ts',s=>s+'\n// unauthorized input handler\n'],
++ ['member writes local draft','app/src/events/usePremiumLineup.ts',s=>s.replace('state.snapshot?.can_write === true','true')],
++ ['responsive confirmation removed','app/src/events/premiumEvents.css',s=>s.replace('display:flex;flex-wrap:wrap;gap:8px','display:flex;flex-wrap:nowrap;gap:8px')],
++ ['event edit overwrites a resumed version','app/src/events/PremiumEvents.tsx',s=>s.replace('editVersion.current!==e?.version','false')],
++ ['logout permits foreground refresh','app/src/auth/useB1Lifecycle.ts',s=>s.replace("mayResume()&&manager.getSnapshot()","true&&manager.getSnapshot()")],
++ ['raw cutout forwarded twice','app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java',s=>s.replace('.setDisplayCutout(null)','')],
+diff --git a/app/src/auth/B1App.test.tsx b/app/src/auth/B1App.test.tsx
+index 1e28a67..a327f5e 100644
+--- a/app/src/auth/B1App.test.tsx
++++ b/app/src/auth/B1App.test.tsx
+@@ -17,0 +18,12 @@ const session=(temporary=false):Session=>({access_token:'access-test',refresh_to
++it('does not resume or retain a private world while explicit logout is clearing the vault',async()=>{
++ let release!:()=>void;const clearing=new Promise<void>(resolve=>{release=resolve;});
++ let token:string|null='saved-test';
++ const request=vi.fn(async(action:string)=>action==='logout'?undefined:session());
++ const manager=new SessionManager({read:async()=>token,write:async value=>{token=value;},clear:async()=>{await clearing;token=null;}},async<T,>(action:string)=>await request(action) as T);
++ render(<B1App manager={manager}/>);await screen.findByText('Chroniony świat demo');
++ fireEvent.click(screen.getByRole('button',{name:'Wyloguj'}));
++ fireEvent(window,new Event('online'));await act(async()=>{await Promise.resolve();});
++ expect(request.mock.calls.filter(c=>c[0]==='refresh')).toHaveLength(1);
++ expect(screen.queryByText('Chroniony świat demo')).toBeNull();
++ await act(async()=>{release();});await screen.findByRole('heading',{name:'Zaloguj się'});expect(token).toBeNull();
++});
+@@ -60 +72 @@ describe('B1 existing Auth into frozen account UI',()=>{
+- it('diagnoses resume: hides/unmounts world, shows checking, refreshes then remounts without login',async()=>{
++ it('preserves the hidden RAM screen through verified resume without remounting',async()=>{
+@@ -69 +81 @@ describe('B1 existing Auth into frozen account UI',()=>{
+-  expect(screen.queryByText('Chroniony świat demo')).toBeNull();expect(worldLifecycle.unmounts).toBe(1);
++  expect(screen.getByText('Chroniony świat demo')).not.toBeVisible();expect(worldLifecycle.unmounts).toBe(0);
+@@ -73 +85 @@ describe('B1 existing Auth into frozen account UI',()=>{
+-  expect(manager.getSnapshot().phase).toBe('checking');expect(screen.queryByText('Chroniony świat demo')).toBeNull();
++  expect(manager.getSnapshot().phase).toBe('checking');expect(screen.getByText('Chroniony świat demo')).not.toBeVisible();
+@@ -75 +87 @@ describe('B1 existing Auth into frozen account UI',()=>{
+-  await screen.findByText('Chroniony świat demo');expect(worldLifecycle.mounts).toBe(2);
++  await waitFor(()=>expect(screen.getByText('Chroniony świat demo')).toBeVisible());expect(worldLifecycle.mounts).toBe(1);
+diff --git a/app/src/auth/B1App.tsx b/app/src/auth/B1App.tsx
+index a3bcfb9..81e39ba 100644
+--- a/app/src/auth/B1App.tsx
++++ b/app/src/auth/B1App.tsx
+@@ -1 +1 @@
+-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
++import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+@@ -14,0 +15 @@ import { useB1Lifecycle } from './useB1Lifecycle';
++import { installFocusVisibility } from '../native/focusVisibility';
+@@ -25 +26,3 @@ export default function B1App({manager:provided}:{manager?:SessionManager}){
+- useB1Lifecycle(manager,auth);
++ const loggingOut=useRef(false);
++ const mayResume=useCallback(()=>!loggingOut.current,[]);
++ useB1Lifecycle(manager,auth,mayResume);
+@@ -28,3 +31,6 @@ export default function B1App({manager:provided}:{manager?:SessionManager}){
+- // Keep only an in-flight native file chooser mounted, hidden by the existing server gate.
+- // Normal resume still unmounts. Offline/revocation/another account drops the continuation.
+- const owner=ready&&!forced?auth.session!.user_id:auth.phase==='checking'?picker?.owner??null:null;
++ // Preserve RAM navigation only across verification, never across a denied session.
++ const continuation=useRef<string|null>(null);
++ if(ready&&!forced&&!loggingOut.current)continuation.current=auth.session!.user_id;
++ else if(auth.phase!=='checking'||loggingOut.current)continuation.current=null;
++ const owner=loggingOut.current?null:ready&&!forced?auth.session!.user_id:auth.phase==='checking'?continuation.current:null;
++ useEffect(()=>installFocusVisibility(),[]);
+@@ -40,0 +47 @@ export default function B1App({manager:provided}:{manager?:SessionManager}){
++  async signOut(){loggingOut.current=true;continuation.current=null;setPicker(null);try{await base.signOut();}finally{loggingOut.current=false;}},
+@@ -46 +53 @@ export default function B1App({manager:provided}:{manager?:SessionManager}){
+-  if(forced){if(next==='login'){setRequested('login');void base.signOut();}return;}
++  if(forced){if(next==='login'){setRequested('login');void port.signOut();}return;}
+@@ -52 +59 @@ export default function B1App({manager:provided}:{manager?:SessionManager}){
+- {(ready&&!forced||auth.phase==='checking'&&!!picker)&&<div hidden={view!==null} className="slm-demo-world"><WorldApp key={owner??'none'} manager={manager} userId={owner??''} liveAuth personalProfile={personalProfile} groupsView={owner?<PremiumGroups key={owner} manager={manager} userId={owner}/>:undefined} onAccount={next=>{if(next==='password')setRequested('password');}} onLogout={()=>{setRequested(null);void port.signOut();}}/></div>}
++ {owner&&<div hidden={view!==null} className="slm-demo-world"><WorldApp key={owner} manager={manager} userId={owner} liveAuth personalProfile={personalProfile} groupsView={<PremiumGroups key={owner} manager={manager} userId={owner}/>} onAccount={next=>{if(next==='password')setRequested('password');}} onLogout={()=>{setRequested(null);void port.signOut();}}/></div>}
+diff --git a/app/src/auth/premiumRuntime.test.tsx b/app/src/auth/premiumRuntime.test.tsx
+index 47d8f27..92c041a 100644
+--- a/app/src/auth/premiumRuntime.test.tsx
++++ b/app/src/auth/premiumRuntime.test.tsx
+@@ -36,3 +36,3 @@ it('actual B1 entry renders API match, original pitch/profile/nav and hides data
+- await screen.findByText('Propozycja składu · niezapisana');
+- expect(container.querySelector('.slm-football-pitch')).toHaveTextContent('Runtime Owner');
+- expect(screen.getByRole('button',{name:'Zapisz'})).toBeEnabled();expect(request.mock.calls.some(c=>c[0]==='lineups_save')).toBe(false);
++ await screen.findByText('Brak zapisanego składu');
++ expect(container.querySelectorAll('.slm-pitch-token')).toHaveLength(0);
++ expect(screen.getByRole('button',{name:'Zapisz'})).toBeDisabled();expect(request.mock.calls.some(c=>c[0]==='lineups_save')).toBe(false);
+diff --git a/app/src/auth/useB1Lifecycle.ts b/app/src/auth/useB1Lifecycle.ts
+index 61c6644..5e9794d 100644
+--- a/app/src/auth/useB1Lifecycle.ts
++++ b/app/src/auth/useB1Lifecycle.ts
+@@ -7 +7,2 @@ import type { SessionManager, SessionState } from './sessionManager';
+-export function useB1Lifecycle(manager:SessionManager,auth:SessionState){
++const alwaysResume=()=>true;
++export function useB1Lifecycle(manager:SessionManager,auth:SessionState,mayResume:()=>boolean=alwaysResume){
+@@ -10 +11 @@ export function useB1Lifecycle(manager:SessionManager,auth:SessionState){
+-  const retry=()=>{if(manager.getSnapshot().phase!=='signed_out')void manager.refresh();};
++  const retry=()=>{if(mayResume()&&manager.getSnapshot().phase!=='signed_out')void manager.refresh();};
+@@ -17 +18 @@ export function useB1Lifecycle(manager:SessionManager,auth:SessionState){
+- },[manager]);
++ },[manager,mayResume]);
+@@ -20 +21 @@ export function useB1Lifecycle(manager:SessionManager,auth:SessionState){
+-  const timer=window.setTimeout(()=>{void manager.refresh();},Math.max(5000,(auth.session.expires_in-60)*1000));
++  const timer=window.setTimeout(()=>{if(mayResume())void manager.refresh();},Math.max(5000,(auth.session.expires_in-60)*1000));
+@@ -22 +23 @@ export function useB1Lifecycle(manager:SessionManager,auth:SessionState){
+- },[manager,auth.phase,auth.session]);
++ },[manager,auth.phase,auth.session,mayResume]);
+diff --git a/app/src/events/PremiumEvents.tsx b/app/src/events/PremiumEvents.tsx
+index 0124cfc..92f9b8d 100644
+--- a/app/src/events/PremiumEvents.tsx
++++ b/app/src/events/PremiumEvents.tsx
+@@ -26 +26,4 @@ import { matchDate,money } from './model';
+-export default function PremiumEvents({data,userId,onGroups,manager}:{manager?:SessionManager;data:PremiumEventsController;userId:string;onGroups:()=>void}){
++export default function PremiumEvents(props:Parameters<typeof PremiumEventsScreen>[0]){
++  return <>{props.data.revalidating&&<section role="status"><p>{props.data.error||'Potwierdzanie dostępu do bieżącego widoku…'}</p><button type="button" onClick={()=>{void props.data.revalidate();}}>Ponów odczyt widoku</button></section>}<div hidden={props.data.revalidating}><PremiumEventsScreen {...props}/></div></>;
++}
++function PremiumEventsScreen({data,userId,onGroups,manager}:{manager?:SessionManager;data:PremiumEventsController;userId:string;onGroups:()=>void}){
+@@ -28 +31,2 @@ export default function PremiumEvents({data,userId,onGroups,manager}:{manager?:S
+-  const [editing,setEditing]=useState(false);
++  const [editing,setEditing]=useState(false),[editConflict,setEditConflict]=useState('');
++  const editVersion=useRef<number|undefined>(undefined);
+@@ -48 +52 @@ export default function PremiumEvents({data,userId,onGroups,manager}:{manager?:S
+-    {(data.creating||editing)&&data.serverNow?<>{messages}<EventForm onBack={()=>editing?setEditing(false):data.back()} onSave={async input=>{if(editing){if(await data.edit(input))setEditing(false);}else await data.create(input);}} live={{editing,canEdit:e?.can_edit,occupied:e?.registered_count??0,groups:editing&&e?data.groups.filter(g=>g.id===e.group_id):data.organizers,initial:editing&&e?premiumEventInput(e):premiumDefaults(data.serverNow,data.organizers.some(g=>g.id===data.activeGroup)?data.activeGroup:data.organizers[0]?.id),busy:data.busy}}/></>:<>
++    {(data.creating||editing&&e?.can_edit&&full)&&data.serverNow?<>{messages}{editConflict&&<p role="alert">{editConflict}</p>}<EventForm onBack={()=>editing?setEditing(false):data.back()} onSave={async input=>{if(editing){if(editVersion.current!==e?.version){setEditConflict('Mecz zmienił się podczas edycji. Szkic zachowano. Anuluj edycję i otwórz aktualny mecz przed nowym zapisem.');return;}if(await data.edit(input))setEditing(false);}else await data.create(input);}} live={{editing,canEdit:e?.can_edit,occupied:e?.registered_count??0,groups:editing&&e?data.groups.filter(g=>g.id===e.group_id):data.organizers,initial:editing&&e?premiumEventInput(e):premiumDefaults(data.serverNow,data.organizers.some(g=>g.id===data.activeGroup)?data.activeGroup:data.organizers[0]?.id),busy:data.busy}}/></>:<>
+@@ -52 +56 @@ export default function PremiumEvents({data,userId,onGroups,manager}:{manager?:S
+-      {e.access!=='none'&&<MatchTabs key={e.id} panels={[<section className="slm-panel slm-match-info"><h2>Informacje</h2><p>{e.group_name} · {matchDate(e.starts_at)}</p><p>{e.location} · {e.duration_minutes} minut</p><p>Koszt meczu: {money(e.cost_cents!/100)} · minimum {e.minimum_players} uczestników</p><p>Rezygnacja do 17:00 w dniu meczu. Później obowiązują zasady odpowiedzialności finansowej, a zastępstwa rozliczane są według kolejności zwolnionych miejsc.</p>{e.decision_required&&<p role="status">Nie ma minimum {e.minimum_players} osób. Administrator podejmuje decyzję o odwołaniu.</p>}{e.can_edit&&e.registration_open&&e.status!=='cancelled'&&<IonButton disabled={writeDisabled} onClick={()=>setEditing(true)}>Edytuj mecz</IonButton>}{e.can_manage&&e.status!=='cancelled'&&<details><summary>Zarządzanie meczem</summary><label>Powód odwołania<input value={reason} maxLength={200} onChange={ev=>setReason(ev.target.value)}/></label><IonButton disabled={writeDisabled||!reason.trim()} color="danger" onClick={()=>{if(window.confirm('Odwołać mecz z zachowaniem historii i rozliczeń?'))void data.act('cancel',{reason});}}>Odwołaj mecz</IonButton></details>}</section> ,<>
++      {e.access!=='none'&&<MatchTabs key={e.id} panels={[<section className="slm-panel slm-match-info"><h2>Informacje</h2><p>{e.group_name} · {matchDate(e.starts_at)}</p><p>{e.location} · {e.duration_minutes} minut</p><p>Koszt meczu: {money(e.cost_cents!/100)} · minimum {e.minimum_players} uczestników</p><p>Rezygnacja do 17:00 w dniu meczu. Później obowiązują zasady odpowiedzialności finansowej, a zastępstwa rozliczane są według kolejności zwolnionych miejsc.</p>{e.decision_required&&<p role="status">Nie ma minimum {e.minimum_players} osób. Administrator podejmuje decyzję o odwołaniu.</p>}{e.can_edit&&e.registration_open&&e.status!=='cancelled'&&<IonButton disabled={writeDisabled} onClick={()=>{editVersion.current=e.version;setEditConflict('');setEditing(true);}}>Edytuj mecz</IonButton>}{e.can_manage&&e.status!=='cancelled'&&<details><summary>Zarządzanie meczem</summary><label>Powód odwołania<input value={reason} maxLength={200} onChange={ev=>setReason(ev.target.value)}/></label><IonButton disabled={writeDisabled||!reason.trim()} color="danger" onClick={()=>{if(window.confirm('Odwołać mecz z zachowaniem historii i rozliczeń?'))void data.act('cancel',{reason});}}>Odwołaj mecz</IonButton></details>}</section> ,<>
+diff --git a/app/src/events/PremiumTeams.tsx b/app/src/events/PremiumTeams.tsx
+index c690f70..8fe2e7d 100644
+--- a/app/src/events/PremiumTeams.tsx
++++ b/app/src/events/PremiumTeams.tsx
+@@ -77,2 +77,2 @@ export default function PremiumTeams({eventId, participants, cancelled, canEdit
+-        <button type="button" onClick={() => setConfirmRefresh(false)}>Zachowaj szkic</button>
+-        <button type="button" disabled={!!remote.state.pending} onClick={() => {setConfirmRefresh(false); void remote.reload();}}>Pobierz aktualny skład</button>
++        <div className="slm-lineup-confirm-actions"><button type="button" onClick={() => setConfirmRefresh(false)}>Zachowaj szkic</button>
++        <button type="button" disabled={!!remote.state.pending} onClick={() => {setConfirmRefresh(false); void remote.reload();}}>Pobierz aktualny skład</button></div>
+@@ -81 +81 @@ export default function PremiumTeams({eventId, participants, cancelled, canEdit
+-        <p className="slm-teams-disclaimer">{snapshot?.version === 0 ? 'Propozycja składu · niezapisana' : 'Zapisany skład · lokalna edycja'}</p>
++        <p className="slm-teams-disclaimer">{snapshot?.version === 0 ? snapshot.can_write?'Propozycja składu · niezapisana':'Brak zapisanego składu' : snapshot?.can_write?'Zapisany skład · lokalna edycja':'Zapisany skład · tylko odczyt'}</p>
+diff --git a/app/src/events/editResume.test.tsx b/app/src/events/editResume.test.tsx
+new file mode 100644
+index 0000000..23c38e9
+--- /dev/null
++++ b/app/src/events/editResume.test.tsx
+@@ -0,0 +1,16 @@
++import {afterEach,expect,it,vi} from 'vitest';
++import {cleanup,fireEvent,render,screen} from '@testing-library/react';
++import PremiumEvents from './PremiumEvents';
++import type {PremiumEventsController} from './usePremiumEvents';
++vi.mock('../demo/EventForm',()=>({default:({onSave}:{onSave:(input:unknown)=>void})=><button onClick={()=>onSave({})}>Wyślij szkic</button>}));
++afterEach(cleanup);
++it('retains the edit draft but refuses to overwrite a version changed during resume',()=>{
++ const event={id:'event',group_id:'group',group_name:'Grupa',created_by:'owner',name:'Mecz',visibility:'private',starts_at:'2099-01-01T18:00:00Z',location:'Boisko',status:'scheduled',access:'full',own_participation:false,duration_minutes:90,capacity:15,cost_cents:0,minimum_players:10,registered_count:0,reserve_count:0,registration_open:true,decision_required:false,can_manage:true,can_edit:true,version:1};
++ const data={detail:{event,participants:[],can_register_paid:true,server_now:'2030-01-01T00:00:00Z'},serverNow:'2030-01-01T00:00:00Z',groups:[{id:'group',name:'Grupa'}],organizers:[],events:[],loading:false,busy:false,error:'',notice:'',back:vi.fn(),refresh:vi.fn(),edit:vi.fn()} as unknown as PremiumEventsController;
++ const {rerender}=render(<PremiumEvents data={data} userId="owner" onGroups={vi.fn()}/>);
++ fireEvent.click(screen.getByRole('tab',{name:/Informacje/}));fireEvent.click(screen.getByText('Edytuj mecz'));
++ rerender(<PremiumEvents data={{...data,detail:{...data.detail!,event:{...data.detail!.event,version:2}}}} userId="owner" onGroups={vi.fn()}/>);
++ fireEvent.click(screen.getByText('Wyślij szkic'));expect(data.edit).not.toHaveBeenCalled();expect(screen.getByRole('alert')).toHaveTextContent('Szkic zachowano');
++ rerender(<PremiumEvents data={{...data,detail:{...data.detail!,event:{...data.detail!.event,can_edit:false}}}} userId="owner" onGroups={vi.fn()}/>);
++ expect(screen.queryByText('Wyślij szkic')).toBeNull();
++});
+diff --git a/app/src/events/lineupContracts.ts b/app/src/events/lineupContracts.ts
+index 71ed587..bab4f52 100644
+--- a/app/src/events/lineupContracts.ts
++++ b/app/src/events/lineupContracts.ts
+@@ -6,0 +7 @@ export interface LineupSnapshot {
++  can_write?: boolean;
+@@ -28,0 +30 @@ export function lineupSnapshot(value: unknown, eventId: string): LineupSnapshot
++  if(r.can_write!==undefined&&typeof r.can_write!=='boolean')throw Error('Invalid lineup permission');
+@@ -39 +41 @@ export function lineupSnapshot(value: unknown, eventId: string): LineupSnapshot
+-  return {event_id: r.event_id, version: r.version, event_version: r.event_version, roster_version: r.roster_version,
++  return {can_write:r.can_write===true,event_id: r.event_id, version: r.version, event_version: r.event_version, roster_version: r.roster_version,
+diff --git a/app/src/events/lineupFixture.test-support.ts b/app/src/events/lineupFixture.test-support.ts
+index 00fbd75..d0bee8a 100644
+--- a/app/src/events/lineupFixture.test-support.ts
++++ b/app/src/events/lineupFixture.test-support.ts
+@@ -21 +21 @@ export function lineupFixture(count = 11, saved = false) {
+-  let snapshot: LineupSnapshot = {event_id: eventId, event_version: 1, version: saved ? 1 : 0, roster_version: token(), saved_roster_version: saved ? token() : null,
++  let snapshot: LineupSnapshot = {can_write:true,event_id: eventId, event_version: 1, version: saved ? 1 : 0, roster_version: token(), saved_roster_version: saved ? token() : null,
+diff --git a/app/src/events/minimum.test.tsx b/app/src/events/minimum.test.tsx
+index 393c79c..4033e21 100644
+--- a/app/src/events/minimum.test.tsx
++++ b/app/src/events/minimum.test.tsx
+@@ -35 +35 @@ it('edits using current version and persists minimum in the existing API payload
+- const manager={call,getSnapshot:()=>({phase:'ready',session:{user_id:'owner'}}),subscribe:()=>()=>{}} as unknown as SessionManager;
++ const snapshot={phase:'ready',session:{user_id:'owner'}};const manager={call,getSnapshot:()=>snapshot,subscribe:()=>()=>{}} as unknown as SessionManager;
+diff --git a/app/src/events/premium.test.tsx b/app/src/events/premium.test.tsx
+index 162948b..37cd1a9 100644
+--- a/app/src/events/premium.test.tsx
++++ b/app/src/events/premium.test.tsx
+@@ -26 +26 @@ function manager(write?:(action:string,body?:Record<string,unknown>)=>Promise<un
+- return {call,subscribe:vi.fn(()=>()=>{}),getSnapshot:()=>({phase:'ready',session:{user_id:'owner'}})} as unknown as SessionManager;
++ const snapshot={phase:'ready',session:{user_id:'owner'}};return {call,subscribe:vi.fn(()=>()=>{}),getSnapshot:()=>snapshot} as unknown as SessionManager;
+@@ -54 +54 @@ it('clears real data on read failure and shows no technical error or demo fallba
+-it('clears cached private data during an Auth recheck and refetches on gallery continuation',async()=>{
++it('hides retained navigation during Auth recheck and refetches before revealing it',async()=>{
+@@ -59,2 +59,2 @@ it('clears cached private data during an Auth recheck and refetches on gallery c
+- expect(result.current.events).toEqual([]);expect(result.current.detail).toBeNull();
+- act(()=>{snapshot.mockImplementation(original);changed();});await waitFor(()=>expect(result.current.events).toHaveLength(1));expect(result.current.detail).toBeNull();
++ expect(result.current.revalidating).toBe(true);expect(result.current.detail?.event.id).toBe(event.id);
++ act(()=>{snapshot.mockImplementation(original);changed();});await waitFor(()=>expect(result.current.revalidating).toBe(false));expect(result.current.detail?.event.id).toBe(event.id);
+diff --git a/app/src/events/premiumEvents.css b/app/src/events/premiumEvents.css
+index 5470f3d..c13a9a1 100644
+--- a/app/src/events/premiumEvents.css
++++ b/app/src/events/premiumEvents.css
+@@ -38,0 +39,2 @@
++.slm-lineup-confirm-actions {display:flex;flex-wrap:wrap;gap:8px;min-width:0;}
++.slm-lineup-confirm-actions button {flex:1 1 160px;box-sizing:border-box;min-width:0;max-width:100%;min-height:44px;white-space:normal;overflow-wrap:anywhere;}
+diff --git a/app/src/events/premiumLineupApi.test.tsx b/app/src/events/premiumLineupApi.test.tsx
+index 2cb9315..e49717c 100644
+--- a/app/src/events/premiumLineupApi.test.tsx
++++ b/app/src/events/premiumLineupApi.test.tsx
+@@ -183,0 +184,18 @@ it('rejects mismatched identity, unsafe author, overlapping IDs and inconsistent
++
++it('members see only the saved assignment and cannot edit, retry or synthesize an admin draft',async()=>{
++ const f=lineupFixture(11,true),context=await f.context();
++ f.intercept(async(action,body)=>action==='lineups_get'?{...f.read(),can_write:false}:f.handle(action,body,f.userId));
++ render(<PremiumTeams eventId={f.eventId} participants={f.people} cancelled={false} canEdit profileContext={context}/>);
++ await screen.findByText('Zapisany skład · tylko odczyt');
++ expect(screen.getByRole('region',{name:'Drużyna A, 6 osób'})).toBeTruthy();
++ click('Zapisz');click('Zamień zawodników');expect(f.saves()).toHaveLength(0);
++ expect(screen.getByRole('button',{name:'Przenieś zawodnika'})).toBeDisabled();
++});
++it('an old backend without the explicit permission contract is read-only',async()=>{
++ const f=lineupFixture(11,false),context=await f.context();
++ f.intercept(async(action,body)=>action==='lineups_get'?{...f.read(),can_write:undefined}:f.handle(action,body,f.userId));
++ render(<PremiumTeams eventId={f.eventId} participants={f.people} cancelled={false} canEdit profileContext={context}/>);
++ await screen.findByText('Brak zapisanego składu');
++ expect(screen.getByRole('region',{name:'Drużyna A, 0 osób'})).toBeTruthy();
++ expect(screen.getByRole('button',{name:'Zapisz'})).toBeDisabled();expect(f.saves()).toHaveLength(0);
++});
+diff --git a/app/src/events/resume.test.tsx b/app/src/events/resume.test.tsx
+new file mode 100644
+index 0000000..e6bb5fa
+--- /dev/null
++++ b/app/src/events/resume.test.tsx
+@@ -0,0 +1,24 @@
++import {act,cleanup,renderHook,waitFor} from '@testing-library/react';
++import {afterEach,expect,it} from 'vitest';
++import {SessionManager} from '../auth/sessionManager';
++import type {Session} from '../auth/api';
++import {AccountError} from '../auth/api';
++import {usePremiumEvents} from './usePremiumEvents';
++afterEach(cleanup);
++it('retains match/scope/query while hidden and replaces private data only after successful revalidation',async()=>{
++ let denied=false,revision=1;
++ const session:Session={user_id:'owner',access_token:'fixture',refresh_token:'fixture',expires_in:3600,role:'member',must_change_password:false};
++ const event={id:'match',group_id:'group',group_name:'Grupa',created_by:'owner',name:'Mecz',visibility:'private',starts_at:'2099-01-01T17:00:00Z',location:'Boisko',status:'scheduled',access:'full',own_participation:false,duration_minutes:90,capacity:15,cost_cents:0,minimum_players:10,registered_count:0,reserve_count:0,registration_open:true,decision_required:false,can_manage:true,can_edit:true,version:1};
++ const manager=new SessionManager({read:async()=>'fixture',write:async()=>{},clear:async()=>{}},async<T,>(action:string)=>{
++  const result=action==='login'||action==='refresh'?{...session}:action==='groups_list'?{groups:[{id:'group',name:'Grupa',description:'',admin_id:'owner',organizer:true,member_count:2,pending_count:0}]}:action==='matches_list'?{events:[event],server_now:'2030-01-01T00:00:00Z',public_discovery_version:1,match_minimum_version:1,has_more:false,next_offset:null,offset:0,limit:100}:action==='matches_detail'?{event:{...event,version:revision},participants:[],server_now:'2030-01-01T00:00:00Z',can_register_paid:true}:null;
++  if(action==='matches_detail'&&denied)throw new AccountError('Denied','not_found');return result as T;
++ });
++ await manager.signIn('fixture','fixture');const {result}=renderHook(()=>usePremiumEvents(manager,'owner'));
++ await waitFor(()=>expect(result.current.events).toHaveLength(1));await act(()=>result.current.open('match'));
++ act(()=>manager.suspend());expect(result.current.detail?.event.id).toBe('match');expect(result.current.revalidating).toBe(true);
++ revision=2;await act(()=>manager.refresh());await waitFor(()=>expect(result.current.revalidating).toBe(false));
++ expect(result.current.detail?.event.id).toBe('match');expect(result.current.detail?.event.version).toBe(2);
++ denied=true;act(()=>manager.suspend());await act(()=>manager.refresh());
++ await waitFor(()=>expect(result.current.detail).toBeNull());expect(result.current.revalidating).toBe(true);
++ await act(()=>manager.logout());expect(result.current.events).toEqual([]);
++});
+diff --git a/app/src/events/usePremiumEvents.ts b/app/src/events/usePremiumEvents.ts
+index b9d2e94..894271c 100644
+--- a/app/src/events/usePremiumEvents.ts
++++ b/app/src/events/usePremiumEvents.ts
+@@ -1 +1 @@
+-import { useCallback,useEffect,useRef,useState } from 'react';
++import { useCallback,useEffect,useRef,useState,useSyncExternalStore } from 'react';
+@@ -9,0 +10,2 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
++  const auth=useSyncExternalStore(manager.subscribe,manager.getSnapshot);
++  const [verifiedSession,setVerifiedSession]=useState(auth.session);
+@@ -43,0 +46,14 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
++  const route=useRef({eventId:detail?.event.id,offset});route.current={eventId:detail?.event.id,offset};
++  const revalidate=useCallback(async()=>{
++    const session=manager.getSnapshot().session;if(!authorized()||!session)return;
++    const {eventId,offset:page}=route.current;
++    setVerifiedSession(null);
++    const ticket=++detailEpoch.current;
++    try{
++      const [listed,d]=await Promise.all([refresh(page),eventId?manager.call('matches_detail',{event_id:eventId}).then(v=>matchDetail(v,eventId)):null]);
++      if(!authorized()||manager.getSnapshot().session!==session||ticket!==detailEpoch.current)return;
++      if(!listed)return;
++      if(d)setDetail(d);
++      setVerifiedSession(session);
++    }catch(e){if(authorized()&&ticket===detailEpoch.current){setDetail(null);setError(matchError(e));}}
++  },[manager,authorized,refresh]);
+@@ -48,4 +64,5 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
+-    const current=manager.getSnapshot(),phase=current.phase;if(phase===previous.phase&&current.session?.user_id===previous.session?.user_id)return;previous=current;
+-    if(phase!=='ready'||current.session?.user_id!==userId){invalidate();if(debounce.current)clearTimeout(debounce.current);query.current={scope:'all',period:'upcoming'};setSearch('');setActiveGroup('');setOffset(0);setListFilter('upcoming');setDiscoveryEnabled(false);setMinimumEnabled(false);setHasMore(false);setNextOffset(null);setEvents([]);setGroups([]);setDetail(null);setLoading(true);}
+-    else{refreshFlight.current=null;void refresh();}
+-  });},[manager,userId,refresh,invalidate]);
++    const current=manager.getSnapshot(),phase=current.phase;if(phase===previous.phase&&current.session===previous.session)return;previous=current;
++    if(phase==='checking'){invalidate();setVerifiedSession(null);if(debounce.current)clearTimeout(debounce.current);return;}
++    if(phase!=='ready'||current.session?.user_id!==userId){invalidate();setVerifiedSession(null);if(debounce.current)clearTimeout(debounce.current);query.current={scope:'all',period:'upcoming'};setSearch('');setActiveGroup('');setOffset(0);setListFilter('upcoming');setDiscoveryEnabled(false);setMinimumEnabled(false);setHasMore(false);setNextOffset(null);setEvents([]);setGroups([]);setDetail(null);setLoading(true);}
++    else{refreshFlight.current=null;void revalidate();}
++  });},[manager,userId,revalidate,invalidate]);
+@@ -104 +121 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
+-  return {listFilter,changeFilter,search,changeSearch,discoveryEnabled,hasMore,nextOffset,recheckFinancial,events,groups,detail,loading,busy,error,notice,serverNow,activeGroup,offset,creating,organizers,refresh,open,back,act,create,edit,beginCreate,selectGroup};
++  return {revalidating:auth.phase!=='ready'||verifiedSession!==auth.session,revalidate,listFilter,changeFilter,search,changeSearch,discoveryEnabled,hasMore,nextOffset,recheckFinancial,events,groups,detail,loading,busy,error,notice,serverNow,activeGroup,offset,creating,organizers,refresh,open,back,act,create,edit,beginCreate,selectGroup};
+diff --git a/app/src/events/usePremiumLineup.ts b/app/src/events/usePremiumLineup.ts
+index 789ab1e..a254e26 100644
+--- a/app/src/events/usePremiumLineup.ts
++++ b/app/src/events/usePremiumLineup.ts
+@@ -78 +78 @@ export function usePremiumLineup(eventId: string, context: LineupProfileContext
+-    if (preserve && old.snapshot && (lineupChanged(old.editor.baseline, old.editor.draft) || old.intent)) {
++    if (snapshot.can_write && preserve && old.snapshot?.can_write && (lineupChanged(old.editor.baseline, old.editor.draft) || old.intent)) {
+@@ -87 +87 @@ export function usePremiumLineup(eventId: string, context: LineupProfileContext
+-    const proposal = snapshot.version === 0 ? editLineup(emptyLineup(eventId), {type: 'preview', ids}).draft : undefined;
++    const proposal = snapshot.can_write && snapshot.version === 0 ? editLineup(emptyLineup(eventId), {type: 'preview', ids}).draft : undefined;
+@@ -134 +134 @@ export function usePremiumLineup(eventId: string, context: LineupProfileContext
+-  const writable = verified && !state.pending && !state.blocked && !state.intent && !isClosed(state);
++  const writable = verified && state.snapshot?.can_write === true && !state.pending && !state.blocked && !state.intent && !isClosed(state);
+@@ -141 +141 @@ export function usePremiumLineup(eventId: string, context: LineupProfileContext
+-    if (!authorized() || flight.current !== null || !s.snapshot || s.verifiedFor !== sessionStamp || (!s.intent && (isClosed(s) || s.blocked || !lineupChanged(s.editor.baseline, s.editor.draft)))) return;
++    if (!authorized() || flight.current !== null || !s.snapshot?.can_write || s.verifiedFor !== sessionStamp || (!s.intent && (isClosed(s) || s.blocked || !lineupChanged(s.editor.baseline, s.editor.draft)))) return;
+diff --git a/app/src/groups/PremiumGroups.tsx b/app/src/groups/PremiumGroups.tsx
+index 9626350..ec30bf9 100644
+--- a/app/src/groups/PremiumGroups.tsx
++++ b/app/src/groups/PremiumGroups.tsx
+@@ -1 +1 @@
+-import { useEffect,useRef,useState } from 'react';
++import { useCallback,useEffect,useRef,useState } from 'react';
+@@ -2,0 +3 @@ import type { SessionManager } from '../auth/sessionManager';
++import type { Session } from '../auth/api';
+@@ -12,2 +13,3 @@ export default function PremiumGroups({manager,userId}:{manager:SessionManager;u
+- const {world,binding,readMember}=useGroups(manager,userId);
+- const [profile,setProfile]=useState<{member:GroupMember|null;error:string}|null>(null);
++ const {world,binding,readMember,verified,verifiedSession}=useGroups(manager,userId);
++ const [profile,setProfile]=useState<{member:GroupMember|null;error:string;id:string;groupId:string;session:Session|null}|null>(null);
++ const currentProfile=useRef(profile);currentProfile.current=profile;
+@@ -18,5 +20,6 @@ export default function PremiumGroups({manager,userId}:{manager:SessionManager;u
+- async function open(id:string,groupId:string){
+-  const ticket=++generation.current;setProfile({member:null,error:''});
+-  try{const member=await readMember(id,groupId);if(ticket===generation.current)setProfile({member,error:''});}
+-  catch{if(ticket===generation.current)setProfile({member:null,error:'Nie udało się potwierdzić dostępu do profilu. Wróć i odśwież grupę.'});}
+- }
++ const open=useCallback(async(id:string,groupId:string)=>{
++  const ticket=++generation.current,session=manager.getSnapshot().session;setProfile({member:null,error:'',id,groupId,session});
++  try{const member=await readMember(id,groupId);if(ticket===generation.current&&manager.getSnapshot().session===session)setProfile({member,error:'',id,groupId,session});}
++  catch{if(ticket===generation.current)setProfile({member:null,error:'Nie udało się potwierdzić dostępu do profilu. Wróć i odśwież grupę.',id,groupId,session});}
++ },[manager,readMember]);
++ useEffect(()=>{const p=currentProfile.current;if(verified&&p&&p.session!==verifiedSession)void open(p.id,p.groupId);},[verified,verifiedSession,open]);
+@@ -23,0 +27,2 @@ export default function PremiumGroups({manager,userId}:{manager:SessionManager;u
++ {!verified&&<section role="status"><p>{binding.error||'Potwierdzanie dostępu do grup…'}</p><button type="button" onClick={()=>{void binding.refresh();}}>Ponów odczyt grup</button></section>}
++ <div hidden={!verified}>
+@@ -26 +31 @@ export default function PremiumGroups({manager,userId}:{manager:SessionManager;u
+- {profile.error?<p role="alert">{profile.error}</p>:!profile.member?<p role="status">Wczytywanie profilu…</p>:<>
++ {profile.error?<p role="alert">{profile.error}</p>:!profile.member||profile.session!==verifiedSession?<p role="status">Wczytywanie profilu…</p>:<>
+@@ -34 +39 @@ export default function PremiumGroups({manager,userId}:{manager:SessionManager;u
+- </>;
++ </div></>;
+diff --git a/app/src/groups/useGroups.test.tsx b/app/src/groups/useGroups.test.tsx
+index 511432a..45959fe 100644
+--- a/app/src/groups/useGroups.test.tsx
++++ b/app/src/groups/useGroups.test.tsx
+@@ -11 +11 @@ const detail:GroupDetail={group,members:[{user_id:'owner',nickname:'Owner',full_
+-function mock(call:(action:string,body?:Record<string,unknown>)=>Promise<unknown>){return {call:vi.fn(call),getSnapshot:()=>({phase:'ready',session:{user_id:'owner'}})} as unknown as SessionManager;}
++function mock(call:(action:string,body?:Record<string,unknown>)=>Promise<unknown>){const state={phase:'ready',session:{user_id:'owner'}};return {call:vi.fn(call),subscribe:()=>()=>{},getSnapshot:()=>state} as unknown as SessionManager;}
+diff --git a/app/src/groups/useGroups.ts b/app/src/groups/useGroups.ts
+index 375a9fb..ff03461 100644
+--- a/app/src/groups/useGroups.ts
++++ b/app/src/groups/useGroups.ts
+@@ -1 +1 @@
+-import { useCallback,useEffect,useRef,useState } from 'react';
++import { useCallback,useEffect,useRef,useState,useSyncExternalStore } from 'react';
+@@ -26,0 +27,2 @@ export function useGroups(manager:SessionManager,userId:string){
++ const auth=useSyncExternalStore(manager.subscribe,manager.getSnapshot);
++ const [verifiedSession,setVerifiedSession]=useState(auth.session);
+@@ -33 +35 @@ export function useGroups(manager:SessionManager,userId:string){
+-  if(!alive.current)return;const ticket=++generation.current;setLoading(true);setError('');
++  if(!alive.current)return;const ticket=++generation.current,session=manager.getSnapshot().session;setLoading(true);setError('');
+@@ -40 +42 @@ export function useGroups(manager:SessionManager,userId:string){
+-   if(alive.current&&ticket===generation.current)setState({groups,inbox,detail});
++   if(alive.current&&ticket===generation.current&&manager.getSnapshot().session===session){setState({groups,inbox,detail});setVerifiedSession(session);}
+@@ -52,0 +55 @@ export function useGroups(manager:SessionManager,userId:string){
++ useEffect(()=>{let previous=manager.getSnapshot();return manager.subscribe(()=>{const current=manager.getSnapshot();if(current===previous)return;previous=current;invalidate();setVerifiedSession(null);if(current.phase==='ready'&&current.session?.user_id===userId)void refresh();else if(current.phase!=='checking'){setState({groups:[],inbox:[],detail:null});selected.current=null;}});},[manager,userId,refresh,invalidate]);
+@@ -91,2 +94,2 @@ export function useGroups(manager:SessionManager,userId:string){
+- const readMember=async(id:string,groupId:string)=>{const m=member(await manager.call('groups_profile',{group_id:groupId,user_id:id}));if(m.user_id!==id)throw Error('Nieprawidłowy profil.');return m;};
+- return {world:groupWorld(userId,state.groups,state.inbox,state.detail),binding,readMember};
++ const readMember=useCallback(async(id:string,groupId:string)=>{const m=member(await manager.call('groups_profile',{group_id:groupId,user_id:id}));if(m.user_id!==id)throw Error('Nieprawidłowy profil.');return m;},[manager]);
++ return {verified:auth.phase==='ready'&&verifiedSession===auth.session,verifiedSession,world:groupWorld(userId,state.groups,state.inbox,state.detail),binding,readMember};
+diff --git a/app/src/native/focusVisibility.test.ts b/app/src/native/focusVisibility.test.ts
+new file mode 100644
+index 0000000..a6e5ce4
+--- /dev/null
++++ b/app/src/native/focusVisibility.test.ts
+@@ -0,0 +1,18 @@
++import {afterEach,expect,it,vi} from 'vitest';
++import {installFocusVisibility} from './focusVisibility';
++afterEach(()=>{document.body.innerHTML='';vi.restoreAllMocks();});
++it('scrolls the focused Ionic field inside the resized viewport without adding padding',async()=>{
++ const content=document.createElement('ion-content'),field=document.createElement('input'),scroll=document.createElement('div');
++ content.append(field);document.body.append(content);
++ content.getScrollElement=async()=>scroll;
++ vi.spyOn(scroll,'getBoundingClientRect').mockReturnValue({top:0,bottom:400} as DOMRect);
++ vi.spyOn(field,'getBoundingClientRect').mockReturnValue({top:600,bottom:650} as DOMRect);
++ vi.spyOn(window,'requestAnimationFrame').mockImplementation(fn=>{fn(0);return 1;});
++ const stop=installFocusVisibility(true);field.focus();await Promise.resolve();
++ expect(scroll.scrollTop).toBe(266);expect(scroll.style.paddingBottom).toBe('');stop();
++});
++it('never scrolls a file picker or changes its value on viewport resize',()=>{
++ const field=document.createElement('input');field.type='file';document.body.append(field);
++ const stop=installFocusVisibility(true);field.focus();window.dispatchEvent(new Event('resize'));
++ expect(field.value).toBe('');stop();
++});
+diff --git a/app/src/native/focusVisibility.ts b/app/src/native/focusVisibility.ts
+new file mode 100644
+index 0000000..ac58962
+--- /dev/null
++++ b/app/src/native/focusVisibility.ts
+@@ -0,0 +1,23 @@
++import { Capacitor } from '@capacitor/core';
++
++// Resize the viewport natively; scroll the actual Ionic scroll container here.
++// No keyboard height/padding, user values, storage or navigation are changed.
++export function installFocusVisibility(native=Capacitor.isNativePlatform()) {
++ if(!native)return ()=>{};
++ let frame=0,alive=true;
++ async function reveal(){
++  const field=document.activeElement;
++  if(!(field instanceof HTMLElement)||!field.matches('input:not([type=file]),textarea,select,[contenteditable=true]'))return;
++  const content=field.closest('ion-content');
++  const scroller=await content?.getScrollElement?.();
++  if(!alive||document.activeElement!==field||!scroller)return;
++  const rect=field.getBoundingClientRect(),viewport=window.visualViewport;
++  const top=Math.max(scroller.getBoundingClientRect().top,viewport?.offsetTop??0)+16;
++  const bottom=Math.min(scroller.getBoundingClientRect().bottom,(viewport?.offsetTop??0)+(viewport?.height??window.innerHeight))-16;
++  const delta=rect.bottom>bottom?rect.bottom-bottom:rect.top<top?rect.top-top:0;
++  if(delta)scroller.scrollTop+=delta;
++ }
++ const schedule=()=>{cancelAnimationFrame(frame);frame=requestAnimationFrame(()=>{void reveal();});};
++ document.addEventListener('focusin',schedule);window.addEventListener('resize',schedule);window.visualViewport?.addEventListener('resize',schedule);
++ return()=>{alive=false;cancelAnimationFrame(frame);document.removeEventListener('focusin',schedule);window.removeEventListener('resize',schedule);window.visualViewport?.removeEventListener('resize',schedule);};
++}
+diff --git a/app/supabase/functions/accounts/handler.ts b/app/supabase/functions/accounts/handler.ts
+index 7b63d4f..55433a0 100644
+--- a/app/supabase/functions/accounts/handler.ts
++++ b/app/supabase/functions/accounts/handler.ts
+@@ -272,0 +273 @@ export function createHandler(env: Environment) {
++            forbidden:[403,'Skład może zapisać wyłącznie aktualny administrator tej grupy.'],
+diff --git a/app/supabase/functions/accounts/lineups.test.ts b/app/supabase/functions/accounts/lineups.test.ts
+index 4b3ac6e..20f7ea6 100644
+--- a/app/supabase/functions/accounts/lineups.test.ts
++++ b/app/supabase/functions/accounts/lineups.test.ts
+@@ -42 +42 @@ it.each(['lineup_version_conflict','lineup_roster_conflict','idempotency_conflic
+-it.each([['lineup_invalid_assignment',400],['invalid_input',400],['request_required',400],['not_found',404],['session_invalid',401]])('maps %s safely', async (code,status) => {
++it.each([['lineup_invalid_assignment',400],['invalid_input',400],['request_required',400],['not_found',404],['session_invalid',401],['forbidden',403]])('maps %s safely', async (code,status) => {
+diff --git a/app/supabase/migrations/20261103190639_group_admin_lineup_writes.sql b/app/supabase/migrations/20261103190639_group_admin_lineup_writes.sql
+new file mode 100644
+index 0000000..0503501
+--- /dev/null
++++ b/app/supabase/migrations/20261103190639_group_admin_lineup_writes.sql
+@@ -0,0 +1,17 @@
++-- Only the current administrator of this group may write; members retain read.
++-- Existing data, CAS, roster tokens, idempotency receipts and ACL stay intact.
++begin;
++do $patch$
++declare definition text;needle text;
++begin
++ select pg_get_functiondef('public.slm_lineups_dispatch(uuid,uuid,text,jsonb)'::regprocedure) into definition;
++ needle:=' perform 1 from public.slm_match_lineups where event_id=e.id for update;';
++ if (length(definition)-length(replace(definition,needle,'')))/length(needle)<>1 then raise exception 'lineup_admin_contract_changed';end if;
++ execute replace(definition,needle,$new$ if p_action='save' and not exists(select 1 from public.slm_groups where id=e.group_id and admin_id=p_user and not archived) then raise exception 'forbidden';end if;
++ perform 1 from public.slm_match_lineups where event_id=e.id for update;$new$);
++ select pg_get_functiondef('slm_private.lineup_present(jsonb,uuid)'::regprocedure) into definition;
++ needle:='jsonb_build_object(''last_change'',';
++ if (length(definition)-length(replace(definition,needle,'')))/length(needle)<>1 then raise exception 'lineup_admin_presentation_contract_changed';end if;
++ execute replace(definition,needle,$new$jsonb_build_object('can_write',exists(select 1 from public.slm_groups g join public.slm_group_members m on m.group_id=g.id and m.user_id=p_viewer where g.id=e.group_id and not g.archived and g.admin_id=p_viewer),'last_change',$new$);
++end $patch$;
++commit;
+diff --git a/app/supabase/tests/lineup_admin.sql b/app/supabase/tests/lineup_admin.sql
+new file mode 100644
+index 0000000..a329bc4
+--- /dev/null
++++ b/app/supabase/tests/lineup_admin.sql
+@@ -0,0 +1,10 @@
++do $$
++declare definition text;
++begin
++ if not (select relrowsecurity from pg_class where oid='public.slm_match_lineups'::regclass) then raise exception 'lineup_rls_disabled';end if;
++ if has_table_privilege('authenticated','public.slm_match_lineups','UPDATE') or has_table_privilege('anon','public.slm_match_lineups','SELECT') then raise exception 'lineup_acl_open';end if;
++ if has_function_privilege('authenticated','public.slm_lineups_dispatch(uuid,uuid,text,jsonb)','EXECUTE') then raise exception 'lineup_rpc_open';end if;
++ if (select prosecdef from pg_proc where oid='public.slm_lineups_dispatch(uuid,uuid,text,jsonb)'::regprocedure) then raise exception 'lineup_definer';end if;
++ select pg_get_functiondef('public.slm_lineups_dispatch(uuid,uuid,text,jsonb)'::regprocedure) into definition;
++ if position('admin_id=p_user' in definition)=0 or position('expected_roster_version' in definition)=0 or position('lineup_version_conflict' in definition)=0 then raise exception 'lineup_admin_cas_missing';end if;
++end $$;

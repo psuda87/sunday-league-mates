@@ -1,0 +1,276 @@
+diff --git a/app/scripts/lineups-ci-approval.json b/app/scripts/lineups-ci-approval.json
+index 53f189d..dd8d291 100644
+--- a/app/scripts/lineups-ci-approval.json
++++ b/app/scripts/lineups-ci-approval.json
+@@ -3 +3 @@
+-  "implementation": "7c45656ab89105ba53a53e7c1f2fd7049b762666"
++  "implementation": "023dc9bfe5aef7f2ec2339495101870f4f364f6a"
+diff --git a/app/scripts/lineups_ci.py b/app/scripts/lineups_ci.py
+index a6e853b..0c4efdd 100644
+--- a/app/scripts/lineups_ci.py
++++ b/app/scripts/lineups_ci.py
+@@ -42,0 +43,30 @@ POLISH_OVERLAY={
++
++POLISH_CI_IMPLEMENTATION='7c45656ab89105ba53a53e7c1f2fd7049b762666'
++MINIMUM_PHONE_IMPLEMENTATION='0d82b09c8a9171bbe479bafc46cd775398208205'
++MINIMUM_PHONE_OVERLAY={
++    'app/scripts/premium-route-policy.mjs',
++    'app/scripts/test-lineups-edge-local.py',
++    'app/scripts/test-lineups-local.py',
++    'app/scripts/verify-consolidation.mjs',
++    'app/scripts/verify-frozen-ui.mjs',
++    'app/scripts/verify-premium-policy-cases.mjs',
++    'app/src/auth/profileAdapter.test.tsx',
++    'app/src/auth/profileAdapter.ts',
++    'app/src/auth/useOwnProfile.ts',
++    'app/src/demo/EventForm.tsx',
++    'app/src/events/PremiumEvents.tsx',
++    'app/src/events/minimum.test.tsx',
++    'app/src/events/premiumContracts.ts',
++    'app/src/events/premiumForm.ts',
++    'app/src/events/usePremiumEvents.ts',
++    'app/src/profile/PhoneEditor.test.tsx',
++    'app/src/profile/PhoneEditor.tsx',
++    'app/src/profile/PremiumIdentityEditor.tsx',
++    'app/src/profile/phoneIsolation.test.ts',
++    'app/src/ui/personalProfile.ts',
++    'app/supabase/functions/accounts/handler.ts',
++    'app/supabase/migrations/20261102180613_configurable_match_minimum.sql',
++    'app/supabase/tests/minimum_phone.sql',
++    'app/vite.demo.config.ts',
++}
++
+@@ -152,0 +183,11 @@ def verify_polish_overlay(root, previous, approved):
++def verify_minimum_phone_overlay(root, previous, approved):
++    candidate = archive(root, MINIMUM_PHONE_IMPLEMENTATION)
++    candidate.pop(APPROVAL, None)
++    delta = {name for name in set(previous) | set(candidate) if previous.get(name) != candidate.get(name)}
++    require(delta == MINIMUM_PHONE_OVERLAY, 'Minimum/phone delta differs from exact reviewed file set')
++    require(set(approved) == set(candidate), 'Minimum/phone implementation added or removed an application input')
++    for name, data in candidate.items():
++        if name not in ('app/scripts/lineups_ci.py', 'app/scripts/test_lineups_ci_context.py'):
++            require(approved.get(name) == data, 'Unreviewed minimum/phone source: ' + name)
++
++
+@@ -166 +207 @@ def verify_sources(root=ROOT, base=BASE):
+-    for ref in (STAGE3B_IMPLEMENTATION, DISCOVERY_IMPLEMENTATION, STAGE2C_IMPLEMENTATION, POLISH_IMPLEMENTATION):
++    for ref in (STAGE3B_IMPLEMENTATION, DISCOVERY_IMPLEMENTATION, STAGE2C_IMPLEMENTATION, POLISH_IMPLEMENTATION, POLISH_CI_IMPLEMENTATION, MINIMUM_PHONE_IMPLEMENTATION):
+@@ -176 +217,4 @@ def verify_sources(root=ROOT, base=BASE):
+-    verify_polish_overlay(root, previous, approved)
++    polish = archive(root, POLISH_CI_IMPLEMENTATION)
++    polish.pop(APPROVAL, None)
++    verify_polish_overlay(root, previous, polish)
++    verify_minimum_phone_overlay(root, polish, approved)
+@@ -178 +222 @@ def verify_sources(root=ROOT, base=BASE):
+-    require(len(migrations) == 42, 'Exact 42 reviewed migrations required')
++    require(len(migrations) == 43, 'Exact 43 reviewed migrations required')
+@@ -260 +304 @@ def context(suite):
+-    print('PASS CI preflight: exact commit/event, approved app/backend/42 migrations, isolated empty local Docker', flush=True)
++    print('PASS CI preflight: exact commit/event, approved app/backend/43 migrations, isolated empty local Docker', flush=True)
+diff --git a/app/scripts/premium-route-policy.mjs b/app/scripts/premium-route-policy.mjs
+index 1b6bc3f..1765521 100644
+--- a/app/scripts/premium-route-policy.mjs
++++ b/app/scripts/premium-route-policy.mjs
+@@ -23,0 +24,4 @@ export const POLISH_ANDROID='f2edf565abd2f3f67a0cc3a28d6c01c5e93806f8';
++// Owner-requested RC fixes: exact tested sources only, no manifest/hash expansion.
++export const MINIMUM_PHONE_SOURCE='51c980befd6a5f28c3471c89392a8a04672aaf0b';
++export const MINIMUM_MIGRATION='app/supabase/migrations/20261102180613_configurable_match_minimum.sql';
++export const MINIMUM_PHONE_RUNTIME=new Set(['app/src/demo/EventForm.tsx','app/src/events/PremiumEvents.tsx','app/src/events/usePremiumEvents.ts','app/src/events/premiumContracts.ts','app/src/events/premiumForm.ts','app/src/auth/profileAdapter.ts','app/src/auth/useOwnProfile.ts','app/src/ui/personalProfile.ts','app/src/profile/PremiumIdentityEditor.tsx','app/src/profile/PhoneEditor.tsx','app/supabase/functions/accounts/handler.ts','app/vite.demo.config.ts']);
+@@ -44 +48 @@ export function verifyPremiumRuntime(root,overrides={}){
+-  assert.equal(digest(current),expected,'Unapproved visual source: '+path);
++  assert.equal(digest(current),path==='app/src/demo/EventForm.tsx'?digest(git(MINIMUM_PHONE_SOURCE,path)):expected,'Unapproved visual source: '+path);
+@@ -45,0 +50,3 @@ export function verifyPremiumRuntime(root,overrides={}){
++ // The one frozen presentation change is exactly the requested minimum field.
++ const form=git(MINIMUM_PHONE_SOURCE,'app/src/demo/EventForm.tsx');
++ assert.equal(form.replace("{field('minimum','Minimum zawodników','number',{min:1,max:100,step:1})}","{live?<p>Minimum zawodników: 10</p>:field('minimum','Minimum zawodników','number',{min:1,step:1})}"),git(APPROVED,'app/src/demo/EventForm.tsx'),'Minimum form exception exceeded its exact field');
+@@ -48 +55 @@ export function verifyPremiumRuntime(root,overrides={}){
+- assert.deepEqual(readdirSync(root+'/app/supabase/migrations').filter(n=>n.endsWith('.sql')).sort(),[...mainSteps,...added,'app/supabase/migrations/20261028204500_restore_pr16_match_name_projection.sql',LINEUPS_MIGRATION,DISCOVERY_MIGRATION].map(p=>p.split('/').at(-1)).sort(),'Unexpected migration/model activation');
++ assert.deepEqual(readdirSync(root+'/app/supabase/migrations').filter(n=>n.endsWith('.sql')).sort(),[...mainSteps,...added,'app/supabase/migrations/20261028204500_restore_pr16_match_name_projection.sql',LINEUPS_MIGRATION,DISCOVERY_MIGRATION,MINIMUM_MIGRATION].map(p=>p.split('/').at(-1)).sort(),'Unexpected migration/model activation');
+@@ -51,2 +58,3 @@ export function verifyPremiumRuntime(root,overrides={}){
+- for(const p of [DISCOVERY_MIGRATION,'app/supabase/functions/accounts/handler.ts'])
+-  assert.equal(digest(read(p)),digest(git(DISCOVERY_SOURCE,p)),'Unreviewed discovery backend source: '+p);
++ for(const p of [DISCOVERY_MIGRATION,'app/supabase/functions/accounts/handler.ts',MINIMUM_MIGRATION])
++  assert.equal(digest(read(p)),digest(git(p===DISCOVERY_MIGRATION?DISCOVERY_SOURCE:MINIMUM_PHONE_SOURCE,p)),'Unreviewed discovery backend source: '+p);
++ for(const p of MINIMUM_PHONE_RUNTIME)assert.equal(digest(read(p)),digest(git(MINIMUM_PHONE_SOURCE,p)),'Unreviewed minimum/phone runtime: '+p);
+@@ -57,0 +66,2 @@ export function verifyPremiumRuntime(root,overrides={}){
++  'app/src/profile/PremiumIdentityEditor.tsx':['./PhoneEditor'],
++  'app/src/profile/PhoneEditor.tsx':['react','../../supabase/functions/_shared/phone'],
+@@ -74,3 +84,3 @@ export function verifyPremiumRuntime(root,overrides={}){
+-  assert.equal(digest(read(path)),digest(git(polishUi.has(path)?POLISH_UI:discoveryUi.has(path)?DISCOVERY_UI:lineupStage2b.has(path)?LINEUPS_STAGE2B:lineupStage1.has(path)?LINEUP_STAGE1:APPROVED,path)),'Approved runtime replaced/condition changed: '+path);
+- for(const path of discoveryUi)assert.equal(digest(read(path)),digest(git(polishUi.has(path)?POLISH_UI:DISCOVERY_UI,path)),'Unreviewed discovery UI: '+path);
+- for(const path of polishUi)assert.equal(digest(read(path)),digest(git(POLISH_UI,path)),'Unreviewed PR31 control: '+path);
++  assert.equal(digest(read(path)),digest(git(MINIMUM_PHONE_RUNTIME.has(path)?MINIMUM_PHONE_SOURCE:polishUi.has(path)?POLISH_UI:discoveryUi.has(path)?DISCOVERY_UI:lineupStage2b.has(path)?LINEUPS_STAGE2B:lineupStage1.has(path)?LINEUP_STAGE1:APPROVED,path)),'Approved runtime replaced/condition changed: '+path);
++ for(const path of discoveryUi)assert.equal(digest(read(path)),digest(git(MINIMUM_PHONE_RUNTIME.has(path)?MINIMUM_PHONE_SOURCE:polishUi.has(path)?POLISH_UI:DISCOVERY_UI,path)),'Unreviewed discovery UI: '+path);
++ for(const path of polishUi)assert.equal(digest(read(path)),digest(git(MINIMUM_PHONE_RUNTIME.has(path)?MINIMUM_PHONE_SOURCE:POLISH_UI,path)),'Unreviewed PR31 control: '+path);
+diff --git a/app/scripts/verify-consolidation.mjs b/app/scripts/verify-consolidation.mjs
+index b08caea..0601f48 100644
+--- a/app/scripts/verify-consolidation.mjs
++++ b/app/scripts/verify-consolidation.mjs
+@@ -6 +6 @@ import {fileURLToPath} from 'node:url';
+-import {LINEUPS_STAGE2A,LINEUPS_MIGRATION,DISCOVERY_SOURCE,DISCOVERY_MIGRATION} from './premium-route-policy.mjs';
++import {LINEUPS_STAGE2A,LINEUPS_MIGRATION,DISCOVERY_SOURCE,DISCOVERY_MIGRATION,MINIMUM_PHONE_SOURCE,MINIMUM_MIGRATION,MINIMUM_PHONE_RUNTIME} from './premium-route-policy.mjs';
+@@ -12 +12,2 @@ for(const [path,expected] of Object.entries({...manifest.main_migrations,...mani
+- assert.equal(createHash('sha256').update(value).digest('hex'),expected,'Protected main source modified: '+path);
++ const approved=MINIMUM_PHONE_RUNTIME.has(path)?createHash('sha256').update(execFileSync('git',['show',MINIMUM_PHONE_SOURCE+':'+path],{cwd:repo,encoding:'utf8'}).replace(/\r\n/g,'\n')).digest('hex'):expected;
++ assert.equal(createHash('sha256').update(value).digest('hex'),approved,'Protected main source modified: '+path);
+@@ -17 +18 @@ assert.equal(historical.length,41,'Exact Stage3B migration baseline');
+-assert.deepEqual(readdirSync(repo+'app/supabase/migrations').filter(p=>p.endsWith('.sql')).sort(),[...historical,DISCOVERY_MIGRATION].map(p=>p.split('/').at(-1)).sort(),'Unexpected migration/model activation');
++assert.deepEqual(readdirSync(repo+'app/supabase/migrations').filter(p=>p.endsWith('.sql')).sort(),[...historical,DISCOVERY_MIGRATION,MINIMUM_MIGRATION].map(p=>p.split('/').at(-1)).sort(),'Unexpected migration/model activation');
+@@ -19 +20 @@ for(const path of historical)assert.equal(readFileSync(repo+path,'utf8').replace
+-for(const path of [DISCOVERY_MIGRATION,'app/supabase/functions/accounts/handler.ts'])assert.equal(readFileSync(repo+path,'utf8').replace(/\r\n/g,'\n'),execFileSync('git',['show',DISCOVERY_SOURCE+':'+path],{cwd:repo,encoding:'utf8'}).replace(/\r\n/g,'\n'),'Unreviewed discovery backend source: '+path);
++for(const path of [DISCOVERY_MIGRATION,'app/supabase/functions/accounts/handler.ts',MINIMUM_MIGRATION])assert.equal(readFileSync(repo+path,'utf8').replace(/\r\n/g,'\n'),execFileSync('git',['show',(path===DISCOVERY_MIGRATION?DISCOVERY_SOURCE:MINIMUM_PHONE_SOURCE)+':'+path],{cwd:repo,encoding:'utf8'}).replace(/\r\n/g,'\n'),'Unreviewed discovery backend source: '+path);
+@@ -28 +29 @@ assert(!/premium318-live|\.worktrees|B22_LOCAL_ONLY/.test(prepare),'Local prep m
+-console.log('PASS consolidation: historical main sources unchanged, 42 exact versioned steps including pinned lineups and discovery, main ancestry, deployment disabled, canonical local preparation.');
++console.log('PASS consolidation: 42 historical steps unchanged + exact minimum migration43, pinned runtime, main ancestry, deployment disabled, canonical local preparation.');
+diff --git a/app/scripts/verify-frozen-ui.mjs b/app/scripts/verify-frozen-ui.mjs
+index 7513eee..1253f1e 100644
+--- a/app/scripts/verify-frozen-ui.mjs
++++ b/app/scripts/verify-frozen-ui.mjs
+@@ -1 +1,2 @@
+-import {verifyPremiumRuntime} from './premium-route-policy.mjs';
++import {verifyPremiumRuntime,MINIMUM_PHONE_SOURCE} from './premium-route-policy.mjs';
++import {execFileSync} from 'node:child_process';
+@@ -12 +13,2 @@ for(const [path,expected] of Object.entries(contract.files)){
+- assert.equal(createHash('sha256').update(value).digest('hex'),expected.sha256,'Approved UI changed: '+path);
++ const approved=path==='app/src/demo/EventForm.tsx'?createHash('sha256').update(execFileSync('git',['show',MINIMUM_PHONE_SOURCE+':'+path],{cwd:repo,encoding:'utf8'}).replace(/\r\n/g,'\n')).digest('hex'):expected.sha256;
++ assert.equal(createHash('sha256').update(value).digest('hex'),approved,'Approved UI changed: '+path);
+diff --git a/app/src/auth/profileAdapter.ts b/app/src/auth/profileAdapter.ts
+index 80d606c..a5606b0 100644
+--- a/app/src/auth/profileAdapter.ts
++++ b/app/src/auth/profileAdapter.ts
+@@ -4,0 +5 @@ import type { IdentityDraft,PersonalProfileData } from '../ui/personalProfile';
++import { normalizePhoneUpdate } from '../../supabase/functions/_shared/phone';
+@@ -21,0 +23,14 @@ export function profileAdapter(manager:SessionManager,userId:string){
++  async changePhone(phone:string,currentPassword:string){
++   const before=validate(await existing.readProfile());
++   if(!before||!currentPassword)throw Error('phone_change_requires_password');
++   const normalized=phone.trim()===''&&before.email_account===true?'':normalizePhoneUpdate(phone,before.phone);
++   if(normalized===before.phone)return before;
++   if(before.email_account===false){
++    await manager.changeSession('identifiers',{login:before.login,phone:normalized,current_password:currentPassword});
++   }else if(before.email_account===true){
++    await manager.call('save_email_profile',{nickname:before.nickname||before.login,phone:normalized,current_password:currentPassword});
++   }else throw Error('phone_contract_unavailable');
++   const confirmed=validate(await existing.readProfile());
++   if(!confirmed||confirmed.phone!==normalized||confirmed.login!==before.login)throw Error('profile_readback_mismatch');
++   return confirmed;
++  },
+diff --git a/app/src/auth/useOwnProfile.ts b/app/src/auth/useOwnProfile.ts
+index 405c7d1..a370178 100644
+--- a/app/src/auth/useOwnProfile.ts
++++ b/app/src/auth/useOwnProfile.ts
+@@ -48 +48,9 @@ export function useOwnProfile(manager:SessionManager,userId:string|null,selectio
+- return {...current,photo,saveIdentity,saveNumber,changeAlias,saving:current.phase==='ready'&&saving,reload:()=>setRevision(v=>v+1),
++ async function changePhone(phone:string,currentPassword:string){
++  const auth=manager.getSnapshot();
++  if(flight.current||!adapter||current.phase!=='ready'||auth.phase!=='ready'||auth.session?.user_id!==userId)return false;
++  const ticket=generation.current;flight.current=true;setSaving(true);
++  try{const profile=await adapter.changePhone(phone,currentPassword);if(ticket!==generation.current)return false;setState({owner:userId,phase:'ready',profile,notice:'Zmieniono i potwierdzono numer telefonu.'});return true;}
++  catch{if(ticket===generation.current)setState(previous=>({...previous,notice:'Nie potwierdzono zmiany telefonu. Sprawdź obecne hasło i unikalność numeru; przy przerwanym połączeniu ponów odczyt profilu.'}));return false;}
++  finally{if(ticket===generation.current){flight.current=false;setSaving(false);}}
++ }
++ return {...current,photo,saveIdentity,saveNumber,changeAlias,changePhone,saving:current.phase==='ready'&&saving,reload:()=>setRevision(v=>v+1),
+diff --git a/app/src/demo/EventForm.tsx b/app/src/demo/EventForm.tsx
+index 8248407..32e3fa8 100644
+--- a/app/src/demo/EventForm.tsx
++++ b/app/src/demo/EventForm.tsx
+@@ -43 +43 @@ export default function EventForm({world,game,live,onBack,onSave}:Props) {
+-    {preview&&model?<><MatchHero badge={<EventPrivacy game={preview}/>} match={model} minimum={preview.minimum} compact displayName={preview.name.trim()||(live?'Mecz':'Mecz · demo')} title="Podgląd meczu"/><dl className="slm-match-facts"><div><dt>Termin · Europe/Warsaw</dt><dd>{formatEventDateTime(preview.startsAt)}</dd></div><div><dt>Grupa / widoczność</dt><dd>{groups.find(g=>g.id===preview.groupId)?.name} · {preview.visibility==='private'?'Prywatne':'Publiczne'}</dd></div><div><dt>Czas trwania</dt><dd>{preview.durationMinutes} min</dd></div><div><dt>Uczestnicy</dt><dd>{preview.minimum}–{preview.capacity} osób</dd></div><div><dt>Koszt całkowity</dt><dd>{(preview.costCents/100).toLocaleString('pl-PL',{style:'currency',currency:'PLN'})}</dd></div><div><dt>Adres</dt><dd>{preview.address||'Nie podano'}</dd></div></dl><div className="slm-event-buttons"><button type="button" onClick={()=>setPreview(null)}>Wróć do edycji</button><button className="slm-event-primary" type="button" disabled={live?.busy} onClick={()=>{if(saving.current)return;const problems=validateEvent(preview,occupied);if(!maySave(preview.groupId))problems.unshift('Uprawnienia do zapisu zostały cofnięte.');if(problems.length){setErrors(problems);setPreview(null);return;}saving.current=true;const result=onSave(preview,key.current);if(live)void Promise.resolve(result).finally(()=>{saving.current=false;});}}>{editing?'Zapisz zmiany':'Utwórz mecz'}</button></div></>:<form noValidate onSubmit={review}><fieldset><legend>Grupa i dostęp</legend>{game?<p className="slm-event-group">{groupName(world!,game)} · grupa niezmienna</p>:<label htmlFor="event-groupId"><span>Grupa organizująca</span><select id="event-groupId" value={draft.groupId} onChange={e=>update('groupId',e.target.value)}><option value="">Wybierz grupę</option>{groups.map(group=><option key={group.id} value={group.id}>{group.name}</option>)}</select></label>}<label htmlFor="event-visibility"><span>Widoczność meczu</span><select id="event-visibility" value={draft.visibility} onChange={e=>update('visibility',e.target.value)}><option value="private">Prywatne · dla grupy</option><option value="public">Publiczne · dla zalogowanych</option></select></label><p className="slm-muted">Zmiana na prywatne zachowuje zapisanych uczestników spoza grupy i ich własne rozliczenia.</p></fieldset><fieldset><legend>Podstawowe</legend>{field('name','Nazwa meczu · opcjonalnie','text',{maxLength:80})}<div className="slm-event-grid">{field('date','Data','text',{placeholder:'DD.MM.RRRR',maxLength:10,inputMode:'numeric','aria-describedby':'event-date-help'})}{field('time','Godzina','text',{placeholder:'HH:mm',maxLength:5,inputMode:'numeric','aria-describedby':'event-time-help'})}{field('durationMinutes','Czas trwania · min','number',{min:1,max:1440,step:1})}</div><p id="event-date-help" className="slm-muted">Data: DD.MM.RRRR</p><p id="event-time-help" className="slm-muted">Godzina: HH:mm · format 24-godzinny · Europe/Warsaw</p>{field('location','Miejsce / nazwa boiska','text',{maxLength:120})}{field('address','Adres boiska','text',{maxLength:180})}</fieldset><fieldset><legend>Uczestnicy</legend><div className="slm-event-grid">{live?<p>Minimum zawodników: 10</p>:field('minimum','Minimum zawodników','number',{min:1,step:1})}{field('capacity','Limit zawodników','number',{min:1,max:100,step:1})}</div>{game&&<p className="slm-muted">Aktualnie zapisani: {registered(game).length}. Goście zajmują miejsca; rezerwa nie.</p>}</fieldset><fieldset><legend>Finanse</legend>{live&&<label htmlFor="event-hourly-rate"><span>Stawka godzinowa · PLN</span><input id="event-hourly-rate" inputMode="decimal" value={rate} onChange={e=>{const value=e.target.value;setRate(value);setDraft(previous=>({...previous,cost:(Number(value.replace(',','.'))*Number(previous.durationMinutes)/60).toFixed(2).replace('.',',')}));}}/></label>}{field('cost','Całkowity koszt · PLN','text',{inputMode:'decimal'})}</fieldset><div className="slm-event-buttons"><button type="button" onClick={onBack}>Anuluj</button><button className="slm-event-primary" type="submit">Podgląd meczu</button></div></form>}
++    {preview&&model?<><MatchHero badge={<EventPrivacy game={preview}/>} match={model} minimum={preview.minimum} compact displayName={preview.name.trim()||(live?'Mecz':'Mecz · demo')} title="Podgląd meczu"/><dl className="slm-match-facts"><div><dt>Termin · Europe/Warsaw</dt><dd>{formatEventDateTime(preview.startsAt)}</dd></div><div><dt>Grupa / widoczność</dt><dd>{groups.find(g=>g.id===preview.groupId)?.name} · {preview.visibility==='private'?'Prywatne':'Publiczne'}</dd></div><div><dt>Czas trwania</dt><dd>{preview.durationMinutes} min</dd></div><div><dt>Uczestnicy</dt><dd>{preview.minimum}–{preview.capacity} osób</dd></div><div><dt>Koszt całkowity</dt><dd>{(preview.costCents/100).toLocaleString('pl-PL',{style:'currency',currency:'PLN'})}</dd></div><div><dt>Adres</dt><dd>{preview.address||'Nie podano'}</dd></div></dl><div className="slm-event-buttons"><button type="button" onClick={()=>setPreview(null)}>Wróć do edycji</button><button className="slm-event-primary" type="button" disabled={live?.busy} onClick={()=>{if(saving.current)return;const problems=validateEvent(preview,occupied);if(!maySave(preview.groupId))problems.unshift('Uprawnienia do zapisu zostały cofnięte.');if(problems.length){setErrors(problems);setPreview(null);return;}saving.current=true;const result=onSave(preview,key.current);if(live)void Promise.resolve(result).finally(()=>{saving.current=false;});}}>{editing?'Zapisz zmiany':'Utwórz mecz'}</button></div></>:<form noValidate onSubmit={review}><fieldset><legend>Grupa i dostęp</legend>{game?<p className="slm-event-group">{groupName(world!,game)} · grupa niezmienna</p>:<label htmlFor="event-groupId"><span>Grupa organizująca</span><select id="event-groupId" value={draft.groupId} onChange={e=>update('groupId',e.target.value)}><option value="">Wybierz grupę</option>{groups.map(group=><option key={group.id} value={group.id}>{group.name}</option>)}</select></label>}<label htmlFor="event-visibility"><span>Widoczność meczu</span><select id="event-visibility" value={draft.visibility} onChange={e=>update('visibility',e.target.value)}><option value="private">Prywatne · dla grupy</option><option value="public">Publiczne · dla zalogowanych</option></select></label><p className="slm-muted">Zmiana na prywatne zachowuje zapisanych uczestników spoza grupy i ich własne rozliczenia.</p></fieldset><fieldset><legend>Podstawowe</legend>{field('name','Nazwa meczu · opcjonalnie','text',{maxLength:80})}<div className="slm-event-grid">{field('date','Data','text',{placeholder:'DD.MM.RRRR',maxLength:10,inputMode:'numeric','aria-describedby':'event-date-help'})}{field('time','Godzina','text',{placeholder:'HH:mm',maxLength:5,inputMode:'numeric','aria-describedby':'event-time-help'})}{field('durationMinutes','Czas trwania · min','number',{min:1,max:1440,step:1})}</div><p id="event-date-help" className="slm-muted">Data: DD.MM.RRRR</p><p id="event-time-help" className="slm-muted">Godzina: HH:mm · format 24-godzinny · Europe/Warsaw</p>{field('location','Miejsce / nazwa boiska','text',{maxLength:120})}{field('address','Adres boiska','text',{maxLength:180})}</fieldset><fieldset><legend>Uczestnicy</legend><div className="slm-event-grid">{field('minimum','Minimum zawodników','number',{min:1,max:100,step:1})}{field('capacity','Limit zawodników','number',{min:1,max:100,step:1})}</div>{game&&<p className="slm-muted">Aktualnie zapisani: {registered(game).length}. Goście zajmują miejsca; rezerwa nie.</p>}</fieldset><fieldset><legend>Finanse</legend>{live&&<label htmlFor="event-hourly-rate"><span>Stawka godzinowa · PLN</span><input id="event-hourly-rate" inputMode="decimal" value={rate} onChange={e=>{const value=e.target.value;setRate(value);setDraft(previous=>({...previous,cost:(Number(value.replace(',','.'))*Number(previous.durationMinutes)/60).toFixed(2).replace('.',',')}));}}/></label>}{field('cost','Całkowity koszt · PLN','text',{inputMode:'decimal'})}</fieldset><div className="slm-event-buttons"><button type="button" onClick={onBack}>Anuluj</button><button className="slm-event-primary" type="submit">Podgląd meczu</button></div></form>}
+diff --git a/app/src/events/PremiumEvents.tsx b/app/src/events/PremiumEvents.tsx
+index 10089aa..0124cfc 100644
+--- a/app/src/events/PremiumEvents.tsx
++++ b/app/src/events/PremiumEvents.tsx
+@@ -22 +22 @@ import type { MatchEntry,EventSummary } from './premiumContracts';
+-import { premiumDefaults } from './premiumForm';
++import { premiumDefaults,premiumEventInput } from './premiumForm';
+@@ -27,0 +28 @@ export default function PremiumEvents({data,userId,onGroups,manager}:{manager?:S
++  const [editing,setEditing]=useState(false);
+@@ -31 +32 @@ export default function PremiumEvents({data,userId,onGroups,manager}:{manager?:S
+-  useFrozenBack(()=>{if(finance){setFinance(false);return true;}if(!data.detail&&!data.creating)return false;data.back();return true;},()=>area.current,25);
++  useFrozenBack(()=>{if(editing){setEditing(false);return true;}if(finance){setFinance(false);return true;}if(!data.detail&&!data.creating)return false;data.back();return true;},()=>area.current,25);
+@@ -33 +34 @@ export default function PremiumEvents({data,userId,onGroups,manager}:{manager?:S
+-  useEffect(()=>{setReason('');},[e?.id]);
++  useEffect(()=>{setReason('');setEditing(false);},[e?.id]);
+@@ -47 +48 @@ export default function PremiumEvents({data,userId,onGroups,manager}:{manager?:S
+-    {data.creating&&data.serverNow?<>{messages}<EventForm onBack={data.back} onSave={input=>data.create(input)} live={{groups:data.organizers,initial:premiumDefaults(data.serverNow,data.organizers.some(g=>g.id===data.activeGroup)?data.activeGroup:data.organizers[0]?.id),busy:data.busy}}/></>:<>
++    {(data.creating||editing)&&data.serverNow?<>{messages}<EventForm onBack={()=>editing?setEditing(false):data.back()} onSave={async input=>{if(editing){if(await data.edit(input))setEditing(false);}else await data.create(input);}} live={{editing,canEdit:e?.can_edit,occupied:e?.registered_count??0,groups:editing&&e?data.groups.filter(g=>g.id===e.group_id):data.organizers,initial:editing&&e?premiumEventInput(e):premiumDefaults(data.serverNow,data.organizers.some(g=>g.id===data.activeGroup)?data.activeGroup:data.organizers[0]?.id),busy:data.busy}}/></>:<>
+@@ -50,2 +51,2 @@ export default function PremiumEvents({data,userId,onGroups,manager}:{manager?:S
+-      {full?<><p className="slm-event-label"><span>{e.group_name}</span></p><MatchHero match={heroMatch(e)} displayName={e.name} badge={badge(e)} title="Szczegóły meczu">{ownAction}</MatchHero></>:<section className="slm-panel"><h2>{e.name}</h2><p>{matchDate(e.starts_at)} · {e.location} · {e.group_name}</p><p>{e.access==='none'?'Szczegóły tego prywatnego meczu są dostępne dla członków grupy.':'Widoczny jest wyłącznie Twój udział po opuszczeniu grupy.'}</p>{e.access==='own'&&ownAction}</section>}
+-      {e.access!=='none'&&<MatchTabs key={e.id} panels={[<section className="slm-panel slm-match-info"><h2>Informacje</h2><p>{e.group_name} · {matchDate(e.starts_at)}</p><p>{e.location} · {e.duration_minutes} minut</p><p>Koszt meczu: {money(e.cost_cents!/100)} · minimum 10 uczestników</p><p>Rezygnacja do 17:00 w dniu meczu. Później obowiązują zasady odpowiedzialności finansowej, a zastępstwa rozliczane są według kolejności zwolnionych miejsc.</p>{e.decision_required&&<p role="status">Nie ma minimum 10 osób. Administrator podejmuje decyzję o odwołaniu.</p>}{e.can_manage&&e.status!=='cancelled'&&<details><summary>Zarządzanie meczem</summary><label>Powód odwołania<input value={reason} maxLength={200} onChange={ev=>setReason(ev.target.value)}/></label><IonButton disabled={writeDisabled||!reason.trim()} color="danger" onClick={()=>{if(window.confirm('Odwołać mecz z zachowaniem historii i rozliczeń?'))void data.act('cancel',{reason});}}>Odwołaj mecz</IonButton></details>}</section> ,<>
++      {full?<><p className="slm-event-label"><span>{e.group_name}</span></p><MatchHero match={heroMatch(e)} minimum={e.minimum_players} displayName={e.name} badge={badge(e)} title="Szczegóły meczu">{ownAction}</MatchHero></>:<section className="slm-panel"><h2>{e.name}</h2><p>{matchDate(e.starts_at)} · {e.location} · {e.group_name}</p><p>{e.access==='none'?'Szczegóły tego prywatnego meczu są dostępne dla członków grupy.':'Widoczny jest wyłącznie Twój udział po opuszczeniu grupy.'}</p>{e.access==='own'&&ownAction}</section>}
++      {e.access!=='none'&&<MatchTabs key={e.id} panels={[<section className="slm-panel slm-match-info"><h2>Informacje</h2><p>{e.group_name} · {matchDate(e.starts_at)}</p><p>{e.location} · {e.duration_minutes} minut</p><p>Koszt meczu: {money(e.cost_cents!/100)} · minimum {e.minimum_players} uczestników</p><p>Rezygnacja do 17:00 w dniu meczu. Później obowiązują zasady odpowiedzialności finansowej, a zastępstwa rozliczane są według kolejności zwolnionych miejsc.</p>{e.decision_required&&<p role="status">Nie ma minimum {e.minimum_players} osób. Administrator podejmuje decyzję o odwołaniu.</p>}{e.can_edit&&e.registration_open&&e.status!=='cancelled'&&<IonButton disabled={writeDisabled} onClick={()=>setEditing(true)}>Edytuj mecz</IonButton>}{e.can_manage&&e.status!=='cancelled'&&<details><summary>Zarządzanie meczem</summary><label>Powód odwołania<input value={reason} maxLength={200} onChange={ev=>setReason(ev.target.value)}/></label><IonButton disabled={writeDisabled||!reason.trim()} color="danger" onClick={()=>{if(window.confirm('Odwołać mecz z zachowaniem historii i rozliczeń?'))void data.act('cancel',{reason});}}>Odwołaj mecz</IonButton></details>}</section> ,<>
+@@ -66 +67 @@ export default function PremiumEvents({data,userId,onGroups,manager}:{manager?:S
+-        <MatchHero compact title="Mecz" match={m.access==='full'?heroMatch(m):{starts_at:m.starts_at,location:m.location,status:m.status}}
++        <MatchHero minimum={m.minimum_players} compact title="Mecz" match={m.access==='full'?heroMatch(m):{starts_at:m.starts_at,location:m.location,status:m.status}}
+diff --git a/app/src/events/premiumContracts.ts b/app/src/events/premiumContracts.ts
+index 1c00d9c..3e02aa8 100644
+--- a/app/src/events/premiumContracts.ts
++++ b/app/src/events/premiumContracts.ts
+@@ -8 +8 @@ export interface EventSummary {
+-  duration_minutes?:number; capacity?:number; cost_cents?:number; minimum_players?:number;
++  duration_minutes?:number; capacity?:number; cost_cents?:number; minimum_players?:number;address?:string;match_minimum_version?:number;
+@@ -24,0 +25 @@ export function eventSummary(value:unknown):EventSummary {
++    if(Number(r.minimum_players)<1||Number(r.minimum_players)>Number(r.capacity))throw Error('Invalid minimum contract');
+@@ -25,0 +27,2 @@ export function eventSummary(value:unknown):EventSummary {
++  if(r.match_minimum_version!==undefined&&r.match_minimum_version!==1)throw Error('Unsupported minimum contract');
++  if(r.address!==undefined&&(typeof r.address!=='string'||r.address.length>200))throw Error('Invalid address contract');
+@@ -37 +40 @@ export function matchList(value:unknown,requireDiscovery=false,offset=0){
+-  return {events,server_now:r.server_now as string,memberCreationEnabled:r.member_creation_enabled===true,
++  return {events,server_now:r.server_now as string,memberCreationEnabled:r.member_creation_enabled===true,minimumEnabled:r.match_minimum_version===1,
+diff --git a/app/src/events/usePremiumEvents.ts b/app/src/events/usePremiumEvents.ts
+index b9e6960..b9d2e94 100644
+--- a/app/src/events/usePremiumEvents.ts
++++ b/app/src/events/usePremiumEvents.ts
+@@ -16,0 +17 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
++  const [minimumEnabled,setMinimumEnabled]=useState(false);
+@@ -35 +36 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
+-        if(authorized()&&ticket===epoch.current){setEvents(list.events);setGroups(ownGroups);setDiscoveryEnabled(list.discovery);setHasMore(list.hasMore);setNextOffset(list.nextOffset);setMemberCreationEnabled(list.memberCreationEnabled);setServerNow(list.server_now);setOffset(page);setActiveGroup(previous=>['public','groups','mine'].includes(previous)||ownGroups.some(g=>g.id===previous)?previous:'');return true;}
++        if(authorized()&&ticket===epoch.current){setEvents(list.events);setGroups(ownGroups);setDiscoveryEnabled(list.discovery);setHasMore(list.hasMore);setNextOffset(list.nextOffset);setMemberCreationEnabled(list.memberCreationEnabled);setMinimumEnabled(list.minimumEnabled);setServerNow(list.server_now);setOffset(page);setActiveGroup(previous=>['public','groups','mine'].includes(previous)||ownGroups.some(g=>g.id===previous)?previous:'');return true;}
+@@ -48 +49 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
+-    if(phase!=='ready'||current.session?.user_id!==userId){invalidate();if(debounce.current)clearTimeout(debounce.current);query.current={scope:'all',period:'upcoming'};setSearch('');setActiveGroup('');setOffset(0);setListFilter('upcoming');setDiscoveryEnabled(false);setHasMore(false);setNextOffset(null);setEvents([]);setGroups([]);setDetail(null);setLoading(true);}
++    if(phase!=='ready'||current.session?.user_id!==userId){invalidate();if(debounce.current)clearTimeout(debounce.current);query.current={scope:'all',period:'upcoming'};setSearch('');setActiveGroup('');setOffset(0);setListFilter('upcoming');setDiscoveryEnabled(false);setMinimumEnabled(false);setHasMore(false);setNextOffset(null);setEvents([]);setGroups([]);setDetail(null);setLoading(true);}
+@@ -73 +74,3 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
+-      const result=await mutate<{event_id:string}>('matches_create',{group_id:input.groupId,name:input.name.trim()||'Mecz',visibility:input.visibility,starts_at:input.startsAt,location:input.location,address:input.address,duration_minutes:input.durationMinutes,capacity:input.capacity,cost_cents:input.costCents});
++      if(input.minimum!==10&&!minimumEnabled)throw Error('Minimum backend unavailable');
++      const result=await mutate<{event_id:string}>('matches_create',eventPayload(input));
++      await confirmMinimum(result.event_id,input);
+@@ -76,0 +80,16 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
++  function eventPayload(input:EventInput){return {group_id:input.groupId,name:input.name.trim()||'Mecz',visibility:input.visibility,starts_at:input.startsAt,location:input.location,address:input.address,duration_minutes:input.durationMinutes,minimum_players:input.minimum,capacity:input.capacity,cost_cents:input.costCents};}
++  async function confirmMinimum(id:string,input:EventInput){
++    const confirmed=matchDetail(await manager.call('matches_detail',{event_id:id}),id);
++    if(confirmed.event.minimum_players!==input.minimum||confirmed.event.capacity!==input.capacity)throw Error('Minimum readback failed');
++  }
++  async function edit(input:EventInput){
++    const event=detail?.event;if(!event?.can_edit)return false;
++    return work(async()=>{
++      if(input.minimum!==event.minimum_players&&event.match_minimum_version!==1)throw Error('Minimum backend unavailable');
++      await mutate('matches_edit',{...eventPayload(input),event_id:event.id,expected_version:event.version});
++      await confirmMinimum(event.id,input);
++      if(!authorized())return;
++      if(!await open(event.id)||!await refresh(offset))throw Error('Readback failed');
++      if(authorized())setNotice('Zmiany meczu zostały zapisane i odczytane.');
++    });
++  }
+@@ -85 +104 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
+-  return {listFilter,changeFilter,search,changeSearch,discoveryEnabled,hasMore,nextOffset,recheckFinancial,events,groups,detail,loading,busy,error,notice,serverNow,activeGroup,offset,creating,organizers,refresh,open,back,act,create,beginCreate,selectGroup};
++  return {listFilter,changeFilter,search,changeSearch,discoveryEnabled,hasMore,nextOffset,recheckFinancial,events,groups,detail,loading,busy,error,notice,serverNow,activeGroup,offset,creating,organizers,refresh,open,back,act,create,edit,beginCreate,selectGroup};
+diff --git a/app/src/profile/PremiumIdentityEditor.tsx b/app/src/profile/PremiumIdentityEditor.tsx
+index 03efd90..ca1fb7e 100644
+--- a/app/src/profile/PremiumIdentityEditor.tsx
++++ b/app/src/profile/PremiumIdentityEditor.tsx
+@@ -4,0 +5 @@ import { profileProblems } from '../account-ui/model';
++import PhoneEditor from './PhoneEditor';
+@@ -13 +14 @@ export default function PremiumIdentityEditor({binding,onClose}:{binding:Persona
+- return <form className="slm-identity-editor slm-premium-identity" noValidate aria-label="Edycja publicznej nazwy" onSubmit={e=>{e.preventDefault();if(flight.current||closing.current||binding.saving)return;const problems=profileProblems({nickname:nick,fullName:full,phone:''});if(problems.length||profileProblems({nickname:'Profil',fullName:first,phone:''}).length){setError(problems[0]||'Sprawdź imię.');return;}if(!groups||!p.nickname){setError('Backend nie udostępnia kontraktu nazw. Odśwież profil.');return;}if(number!==''&&!/^\d{1,2}$/.test(number)){setError('Numer: 0–99 lub puste pole.');return;}const draft:IdentityDraft={nickname:nick.trim(),first_name:first.trim(),full_name:full.trim(),display_as:mode,jersey_number:number===''?null:Number(number),group_scope:groups.map(g=>g.group_id).sort(),accept_disclosure:false,request_id:request.current};if(needs)setPending(draft);else void save(draft);}}>
++ return <><form className="slm-identity-editor slm-premium-identity" noValidate aria-label="Edycja publicznej nazwy" onSubmit={e=>{e.preventDefault();if(flight.current||closing.current||binding.saving)return;const problems=profileProblems({nickname:nick,fullName:full,phone:''});if(problems.length||profileProblems({nickname:'Profil',fullName:first,phone:''}).length){setError(problems[0]||'Sprawdź imię.');return;}if(!groups||!p.nickname){setError('Backend nie udostępnia kontraktu nazw. Odśwież profil.');return;}if(number!==''&&!/^\d{1,2}$/.test(number)){setError('Numer: 0–99 lub puste pole.');return;}const draft:IdentityDraft={nickname:nick.trim(),first_name:first.trim(),full_name:full.trim(),display_as:mode,jersey_number:number===''?null:Number(number),group_scope:groups.map(g=>g.group_id).sort(),accept_disclosure:false,request_id:request.current};if(needs)setPending(draft);else void save(draft);}}>
+@@ -23 +24 @@ export default function PremiumIdentityEditor({binding,onClose}:{binding:Persona
+- </form>;
++ </form>{binding.changePhone&&<PhoneEditor binding={binding} onClose={onClose}/>}</>;
+diff --git a/app/vite.demo.config.ts b/app/vite.demo.config.ts
+index 946316a..e5aee5e 100644
+--- a/app/vite.demo.config.ts
++++ b/app/vite.demo.config.ts
+@@ -10,0 +11,2 @@ const allowed = new Set([
++  'src/profile/PhoneEditor.tsx', // Pure controlled form; optional binding, no Auth/API.
++  'supabase/functions/_shared/phone.ts', // Pure existing normalizer only, never handler/client.

@@ -36,3 +36,5 @@
 .slm-guest-form input,.slm-guest-form select {box-sizing:border-box;display:block;width:100%;min-width:0;min-height:44px;font-size:1rem;}
 .slm-guest-form p {margin:0;overflow-wrap:anywhere;}
 .slm-guest-form button {white-space:normal;min-height:44px;}
+.slm-lineup-confirm-actions {display:flex;flex-wrap:wrap;gap:8px;min-width:0;}
+.slm-lineup-confirm-actions button {flex:1 1 160px;box-sizing:border-box;min-width:0;max-width:100%;min-height:44px;white-space:normal;overflow-wrap:anywhere;}

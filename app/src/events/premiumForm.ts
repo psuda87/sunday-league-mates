@@ -1,5 +1,9 @@
 import { eventInstant,localEventTime } from '../demo/eventDraft';
 import type { EventInput } from '../demo/eventDraft';
+import type { EventSummary } from './premiumContracts';
+export function premiumEventInput(e:EventSummary):EventInput {
+ return {groupId:e.group_id,visibility:e.visibility,name:e.name,startsAt:e.starts_at,location:e.location,address:e.address??'',durationMinutes:e.duration_minutes!,minimum:e.minimum_players!,capacity:e.capacity!,costCents:e.cost_cents!};
+}
 export function premiumDefaults(serverNow:string,groupId=''):EventInput {
   const now=Date.parse(serverNow),day=new Date(localEventTime(now).date+'T12:00:00Z');
   let startsAt='';

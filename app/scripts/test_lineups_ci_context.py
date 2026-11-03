@@ -187,6 +187,24 @@ class SourceTests(unittest.TestCase):
         cls.polish = cls.commit(cls.template, 'reviewed PR31 runtime and policy')
         cls.write(cls.template,'app/scripts/lineups_ci.py','reviewed PR31 CI gate\n')
         cls.write(cls.template,'app/scripts/test_lineups_ci_context.py','reviewed PR31 source tests\n')
+        cls.polish_ci = cls.commit(cls.template, 'reviewed PR31 CI implementation')
+        cls.minimum_overlay = {'app/src/view.tsx','app/src/profile/PhoneEditor.tsx',
+                               'app/supabase/migrations/00000000000042_minimum.sql',
+                               'app/supabase/functions/accounts/handler.ts','app/scripts/test-lineups-edge-local.py'}
+        for name in cls.minimum_overlay:
+            cls.write(cls.template, name, 'exact minimum/phone source\n')
+        cls.minimum = cls.commit(cls.template, 'reviewed minimum43 and own-phone sources')
+        cls.write(cls.template,'app/scripts/lineups_ci.py','reviewed minimum/phone CI gate\n')
+        cls.write(cls.template,'app/scripts/test_lineups_ci_context.py','reviewed minimum/phone source tests\n')
+        cls.minimum_ci = cls.commit(cls.template, 'reviewed minimum CI implementation')
+        cls.stabilization_overlay = {'app/src/view.tsx', 'app/src/events/usePremiumLineup.ts',
+                                    'app/supabase/migrations/00000000000043_admin.sql',
+                                    'app/capacitor.config.ts'}
+        for name in cls.stabilization_overlay:
+            cls.write(cls.template, name, 'exact stabilization source\n')
+        cls.stabilization = cls.commit(cls.template, 'reviewed stabilization sources')
+        cls.write(cls.template,'app/scripts/lineups_ci.py','reviewed stabilization CI gate\n')
+        cls.write(cls.template,'app/scripts/test_lineups_ci_context.py','reviewed stabilization source tests\n')
         cls.implementation = cls.commit(cls.template, 'reviewed CI implementation')
         cls.write(cls.template, ci.APPROVAL, json.dumps({'base': cls.base, 'implementation': cls.implementation}))
         cls.commit(cls.template, 'approval pointer')
@@ -219,7 +237,10 @@ class SourceTests(unittest.TestCase):
     def verify(self, **overrides):
         pins = dict(STAGE3B_IMPLEMENTATION=self.stage3b, DISCOVERY_IMPLEMENTATION=self.discovery,
                     DISCOVERY_OVERLAY=self.overlay, STAGE2C_IMPLEMENTATION=self.stage2c,
-                    POLISH_IMPLEMENTATION=self.polish, POLISH_OVERLAY=self.polish_overlay)
+                    POLISH_IMPLEMENTATION=self.polish, POLISH_OVERLAY=self.polish_overlay,
+                    POLISH_CI_IMPLEMENTATION=self.polish_ci, MINIMUM_PHONE_IMPLEMENTATION=self.minimum,
+                    MINIMUM_PHONE_OVERLAY=self.minimum_overlay, MINIMUM_PHONE_CI_IMPLEMENTATION=self.minimum_ci,
+                    STABILIZATION_IMPLEMENTATION=self.stabilization, STABILIZATION_OVERLAY=self.stabilization_overlay)
         pins.update(overrides)
         with ExitStack() as stack:
             for name, value in pins.items():
@@ -352,6 +373,51 @@ class SourceTests(unittest.TestCase):
             orphan=self.command(self.root,'commit-tree',tree,'-m','same tree without reviewed history')
             with self.subTest(name=name), self.assertRaisesRegex(RuntimeError,'ancestry missing'):
                 self.verify(**{name:orphan})
+
+
+    def test_minimum_phone_inputs_remain_pinned_after_pointer_repin(self):
+        for name in self.minimum_overlay:
+            with self.subTest(name=name):
+                before=(self.root/name).read_bytes()
+                self.write(self.root,name,'unapproved minimum/phone source')
+                bad=self.commit(self.root,'unauthorized repin')
+                self.write(self.root,ci.APPROVAL,json.dumps({'base':self.base,'implementation':bad}))
+                with self.assertRaises(RuntimeError):self.verify()
+                (self.root/name).write_bytes(before)
+
+    def test_minimum_phone_overlay_cannot_expand_or_omit_inputs(self):
+        for overlay in (self.minimum_overlay|{'app/src/auth/sessionManager.ts'}, self.minimum_overlay-{'app/src/profile/PhoneEditor.tsx'}):
+            with self.subTest(overlay=overlay), self.assertRaises(RuntimeError):
+                self.verify(MINIMUM_PHONE_OVERLAY=overlay)
+
+    def test_minimum_phone_and_prior_pr31_ci_ancestry_required(self):
+        for name,ref in (('MINIMUM_PHONE_IMPLEMENTATION',self.minimum),('POLISH_CI_IMPLEMENTATION',self.polish_ci)):
+            tree=self.command(self.root,'rev-parse',ref+'^{tree}')
+            orphan=self.command(self.root,'commit-tree',tree,'-m','same tree without required history')
+            with self.subTest(name=name), self.assertRaisesRegex(RuntimeError,'ancestry missing'):
+                self.verify(**{name:orphan})
+
+
+    def test_stabilization_exact_inputs_and_extra_migration_rejected(self):
+        for name in self.stabilization_overlay | {'app/supabase/migrations/00000000000044_unauthorized.sql'}:
+            with self.subTest(name=name), self.assertRaises(RuntimeError):
+                original=(self.root/name).read_bytes() if (self.root/name).exists() else None
+                try:
+                    self.write(self.root,name,'unauthorized source')
+                    self.verify()
+                finally:
+                    if original is None:(self.root/name).unlink()
+                    else:(self.root/name).write_bytes(original)
+
+    def test_stabilization_overlay_cannot_expand_or_omit_inputs(self):
+        for overlay in (self.stabilization_overlay|{'app/src/auth/sessionManager.ts'},self.stabilization_overlay-{'app/capacitor.config.ts'}):
+            with self.subTest(overlay=overlay), self.assertRaises(RuntimeError):self.verify(STABILIZATION_OVERLAY=overlay)
+
+    def test_stabilization_and_prior_minimum_ci_ancestry_required(self):
+        for name,ref in (('STABILIZATION_IMPLEMENTATION',self.stabilization),('MINIMUM_PHONE_CI_IMPLEMENTATION',self.minimum_ci)):
+            tree=self.command(self.root,'rev-parse',ref+'^{tree}').strip()
+            orphan=self.command(self.root,'commit-tree',tree,'-m','same bytes without approved ancestry').strip()
+            with self.subTest(name=name), self.assertRaises(RuntimeError):self.verify(**{name:orphan})
 
 
 if __name__ == '__main__':

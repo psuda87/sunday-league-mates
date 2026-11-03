@@ -1,4 +1,4 @@
-import { useCallback,useEffect,useRef,useState } from 'react';
+import { useCallback,useEffect,useRef,useState,useSyncExternalStore } from 'react';
 import { AccountError } from '../auth/api';
 import type { SessionManager } from '../auth/sessionManager';
 import type { GroupWorld,GroupPerson } from '../demo/groups';
@@ -24,20 +24,22 @@ export function groupWorld(userId:string,groups:GroupSummary[],inbox:GroupReques
   requests:[...requests.values()].map(r=>({id:r.id,groupId:r.group_id,kind:r.kind,status:r.state,targetId:r.target_id??(r.kind==='invite'||r.kind==='join'?userId:null),requestedBy:r.actor_id??userId,channel:r.target_id===null?'phone':'nick'}))}};
 }
 export function useGroups(manager:SessionManager,userId:string){
+ const auth=useSyncExternalStore(manager.subscribe,manager.getSnapshot);
+ const [verifiedSession,setVerifiedSession]=useState(auth.session);
  const [state,setState]=useState<{groups:GroupSummary[];inbox:GroupRequest[];detail:GroupDetail|null}>({groups:[],inbox:[],detail:null});
  const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState(''),[found,setFound]=useState<GroupBinding['found']>([]),[candidates,setCandidates]=useState<GroupBinding['candidates']>([]);
  const [searching,setSearching]=useState(false),[finding,setFinding]=useState(false);
  const alive=useRef(true),generation=useRef(0),searchEpoch=useRef(0),candidateEpoch=useRef(0),flight=useRef(false),selected=useRef<string|null>(window.location.hash.startsWith('#group/')?window.location.hash.slice(7):null),keys=useRef(new Map<string,string>());
  const fail=useCallback((e:unknown)=>{if(alive.current)setError(e instanceof AccountError&&e.code==='forbidden'?'Nie masz dostępu do tej grupy.':'Nie udało się potwierdzić danych grup. Odśwież i spróbuj ponownie.');},[]);
  const refresh=useCallback(async()=>{
-  if(!alive.current)return;const ticket=++generation.current;setLoading(true);setError('');
+  if(!alive.current)return;const ticket=++generation.current,session=manager.getSnapshot().session;setLoading(true);setError('');
   try {
    const [a,b]=await Promise.all([manager.call<{groups:GroupSummary[]}>('groups_list'),manager.call<{requests:GroupRequest[];outgoing?:GroupRequest[]}>('groups_inbox')]);
    if(!Array.isArray(a.groups)||!Array.isArray(b.requests))throw Error('Nieprawidłowy kontrakt grup.');
    const groups=a.groups.map(summary),inbox=[...requests(b.requests),...requests(b.outgoing??[])];
    let detail:GroupDetail|null=null;
    if(selected.current&&groups.some(g=>g.id===selected.current))detail=details(await manager.call('groups_detail',{group_id:selected.current}),selected.current,userId);
-   if(alive.current&&ticket===generation.current)setState({groups,inbox,detail});
+   if(alive.current&&ticket===generation.current&&manager.getSnapshot().session===session){setState({groups,inbox,detail});setVerifiedSession(session);}
   } catch(e){if(ticket===generation.current){setState({groups:[],inbox:[],detail:null});fail(e);}}
   finally {if(alive.current&&ticket===generation.current)setLoading(false);}
  },[manager,userId,fail]);
@@ -50,6 +52,7 @@ export function useGroups(manager:SessionManager,userId:string){
  },[refresh]);
  const invalidate=useCallback(()=>{generation.current++;searchEpoch.current++;candidateEpoch.current++;},[]);
  useEffect(()=>{alive.current=true;void refresh();return()=>{alive.current=false;invalidate();};},[refresh,userId,invalidate]);
+ useEffect(()=>{let previous=manager.getSnapshot();return manager.subscribe(()=>{const current=manager.getSnapshot();if(current===previous)return;previous=current;invalidate();setVerifiedSession(null);if(current.phase==='ready'&&current.session?.user_id===userId)void refresh();else if(current.phase!=='checking'){setState({groups:[],inbox:[],detail:null});selected.current=null;}});},[manager,userId,refresh,invalidate]);
  const mutate=async<T,>(action:string,body:Record<string,unknown>)=>{
   const fingerprint=JSON.stringify([action,body]);let key=keys.current.get(fingerprint);if(!key){key=crypto.randomUUID();keys.current.set(fingerprint,key);}
   const result=await manager.call<T>(action,{...body,request_id:key});keys.current.delete(fingerprint);window.dispatchEvent(new Event('slm-groups-changed'));return result;
@@ -88,6 +91,6 @@ export function useGroups(manager:SessionManager,userId:string){
    await mutate('groups_'+operation,body);if(action.type==='group_leave')selected.current=null;await refresh();
   });},
  };
- const readMember=async(id:string,groupId:string)=>{const m=member(await manager.call('groups_profile',{group_id:groupId,user_id:id}));if(m.user_id!==id)throw Error('Nieprawidłowy profil.');return m;};
- return {world:groupWorld(userId,state.groups,state.inbox,state.detail),binding,readMember};
+ const readMember=useCallback(async(id:string,groupId:string)=>{const m=member(await manager.call('groups_profile',{group_id:groupId,user_id:id}));if(m.user_id!==id)throw Error('Nieprawidłowy profil.');return m;},[manager]);
+ return {verified:auth.phase==='ready'&&verifiedSession===auth.session,verifiedSession,world:groupWorld(userId,state.groups,state.inbox,state.detail),binding,readMember};
 }

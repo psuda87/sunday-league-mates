@@ -40,6 +40,77 @@ POLISH_OVERLAY={
     'app/scripts/verify-premium-policy-cases.mjs',
 }
 
+
+POLISH_CI_IMPLEMENTATION='7c45656ab89105ba53a53e7c1f2fd7049b762666'
+MINIMUM_PHONE_IMPLEMENTATION='0d82b09c8a9171bbe479bafc46cd775398208205'
+MINIMUM_PHONE_OVERLAY={
+    'app/scripts/premium-route-policy.mjs',
+    'app/scripts/test-lineups-edge-local.py',
+    'app/scripts/test-lineups-local.py',
+    'app/scripts/verify-consolidation.mjs',
+    'app/scripts/verify-frozen-ui.mjs',
+    'app/scripts/verify-premium-policy-cases.mjs',
+    'app/src/auth/profileAdapter.test.tsx',
+    'app/src/auth/profileAdapter.ts',
+    'app/src/auth/useOwnProfile.ts',
+    'app/src/demo/EventForm.tsx',
+    'app/src/events/PremiumEvents.tsx',
+    'app/src/events/minimum.test.tsx',
+    'app/src/events/premiumContracts.ts',
+    'app/src/events/premiumForm.ts',
+    'app/src/events/usePremiumEvents.ts',
+    'app/src/profile/PhoneEditor.test.tsx',
+    'app/src/profile/PhoneEditor.tsx',
+    'app/src/profile/PremiumIdentityEditor.tsx',
+    'app/src/profile/phoneIsolation.test.ts',
+    'app/src/ui/personalProfile.ts',
+    'app/supabase/functions/accounts/handler.ts',
+    'app/supabase/migrations/20261102180613_configurable_match_minimum.sql',
+    'app/supabase/tests/minimum_phone.sql',
+    'app/vite.demo.config.ts',
+}
+
+MINIMUM_PHONE_CI_IMPLEMENTATION='023dc9bfe5aef7f2ec2339495101870f4f364f6a'
+STABILIZATION_IMPLEMENTATION='3e1c62cdcbfc8312dd983228a1ea1ef78f785ee4'
+STABILIZATION_OVERLAY={
+    'app/android/app/src/androidTest/java/com/getcapacitor/myapp/ExampleInstrumentedTest.java',
+    'app/android/app/src/androidTest/java/pl/psuda87/slm/SlmWindowInsetsTest.java',
+    'app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java',
+    'app/capacitor.config.ts',
+    'app/scripts/lineups_ci.py',
+    'app/scripts/premium-route-policy.mjs',
+    'app/scripts/test-lineups-edge-local.py',
+    'app/scripts/test-lineups-local.py',
+    'app/scripts/test_lineups_ci_context.py',
+    'app/scripts/verify-consolidation.mjs',
+    'app/scripts/verify-premium-policy-cases.mjs',
+    'app/src/auth/B1App.test.tsx',
+    'app/src/auth/B1App.tsx',
+    'app/src/auth/premiumRuntime.test.tsx',
+    'app/src/auth/useB1Lifecycle.ts',
+    'app/src/events/PremiumEvents.tsx',
+    'app/src/events/PremiumTeams.tsx',
+    'app/src/events/editResume.test.tsx',
+    'app/src/events/lineupContracts.ts',
+    'app/src/events/lineupFixture.test-support.ts',
+    'app/src/events/minimum.test.tsx',
+    'app/src/events/premium.test.tsx',
+    'app/src/events/premiumEvents.css',
+    'app/src/events/premiumLineupApi.test.tsx',
+    'app/src/events/resume.test.tsx',
+    'app/src/events/usePremiumEvents.ts',
+    'app/src/events/usePremiumLineup.ts',
+    'app/src/groups/PremiumGroups.tsx',
+    'app/src/groups/useGroups.test.tsx',
+    'app/src/groups/useGroups.ts',
+    'app/src/native/focusVisibility.test.ts',
+    'app/src/native/focusVisibility.ts',
+    'app/supabase/functions/accounts/handler.ts',
+    'app/supabase/functions/accounts/lineups.test.ts',
+    'app/supabase/migrations/20261103190639_group_admin_lineup_writes.sql',
+    'app/supabase/tests/lineup_admin.sql',
+}
+
 CHANGED = {'app/scripts/test-lineups-local.py', 'app/scripts/test-lineups-edge-local.py',
            'app/scripts/test-lineups-ui-browser.mjs'}
 ADDED = {'app/scripts/lineups_ci.py', 'app/scripts/test_lineups_ci_context.py'}
@@ -150,6 +221,28 @@ def verify_polish_overlay(root, previous, approved):
             require(approved.get(name) == data, 'Unreviewed PR31 source: ' + name)
 
 
+def verify_minimum_phone_overlay(root, previous, approved):
+    candidate = archive(root, MINIMUM_PHONE_IMPLEMENTATION)
+    candidate.pop(APPROVAL, None)
+    delta = {name for name in set(previous) | set(candidate) if previous.get(name) != candidate.get(name)}
+    require(delta == MINIMUM_PHONE_OVERLAY, 'Minimum/phone delta differs from exact reviewed file set')
+    require(set(approved) == set(candidate), 'Minimum/phone implementation added or removed an application input')
+    for name, data in candidate.items():
+        if name not in ('app/scripts/lineups_ci.py', 'app/scripts/test_lineups_ci_context.py'):
+            require(approved.get(name) == data, 'Unreviewed minimum/phone source: ' + name)
+
+
+def verify_stabilization_overlay(root, previous, approved):
+    candidate = archive(root, STABILIZATION_IMPLEMENTATION)
+    candidate.pop(APPROVAL, None)
+    delta = {name for name in set(previous) | set(candidate) if previous.get(name) != candidate.get(name)}
+    require(delta == STABILIZATION_OVERLAY, 'Stabilization delta differs from exact reviewed file set')
+    require(set(approved) == set(candidate), 'Stabilization added or removed an application input')
+    for name, data in candidate.items():
+        if name not in ('app/scripts/lineups_ci.py', 'app/scripts/test_lineups_ci_context.py'):
+            require(approved.get(name) == data, 'Unreviewed stabilization source: ' + name)
+
+
 def verify_sources(root=ROOT, base=BASE):
     pointer = root / APPROVAL
     require(pointer.is_file() and not pointer.is_symlink(), 'Missing regular CI approval pointer')
@@ -163,7 +256,7 @@ def verify_sources(root=ROOT, base=BASE):
     approved.pop(APPROVAL, None)
     original = archive(root, STAGE3B_IMPLEMENTATION)
     original.pop(APPROVAL, None)
-    for ref in (STAGE3B_IMPLEMENTATION, DISCOVERY_IMPLEMENTATION, STAGE2C_IMPLEMENTATION, POLISH_IMPLEMENTATION):
+    for ref in (STAGE3B_IMPLEMENTATION, DISCOVERY_IMPLEMENTATION, STAGE2C_IMPLEMENTATION, POLISH_IMPLEMENTATION, POLISH_CI_IMPLEMENTATION, MINIMUM_PHONE_IMPLEMENTATION, MINIMUM_PHONE_CI_IMPLEMENTATION, STABILIZATION_IMPLEMENTATION):
         require(subprocess.run(['git', '-C', str(root), 'merge-base', '--is-ancestor', ref, implementation],
                                capture_output=True).returncode == 0, 'Reviewed discovery/CI ancestry missing')
     require(set(original) == set(baseline) | ADDED, 'Stage3B implementation file set changed')
@@ -173,9 +266,15 @@ def verify_sources(root=ROOT, base=BASE):
     previous = archive(root, STAGE2C_IMPLEMENTATION)
     previous.pop(APPROVAL, None)
     verify_discovery_overlay(root, original, previous)
-    verify_polish_overlay(root, previous, approved)
+    polish = archive(root, POLISH_CI_IMPLEMENTATION)
+    polish.pop(APPROVAL, None)
+    verify_polish_overlay(root, previous, polish)
+    minimum = archive(root, MINIMUM_PHONE_CI_IMPLEMENTATION)
+    minimum.pop(APPROVAL, None)
+    verify_minimum_phone_overlay(root, polish, minimum)
+    verify_stabilization_overlay(root, minimum, approved)
     migrations = {p for p in approved if p.startswith('app/supabase/migrations/') and p.endswith('.sql')}
-    require(len(migrations) == 42, 'Exact 42 reviewed migrations required')
+    require(len(migrations) == 44, 'Exact 44 reviewed migrations required')
     for name, data in approved.items():
         path = root / name
         require(path.is_file() and not path.is_symlink() and path.read_bytes() == data,
@@ -257,7 +356,7 @@ def context(suite):
     memory = Path('/proc/meminfo').read_text()
     validate_resources(os.cpu_count() or 0, shutil.disk_usage(ROOT).free,
                        int(re.search(r'MemTotal:\s+(\d+)', memory).group(1)))
-    print('PASS CI preflight: exact commit/event, approved app/backend/42 migrations, isolated empty local Docker', flush=True)
+    print('PASS CI preflight: exact commit/event, approved app/backend/44 migrations, isolated empty local Docker', flush=True)
 
 
 def options(suite, image):

@@ -174,6 +174,9 @@ def main(verify_ui=None):
         if branch == 'feat/public-match-discovery-stage2b':
             import discovery_local
             discovery_local.verify()
+        elif branch == 'fix/slm2-minimum-phone':
+            # Exact full-checkout approval, not a general local branch bypass.
+            lineups_ci.verify_sources()
         elif branch == 'feat/premium-lineups-stage2b' and verify_ui is not None:
             # The dependent UI runner may reuse the fixture ONLY with the exact
             # Stage2A backend. This does not authorize a different schema or Auth.
@@ -238,10 +241,14 @@ Deno.serve(async(req:Request)=>{
     sql('grant select on auth.users,auth.sessions to service_role;'
         'grant execute on all functions in schema auth to anon,authenticated,service_role;')
     migrations = sorted((ROOT / 'app/supabase/migrations').glob('*.sql'))
-    assert len(migrations) == (42 if CI_MODE or branch == 'feat/public-match-discovery-stage2b' else 41), 'Expected exact reviewed migration set'
+    assert len(migrations) == (44 if CI_MODE or branch == 'fix/slm2-minimum-phone' else 42 if branch == 'feat/public-match-discovery-stage2b' else 41), 'Expected exact reviewed migration set'
+    admin_step=next((p for p in migrations if p.name.endswith('_group_admin_lineup_writes.sql')),None)
     for file in migrations:
+        if file==admin_step:continue
         sql(file.read_text(encoding='utf-8'))
-    check(True, str(len(migrations))+' canonical migrations replay on real GoTrue Auth schema')
+    if len(migrations) >= 43:
+        sql((ROOT / 'app/supabase/tests/minimum_phone.sql').read_text(encoding='utf-8'))
+    check(True, ('43 historical migrations before admin44' if admin_step else str(len(migrations))+' canonical migrations replay on real GoTrue Auth schema'))
     sql('create role authenticator login noinherit;grant anon,authenticated,service_role to authenticator;')
     start(NAME + '-rest', REST_IMAGE, {
         'PGRST_DB_URI': 'postgresql://authenticator@127.0.0.1/postgres', 'PGRST_DB_SCHEMAS': 'public',
@@ -260,7 +267,7 @@ Deno.serve(async(req:Request)=>{
         encoded = login['access_token'].split('.')[1]
         claims = json.loads(base64.urlsafe_b64decode(encoded + '=' * (-len(encoded) % 4)))
         assert claims['role'] == 'authenticated', 'Real client must exercise authenticated ACL'
-        users.append({'id': user['id'], 'token': login['access_token'], 'session': login})
+        users.append({'id': user['id'], 'token': login['access_token'], 'session': login, 'login':email, 'password':password})
     admin, member, second, outsider = users
     check(sql('select count(*) from auth.sessions') == '4', 'four real GoTrue sessions accepted through unchanged accounts login')
     group = write(admin, 'groups_create', name='Lineup Edge fixture')['group_id']
@@ -331,6 +338,9 @@ Deno.serve(async(req:Request)=>{
             break
         time.sleep(.25)
     check(status == 200 and after == before, 'same GoTrue client reads identical persisted snapshot after isolated backend restart')
+    if admin_step:
+        sql(admin_step.read_text(encoding='utf-8'))
+        check(True,'new fixture upgraded43-to44; existing member-write regression preserved before permission change')
     if verify_ui is not None:
         verify_ui(users, group)
     write(second, 'groups_leave', group_id=group)

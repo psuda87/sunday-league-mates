@@ -33,9 +33,9 @@ it('actual B1 entry renders API match, original pitch/profile/nav and hides data
  expect(screen.getByRole('button',{name:'Utwórz mecz'})).toBeTruthy();
  fireEvent.click(container.querySelector('.slm-card-link')!);
  fireEvent.click(await screen.findByRole('tab',{name:/Składy/}));
- await screen.findByText('Propozycja składu · niezapisana');
- expect(container.querySelector('.slm-football-pitch')).toHaveTextContent('Runtime Owner');
- expect(screen.getByRole('button',{name:'Zapisz'})).toBeEnabled();expect(request.mock.calls.some(c=>c[0]==='lineups_save')).toBe(false);
+ await screen.findByText('Brak zapisanego składu');
+ expect(container.querySelectorAll('.slm-pitch-token')).toHaveLength(0);
+ expect(screen.getByRole('button',{name:'Zapisz'})).toBeDisabled();expect(request.mock.calls.some(c=>c[0]==='lineups_save')).toBe(false);
  fireEvent.click(screen.getByRole('button',{name:'Profil'}));
  await waitFor(()=>expect(container.querySelector('.slm-ultimate-card')).toHaveTextContent('Runtime Owner'));
  expect(screen.getByLabelText('Numer koszulki 27')).toBeTruthy();

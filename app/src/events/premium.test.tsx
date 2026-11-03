@@ -23,7 +23,7 @@ function manager(write?:(action:string,body?:Record<string,unknown>)=>Promise<un
   if(action==='matches_detail')return {...detail,event:{...event,id:body?.event_id}};
   return write?.(action,body);
  });
- return {call,subscribe:vi.fn(()=>()=>{}),getSnapshot:()=>({phase:'ready',session:{user_id:'owner'}})} as unknown as SessionManager;
+ const snapshot={phase:'ready',session:{user_id:'owner'}};return {call,subscribe:vi.fn(()=>()=>{}),getSnapshot:()=>snapshot} as unknown as SessionManager;
 }
 it('requires stable requested event identity and never invents counts for private outsider',()=>{
  expect(()=>matchDetail(detail,'different-id')).toThrow();
@@ -51,13 +51,13 @@ it('clears real data on read failure and shows no technical error or demo fallba
  vi.mocked(m.call).mockRejectedValue(new Error('PostgreSQL private-schema secret diagnostic'));
  await act(()=>result.current.refresh());expect(result.current.events).toEqual([]);expect(result.current.groups).toEqual([]);expect(result.current.error).not.toMatch(/PostgreSQL|secret/);
 });
-it('clears cached private data during an Auth recheck and refetches on gallery continuation',async()=>{
+it('hides retained navigation during Auth recheck and refetches before revealing it',async()=>{
  const m=manager();let changed!:()=>void;vi.mocked(m.subscribe).mockImplementation(listener=>{changed=listener;return()=>{};});
  const original=m.getSnapshot;const snapshot=vi.spyOn(m,'getSnapshot');
  const {result}=renderHook(()=>usePremiumEvents(m,'owner'));await waitFor(()=>expect(result.current.events).toHaveLength(1));await act(()=>result.current.open(event.id));
  act(()=>{snapshot.mockReturnValue({phase:'checking',session:null,message:''});changed();});
- expect(result.current.events).toEqual([]);expect(result.current.detail).toBeNull();
- act(()=>{snapshot.mockImplementation(original);changed();});await waitFor(()=>expect(result.current.events).toHaveLength(1));expect(result.current.detail).toBeNull();
+ expect(result.current.revalidating).toBe(true);expect(result.current.detail?.event.id).toBe(event.id);
+ act(()=>{snapshot.mockImplementation(original);changed();});await waitFor(()=>expect(result.current.revalidating).toBe(false));expect(result.current.detail?.event.id).toBe(event.id);
 });
 it('drops a late private detail after Back or changing the active group',async()=>{
  const m=manager(),{result}=renderHook(()=>usePremiumEvents(m,'owner'));
