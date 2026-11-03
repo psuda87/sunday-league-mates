@@ -1,5 +1,97 @@
 # Public Match Discovery — przegląd integracyjny Cloud
 
+## Aktualizacja Cloud 2026-11-03 22:58 UTC — Stage 2B już znajduje się w main
+
+**PASS ponowionego przeglądu wskazanego historycznego Stage2B; WARN nieaktualnej
+bazy zadania; BLOCK ponownego stosowania archiwalnych patchy CI do dzisiejszego
+main.** Nie jest to ocena gotowości produkcyjnej obecnego main.
+
+### Faktyczny stan Git
+
+- Źródłowy `feat/public-match-discovery-stage2b` nadal ma HEAD
+  **fd4fccdc1c22caa5f217625809689f336139a122** — bez nowych zmian aplikacji.
+- Żądana gałąź review już istniała z nowym commitem
+  **324fbdf7b01b039497ca444975337014671a0850**. Zachowano jego raport Windows oraz
+  test60. Lokalną referencję przesunięto wyłącznie do istniejącego potomka po
+  sprawdzeniu ancestry; bez merge, rebase, resetu lub nadpisania historii.
+- Zdalny `main` jest obecnie na **1b6ee83356d53b7b34193af88802067dc9b2fede**:
+  merge PR32 `release/slm-2.0-rc`, zawierający też merge PR33. Git merge-base
+  --is-ancestor potwierdza, że **całe Stage2B/fd4fccd jest już przodkiem main**.
+- Main zawiera również Stage2C **d7b36eee379acf5036f8ea8aaeeea5f7791c8a04**
+  i osobne przypięcie **cb63962e0ff4ccfbc4fb7157e4627beeee5ae8d5**. Obecny
+  CI implementation main to **2f4adedfbaeb2dd1e69f8dc22c62823fc2f0c168**.
+  Są już **44 migracje**, nie42. Migracja discovery42 jest nadal niezmieniona.
+
+Wnioski dawnych raportów „main jest starszy” i „należy dopiero aktywować CI2C”
+są historyczne. **Nie scalać ponownie Stage2B i nie stosować starego patcha41→42
+lub dawnego pointera do main44.** Niczego nie cofano do historycznej wersji.
+
+### Niezależna ponowna kontrola wskazanego splotu źródeł
+
+Ponowiono porównania do Stage3B/e04d9a4 oraz audytu2A/ddd3a3e. Na gałęzi review
+całe app/ i aktywne CI są niezmienione względem fd4fccd; backend odpowiada dokładnie
+24a59e1. Od ostatniego review zmieniły się tylko dokumenty i pomocniczy test guardów.
+Poprzednią analizę session_valid, service-only invoker ACL, predykatów widoczności,
+filtrów przed LIMIT/OFFSET i minimalnego DTO sprawdzono względem tych samych źródeł.
+Nie znaleziono nowej zmiany backendu lub błędu bezpieczeństwa wymagającego poprawki.
+RLS nie chroni przed service_role: nadal istotne są kontrola sesji i uprawnień SQL.
+
+Trzy UI runtime są nadal dokładnieae2fd95; kontrola generacji odpowiedzi, debounce,
+resetu strony, walidacji marker/paging i kasowania danych po zmianie sesji pozostała
+bez zmian. Ponowiono testy kontrolera i negatywne mutacje runtime/backendu/41SQL.
+Manifest55, karty, CSS, Ultimate, BottomNav, Auth, finanse i składy nie były zmieniane.
+To przegląd historycznego2B — późniejsze zmiany main w tych modułach **nie są objęte
+pełnym nowym audytem** ani poniższym wynikiem361Vitest.
+
+### CI i faktycznie wykonane kontrole tej sesji Cloud Linux
+
+| Kontrola na gałęzi review/Stage2B | Wynik 2026-11-03 22:58 UTC |
+|---|---|
+| Vitest | **PASS361 /55 plików** |
+| TypeScript aplikacji / strict Edge / pełny ESLint | **PASS** |
+| Consolidation / visual / import boundaries | **PASS42 /55 /10** |
+| Premium policy | **PASS45**, bez skip |
+| Negatywne rzeczywiste Premium/consolidation | **PASS60**, wszystkie41 historycznych SQL i dodatkowa43 |
+| Aktualny tu zestaw launch-contract | **PASS23** Linux |
+| Negatywne preflight bez tworzenia bazy | **PASS9** |
+| Archiwalna nieaktywna propozycja CI | **PASS33 overlay +40 pełnego gate'u +23 proponowanych launch-contract** |
+| LIVE / Premium-finance-local / Android-stage3 web / demo | **PASS4**, izolacja demo16 |
+| Historyczny aktywny source gate2B | **BLOCK oczekiwany** na premium-route-policy.mjs; to nie wynik gate'u main |
+| SQL/RLS, GoTrue/Edge/PostgREST, Chromium/Cypress | **NOT RUN w tej sesji** |
+| Windows/native Gradle/telefon i GitHub-hosted Actions | **NOT RUN w tej sesji** |
+
+Wyników SQL/HTTP/Android z innych sesji nie zaliczano ponownie. Nie uruchamiano
+Docker fixture ani migracji; nie fałszowano kontekstu GitHub lub gałęzi runnera.
+Nie zmieniano helperów, przypięć, workflow, zmiennych repozytorium ani planu opłat.
+Materiały CI z tego review zachowano jako audyt historyczny; nie dodano kolejnej
+konkurencyjnej implementacji obok już zintegrowanego Stage2C.
+
+### Bieżące ograniczenia i rzeczywiste decyzje właściciela
+
+1. **Nie ma już decyzji o ponownej integracji Stage2B do main:** ancestry dowodzi,
+   że kod wszedł do repozytorium. Nie wnioskujemy z tego o deployu lub gotowości
+   produkcyjnego Supabase — tego nie sprawdzano i nie zmieniano.
+2. Jeżeli celem jest gotowość **obecnej aplikacji**, zatwierdzić osobny zakres
+   przeglądu `main` **1b6ee83356d53b7b34193af88802067dc9b2fede** (lub wtedy nowszego,
+   ponownie zweryfikowanego HEAD), wraz z jego aktualnymi44 migracjami i kontraktami.
+   Nie przenosić na main historycznego wyniku PASS dla42.
+3. Przed hostowanym odbiorem nadal potrzebne jest odrębne polecenie uruchomienia
+   Actions po potwierdzeniu darmowego limitu/opt-in oraz zgoda na testy wyłącznie
+   w nowym izolowanym backendzie **zgodnym z wybranym aktualnym SHA**. W tym zadaniu
+   nie ustawiano zmiennych ani nie aktywowano jobów.
+4. Odbiór telefonu, rzeczywistej sesji/uprawnień i test obciążenia nie są pokryte
+   testami źródeł. Znane ograniczenia offsetu bez snapshotu, skanowania i globalnego
+   locka pozostają ryzykiem historycznego API. Nowa zgoda na deploy/migracje Cloud
+   byłaby osobną decyzją, której nie zakładamy.
+
+Ta kontynuacja dodaje wyłącznie aktualizację raportu, STATUS i chronologiczny wpis
+ODPOWIEDZI_CODEX. Nie zmienia kodu, patchy CI, przypięć lub guardów i nie otwiera PR.
+Wszystkie wcześniejsze raporty i zmiany z324fbdf zachowane. W tej sesji nie wykonano
+żadnego merge; wykryty merge PR32 był już obecny na origin przed rozpoczęciem.
+
+---
+
+
 ## Aktualizacja 2026-11-02 — ponowny niezależny przegląd, faktyczne środowisko Windows
 
 **PASS ponowionych kontroli źródeł/frontendu i nieaktywnego overlay CI; WARN środowiska; BLOCK aktywnego source gate Stage2B.** Nie aktywowano CI, nie zmieniono repo variables ani aplikacji. Poniższy pierwotny raport Cloud pozostaje historycznym zapisem wcześniejszej sesji, nie nowymi wynikami z Windows.

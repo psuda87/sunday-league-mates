@@ -1,3 +1,13 @@
+# Cloud — rewalidacja historycznego Public Match Discovery 2B, 2026-11-03 22:58 UTC
+
+**Stage2B/fd4fccd już jest przodkiem main1b6ee83356d53b7b34193af88802067dc9b2fede (PR32).** W main są również Stage2C/późniejsze CI i44 migracje. Nie scalać ponownie2B i nie stosować archiwalnego patcha CI42. Review kontynuuje istniejącą historię324fbdf bez zmian app/ lub aktywnego CI.
+
+PASS ponowionych kontroli historycznego2B w Cloud Linux:361Vitest/55,TS/strictEdge/lint,45policy,42/55/10,60negatywnych Premium/consolidation,23launch-contract,9preflight,archiwalna propozycjaCI33+40+23,4buildy i izolacja16. SQL/RLS/HTTP/Chromium/Cypress/native/Windows/POCO/hostowaneActions NOT RUN tej sesji. Historyczny sourcegate2B nadal oczekiwanie BLOCK; nie jest to wynik obecnego main.
+
+[Raport](PUBLIC_MATCH_DISCOVERY_INTEGRATION_REVIEW.md). WARN nieaktualnej bazy zadania i ograniczeń API; aktualnego main nie uznano za odebrany na podstawie testów starego2B. Decyzja właściciela: ewentualny osobny audyt obecnego main z44migracjami i osobny izolowany/bezpłatny odbiór CI/telefonu. Nie wykonywano merge/deployu/migracji/Cloud/zmian repo variables; aktualizacja wyłącznie dokumentacyjna.
+
+---
+
 # Public Match Discovery — przegląd integracyjny Cloud
 
 2026-11-02 Europe/Warsaw — kontynuacja istniejącego review22b2e61 w nowym oddzielnym worktree, bez nadpisywania wcześniejszych wyników Cloud. Rzeczywiste narzędzia tej sesji:lokalny Windows, nie CloudLinux. Stage2B nadalfd4fccd. Ponowione PASS:361Vitest,lint/TS/strictEdge,45policy,consolidation42/55/10,6buildów+demo16,9preflight,33nieaktywneCI,60negatywnychPremium/consolidation w prywatnej kopii oraz zgodność backend24a/UIae2 i obu diffów. Nie znaleziono nowego błędu runtime; żadnej zmiany app/workflow/pointer/manifest55. Aktywny source gate nadal oczekiwane BLOCK na starym6d96391. Pełne proposed40/23 oraz Linux launch-contract NOT RUN ponownie (Windows symlink1314, Docker niedostępny/nieuruchamiany); SQL/HTTP/Chromium/native/telefon/hostedActions NOT RUN. Wcześniejszych PASS Cloud nie zaliczano ponownie. Dodano odtwarzalny test60 i aktualizację raportu. Do decyzji:piny2B, wybór istniejącegoStage2C/d7→cb albo osobnej propozycjiCI, izolowany realny odbiór42 i późniejsza osobna zgoda na merge. Bez deploy/Supabase/zmianvariables/odpłatnychzasobów. Szczegóły:docs/PUBLIC_MATCH_DISCOVERY_INTEGRATION_REVIEW.md; chronologia:docs/ODPOWIEDZI_CODEX.txt.
