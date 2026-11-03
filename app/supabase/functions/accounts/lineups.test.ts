@@ -39,7 +39,7 @@ it.each(['user_id','group_id','p_user','p_session','author_id','updated_by','upd
 it.each(['lineup_version_conflict','lineup_roster_conflict','idempotency_conflict','event_cancelled','lineup_closed','group_archived'])('maps %s to explicit HTTP409 without SQL details', async code => {
  const {result}=await request({},code);expect(result.status).toBe(409);const data=await result.json();expect(data.code).toBe(code);expect(JSON.stringify(data)).not.toContain('P0001');
 });
-it.each([['lineup_invalid_assignment',400],['invalid_input',400],['request_required',400],['not_found',404],['session_invalid',401]])('maps %s safely', async (code,status) => {
+it.each([['lineup_invalid_assignment',400],['invalid_input',400],['request_required',400],['not_found',404],['session_invalid',401],['forbidden',403]])('maps %s safely', async (code,status) => {
  const {result}=await request({},String(code));expect(result.status).toBe(status);expect((await result.json()).code).toBe(code);
 });
 it('requires a verified non-temporary session before dispatch', async () => {

@@ -270,6 +270,7 @@ export function createHandler(env: Environment) {
           const code = typeof r.data?.message === 'string' ? r.data.message : '';
           const errors: Record<string,[number,string]> = {
             session_invalid:[401,'Sesja wygasła. Zaloguj się ponownie.'],
+            forbidden:[403,'Skład może zapisać wyłącznie aktualny administrator tej grupy.'],
             not_found:[404,'Mecz nie istnieje lub nie masz dostępu do jego składu.'],
             group_archived:[409,'Grupa jest zarchiwizowana.'],
             event_cancelled:[409,'Nie można zmieniać składu odwołanego meczu.'],
