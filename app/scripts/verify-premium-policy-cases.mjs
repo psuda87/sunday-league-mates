@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {verifyPremiumRuntime,APPROVED,LINEUPS_MIGRATION,DISCOVERY_MIGRATION,MINIMUM_MIGRATION} from './premium-route-policy.mjs';
+import {verifyPremiumRuntime,APPROVED,LINEUPS_MIGRATION,DISCOVERY_MIGRATION,MINIMUM_MIGRATION,ADMIN_MIGRATION} from './premium-route-policy.mjs';
 const root=fileURLToPath(new URL('../../',import.meta.url));
 const read=p=>readFileSync(root+'/'+p,'utf8');
 test('actual source graph passes',()=>assert.equal(verifyPremiumRuntime(root).frozen,55));
@@ -68,4 +68,11 @@ for(const [label,path,mutate] of [
  ['phone password printed as text','app/src/profile/PhoneEditor.tsx',s=>s.replace('type="password"','type="text"')],
  ['phone pending guard removed','app/src/profile/PhoneEditor.tsx',s=>s.replace('if(flight.current||binding.saving)return','if(binding.saving)return')],
  ['phone expands demo to Auth','app/vite.demo.config.ts',s=>s.replace("'src/profile/PhoneEditor.tsx'","'src/auth/sessionManager.ts'")],
+ ['admin44 authorization removed',ADMIN_MIGRATION,s=>s.replace("p_action='save' and not exists","false and not exists")],
+ ['resume shows stale screen','app/src/auth/B1App.tsx',s=>s.replace('hidden={view!==null}','hidden={false}')],
+ ['resume retains denied account','app/src/auth/B1App.tsx',s=>s.replace('continuation.current=null','continuation.current="old"')],
+ ['IME gets two inset owners','app/capacitor.config.ts',s=>s.replace("insetsHandling: 'disable'","insetsHandling: 'css'")],
+ ['focus helper replaced','app/src/native/focusVisibility.ts',s=>s+'\n// unauthorized input handler\n'],
+ ['member writes local draft','app/src/events/usePremiumLineup.ts',s=>s.replace('state.snapshot?.can_write === true','true')],
+ ['responsive confirmation removed','app/src/events/premiumEvents.css',s=>s.replace('display:flex;flex-wrap:wrap;gap:8px','display:flex;flex-wrap:nowrap;gap:8px')],
 ])test('rejects '+label,()=>{verifyPremiumRuntime(root);const source=read(path),changed=mutate(source);assert.notEqual(changed,source,'Mutation must exercise a real source change');assert.throws(()=>verifyPremiumRuntime(root,{[path]:changed}));});
