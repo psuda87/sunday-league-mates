@@ -15,6 +15,18 @@ vi.mock('../events/PremiumWorld',()=>({default:function MockWorld({onLogout,onAc
 }}));
 afterEach(()=>{cleanup();vi.restoreAllMocks();worldLifecycle.mounts=0;worldLifecycle.unmounts=0;});
 const session=(temporary=false):Session=>({access_token:'access-test',refresh_token:'refresh-test',user_id:'fictional-test',role:'member',expires_in:3600,must_change_password:temporary});
+it('does not resume or retain a private world while explicit logout is clearing the vault',async()=>{
+ let release!:()=>void;const clearing=new Promise<void>(resolve=>{release=resolve;});
+ let token:string|null='saved-test';
+ const request=vi.fn(async(action:string)=>action==='logout'?undefined:session());
+ const manager=new SessionManager({read:async()=>token,write:async value=>{token=value;},clear:async()=>{await clearing;token=null;}},async<T,>(action:string)=>await request(action) as T);
+ render(<B1App manager={manager}/>);await screen.findByText('Chroniony świat demo');
+ fireEvent.click(screen.getByRole('button',{name:'Wyloguj'}));
+ fireEvent(window,new Event('online'));await act(async()=>{await Promise.resolve();});
+ expect(request.mock.calls.filter(c=>c[0]==='refresh')).toHaveLength(1);
+ expect(screen.queryByText('Chroniony świat demo')).toBeNull();
+ await act(async()=>{release();});await screen.findByRole('heading',{name:'Zaloguj się'});expect(token).toBeNull();
+});
 function setup(request:(action:string,values?:Record<string,unknown>,session?:Session|null)=>Promise<unknown>,token:string|null=null){
  const store={read:async()=>token,write:async(value:string)=>{token=value;},clear:async()=>{token=null;}};
  return {manager:new SessionManager(store,async<T,>(action:string,values?:Record<string,unknown>,session?:Session|null)=>await request(action,values,session) as T),peek:()=>token};

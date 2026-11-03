@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { IonContent, IonPage } from '@ionic/react';
 import AccountScreens from '../account-ui/AccountScreens';
 import type { AccountUiPort, AccountView } from '../account-ui/model';
@@ -23,14 +23,16 @@ export default function B1App({manager:provided}:{manager?:SessionManager}){
  const [requested,setRequested]=useState<AccountView|null>(null);
  const [pending,setPending]=useState<'login'|'password'|null>(null);
  const scope=useRef<HTMLIonContentElement>(null);
- useB1Lifecycle(manager,auth);
+ const loggingOut=useRef(false);
+ const mayResume=useCallback(()=>!loggingOut.current,[]);
+ useB1Lifecycle(manager,auth,mayResume);
  const ready=auth.phase==='ready'&&!!auth.session;
  const forced=ready&&auth.session!.must_change_password;
  // Preserve RAM navigation only across verification, never across a denied session.
  const continuation=useRef<string|null>(null);
- if(ready&&!forced)continuation.current=auth.session!.user_id;
- else if(auth.phase!=='checking')continuation.current=null;
- const owner=ready&&!forced?auth.session!.user_id:auth.phase==='checking'?continuation.current:null;
+ if(ready&&!forced&&!loggingOut.current)continuation.current=auth.session!.user_id;
+ else if(auth.phase!=='checking'||loggingOut.current)continuation.current=null;
+ const owner=loggingOut.current?null:ready&&!forced?auth.session!.user_id:auth.phase==='checking'?continuation.current:null;
  useEffect(()=>installFocusVisibility(),[]);
  const personalProfile=useOwnProfile(manager,owner,{
   begin:()=>{if(ready&&!forced)setPicker({owner:auth.session!.user_id,done:false});},
@@ -42,12 +44,13 @@ export default function B1App({manager:provided}:{manager?:SessionManager}){
  const view:AccountView|null=pending??(auth.phase==='checking'?'checking':auth.phase==='unavailable'||auth.phase==='storage_error'?'network':forced?'password':ready?requested:requested==='login'?'login':auth.message||requested==='expired'?'expired':requested==='register'||requested==='forgot'?requested:'login');
  const base=useMemo(()=>b1Port(manager),[manager]);
  const port:AccountUiPort={...base,
+  async signOut(){loggingOut.current=true;continuation.current=null;setPicker(null);try{await base.signOut();}finally{loggingOut.current=false;}},
   async signIn(identifier,password){setPending('login');try{await base.signIn(identifier,password);setRequested(null);}finally{setPending(null);}},
   async updatePassword(password,current){setPending('password');try{await base.updatePassword(password,current);setRequested(null);}finally{setPending(null);}},
  };
  function navigate(next:AccountView){
   // No simulator, callback URL, registration or recovery can grant access.
-  if(forced){if(next==='login'){setRequested('login');void base.signOut();}return;}
+  if(forced){if(next==='login'){setRequested('login');void port.signOut();}return;}
   if(ready){if(next==='login'||next==='password-saved')setRequested(null);return;}
   setRequested(next==='register'||next==='forgot'?next:'login');
  }
