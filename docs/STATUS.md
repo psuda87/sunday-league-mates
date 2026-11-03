@@ -395,3 +395,8 @@ Wykonano minimum/default10 i własny telefon PL/+48/hasło, migracja43tylko w no
 
 
 2026-11-03 18:57 Europe/Warsaw: opublikowano fix/slm2-minimum-phone, Draft PR33 → release/slm-2.0-rc/fa6bc792, bez merge. Funkcje minimum i telefonu oraz emulator LIVE PASS. APK i backend43/55431 gotowe według docs/SLM_2_0_MINIMUM_PHONE.md. Przed integracją: odbiór ścisłych pinów; test POCO i GitHub-hosted NOT RUN. Pełna chronologia docs/ODPOWIEDZI_CODEX.txt.
+
+
+## 2026-11-03 21:01 Europe/Warsaw — finalna stabilizacja fix/slm2-minimum-phone
+
+Naprawy A–E oraz administratorzy składów/migracja44 wykonane. PASS395Vitest/71policy/Linux35+107/SQL52/HTTP27/Cypress6/JVM1/native5, TS/lint/strictEdge/buildy i rzeczywisty emulator. Premium55 niezmieniony w tej stabilizacji. Backend43 zachowany; nowa fixture44/55441 działa, bez migracji istniejących baz i Cloud. Następnie: sprawdzenie refów merge33→RC i32→main, zwykłe merge tylko poPASS, APK z finalnego main. POCO/hosted/Cloud/Storage/FCM NOTRUN. Szczegóły docs/SLM_2_0_RC.md; chronologia docs/ODPOWIEDZI_CODEX.txt.

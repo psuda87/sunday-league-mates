@@ -106,3 +106,29 @@ Odtworzenie APK: `npm run build:android-stage3`, ustaw w procesie `SLM_ANDROID_S
 ## Publikacja
 
 Gałąź wypchnięta, pakiet/instrukcja w `ecf37e6087726e2e66a8292dba45217160cadc35`. Utworzono jeden nowy [Draft PR32 → main](https://github.com/psuda87/sunday-league-mates/pull/32); API: open/draft, merged=false, mergeable=true/clean, base main134c52b. Starszych Draft PR nie zmieniano ani nie zamykano. Dla ecf37e6 hostowane run41491555489 i41491555508 są completed/**skipped**: GitHub-hosted **NOT RUN**, nie PASS. Nie aktywowano Actions/opt-in ani dispatch. Końcowy commit dopisuje wyłącznie tę informację; końcowy SHA należy odczytać z HEAD release/slm-2.0-rc.
+
+
+## 2026-11-03 21:01 Europe/Warsaw — finalna stabilizacja przed integracją PR33 → RC → PR32
+
+Wykonano na istniejącej `fix/slm2-minimum-phone`, bez nowych gałęzi/PR/worktree. Punkty wejścia potwierdzone fetch: main134c52b, RCfa6bc792, PR33 94efc95b. Znane sześć niezacommitowanych zmian w głównym worktree pozostawiono bez dotykania.
+
+Naprawy:
+- Android: jeden natywny właściciel safe area; SystemBars nie dodaje drugiego właściciela. IME rezerwuje tylko część nieodjętą już przez adjustResize. Natywny viewport konsumuje też surowy DisplayCutout; nowy test odtworzył błąd przed poprawką. Czysty pomocnik przewija aktywny input w rzeczywistym scrollu Ionic, bez dodatkowego paddingu/odczytu wartości.
+- Normalny background/foreground zachowuje ukrytą instancję RAM i kontekst widoku. Sesja, grupy, profil grupowy i bieżący mecz są potwierdzane przed odsłonięciem. Logout/odmowa/zmiana konta usuwa świat. Odtworzony testem wyścig wznowienia podczas wolnego logout jest zablokowany w adapterze lifecycle; SessionManager i vault pozostają niezmienione.
+- Anulowanie rzeczywistego Android chooser zachowuje edytor zdjęcia. Niewysłane dane formularza przetrwały HOME/powrót. Zmieniona w tle wersja meczu blokuje zapis starego szkicu zamiast podmieniania jego expected_version.
+- Dwa przyciski potwierdzenia odświeżenia składu zawijają się i nie nachodzą na siebie przy360dp. Nie zmieniano kart, logo, CSS Premium poza tymi dwiema regułami runtime ani manifestu Premium55. W tej stabilizacji żaden z55 plików nie został zmieniony; wcześniejszy wyjątek minimum pozostaje bez zmian.
+- Migracja44 `20261103190639_group_admin_lineup_writes.sql`: zapis wyłącznie aktualnego administratora danej grupy, niezależnie od twórcy meczu/globalnej roli. Członek czyta zapisany podział; bez lokalnej propozycji administratora. Role, RLS, roster/CAS, no-op i request_id nadal egzekwuje serwer. Po odebraniu roli nie pomaga ponowienie starego request_id. Edge mapuje odmowę na403; rzeczywisty test wykrył i doprowadził do poprawki wcześniejsze503.
+
+Dokładne piny: źródła589e643de9310bd8c205ce7b1c473a55fe767464, kandydat policy3e1c62c, implementacja CI2f4adedfbaeb2dd1e69f8dc22c62823fc2f0c168, osobny wskaźnik8c94e8c. CI dopuszcza dokładnie36 zadeklarowanych plików; stare implementacje i ancestry d7b36ee/cb63962/PR31/minimum zachowane. Brak wildcardów, zmiany manifestu55 lub automatycznej aktywacji Actions. Dokładny diff: `docs/review/slm-final-runtime.diff`.
+
+Faktyczne lokalne PASS: TypeScript, lint, strict Edge,395 Vitest/62 pliki,71 policy,consolidation44/55/13, Linux35 SourceTests i107 rzeczywistych odmów mutacji,SQL52, real GoTrue/Edge/PostgREST/PostgreSQL27,Cypress6,web/demo16artefaktów,Android Stage3 web,Gradle APK/JVM1/testAPK i pełne natywne5/5. Windows symlink wymaga niedostępnego uprawnienia1314; nie zmieniano testu, pełny Linux35PASS rozstrzyga ten przypadek. Cypress16 wymagał usunięcia odziedziczonego ELECTRON_RUN_AS_NODE tylko w procesie testu i wskazania istniejącego specPattern; bez instalacji i zmian ustawień Windows.
+
+SQL52 obejmuje dotychczasową regresję na nowej fixture43 oraz upgrade44/ACL. HTTP27 obejmuje13 dotychczasowych kontroli, upgrade44 i13 scenariuszy administratora/członka na44. Nie usunięto historycznych testów; stare pozytywne zapisy członka wykonują się PRZED zmianą polityki, a nowa polityka jest testowana PO upgrade. Po ostatnich poprawkach wyłącznie UI/natywnych nie powtarzano niezmienionego backendu.
+
+Emulator rzeczywisty: HOME/powrót na ten sam mecz i panel Składy; anulowanie galerii bez skoku do Home; klawiatura i pełne widoczne aktywne pole; zachowany niewysłany szkic telefonu; kontrolki360dp bez nakładania; systemowy Light/Dark, wyższy cutout i poziom sprawdzone w renderowanym APK. Zrzuty `docs/ui/slm-final/` zawierają wyłącznie fikcyjne konta, bez haseł/tokenów. Pierwsze próby pomiaru cutout trafiły w restart/zimny start A11y; nie zaliczono ich. Właściwy odbiór po starcie: zrzuty i natywna geometria/raw-cutout5PASS.
+
+NOT RUN: fizyczny POCO/Android12/MIUI, GitHub-hosted, Cloud, Storage upload i FCM. Test galerii obejmuje otwarcie/anulowanie systemowego wyboru, nie udaje wysłania zdjęcia do nieuruchomionego Storage. Źródła projektu Android nadal mają applicationId pl.psuda87.slm i native version1.0/1.
+
+Istniejący backend43 i jego dane zachowano bez migracji. Administratorzy składów wymagają nowej polityki44: działająca odrębna fixture44 ma relay127.0.0.1:55441. Tworzono tylko nowe izolowane kontenery istniejącym runnerem, bez resetowania/zmiany istniejących baz i Cloud. APK używa nadal127.0.0.1:64321; dla końcowych testów reverse musi prowadzić do55441. Na43 UI składu celowo pozostaje tylko do odczytu, gdy brak can_write.
+
+Integracja w chwili tego wpisu jeszcze NIE wykonana: po sprawdzeniu rzeczywistych refów merge i warunków GitHub wyłącznie zwykły merge33→RC, następnie32→main. Bez squash/rebase/force push i scalania innych PR. Finalny APK zostanie zbudowany z faktycznego main po merge. Wynik integracji, main SHA i SHA256 APK zostaną dopisane po wykonaniu; bez nazywania lokalnych wyników GitHub-hostedPASS.
