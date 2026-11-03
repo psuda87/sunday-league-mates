@@ -392,3 +392,6 @@ Instrukcja instalacji/uruchomienia i checklista docs/SLM_2_0_RC.md; bezpieczne z
 ## 2026-11-03 18:53 Europe/Warsaw — fix/slm2-minimum-phone
 
 Wykonano minimum/default10 i własny telefon PL/+48/hasło, migracja43tylko w nowejfixture; bezCloud/istniejącychbaz/merge/POCO. PASS387Vitest,61policy,consolidation43/55/13,Linux32+87source,SQL51,GoTrueEdge47,TS/lint/strictEdge/web/demo/AndroidAPK/JVM1/insets2. EmulatorLIVE:edycja minimum,zapis telefonu i niezależneAPIreadbackPASS. Backend43/55431wznowiony bezresetu; APK.cache/minimum-phone/slm2-minimum-phone-debug.apk. WindowsWinError1314symlink rozstrzygnięty pełnymLinux; hostedActions/POCONOTRUN. Piny51c980b/0d82b09/023dc9b/2de6e5e,Premium55manifestnietknięty. Raport docs/SLM_2_0_MINIMUM_PHONE.md,chronologia docs/ODPOWIEDZI_CODEX.txt. Następnykrok:DraftPRdoRC,odbiórścisłychpinówprzezwłaściciela,osobnytestPOCO; bezsquash/rebase.
+
+
+2026-11-03 18:57 Europe/Warsaw: opublikowano fix/slm2-minimum-phone, Draft PR33 → release/slm-2.0-rc/fa6bc792, bez merge. Funkcje minimum i telefonu oraz emulator LIVE PASS. APK i backend43/55431 gotowe według docs/SLM_2_0_MINIMUM_PHONE.md. Przed integracją: odbiór ścisłych pinów; test POCO i GitHub-hosted NOT RUN. Pełna chronologia docs/ODPOWIEDZI_CODEX.txt.
