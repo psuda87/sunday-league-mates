@@ -4,7 +4,7 @@ Gałąź `docs/screen-function-acceptance` z aktualnego origin/main `1b6ee83356d
 
 Premium3.18 pozostaje zaakceptowanym wzorcem wyglądu; nie przenoszono technicznych PASS lub dawnych raportów na akceptację funkcjonalną obecnego main. Stabilne ID, zależności, katalog17 pakietów testów, pola SHA/potwierdzenie/regresja i procedura funkcja→poprawka→testy→odbiór właściciela→osobna zgoda na merge→zamknięcie. Istniejąca UI_INTEGRATION_MAP rozszerzona o aktualny indeks i oznaczenie historycznej tabeli; TODO wskazuje tę samą sprawę, bez drugiego rejestru statusów.
 
-Weryfikacja tej pracy: wyłącznie spójność dokumentów/ID/linków/countów i zakresu Git. Testy aplikacji/SQL/build/lint/telefon NOT RUN; nie są potrzebne do oceny zmiany samych dokumentów i nie zatwierdzają funkcji. Bez zmian app/migracji/CI/guardów/UI/SupabaseCloud/merge/deploy. Publikacja i wynik utworzenia PR do main zapisane po próbie; brak zgody na merge.
+Weryfikacja tej pracy: wyłącznie spójność dokumentów/ID/linków/countów i zakresu Git. Testy aplikacji/SQL/build/lint/telefon NOT RUN; nie są potrzebne do oceny zmiany samych dokumentów i nie zatwierdzają funkcji. Bez zmian app/migracji/CI/guardów/UI/SupabaseCloud/merge/deploy. Zwykły push potwierdzony, commit mapy `dc7fa17857c0347d86c31eb1f89f85a4e612465e`. PR do main NIE UTWORZONY: GraphQL i POST REST API odmawiają Forbidden; [porównanie do utworzenia PR](https://github.com/psuda87/sunday-league-mates/compare/main...docs/screen-function-acceptance?expand=1). Tytuł/opis przygotowane; bez zgody na merge i bez fikcyjnego numeru PR.
 
 ---
 
