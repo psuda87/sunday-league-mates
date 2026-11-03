@@ -71,7 +71,7 @@ MINIMUM_PHONE_OVERLAY={
 }
 
 MINIMUM_PHONE_CI_IMPLEMENTATION='023dc9bfe5aef7f2ec2339495101870f4f364f6a'
-STABILIZATION_IMPLEMENTATION='315a0794b45386751eedc925b24878425fa59bd9'
+STABILIZATION_IMPLEMENTATION='3e1c62cdcbfc8312dd983228a1ea1ef78f785ee4'
 STABILIZATION_OVERLAY={
     'app/android/app/src/androidTest/java/com/getcapacitor/myapp/ExampleInstrumentedTest.java',
     'app/android/app/src/androidTest/java/pl/psuda87/slm/SlmWindowInsetsTest.java',
