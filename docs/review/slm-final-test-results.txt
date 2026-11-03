@@ -107,3 +107,5 @@ Cypress16/Chrome:6PASS after removing ELECTRON_RUN_AS_NODE in test process only.
 Emulator actual HOME/foreground same match+lineup, real chooser cancellation, IME+unsent profile draft,360dp nonoverlap PASS.
 Light/Dark system and tall cutout/landscape screenshots visually inspected after startup; Android native5PASS.
 Existing43 untouched; new isolated44 only. No cloud, POCO or hosted execution.
+
+Final main1b6ee83356d53b7b34193af88802067dc9b2fede: source gate PASS; app/.github/AGENTS identical to5ec314d. Final web/Cap sync/Gradle APK+JVM PASS. APK SHA256a62adb31332481934fb76b08dee402215b37bc315620f61ebf685bac4f9d91b3; signature/config PASS. Emulator install-r/start LIVE and logout/HOME/resume signed-out PASS. Fixture44 resume and actual Edge login200 PASS. PR33 and32 ordinary merged, GitHub-hosted NOT RUN; POCO NOT RUN.

@@ -132,3 +132,56 @@ NOT RUN: fizyczny POCO/Android12/MIUI, GitHub-hosted, Cloud, Storage upload i FC
 Istniejący backend43 i jego dane zachowano bez migracji. Administratorzy składów wymagają nowej polityki44: działająca odrębna fixture44 ma relay127.0.0.1:55441. Tworzono tylko nowe izolowane kontenery istniejącym runnerem, bez resetowania/zmiany istniejących baz i Cloud. APK używa nadal127.0.0.1:64321; dla końcowych testów reverse musi prowadzić do55441. Na43 UI składu celowo pozostaje tylko do odczytu, gdy brak can_write.
 
 Integracja w chwili tego wpisu jeszcze NIE wykonana: po sprawdzeniu rzeczywistych refów merge i warunków GitHub wyłącznie zwykły merge33→RC, następnie32→main. Bez squash/rebase/force push i scalania innych PR. Finalny APK zostanie zbudowany z faktycznego main po merge. Wynik integracji, main SHA i SHA256 APK zostaną dopisane po wykonaniu; bez nazywania lokalnych wyników GitHub-hostedPASS.
+
+## 2026-11-03 21:11 Europe/Warsaw — integracja zakończona
+
+PASS lokalny. PR33 scalono zwykłym merge `65b9a0ebd0ad542d41f65f30bcb2a37a0659c5eb`, PR32 zwykłym merge do main `1b6ee83356d53b7b34193af88802067dc9b2fede`. GitHub API potwierdza oba merged=true. Bez squash/rebase, nowych gałęzi/worktree/PR, usuwania gałęzi i zmian Cloud. Historyczne d7b36ee/cb63962 oraz wszystkie późniejsze piny są przodkami finalnego main. Testowy merge32 `15db90c64ed17d411504736e633e438bdb467a58` i rzeczywisty finalny main przeszły source gate; app/.github/AGENTS są bajtowo identyczne z przetestowanym5ec314d. Zintegrowany RC przeszedł consolidation44/55/13. Nie powtarzano niezmienionego backendu po merge.
+
+Przed merge ponownie sprawdzono main/RC: protected=false i rulesets=[]; PR mergeable=true/clean. Nie obchodzono ochrony. GitHub-hosted NOT RUN (brak runs dla finalnego main w chwili kontroli), nie PASS. Nie aktywowano Actions/zmiennych ani płatnych usług.
+
+Wykonane lokalnie: TypeScript, lint, strict Edge,395 Vitest,71 policy, Linux35 SourceTests+107 rzeczywistych odmów mutacji, SQL52, real HTTP27, Cypress6, JVM1 i native5/5; build web/demo/Android. Windows symlink WinError1314 pozostaje ograniczeniem hosta; ten sam niezmieniony test przechodzi w Linux. Szczegóły wcześniejszej sekcji i docs/review/slm-final-test-results.txt.
+
+Finalne APK z DOKŁADNEGO main1b6ee833 (checkout detached w istniejącym RC, następnie przywrócona gałąź):
+- `I:\slm\sunday-league-mates\.worktrees\slm2-minimum-phone\.cache\stabilization\slm-2.0-final-debug.apk`
+- SHA256 `a62adb31332481934fb76b08dee402215b37bc315620f61ebf685bac4f9d91b3`
+- aplikacja `pl.psuda87.slm`, native versionName1.0/versionCode1; nazwa wydania2.0 nie zmienia numeracji Android.
+- certyfikat debug SHA256 `1324e26980d16dbdca3dac8830b752924960ab1bcd418f84083f549f00692457`, zgodny z poprzednim lokalnym APK.
+- Build finalnego main: Android Stage3 web/TypeScript, Capacitor sync, Gradle assembleDebug/testDebugUnitTest offline PASS. apksigner verify i kontrola konfiguracji ZIP PASS; logging none, WebView debugging false, SystemBars insetsHandling disable, endpoint127.0.0.1:64321.
+- Faktyczna aktualizacja emulatora install -r PASS bez czyszczenia danych; odczyt meczu LIVE oraz logout→HOME→foreground: ekran logowania, brak starego meczu PASS. Wcześniejsze natywne5/5 i UI16/Chrome6 dotyczą identycznych źródeł. POCO nie podłączano/nie instalowano.
+
+### Backend i aktualizacja na POCO (polecenia do późniejszego wykonania przez właściciela)
+
+Istniejący backend43/55431 i dane zachowane. Nowa własna fixture44 działa na127.0.0.1:55441; wznowienie istniejącym runnerem --resume rzeczywiście wykonane, kontrola tożsamości kontenerów/obrazów i źródeł PASS, realny login Edge HTTP200. Wznowienie odtwarza wyłącznie własny stateless Edge z odświeżonym lokalnym JWT; nie migruje schematu ani danych. Fixture nie obejmuje Storage/FCM. Pełne obecne uprawnienia administratora składu wymagają44; backend43 jest celowo read-only dla nowego UI bez can_write.
+
+```powershell
+$fix = 'I:\slm\sunday-league-mates\.worktrees\slm2-minimum-phone'
+Invoke-RestMethod http://127.0.0.1:55441/healthz
+# TYLKO jeśli relay nie działa: osobny terminal, pozostaw otwarty.
+# Używamy już istniejącego checkoutu LF z zaakceptowanego main.
+Set-Location "$fix\.cache\minimum-phone\canonical"
+python -X utf8 -B docs/review/test-admin-lineups-local.py --resume --state-dir ../../../.cache/stabilization
+# Nie uruchamiaj bez --resume, nie usuwaj stanu/bazy; port zajęty oznacza STOP.
+```
+
+Jeżeli długotrwały relay zwraca błąd technicznego JWT, uruchom ponownie TYLKO jego własny proces i powyższy --resume; nie resetuj danych ani kluczy. Bieżący ukryty proces uruchomiono --resume, ma własne logi .cache/stabilization/backend44-resume.log/.err. Przed zatrzymaniem zawsze ustal PID nasłuchujący55441 i potwierdź CommandLine test-admin-lineups-local.py; nie zatrzymuj cudzych usług.
+
+```powershell
+$fix = 'I:\slm\sunday-league-mates\.worktrees\slm2-minimum-phone'
+$apk = "$fix\.cache\stabilization\slm-2.0-final-debug.apk"
+(Get-FileHash $apk -Algorithm SHA256).Hash
+$adb = Join-Path $env:LOCALAPPDATA 'Android\Sdk\platform-tools\adb.exe'
+& $adb devices -l
+$poco = 'WPISZ_SERIAL_FIZYCZNEGO_POCO' # wybierz jawnie, nie emulator-5554
+& $adb -s $poco install -r $apk
+if ($LASTEXITCODE -ne 0) { throw 'STOP: zachowaj dane; nie odinstalowuj i nie używaj pm clear. Sprawdź błąd/podpis.' }
+& $adb -s $poco reverse tcp:64321 tcp:55441
+if ($LASTEXITCODE -ne 0) { throw 'STOP: sprawdź USB/ADB i działający relay.' }
+& $adb -s $poco shell am start -W -n pl.psuda87.slm/.MainActivity
+notepad "$fix\.cache\stabilization\TEST-LOGIN.txt" # wyłącznie lokalne fikcyjne konto; nie publikuj pliku
+```
+
+Komputer/Docker/relay i USB muszą działać. Po odłączeniu telefonu ponów reverse. Nie łącz tego APK na siłę z Cloud. Jeśli stara lokalna sesja należy do innej fixture, wyloguj się w aplikacji i użyj konta44, bez czyszczenia danych aplikacji.
+
+Odbiór fizycznego Android12/MIUI nadal NOT RUN: IME na formularzach, ten sam mecz/zakładka po tle, anulowanie zdjęcia ze szkicem, status bar/cutout/obrót/Light-Dark i kontrolki składów360dp. Dodatkowo administrator zapisuje, członek tylko czyta; CAS/roster/no-op zachowane. Storage upload i FCM NOT RUN, nie są symulowane. Backend44 testuje prawdziwy Auth/Edge/PostgREST/PG; istniejących baz i Cloud nie zmieniono.
+
+Dokumentacja po integracji jest dopisana wyłącznie na istniejącym RC; main pozostaje dokładnym zatwierdzonym merge1b6ee833 i odpowiada APK. Znane sześć lokalnych zmian użytkownika w głównym worktree pozostawiono. Chronologia: docs/ODPOWIEDZI_CODEX.txt.
