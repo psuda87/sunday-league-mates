@@ -71,15 +71,17 @@ MINIMUM_PHONE_OVERLAY={
 }
 
 MINIMUM_PHONE_CI_IMPLEMENTATION='023dc9bfe5aef7f2ec2339495101870f4f364f6a'
-STABILIZATION_IMPLEMENTATION='f38fae018b9996dcf7c566da26fa72f1fab45fcc'
+STABILIZATION_IMPLEMENTATION='a131a6e7b862b2bf6d36c5c79642ba992ace5b4e'
 STABILIZATION_OVERLAY={
     'app/android/app/src/androidTest/java/com/getcapacitor/myapp/ExampleInstrumentedTest.java',
     'app/android/app/src/androidTest/java/pl/psuda87/slm/SlmWindowInsetsTest.java',
     'app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java',
     'app/capacitor.config.ts',
+    'app/scripts/lineups_ci.py',
     'app/scripts/premium-route-policy.mjs',
     'app/scripts/test-lineups-edge-local.py',
     'app/scripts/test-lineups-local.py',
+    'app/scripts/test_lineups_ci_context.py',
     'app/scripts/verify-consolidation.mjs',
     'app/scripts/verify-premium-policy-cases.mjs',
     'app/src/auth/B1App.test.tsx',
@@ -101,6 +103,8 @@ STABILIZATION_OVERLAY={
     'app/src/groups/useGroups.ts',
     'app/src/native/focusVisibility.test.ts',
     'app/src/native/focusVisibility.ts',
+    'app/supabase/functions/accounts/handler.ts',
+    'app/supabase/functions/accounts/lineups.test.ts',
     'app/supabase/migrations/20261103190639_group_admin_lineup_writes.sql',
     'app/supabase/tests/lineup_admin.sql',
 }
