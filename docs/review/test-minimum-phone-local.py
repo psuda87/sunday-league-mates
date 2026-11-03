@@ -1,14 +1,24 @@
 """Real minimum43/phone acceptance; only NEW containers from the existing runner.
 Bootstrap42 mode tests atomic upgrade of a fresh fixture, never an existing DB.
 """
-import argparse,importlib.util,json,secrets,shutil,subprocess,sys,uuid
+import argparse,importlib.util,json,secrets,shutil,socket,subprocess,sys,time,uuid
+from http.server import BaseHTTPRequestHandler,ThreadingHTTPServer
 from pathlib import Path
 from datetime import datetime,timedelta
 
 ROOT=Path(__file__).resolve().parents[2]
 parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--fixture-repo',type=Path,required=True)
+parser.add_argument('--serve',action='store_true')
+parser.add_argument('--resume',action='store_true')
 args=parser.parse_args()
+STATE=ROOT/'.cache/minimum-phone/local-backend.json'
+LOGIN=ROOT/'.cache/minimum-phone/TEST-LOGIN.txt'
+mobile=[]
+if args.serve or args.resume:
+ with socket.socket() as probe:
+  try:probe.bind(('127.0.0.1',55431))
+  except OSError:raise SystemExit('Port55431 already used; no containers changed.')
 repo=args.fixture_repo.resolve()
 sys.path.insert(0,str(repo/'app/scripts'))
 spec=importlib.util.spec_from_file_location('minimum_fixture',repo/'app/scripts/test-lineups-edge-local.py')
@@ -122,6 +132,7 @@ def verify(users,group):
  check(True,'knowing another phone and own password cannot take over the account')
  f.account(email_b,'save_email_profile',expected=409,nickname='Email B',phone='000000333',current_password=email_b['password'])
  check(f.account(email_b,'profile')['phone']=='','reverse-model contact collision denied')
+ mobile.extend([email_b,legacy])
  for path,body in (('/rpc/slm_email_profile_save',{'p_user':email_a['id'],'p_phone':'+48000000999','p_nickname':'forged','p_session':str(uuid.uuid4())}),('/rpc/slm_account_finish',{'p_user':legacy['id'],'p_operation':str(uuid.uuid4()),'p_phone':'+48000000999'})):
   status,_,_=f.http(3000,path,body,token=email_b['token']);check(status in (401,403,404),'authenticated client cannot invoke privileged phone RPC')
  check(f.account(email_a,'profile',user_id=email_b['id'])['user_id']==email_a['id'],'profile subject comes from verified session, not body target')
@@ -129,7 +140,103 @@ def verify(users,group):
  check(True,'logout blocks stale own-profile access')
  print('MINIMUM_PHONE_RESULT '+str(extra)+' PASS; real GoTrue/Edge/PostgreSQL; no Cloud/existing DB mutation',flush=True)
 
-try:f.main(verify)
+class Relay(BaseHTTPRequestHandler):
+ allowed={'http://localhost','https://localhost','capacitor://localhost'}
+ def log_message(self,*args):pass
+ def send(self,status,data):
+  origin=self.headers.get('Origin')
+  if origin and origin not in self.allowed:self.send_error(403);return
+  wire=json.dumps(data).encode();self.send_response(status);self.send_header('Content-Type','application/json');self.send_header('Cache-Control','no-store')
+  if origin:self.send_header('Access-Control-Allow-Origin',origin);self.send_header('Vary','Origin')
+  self.send_header('Access-Control-Allow-Methods','POST, OPTIONS');self.send_header('Access-Control-Allow-Headers','Content-Type, Authorization');self.send_header('Content-Length',str(len(wire)));self.end_headers()
+  try:self.wfile.write(wire)
+  except (BrokenPipeError,ConnectionResetError):pass
+ def do_GET(self):
+  if self.path!='/healthz':self.send_error(404);return
+  ready=f.http(9000,'/health')[0]==200;self.send(200 if ready else 503,{'ready':ready,'migrations':43,'local_test_only':True})
+ def do_OPTIONS(self):
+  if self.path!='/functions/v1/accounts':self.send_error(404);return
+  self.send(200,{})
+ def do_POST(self):
+  if self.path!='/functions/v1/accounts' or self.headers.get('Origin') not in (None,*self.allowed):self.send_error(403);return
+  try:
+   size=int(self.headers.get('Content-Length','0'));assert 0<size<=12288
+   body=json.loads(self.rfile.read(size));assert isinstance(body,dict)
+  except (ValueError,AssertionError):self.send_error(400);return
+  status,data,_=f.http(9000,self.path,body,self.headers.get('Authorization','').removeprefix('Bearer '));self.send(status or 503,data)
+
+def identities(names):
+ result=[]
+ for name in names:
+  d=json.loads(f.command(['docker','inspect',name]))[0]
+  assert d['Config']['Labels']['slm.fixture']=='lineups-edge-stage2a' and not d['HostConfig']['PortBindings']
+  assert d['HostConfig']['NetworkMode']=='none' or d['HostConfig']['NetworkMode'].startswith('container:')
+  result.append({'name':name,'id':d['Id'],'image':d['Image']})
+ return result
+
+def serve():
+ server=ThreadingHTTPServer(('127.0.0.1',55431),Relay)
+ print('READY owned backend43 http://127.0.0.1:55431; private credentials '+str(LOGIN),flush=True)
+ try:server.serve_forever()
+ finally:server.server_close()
+
+def renew_owned_edge(state,names):
+ # Existing runner service JWTs expire after one hour. Retain the database and
+ # its JWT signing key; replace only this verified, stateless fixture worker.
+ rest=json.loads(f.command(['docker','inspect',names[2]]))[0]
+ env=dict(item.split('=',1) for item in rest['Config']['Env'] if '=' in item)
+ f.SECRET=env['PGRST_JWT_SECRET']
+ assert len(f.SECRET)==64 and all(c in '0123456789abcdef' for c in f.SECRET)
+ edge=json.loads(f.command(['docker','inspect',names[3]]))[0]
+ mounts=[m for m in edge['Mounts'] if m['Destination']=='/fixture']
+ assert len(mounts)==1 and edge['Mounts']==mounts and not mounts[0]['RW']
+ assert edge['Image']==json.loads(f.command(['docker','image','inspect',f.EDGE_IMAGE]))[0]['Id']
+ source=Path(mounts[0]['Source']).resolve()
+ assert source.is_relative_to(repo/'.cache') and source.name==f.NAME
+ actual={p.relative_to(source/'functions').as_posix():p.read_bytes() for p in (source/'functions').rglob('*') if p.is_file()}
+ expected={p.relative_to(repo/'app/supabase/functions').as_posix():p.read_bytes() for p in (repo/'app/supabase/functions').rglob('*') if p.is_file()}
+ assert actual==expected,'Retained fixture functions differ from reviewed sources'
+ assert identities(names)==state['containers'],'Fixture identity changed during resume'
+ f.command(['docker','stop','--timeout','5',names[3]])
+ f.command(['docker','rm',names[3]])  # No -v; worker has only the read-only source bind, no database.
+ f.start(names[3],f.EDGE_IMAGE,{'FIXTURE_ANON':f.jwt('anon'),'FIXTURE_SERVICE':f.jwt('service_role')},['start','--ip','127.0.0.1','--main-service','/fixture'],source)
+ state['containers']=identities(names)
+ STATE.write_text(json.dumps(state,indent=2))
+ print('Renewed only owned stateless Edge fixture credentials; database/key/accounts retained.',flush=True)
+
+try:
+ if args.resume:
+  import lineups_ci
+  lineups_ci.verify_sources()
+  state=json.loads(STATE.read_text());assert state['migrations']==43 and state['name'].startswith('slm-lineups-edge-')
+  names=[state['name']+suffix for suffix in ('','-auth','-rest','-edge')]
+  assert identities(names)==state['containers']
+  f.NAME=state['name']
+  f.command(['docker','start',names[0]]);f.started.append(names[0])
+  for attempt in range(60):
+   if subprocess.run(['docker','exec',names[0],'pg_isready','-U','postgres'],capture_output=True,timeout=10).returncode==0:break
+   time.sleep(0.5)
+  else:raise RuntimeError('Recorded local PostgreSQL did not become ready; no schema changed')
+  for name in names[1:3]:f.command(['docker','start',name]);f.started.append(name)
+  renew_owned_edge(state,names)
+  for port,path in ((9999,'/health'),(3000,'/'),(9000,'/health')):f.wait_http(port,path)
+  serve()
+ else:
+  if args.serve:assert not STATE.exists(),'Use resume for the recorded fixture'
+  f.main(verify)
+  if args.serve:
+   admin,member=mobile
+   group=f.write(admin,'groups_create',name='SLM RC minimum i telefon')['group_id']
+   f.write(admin,'groups_invite',group_id=group,user_id=member['id'])
+   invitation=f.account(member,'groups_inbox')['requests'][0];f.write(member,'groups_decide',id=invitation['id'],accept=True)
+   event=f.write(admin,'matches_create',group_id=group,name='Minimum 13 - testy RC',visibility='private',date=(datetime.now()+timedelta(days=7)).strftime('%Y-%m-%d'),time='18:00',location='Boisko testowe',duration_minutes=90,capacity=15,minimum_players=13,cost_cents=0)['event_id']
+   for user in mobile:f.write(user,'matches_join',event_id=event)
+   for n in range(11):f.write(admin,'matches_guest',event_id=event,guest_name='Gosc RC '+str(n+1),list='registered')
+   assert f.account(admin,'matches_detail',event_id=event)['event']['registered_count']==13
+   LOGIN.write_text('LOCAL FICTIONAL ACCOUNTS ONLY\n'+''.join('Login: '+u['login']+'\nPhone: '+u['phone']+'\nPassword: '+u['password']+'\n\n' for u in mobile),encoding='utf-8')
+   STATE.write_text(json.dumps({'name':f.NAME,'migrations':43,'containers':identities(f.started)},indent=2))
+   serve()
+except KeyboardInterrupt:print('Stopping only owned backend43 fixture.',flush=True)
 finally:
  for name in reversed(f.started):subprocess.run(['docker','stop','--timeout','5',name],capture_output=True,timeout=25)
  print('Stopped/retained only NEW minimum-phone fixture: '+f.NAME,flush=True)
