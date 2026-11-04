@@ -1,4 +1,4 @@
-# Brevo i rejestracja e-mail — aktywowane, odbiór wiadomości do sprawdzenia
+# Brevo i rejestracja e-mail — działanie potwierdzone przez właściciela
 
 2026-11-04, `feat/premium-legal-pages`. Po wyraźnym potwierdzeniu właściciela
 włączono samorejestrację Supabase i `SLM_EMAIL_SIGNUP_ENABLED=true`. Zachowano
@@ -9,9 +9,11 @@ podpisu hooka wprowadził właściciel bezpośrednio w panelu. Send Email hook H
 jest włączony. W tym etapie bez zmian kodu, migracji, Edge Functions i Vercel.
 PASS: UI potwierdza zapis; puste POST signup zwraca400`invalid_input` i dokładny
 CORS zamiast wcześniejszego503`mail_unconfigured`. To nie dowodzi wysłania poczty.
-NOT RUN: rzeczywista rejestracja, SMTP/doręczenie, potwierdzenie i recovery.
-Następny krok: właściciel rejestruje konto przez formularz Vercel; sprawdzić
-wiadomość, potwierdzenie i logowanie, a następnie odzyskiwanie. Dokumenty prawne
+RĘCZNY PASS według potwierdzenia właściciela w tej rozmowie: rzeczywista
+rejestracja przez Vercel, dostarczenie wiadomości Brevo, kliknięcie linku,
+potwierdzenie konta i skuteczne logowanie. Agent nie wykonywał tych kroków
+samodzielnie; nie zapisano danych konta ani dowodów weryfikacyjnych.
+NOT RUN: odzyskiwanie hasła. Następny krok: sprawdzić recovery. Dokumenty prawne
 nadal testowe i wymagają uzupełnienia oznaczonych danych.
 
 ---
