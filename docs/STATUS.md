@@ -1,4 +1,4 @@
-# Dokumenty testowe Premium — przygotowane do publikacji
+# Dokumenty testowe Premium — opublikowane
 
 2026-11-04, `feat/premium-legal-pages`, baza faktycznie wdrożonego PR34 `2d568f3`.
 Dodano statyczne `/regulamin/` i `/polityka-prywatnosci/` z oznaczeniem brakujących
@@ -9,7 +9,10 @@ TS/lint/build,476Vitest/68plików,82policy,3testy konfiguracji,kontrakt55/13gran
 Cypress nie wykonał scenariuszy (brak serwera localhost5173). Backend accounts v8
 odczytany; bezdane POST signup:503`mail_unconfigured`, poprawny CORS. Rejestracja
 i rzeczywista wysyłka niezaliczone z powodu wyłączonego procesu poczty. Następny
-krok: publikacja tej gałęzi i sprawdzenie dokumentów oraz walidacji w przeglądarce.
+krok: uzupełnić dane administratora i dostawców, skonfigurować pocztę zgodnie z
+PREMIUM_REAL_AUTH_WEB.md i dopiero wtedy sprawdzić pełną rejestrację. Produkcja
+Vercel READY: `023ebcd`, alias slm-ui-demo.vercel.app. Obie strony HTTP200,
+formularz ma linki i nadal wymaga zgody oraz walidacji. PR35 pozostaje Draft.
 Raport: [PREMIUM_LEGAL_PAGES.md](PREMIUM_LEGAL_PAGES.md). Bez merge do main.
 
 ---

@@ -55,7 +55,16 @@ VITE_SLM_PRIVACY_URL=https://slm-ui-demo.vercel.app/polityka-prywatnosci
 
 Root `app`, build `npm run build:premium-web`, output `dist-premium-web`.
 Automatyczne wdrożenia Git pozostają wyłączone. Nie zmieniono ochrony Vercel.
-Wyniki publikacji i HTTP zostaną dopisane po sprawdzeniu rzeczywistego wdrożenia.
+Produkcja: `023ebcd095545bf52b8e99fef155172f31700fe8`, deployment
+`dpl_7eCU7sDWvKvwjycvFBu3BoLT9pZM` — READY; istniejący alias
+`slm-ui-demo.vercel.app` wskazuje ten deployment. Oba URL (także warianty z
+końcowym ukośnikiem), `/` i `/legal.css` odpowiadają HTTP200 z właściwym typem,
+`noindex, nofollow` i `nosniff`. Przeglądarka pokazuje obie polskie strony
+bez logowania. Formularz pokazuje linki, pole zgody jest aktywne i początkowo
+odznaczone. Pusta próba zgłasza walidację e-maila, hasła, pseudonimu i wymaganej
+akceptacji; nie wysyła żądania rejestracji. Konsola nie zgłosiła błędów.
+Rzeczywistego utworzenia konta, dostarczenia wiadomości i potwierdzenia e-mail
+nie zaliczono, ponieważ serwer zwraca `mail_unconfigured`.
 
 ## Faktyczne kontrole lokalne
 
