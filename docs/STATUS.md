@@ -1,3 +1,14 @@
+# Automatyczny push — zasada pracy
+
+2026-11-04, `feat/premium-legal-pages`. Na polecenie właściciela zapisano w AGENTS.md
+obowiązek zwykłego push po każdej zakończonej zmianie i odpowiednich kontrolach.
+Nie stanowi to zgody na merge, deploy ani zdalne migracje. Zmiana wyłącznie
+dokumentacyjna: sprawdzono diff; testów aplikacji nie powtarzano. Przygotowano
+wysłanie zaległego commita prywatności `bab1acc` oraz tej zasady; wynik push
+potwierdzany bezpośrednio na GitHub w raporcie rozmowy.
+
+---
+
 # Prywatność telefonu i usuwanie konta — implementacja bez wdrożenia
 
 2026-11-04, `feat/premium-legal-pages`, baza `5d39c00`. Przygotowano migrację46
