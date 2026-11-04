@@ -1,3 +1,16 @@
+# Przegląd strażników Premium — propozycja bez aktywacji
+
+2026-11-04, `feat/premium-legal-pages`, przegląd `bab1acc`. Zapisano dokładny diff
+chronionych źródeł względem ich indywidualnych zatwierdzonych baseline oraz
+nieaktywny patch trzech strażników w docs/review/account-privacy-*. Historyczny
+manifest55 pozostaje bez zmian. Przycisk w zamkniętych ustawieniach rozszerza
+ich zawartość i jest wymaganym wyjątkiem funkcjonalnym od zamrożonego źródła;
+karta, CSS i pozostały profil bez zmian. Rekomendacja: NO-GO publikacji do odbioru
+wyjątku przez właściciela. Nie powtarzano testów, nie wdrażano, nie migrowano.
+Sprawdzono wyłącznie stosowalność propozycji przez git apply --check.
+
+---
+
 # Automatyczny push — zasada pracy
 
 2026-11-04, `feat/premium-legal-pages`. Na polecenie właściciela zapisano w AGENTS.md
