@@ -1,3 +1,19 @@
+# Dokumenty testowe Premium — przygotowane do publikacji
+
+2026-11-04, `feat/premium-legal-pages`, baza faktycznie wdrożonego PR34 `2d568f3`.
+Dodano statyczne `/regulamin/` i `/polityka-prywatnosci/` z oznaczeniem brakujących
+danych administratora, dostawców, transferów i retencji. Bez zmian UI, Auth,
+strażników, migracji i Edge Functions. Vercel istniejący `slm-ui-demo`, plan Hobby;
+obie publiczne zmienne VITE ustawione na HTTPS tego projektu. PASS: buildPremium,
+TS/lint/build,476Vitest/68plików,82policy,3testy konfiguracji,kontrakt55/13granic.
+Cypress nie wykonał scenariuszy (brak serwera localhost5173). Backend accounts v8
+odczytany; bezdane POST signup:503`mail_unconfigured`, poprawny CORS. Rejestracja
+i rzeczywista wysyłka niezaliczone z powodu wyłączonego procesu poczty. Następny
+krok: publikacja tej gałęzi i sprawdzenie dokumentów oraz walidacji w przeglądarce.
+Raport: [PREMIUM_LEGAL_PAGES.md](PREMIUM_LEGAL_PAGES.md). Bez merge do main.
+
+---
+
 # Uruchomienie Vercel — repozytorium gotowe, dostęp zdalny zablokowany
 
 2026-11-04 13:06 UTC, `feat/premium-real-auth-web`, PR34 wg właściciela. Zatwierdzone Auth36ed569 przypięte w strażnikach: PASS45migracji/55plików/13granic i82policy (stare71+11),476Vitest,TS/strictEdge/lint,buildPremium i3testy konfiguracji. Manifest55 i aplikacja bez zmian. Lokalny produkcyjny preview: HTTP200, logowanie390px, SPA/czyszczeniecallbacku, bez JS/overflow. Vercel rootapp/build:premium-web/dist-premium-web przygotowany. Bez migracji45/deployaccounts/Cloud/merge. Dostęp Vercel/Supabase: proxy403, brak aktywnego dostępu. Jedyny krok zewnętrzny: ChatGPT ma ręcznie wdrożyć PR34 w istniejącym slm-ui-demo i ustawić CORS oraz backend hjtcyybkxebvdropchac według [instrukcji](PREMIUM_REAL_AUTH_WEB.md). Brak SMTP nie blokuje pierwszego testu istniejącego logowania. Cypress/realny backend/telefon/hostedCI niezaliczone; bez instalacji CLI i żądania tokenów. Osobny snapshot SQL/Edge CI nie był częścią frontendowego uruchomienia.
