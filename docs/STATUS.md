@@ -13,8 +13,11 @@ RĘCZNY PASS według potwierdzenia właściciela w tej rozmowie: rzeczywista
 rejestracja przez Vercel, dostarczenie wiadomości Brevo, kliknięcie linku,
 potwierdzenie konta i skuteczne logowanie. Agent nie wykonywał tych kroków
 samodzielnie; nie zapisano danych konta ani dowodów weryfikacyjnych.
-NOT RUN: odzyskiwanie hasła. Następny krok: sprawdzić recovery. Dokumenty prawne
-nadal testowe i wymagają uzupełnienia oznaczonych danych.
+RĘCZNY PASS według kolejnego potwierdzenia właściciela: reset hasła działa
+prawidłowo. Podstawowe ścieżki konta (rejestracja, weryfikacja e-mail, logowanie,
+odzyskiwanie hasła) odebrane ręcznie przez właściciela; nie jest to pełny audyt
+wszystkich przypadków bezpieczeństwa. Następny krok: uzupełnić oznaczone dane
+w nadal testowych dokumentach prawnych.
 
 ---
 
