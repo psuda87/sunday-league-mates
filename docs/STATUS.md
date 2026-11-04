@@ -1,3 +1,21 @@
+# Brevo i rejestracja e-mail — aktywowane, odbiór wiadomości do sprawdzenia
+
+2026-11-04, `feat/premium-legal-pages`. Po wyraźnym potwierdzeniu właściciela
+włączono samorejestrację Supabase i `SLM_EMAIL_SIGNUP_ENABLED=true`. Zachowano
+Confirm email, secure email change, wymaganie obecnego hasła, wyłączone konta
+anonimowe/manual linking/telefon oraz blokadę SMS. Zapisano konfigurację Brevo
+i dokładny callback `https://slm-ui-demo.vercel.app/auth/callback`; SMTP i sekret
+podpisu hooka wprowadził właściciel bezpośrednio w panelu. Send Email hook HTTPS
+jest włączony. W tym etapie bez zmian kodu, migracji, Edge Functions i Vercel.
+PASS: UI potwierdza zapis; puste POST signup zwraca400`invalid_input` i dokładny
+CORS zamiast wcześniejszego503`mail_unconfigured`. To nie dowodzi wysłania poczty.
+NOT RUN: rzeczywista rejestracja, SMTP/doręczenie, potwierdzenie i recovery.
+Następny krok: właściciel rejestruje konto przez formularz Vercel; sprawdzić
+wiadomość, potwierdzenie i logowanie, a następnie odzyskiwanie. Dokumenty prawne
+nadal testowe i wymagają uzupełnienia oznaczonych danych.
+
+---
+
 # Dokumenty testowe Premium — opublikowane
 
 2026-11-04, `feat/premium-legal-pages`, baza faktycznie wdrożonego PR34 `2d568f3`.
