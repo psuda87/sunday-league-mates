@@ -1,5 +1,5 @@
 {
-  "status": "PROPOSED_ONLY_REQUIRES_OWNER_REVIEW",
+  "status": "OWNER_AUTHORIZED_AUTH_PINS_ACTIVATED",
   "base": "1b6ee83356d53b7b34193af88802067dc9b2fede",
   "normalization": "CRLF to LF before SHA256",
   "ui_manifest_files": 55,
@@ -11,7 +11,7 @@
   "new_migrations": [
     "app/supabase/migrations/20261104090000_accounts_email_ui.sql"
   ],
-  "active_guards_or_ci_modified": false,
+  "active_guards_or_ci_modified": true,
   "files": [
     {
       "path": ".gitignore",
@@ -143,5 +143,13 @@
       "base_sha256": "2b201804cc4338b6ac8da01debcaf066cd9709e7bbccd1cb4ca4921b3b05e8c7",
       "proposed_sha256": "655cc075b3955dfeb73517d2820a2d17847b9232e5cce52697785c32acbd9a38"
     }
+  ],
+  "approved_source": "36ed569b62bb6861640d2f64c10ed12038c4b15a",
+  "ci_modified": false,
+  "source_guard_files_modified": [
+    "app/scripts/premium-route-policy.mjs",
+    "app/scripts/verify-consolidation.mjs",
+    "app/scripts/verify-frozen-ui.mjs",
+    "app/scripts/verify-premium-policy-cases.mjs"
   ]
 }

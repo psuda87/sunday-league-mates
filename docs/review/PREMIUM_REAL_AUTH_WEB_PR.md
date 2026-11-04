@@ -1,3 +1,5 @@
+Aktualizacja PR34: właściciel zatwierdził przypięcia Auth. Frontendowe strażniki są już PASS:45 migracji/55plików/13granic oraz82 testy policy (wszystkie stare71 zachowane). Build Premium,476Vitest,TS/lint i lokalny produkcyjny previewHTTP200 PASS. Bez zmian aplikacji i oryginalnego manifestu55. Starszy opis blokady pinów poniżej jest historyczny. Wdrożenie naVercel/zmianyCloud nie zostały wykonane z powodu braku dostępu API; jedno konkretne działanie dlaChatGPT podano na początku docs/PREMIUM_REAL_AUTH_WEB.md.
+
 Premium używał rzeczywistego logowania, ale rejestracja, callback i recovery pozostawały niepodłączone, a Vercel budował demo. Ta zmiana podłącza istniejące ekrany do accounts i dodaje produkcyjny build tego samego entry Premium, bez kopii aplikacji.
 
 - Zachowany SessionManager; dowody wyłącznie we fragmencie URL, natychmiast czyszczone. Weryfikacja/reset nie przekazują sesji przeglądarce; wymagane normalne logowanie.

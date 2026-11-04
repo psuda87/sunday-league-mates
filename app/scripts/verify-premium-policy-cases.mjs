@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {verifyPremiumRuntime,APPROVED,LINEUPS_MIGRATION,DISCOVERY_MIGRATION,MINIMUM_MIGRATION,ADMIN_MIGRATION} from './premium-route-policy.mjs';
+import {verifyPremiumRuntime,APPROVED,LINEUPS_MIGRATION,DISCOVERY_MIGRATION,MINIMUM_MIGRATION,ADMIN_MIGRATION,AUTH_WEB_MIGRATION,AUTH_WEB_FILES} from './premium-route-policy.mjs';
 const root=fileURLToPath(new URL('../../',import.meta.url));
 const read=p=>readFileSync(root+'/'+p,'utf8');
 test('actual source graph passes',()=>assert.equal(verifyPremiumRuntime(root).frozen,55));
@@ -78,4 +78,21 @@ for(const [label,path,mutate] of [
  ['event edit overwrites a resumed version','app/src/events/PremiumEvents.tsx',s=>s.replace('editVersion.current!==e?.version','false')],
  ['logout permits foreground refresh','app/src/auth/useB1Lifecycle.ts',s=>s.replace("mayResume()&&manager.getSnapshot()","true&&manager.getSnapshot()")],
  ['raw cutout forwarded twice','app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java',s=>s.replace('.setDisplayCutout(null)','')],
+ ['email operation accepts a session','app/src/auth/sessionManager.ts',s=>s.replace("'access_token' in result","false")],
+ ['recovery actor forged','app/supabase/functions/accounts/emailFlows.ts',s=>s.replace('p_actor:user.id','p_actor:body.user_id')],
+ ['email proof check redirected','app/supabase/functions/accounts/emailFlows.ts',s=>s.replace("'/auth/v1/verify'","'/auth/v1/user'")],
+ ['mail signature removed','app/supabase/functions/accounts/emailHook.ts',s=>s.replace('if(!await bounded(()=>signature','if(false&&!await bounded(()=>signature')],
+ ['SMTP TLS replaced','app/supabase/functions/accounts/index.ts',s=>s.replace('Deno.connectTls(options)','Deno.connect(options)')],
+ ['Premium web builds demo','app/scripts/build-premium-web.mjs',s=>s.replace("cwd+'vite.b1.config.ts'","cwd+'vite.demo.config.ts'")],
+ ['Vercel CSP allows every destination','app/vercel.json',s=>s.replace("connect-src 'self' https://hjtcyybkxebvdropchac.supabase.co","connect-src *")],
+ ['email helper exposed to clients',AUTH_WEB_MIGRATION,s=>s.replace('to service_role;','to authenticated,service_role;')],
+ ['email recovery loses version check',AUTH_WEB_MIGRATION,s=>s.replace('s.security_version is distinct from p_version','false')],
+ ['account appearance changed','app/src/account-ui/AccountScreens.tsx',s=>s.replace('slm-account-panel','slm-account-unsafe')],
 ])test('rejects '+label,()=>{verifyPremiumRuntime(root);const source=read(path),changed=mutate(source);assert.notEqual(changed,source,'Mutation must exercise a real source change');assert.throws(()=>verifyPremiumRuntime(root,{[path]:changed}));});
+test('cannot remove an approved Auth source from the exact inventory',()=>{
+ const path='app/src/auth/emailCallback.ts';
+ assert(AUTH_WEB_FILES.has(path));AUTH_WEB_FILES.delete(path);
+ try{assert.throws(()=>verifyPremiumRuntime(root),/Approved Auth file set changed/);}
+ finally{AUTH_WEB_FILES.add(path);}
+ verifyPremiumRuntime(root);
+});

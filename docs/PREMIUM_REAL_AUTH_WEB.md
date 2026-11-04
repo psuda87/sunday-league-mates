@@ -1,3 +1,15 @@
+# Bieżący stan uruchomienia — PR34
+
+Na polecenie właściciela aktywowano dokładne przypięcia Auth z `36ed569b62bb6861640d2f64c10ed12038c4b15a`. **PASS: consolidation45/55/13, wszystkie82 testy policy (stare71 +11 nowych),476 Vitest, TypeScript/strictEdge, lint, build Premium i3 testy konfiguracji.** Bez zmian aplikacji, oryginalnego manifestu55, wyłączenia testów lub wildcardów. Runtime porównuje26 zatwierdzonych plików do niezmiennego commita; lista też jest weryfikowana względem historycznego manifestu.
+
+Rzeczywisty produkcyjny build uruchomiono lokalnie: HTTP200, ekran logowania390px, brak błędów JS/overflow, działający SPA callback i czyszczenie URL. To nie test zalogowania do Supabase. Zdalnego URL nie uzyskano: API Vercel/Supabase blokuje proxy403, brak aktywnego dostępu/narzędzi tych usług. Nie instalowano CLI ani nie żądano tokenów. Migracja45 i nowy accounts nie zostały wdrożone. Cypress nie blokował pracy; realne GoTrue/SMTP/Cloud/telefon pozostają niezweryfikowane. Osobny snapshot izolowanego SQL/Edge CI pozostawiono do jego własnego etapu, nie uruchamiano fixture ani Actions.
+
+**Jedno działanie dla ChatGPT z podłączonymi narzędziami:** wykonaj ręczne wdrożenie PR34 (`feat/premium-real-auth-web`) w istniejącym `slm-ui-demo`: Root `app`, Build `npm run build:premium-web`, Output `dist-premium-web`. Dodaj uzyskany dokładny origin HTTPS do istniejącej listy CORS `accounts` w `hjtcyybkxebvdropchac` i sprawdź login istniejącego konta testowego. W ramach tego uruchomienia zastosuj wyłącznie przygotowaną migrację45 i zaktualizuj istniejący `accounts`, a callback/SMTP ustaw według tabel poniżej. Brak SMTP nie powinien zatrzymać pierwszego wdrożenia i testu istniejącego logowania v7. Zwróć zweryfikowany HTTPS URL; nie twórz nowych projektów i nie wyłączaj Auth/RLS.
+
+Poniżej zachowano szczegółową konfigurację i historię; wcześniejsza blokada frontendowych przypięć jest już rozwiązana.
+
+---
+
 # Premium 3.18 — rzeczywiste konta i build web
 
 2026-11-04. Baza: `main` / `1b6ee83356d53b7b34193af88802067dc9b2fede`.
