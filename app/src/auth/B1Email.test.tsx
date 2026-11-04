@@ -44,6 +44,7 @@ it('usuwa dowód z adresu przed transportem i potwierdza e-mail tylko raz także
  const f=fixture(async action=>{expect(window.location.href).not.toContain(hash);expect(action).toBe('verify_email');return {email_verified:true};});
  render(<StrictMode><B1App manager={f.manager}/></StrictMode>);
  await screen.findByRole('heading',{name:'E-mail potwierdzony'});expect(f.request).toHaveBeenCalledTimes(1);expect(f.store.clear).toHaveBeenCalledOnce();expect(f.store.write).not.toHaveBeenCalled();
+ expect(screen.getByText('Zaloguj się adresem e-mail.')).toBeVisible();
  fireEvent.click(screen.getByRole('button',{name:'Przejdź do logowania'}));await screen.findByRole('heading',{name:'Zaloguj się'});
 });
 it('wykonuje recovery bez odtworzenia starego konta, bez zapisu tokenów i kończy na logowaniu',async()=>{

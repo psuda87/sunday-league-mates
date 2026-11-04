@@ -41,7 +41,7 @@ export function displayName(login: string, fullName: string, mode: string) {
 }
 
 export function createHandler(env: Environment) {
-  async function call(path: string, method = 'GET', body?: unknown, token?: string, admin = false) {
+  async function call(path: string, method = 'GET', body?: unknown, token?: string, admin = false, signal?:AbortSignal) {
     const headers: Record<string, string> = { apikey: admin ? env.service : env.anon,
       Authorization: `Bearer ${token ?? (admin ? env.service : env.anon)}` };
     if (body !== undefined) headers['Content-Type'] = 'application/json';
@@ -49,7 +49,7 @@ export function createHandler(env: Environment) {
     let r: Response;
     try {
       r = await fetch(env.url + path, { method, headers,
-        body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(15000) });
+        body: body === undefined ? undefined : JSON.stringify(body), signal: signal?AbortSignal.any([signal,AbortSignal.timeout(15000)]):AbortSignal.timeout(15000) });
     } catch { throw new ApiError(503, 'service_unavailable', 'Serwer jest chwilowo niedostępny. Spróbuj ponownie.'); }
     const data = await r.json().catch(() => null);
     return { ok: r.ok, status: r.status, data };
@@ -141,10 +141,14 @@ export function createHandler(env: Environment) {
   return async (request: Request): Promise<Response> => {
     if(new URL(request.url).searchParams.get('hook')==='email'){
       return sendEmailHook(request,env,{
-        aliases:async user=>(await db(`slm_aliases?user_id=eq.${user}&select=user_id`)).length>0,
-        send:async mail=>{
+        aliases:async(user,signal)=>{
+          const r=await call(`/rest/v1/slm_aliases?user_id=eq.${user}&select=user_id`,'GET',undefined,undefined,true,signal);
+          if(!r.ok||!Array.isArray(r.data))throw Error('mail_unconfirmed');
+          return r.data.length>0;
+        },
+        send:async(mail,signal)=>{
           if(!env.connectSmtp)throw Error('mail_unconfigured');
-          await sendSmtp(env.smtp??{},mail,env.connectSmtp);
+          await sendSmtp(env.smtp??{},mail,env.connectSmtp,signal);
         },
       });
     }

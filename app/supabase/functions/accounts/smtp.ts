@@ -11,33 +11,34 @@ export function smtpSettings(s:Partial<SmtpSettings>):s is SmtpSettings{
   typeof s.password==='string'&&s.password.length>0&&s.password.length<=1024&&!/[\r\n\0]/.test(s.password)&&mailAddress(s.from);
 }
 const base64=(s:string)=>btoa(String.fromCharCode(...new TextEncoder().encode(s)));
-export async function sendSmtp(settings:Partial<SmtpSettings>,mail:Mail,connect:ConnectSmtp):Promise<void>{
+export async function sendSmtp(settings:Partial<SmtpSettings>,mail:Mail,connect:ConnectSmtp,deadline:AbortSignal=AbortSignal.timeout(4000)):Promise<void>{
  if(!smtpSettings(settings)||!mailAddress(mail.to)||!mail.id.match(/^[a-zA-Z0-9_-]{1,128}$/))throw Error('mail_unconfigured');
- const deadline=AbortSignal.timeout(12000);
  let conn:SmtpConnection|undefined;
  let buffer='';const encoder=new TextEncoder(),decoder=new TextDecoder();
- async function bounded<T>(operation:Promise<T>):Promise<T>{
+ async function bounded<T>(operation:()=>Promise<T>):Promise<T>{
   if(deadline.aborted)throw Error('mail_timeout');
   return new Promise<T>((resolve,reject)=>{
    const abort=()=>{try{conn?.close();}catch{/* The socket may already be closed. */}reject(Error('mail_timeout'));};
    deadline.addEventListener('abort',abort,{once:true});
-   operation.then(resolve,reject).finally(()=>deadline.removeEventListener('abort',abort));
+   try{operation().then(resolve,reject).finally(()=>deadline.removeEventListener('abort',abort));}
+   catch(error){deadline.removeEventListener('abort',abort);reject(error);}
   });
  }
  try{
   // Deno connectTls verifies the certificate and hostname by default. Only port465.
+  if(deadline.aborted)throw Error('mail_timeout');
   const connecting=connect({hostname:settings.host,port:465});
   void connecting.then(c=>{if(deadline.aborted)try{c.close();}catch{/* Already closed. */}},()=>undefined);
-  conn=await bounded(connecting);
+  conn=await bounded(()=>connecting);
   async function write(value:string){
    const bytes=encoder.encode(value);let offset=0;
-   while(offset<bytes.length){const n=await bounded(conn!.write(bytes.subarray(offset)));if(n<=0)throw Error('mail_transport');offset+=n;}
+   while(offset<bytes.length){const n=await bounded(()=>conn!.write(bytes.subarray(offset)));if(n<=0)throw Error('mail_transport');offset+=n;}
   }
   async function reply(code:number){
    let total=0;
    while(true){
     while(!buffer.includes('\r\n')){
-     const bytes=new Uint8Array(2048),n=await bounded(conn!.read(bytes));if(n===null||n===0)throw Error('mail_transport');
+     const bytes=new Uint8Array(2048),n=await bounded(()=>conn!.read(bytes));if(n===null||n===0)throw Error('mail_transport');
      buffer+=decoder.decode(bytes.subarray(0,n),{stream:true});if(buffer.length>32768)throw Error('mail_transport');
     }
     const end=buffer.indexOf('\r\n'),line=buffer.slice(0,end);buffer=buffer.slice(end+2);total+=line.length;

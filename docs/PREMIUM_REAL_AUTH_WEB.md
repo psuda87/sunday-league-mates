@@ -195,7 +195,7 @@ down/reset ani automatycznego deployu.
 ## Testy i blokady
 
 - PASS: TypeScript frontend i strict Edge, pełny ESLint.
-- PASS: pełny Vitest **468/468, 68 plików**; 395 dotychczasowych testów zachowanych,
+- PASS: pełny Vitest **476/476, 68 plików**; 395 dotychczasowych testów zachowanych,
   test oczekujący braku integracji zastąpiony testem nowych bezpiecznych ograniczeń.
 - PASS: 3 testy konfiguracji produkcyjnego builda; build Premium web, LIVE i demo.
 - PASS: izolacja builda demo — 16 plików bez Auth/Edge/Supabase.
@@ -280,3 +280,34 @@ Nie wymagano nowych poświadczeń. Gotowy opis: [PREMIUM_REAL_AUTH_WEB_PR.md](re
 [Porównanie i formularz utworzenia PR do main](https://github.com/psuda87/sunday-league-mates/compare/main...feat/premium-real-auth-web?expand=1).
 Wymagane review przypięć oraz realnego backendu pozostaje blokadą integracji;
 nie wykonano merge ani wdrożenia.
+
+## Kontynuacja z niezmienionego main — 2026-11-04
+
+Ponowny fetch potwierdził ten sam main1b6ee83 i czystą gałąź implementacyjną d5a52e3.
+Nie powielano gałęzi ani dotychczasowej integracji. Dopracowano:
+
+- instrukcję po potwierdzeniu: logowanie adresem e-mail, bez zmiany pól lub styli;
+- odmowę lokalnego callbacku nawet wtedy, gdy localhost jest dopuszczony jako
+  origin istniejącej aplikacji natywnej;
+- wspólny limit4 sekund dla całego HTTP Send Email hooka (body/podpis/aliasy/SMTP).
+  W oficjalnym GoTrue d7955e9 `internal/hooks/hookshttp/hookshttp.go` domyślny
+  HTTP hook timeout wynosi5 sekund. Dawny limit SMTP12 sekund był zbyt długi.
+  Anulowanie żądania/budżetu przerywa odczyt aliasów i zamyka SMTP; po wygaśnięciu
+  nie otwieramy nowego połączenia ani nie rozpoczynamy kolejnej komendy.
+
+Nowe testy obejmują5 wariantów lokalnego callbacku, deadline odczytu aliasów,
+przekazanie tego samego sygnału do SMTP i odmowę rozpoczęcia SMTP po anulowaniu.
+Ponownie PASS: TS frontend/strict Edge i testów backendu, lint,476 Vitest/68 plików,
+3 testy konfiguracji, build Premium i demo/izolacja16, Chromium320/390/768 i12
+trybów/palet. Zrzuty logowania Dark i Light są identyczne bajtowo z d5a52e3;
+zmieniła się wyłącznie instrukcja na zrzucie potwierdzenia.
+
+Aktualne strażniki nadal FAIL;71 testów policy nie uzyskuje zatwierdzonego baseline.
+Nie aktualizowano aktywnych pinów, CI ani manifestu55. Cytat z AGENTS.md:
+„Zmiana strażników i CI wymaga osobnego przeglądu właściciela.” Nowy manifest
+pozostaje wyłącznie propozycją do tego przeglądu.
+
+GitHub REST odczytu repozytorium nadal zwraca Forbidden. Pobranie Cypress z
+`download.cypress.io` blokuje proxy403; CLI nie znajduje binarium. Cypress oraz
+realny GoTrue/SQL/RLS/SMTP/telefon/Cloud pozostają NOT RUN. Nie wykonano wdrożenia,
+zmian Cloud ani migracji. Konfiguracja do osobnego wdrożenia jest taka sama jak wyżej.

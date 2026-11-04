@@ -18,6 +18,10 @@ describe('email accounts (kontrolowany transport GoTrue/RPC, nie Cloud)',()=>{
   for(const bad of ['https://evil.invalid/auth/callback','http://slm.example.invalid/auth/callback','https://slm.example.invalid/auth/callback?next=bad'])expect(()=>emailRedirect({...env,emailRedirectUrl:bad})).toThrow();
   expect(call).not.toHaveBeenCalled();
  });
+ it.each(['https://localhost','https://app.localhost','https://127.0.0.1','https://127.1','https://[::1]'])('nie używa lokalnego callbacku %s nawet z allowlisty natywnego CORS',origin=>{
+  const normalized=new URL(origin).origin;
+  expect(()=>emailRedirect({...env,origins:[normalized],emailRedirectUrl:origin+'/auth/callback'})).toThrow('Proces e-mail');
+ });
  it('rejestruje przez GoTrue z walidowanym profilem, bez roli, grup, dowolnych redirectów lub autoconfirm',async()=>{
   const {d,call}=deps();const p={nickname:' Fikcyjny ',fullName:'',phone:'123456789',jerseyNumber:0,role:'admin'};
   const r=await emailAction('signup',{email:' Fixture@Example.invalid ',password:recovery.new_password,profile:p,accept_policies:true,redirect_to:'https://evil.invalid'},env,d);

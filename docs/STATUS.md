@@ -1,3 +1,9 @@
+# Premium Auth web — ponowna weryfikacja
+
+2026-11-04 12:09 UTC, ta sama gałąź `feat/premium-real-auth-web`, main nadal `1b6ee83`. Uzupełniono instrukcję logowania e-mailem, blokadę lokalnych callbacków i wspólny budżet4s HTTP hook/SMTP wobec domyślnego limitu5s GoTrue. PASS: TS/strictEdge/typy testów, lint,476Vitest/68plików,3 testy konfiguracji, build Premium/demo i izolacja16, Chromium320/390/768 oraz12 kombinacji palet/trybów. Logowanie Dark/Light na zrzutach bez zmian bajtowych. Aktywne source/UI/policy nadalFAIL do osobnego review; piny/manifest55/CI bez zmian. Cypress nadalNOTRUN (binarium/download403), realneSQL/RLS/GoTrue/SMTP/telefon/CloudNOTRUN. Migracja45 wyłącznie przygotowana; poprzednie44 nietknięte, bez deployu i merge. Raport i dokładne ustawienia: [PREMIUM_REAL_AUTH_WEB.md](PREMIUM_REAL_AUTH_WEB.md).
+
+---
+
 # Premium Auth web — kandydat do review, bez wdrożenia
 
 2026-11-04 10:32 UTC, `feat/premium-real-auth-web` z main`1b6ee83`. Istniejący Premium3.18/B1 i SessionManager: podłączone rejestracja, resend, potwierdzenie e-mail i recovery przez accounts; fragmentowe dowody czyszczone z URL, bez przyjmowania sesji z linku. Nowy podpisany Send Email hook w istniejącym accounts + SMTP/TLS465 zachowuje blokadę legacy i email_change. Build`build:premium-web`, Vercel root`app`, output`dist-premium-web`, SPA/CSP HTTPS. Brak dokumentów prawnych blokuje rejestrację.

@@ -30,6 +30,10 @@ describe('SMTP implicit TLS465, bez połączenia sieciowego',()=>{
  it('nie obchodzi błędu TLS innym transportem',async()=>{
   const connect=vi.fn(async()=>{throw Error('certificate verification failed');});await expect(sendSmtp(settings,mail,connect)).rejects.toThrow('certificate verification failed');expect(connect).toHaveBeenCalledOnce();
  });
+ it('nie otwiera połączenia, jeśli wspólny budżet hooka już wygasł',async()=>{
+  const controller=new AbortController(),connect=vi.fn();controller.abort();
+  await expect(sendSmtp(settings,mail,connect,controller.signal)).rejects.toThrow('mail_timeout');expect(connect).not.toHaveBeenCalled();
+ });
  it('timeout odrzuca operację także wtedy, gdy zamknięcie socketu zgłasza błąd',async()=>{
   const controller=new AbortController(),timeout=vi.spyOn(AbortSignal,'timeout').mockReturnValue(controller.signal);
   const f=connection();vi.mocked(f.c.read).mockImplementation(()=>new Promise(()=>{}));vi.mocked(f.c.close).mockImplementation(()=>{throw Error('already closed');});

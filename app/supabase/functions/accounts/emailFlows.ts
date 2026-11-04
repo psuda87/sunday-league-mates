@@ -43,7 +43,8 @@ export function signupProfile(body:Row){
 export function emailRedirect(env:EmailEnvironment){
   try{
     const u=new URL(env.emailRedirectUrl??'');
-    if(u.protocol==='https:'&&env.origins.includes(u.origin)&&u.pathname==='/auth/callback'&&!u.username&&!u.password&&!u.search&&!u.hash)return u.href;
+    const local=u.hostname==='localhost'||u.hostname.endsWith('.localhost')||u.hostname==='[::1]'||u.hostname==='[::]'||u.hostname==='0.0.0.0'||/^127\./.test(u.hostname);
+    if(u.protocol==='https:'&&!local&&env.origins.includes(u.origin)&&u.pathname==='/auth/callback'&&!u.username&&!u.password&&!u.search&&!u.hash)return u.href;
   }catch{/* fail closed */}
   throw new EmailFlowError(503,'mail_unconfigured','Proces e-mail oczekuje na konfigurację adresu aplikacji i poczty.');
 }
