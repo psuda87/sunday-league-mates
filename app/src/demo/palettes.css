@@ -206,12 +206,12 @@ Fixed SLM crest, Ultimate card and natural pitch retain their approved artwork. 
  --ion-background-color-rgb:247,243,252;
  --ion-text-color:#241A32;
  --ion-text-color-rgb:36,26,50;
- --ion-color-primary:#7142BD;
- --ion-color-primary-rgb:113,66,189;
+ --ion-color-primary:#665584;
+ --ion-color-primary-rgb:102,85,132;
  --ion-color-primary-contrast:#FFFFFF;
  --ion-color-primary-contrast-rgb:255,255,255;
- --ion-color-primary-shade:color-mix(in srgb,#7142BD 85%,black);
- --ion-color-primary-tint:color-mix(in srgb,#7142BD 85%,white);
+ --ion-color-primary-shade:color-mix(in srgb,#665584 85%,black);
+ --ion-color-primary-tint:color-mix(in srgb,#665584 85%,white);
  --ion-color-secondary-contrast:#FFFFFF;
  --slm-panel:#FFFFFF;
  --slm-card-bottom:#FFFFFF;
@@ -221,33 +221,33 @@ Fixed SLM crest, Ultimate card and natural pitch retain their approved artwork. 
  --slm-border:#DACCE9;
  --slm-match-border:#65409A70;
  --slm-gold:#65409A;
- --slm-fill:#7142BD;
- --slm-gold-edge:#CFB5FF;
+ --slm-fill:#665584;
+ --slm-gold-edge:#C2B5D7;
  --slm-track:#DACCE9;
  --slm-premium-burgundy:#53308C;
- --slm-premium-gold:#7142BD;
- --slm-button-top:#7142BD;
- --slm-button-bottom:color-mix(in srgb,#7142BD 82%,black);
- --slm-button-shadow:#7142BD40;
- --slm-glow:#7142BD20;
- --slm-home-tint:#C534DF12;
- --slm-canvas-glow:#7142BD30;
+ --slm-premium-gold:#665584;
+ --slm-button-top:#665584;
+ --slm-button-bottom:color-mix(in srgb,#665584 82%,black);
+ --slm-button-shadow:#66558440;
+ --slm-glow:#66558420;
+ --slm-home-tint:#81719812;
+ --slm-canvas-glow:#66558430;
  --slm-canvas-shade:#F7F3FC20;
- --slm-header-glow:#C534DF25;
+ --slm-header-glow:#81719825;
  --slm-nav-active:#65409A15;
- --slm-active-top:#7142BD1A;
- --slm-active-bottom:#7142BD08;
+ --slm-active-top:#6655841A;
+ --slm-active-bottom:#66558408;
  --slm-photo-line:#65409A55;
- --slm-light-flare:#C534DF26;
+ --slm-light-flare:#81719826;
  --slm-card-light:#65409A38;
  --slm-card-rim:#65409A70;
- --slm-card-burgundy:#C534DF26;
- --slm-date-floor:#7142BD80;
+ --slm-card-burgundy:#81719826;
+ --slm-date-floor:#66558480;
  --slm-crest-halo:#65409A20;
- --slm-crest-burgundy:#C534DF10;
+ --slm-crest-burgundy:#81719810;
  --slm-detail-rim:#65409A40;
  --slm-roster-avatar-top:#EEE7F8;
- --slm-roster-avatar-bottom:#7142BD30;
+ --slm-roster-avatar-bottom:#66558430;
  --slm-field-bg:#FFFFFF;
  --slm-field-edge:#65409A;
 }
@@ -256,50 +256,50 @@ Fixed SLM crest, Ultimate card and natural pitch retain their approved artwork. 
  --ion-background-color-rgb:18,18,18;
  --ion-text-color:#FFFFFF;
  --ion-text-color-rgb:255,255,255;
- --ion-color-primary:#7142BD;
- --ion-color-primary-rgb:113,66,189;
+ --ion-color-primary:#665584;
+ --ion-color-primary-rgb:102,85,132;
  --ion-color-primary-contrast:#FFFFFF;
  --ion-color-primary-contrast-rgb:255,255,255;
- --ion-color-primary-shade:color-mix(in srgb,#7142BD 85%,black);
- --ion-color-primary-tint:color-mix(in srgb,#7142BD 85%,white);
+ --ion-color-primary-shade:color-mix(in srgb,#665584 85%,black);
+ --ion-color-primary-tint:color-mix(in srgb,#665584 85%,white);
  --ion-color-secondary-contrast:#20242A;
  --slm-panel:#1E1E1E;
  --slm-card-bottom:#1E1E1E;
  --slm-card-top:#2A2235;
- --slm-card-edge:#B58AFF20;
+ --slm-card-edge:#B4A4CB20;
  --slm-text-secondary:#C7BBD7;
- --slm-border:#7B44D4;
- --slm-match-border:#B58AFF70;
- --slm-gold:#B58AFF;
- --slm-fill:#9D6BFF;
+ --slm-border:#77668E;
+ --slm-match-border:#B4A4CB70;
+ --slm-gold:#B4A4CB;
+ --slm-fill:#A393BF;
  --slm-gold-edge:#D1B5FF;
  --slm-track:#60487B;
  --slm-premium-burgundy:#53308C;
- --slm-premium-gold:#9D6BFF;
- --slm-button-top:#7142BD;
- --slm-button-bottom:color-mix(in srgb,#7142BD 82%,black);
- --slm-button-shadow:#7142BD40;
- --slm-glow:#7142BD20;
- --slm-home-tint:#C534DF40;
- --slm-canvas-glow:#7142BD30;
+ --slm-premium-gold:#A393BF;
+ --slm-button-top:#665584;
+ --slm-button-bottom:color-mix(in srgb,#665584 82%,black);
+ --slm-button-shadow:#66558440;
+ --slm-glow:#66558420;
+ --slm-home-tint:#81719840;
+ --slm-canvas-glow:#66558430;
  --slm-canvas-shade:#12121220;
- --slm-header-glow:#C534DF25;
- --slm-nav-active:#B58AFF15;
- --slm-active-top:#7142BD70;
- --slm-active-bottom:#7142BD22;
- --slm-photo-line:#B58AFF55;
- --slm-light-flare:#C534DF26;
- --slm-card-light:#B58AFF38;
- --slm-card-rim:#B58AFF70;
- --slm-card-burgundy:#C534DF26;
- --slm-date-floor:#7142BD80;
- --slm-crest-halo:#B58AFF20;
- --slm-crest-burgundy:#C534DF35;
- --slm-detail-rim:#B58AFF40;
+ --slm-header-glow:#81719825;
+ --slm-nav-active:#B4A4CB15;
+ --slm-active-top:#66558470;
+ --slm-active-bottom:#66558422;
+ --slm-photo-line:#B4A4CB55;
+ --slm-light-flare:#81719826;
+ --slm-card-light:#B4A4CB38;
+ --slm-card-rim:#B4A4CB70;
+ --slm-card-burgundy:#81719826;
+ --slm-date-floor:#66558480;
+ --slm-crest-halo:#B4A4CB20;
+ --slm-crest-burgundy:#81719835;
+ --slm-detail-rim:#B4A4CB40;
  --slm-roster-avatar-top:#2A2235;
- --slm-roster-avatar-bottom:#7142BD30;
+ --slm-roster-avatar-bottom:#66558430;
  --slm-field-bg:#1E1E1E;
- --slm-field-edge:#B58AFF;
+ --slm-field-edge:#B4A4CB;
 }
 .slm-appearance .slm-palette-picker { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
 .slm-palette-picker legend { grid-column:1/-1; }
@@ -312,7 +312,8 @@ Fixed SLM crest, Ultimate card and natural pitch retain their approved artwork. 
 [data-palette=espana] { --swatch-bg:#0B0C10; --swatch-primary:#880000; --swatch-accent:#D4AF37; }
 [data-palette=fcb] { --swatch-bg:#101B37; --swatch-primary:#173B83; --swatch-accent:#9C173B; }
 [data-palette=lime] { --swatch-bg:#172A27; --swatch-primary:#28463D; --swatch-accent:#B9F254; }
-[data-palette=deimos] { --swatch-bg:#121212; --swatch-primary:#7142BD; --swatch-accent:#C534DF; }
+[data-palette=deimos] { --swatch-bg:#252338; --swatch-primary:#665584; --swatch-accent:#A393BF; }
+[data-palette=midnight] { --swatch-bg:#101C2B; --swatch-primary:#245A69; --swatch-accent:#D3AE68; }
 @media(max-width:350px) { .slm-appearance .slm-palette-picker { grid-template-columns:1fr; } }
 
 :root[data-theme="espana"].ion-palette-dark { --slm-button-top:#E71835; }
@@ -321,4 +322,47 @@ Fixed SLM crest, Ultimate card and natural pitch retain their approved artwork. 
    Stadium photographs and official brand assets are unchanged. */
 :root[data-theme="fcb"].ion-palette-dark,:root[data-theme="lime"].ion-palette-dark,:root[data-theme="deimos"].ion-palette-dark {
  --slm-dark-texture:radial-gradient(ellipse at 80% 10%,var(--slm-glow),transparent 70%);
+}
+
+/* Midnight Gold: muted navy, deep teal and champagne gold. */
+:root[data-theme="midnight"]:not(.ion-palette-dark) {
+ --ion-background-color:#E7E9EB; --ion-background-color-rgb:231,233,235;
+ --ion-text-color:#182630; --ion-text-color-rgb:24,38,48;
+ --ion-color-primary:#245A69; --ion-color-primary-rgb:36,90,105;
+ --ion-color-primary-contrast:#FFFFFF; --ion-color-primary-contrast-rgb:255,255,255;
+ --slm-panel:#EFF0F1; --slm-card-bottom:#EFF0F1; --slm-card-top:#E0E5E7;
+ --slm-text-secondary:#50616B; --slm-border:#B8C4C8; --slm-track:#B8C4C8;
+ --slm-gold:#8B6C30; --slm-fill:#B49252; --slm-gold-edge:#D3AE68;
+ --slm-premium-burgundy:#182630; --slm-premium-gold:#B49252;
+ --slm-button-top:#245A69; --slm-button-bottom:#173F4B;
+ --slm-button-shadow:#245A6940; --slm-glow:#245A6920;
+ --slm-nav-active:#B492521F; --slm-active-top:#245A691A; --slm-active-bottom:#245A6908;
+ --slm-field-bg:#EFF0F1; --slm-field-edge:#8B6C30;
+ --slm-roster-avatar-top:#E0E5E7; --slm-roster-avatar-bottom:#245A6930;
+ --slm-card-edge:#B4925220; --slm-match-border:#8B6C3070;
+}
+:root[data-theme="midnight"].ion-palette-dark {
+ --ion-background-color:#101C2B; --ion-background-color-rgb:16,28,43;
+ --ion-text-color:#E8EDF0; --ion-text-color-rgb:232,237,240;
+ --ion-color-primary:#397889; --ion-color-primary-rgb:57,120,137;
+ --ion-color-primary-contrast:#FFFFFF; --ion-color-primary-contrast-rgb:255,255,255;
+ --slm-panel:#192B39; --slm-card-bottom:#192B39; --slm-card-top:#223B49;
+ --slm-text-secondary:#B9C8D0; --slm-border:#3B5260; --slm-track:#3B5260;
+ --slm-gold:#D3AE68; --slm-fill:#D3AE68; --slm-gold-edge:#E5C78E;
+ --slm-premium-burgundy:#101C2B; --slm-premium-gold:#D3AE68;
+ --slm-button-top:#397889; --slm-button-bottom:#245A69;
+ --slm-button-shadow:#245A6940; --slm-glow:#39788930;
+ --slm-nav-active:#D3AE6820; --slm-active-top:#39788955; --slm-active-bottom:#39788920;
+ --slm-field-bg:#192B39; --slm-field-edge:#D3AE68;
+ --slm-roster-avatar-top:#223B49; --slm-roster-avatar-bottom:#39788930;
+ --slm-card-edge:#D3AE6820; --slm-match-border:#D3AE6870;
+}
+/* Light-only neutral surfaces: retain each palette's original brand colors. */
+:root:not(.ion-palette-dark) {
+ --slm-panel:#ECEEF0;
+ --slm-card-bottom:#ECEEF0;
+ --slm-field-bg:#ECEEF0;
+}
+:root[data-theme="fcb"]:not(.ion-palette-dark),:root[data-theme="lime"]:not(.ion-palette-dark),:root[data-theme="deimos"]:not(.ion-palette-dark),:root[data-theme="midnight"]:not(.ion-palette-dark) {
+ --slm-panel:#ECEEF0; --slm-card-bottom:#ECEEF0; --slm-field-bg:#ECEEF0;
 }
