@@ -6,6 +6,9 @@ import { SessionManager } from './sessionManager';
 import { AccountError } from './api';
 import type { Session } from './api';
 import { b1Port } from './b1Port';
+import {Capacitor} from '@capacitor/core';
+import {App} from '@capacitor/app';
+vi.mock('@capacitor/app',()=>({App:{addListener:vi.fn(async()=>({remove:async()=>{}}))}}));
 vi.mock('./useOwnProfile',()=>({useOwnProfile:(_manager:unknown,_owner:unknown,selection?:{begin:()=>void;end:()=>void})=>({photo:{beginSelection:selection?.begin,endSelection:selection?.end}})}));
 const worldLifecycle=vi.hoisted(()=>({mounts:0,unmounts:0}));
 vi.mock('../events/PremiumWorld',()=>({default:function MockWorld({onLogout,onAccount,personalProfile}:{personalProfile?:{photo:{beginSelection:()=>void;endSelection:()=>void}};onLogout:()=>void;onAccount:(view:string)=>void}){
@@ -70,6 +73,8 @@ describe('B1 existing Auth into frozen account UI',()=>{
   fireEvent.click(screen.getByRole('button',{name:'Wróć do logowania'}));await screen.findByRole('heading',{name:'Zaloguj się'});
  });
  it('preserves the hidden RAM screen through verified resume without remounting',async()=>{
+  vi.spyOn(Capacitor,'isNativePlatform').mockReturnValue(true);
+  vi.spyOn(App,'addListener').mockResolvedValue({remove:async()=>{}});
   let visibility:DocumentVisibilityState='visible';
   vi.spyOn(document,'visibilityState','get').mockImplementation(()=>visibility);
   let finishRefresh!:(value:Session)=>void;
@@ -88,6 +93,8 @@ describe('B1 existing Auth into frozen account UI',()=>{
   expect(manager.getSnapshot().phase).toBe('ready');expect(screen.queryByRole('heading',{name:'Zaloguj się'})).toBeNull();
  });
  it('keeps only a pending picker hidden through verification, then drops it on revoked session',async()=>{
+  vi.spyOn(Capacitor,'isNativePlatform').mockReturnValue(true);
+  vi.spyOn(App,'addListener').mockResolvedValue({remove:async()=>{}});
   let visibility:DocumentVisibilityState='visible';vi.spyOn(document,'visibilityState','get').mockImplementation(()=>visibility);
   let finishRefresh!:(value:Session)=>void;
   const request=vi.fn().mockResolvedValueOnce(session()).mockImplementationOnce(()=>new Promise<Session>(resolve=>{finishRefresh=resolve;})).mockRejectedValueOnce(new AccountError('Revoked','session_invalid'));

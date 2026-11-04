@@ -21,6 +21,7 @@ export class SessionManager {
   private listeners = new Set<() => void>();
   private current: Session | null = null;
   private expiresAt = 0;
+  private verifiedAt = 0;
   private generation = 0;
   private refreshFlight: Promise<void> | null = null;
   private mutation: Promise<void> | null = null;
@@ -56,12 +57,13 @@ export class SessionManager {
     this.current = session;
     this.expiresAt = this.now() + session.expires_in * 1000;
     await this.persist(() => this.store.write(session.refresh_token), generation);
-    if (generation === this.generation) this.publish({ phase: 'ready', session, message: '' });
+    if (generation === this.generation) { this.verifiedAt=this.now();this.publish({ phase: 'ready', session, message: '' }); }
   }
   private async problem(error: unknown, generation: number) {
     if (generation !== this.generation) return;
     if (error instanceof AccountError && error.code === 'session_invalid') {
       this.current = null;
+      this.publish({phase:'checking',session:null,message:''});
       try { await this.persist(() => this.store.clear(), generation); }
       catch { this.publish({ phase: 'storage_error', session: null, message: 'Nie można usunąć zapisanej sesji. Ponów wylogowanie.' }); return; }
       if (generation === this.generation) this.publish({ ...signedOut(), message: 'Sesja wygasła lub została cofnięta. Zaloguj się ponownie.' });
@@ -72,11 +74,17 @@ export class SessionManager {
     }
   }
   // Jeden refresh naraz: rotacja nie może zużyć równolegle tego samego tokenu.
-  refresh = (): Promise<void> => {
-    if (this.mutation) return this.mutation.then(() => this.refresh(), () => this.refresh());
+  resume = (): Promise<void> => {
+    if(this.refreshFlight)return this.refreshFlight;
+    if(this.state.phase==='ready'&&this.expiresAt-this.now()>60000&&this.now()-this.verifiedAt<60000)return Promise.resolve();
+    return this.refresh(true);
+  };
+  refresh = (background=false): Promise<void> => {
+    if (this.mutation) return this.mutation.then(() => this.refresh(background), () => this.refresh(background));
     if (this.refreshFlight) return this.refreshFlight;
     const generation = this.generation;
-    this.publish({ phase: 'checking', session: null, message: '' });
+    if(!background||this.state.phase!=='ready'||this.expiresAt<=this.now())this.publish({ phase: 'checking', session: null, message: '' });
+    const expiry=background&&this.state.phase==='ready'?setTimeout(()=>{if(generation===this.generation)this.suspend();},Math.max(0,this.expiresAt-this.now())):null;
     const flight = (async () => {
       try {
         const token = this.current?.refresh_token ?? await this.store.read();
@@ -88,7 +96,7 @@ export class SessionManager {
       } catch (error) { await this.problem(error, generation); }
     })();
     this.refreshFlight = flight;
-    void flight.finally(() => { if (this.refreshFlight === flight) this.refreshFlight = null; });
+    void flight.finally(() => { if(expiry!==null)clearTimeout(expiry);if (this.refreshFlight === flight) this.refreshFlight = null; });
     return flight;
   };
   signIn(identifier: string, password: string): Promise<void> {
@@ -120,6 +128,7 @@ export class SessionManager {
     return flight;
   }
   async call<T>(action: string, values: Record<string, unknown> = {}): Promise<T> {
+    if(this.refreshFlight)await this.refreshFlight;
     if (this.current && this.expiresAt - this.now() < 60000) await this.refresh();
     if (this.state.phase !== 'ready' || !this.current) throw new AccountError(unavailableMessage, 'access_unavailable');
     const generation = this.generation;

@@ -1,3 +1,29 @@
+# Premium web — powrót do karty bez migania
+
+2026-11-04, `feat/premium-legal-pages`. Przyczyna: visibility hidden wywoływało
+suspend, a każde visible uruchamiało refresh ustawiający checking; B1App pokazywał
+wtedy pełnoekranowy AccountScreens. FocusVisibility obsługuje tylko przewijanie
+natywnych pól, nie odpowiada za ten objaw. Zmieniono sessionManager/useB1Lifecycle:
+web nie zawiesza ważnej sesji przy ukryciu; resume współdzieli refresh i pomija
+ponowienie przez60s od weryfikacji, o ile token ma ponad60s ważności. Weryfikacja
+w tle nie zmienia ready; chronione wywołania czekają na wynik. Wygaśnięcie w trakcie
+żądania blokuje widok timerem; nieważna sesja blokuje dostęp przed czyszczeniem
+magazynu, błąd sieci usuwa dostęp i pozostawia bezpieczny stan unavailable.
+Pierwsze uruchomienie i native suspend zachowane. Bez CSS/UI/backendu/migracji.
+
+PASS:32 testy jednostkowe w4 plikach (6 nowych przypadków powrotu/równoległości,
+ważna/wygasła sesja, błąd sieci/cofnięcie, termin ważności w trakcie żądania),
+TypeScript i lint4 zmienionych plików. Dwa dotychczasowe testy galerii jawnie
+testują natywny lifecycle. Początkowy runner miał ograniczenie katalogu temp;
+ponowienie poza ograniczeniem wykonało testy. FAIL strażników: frozen UI nadal
+blokuje wcześniejszy Profile, consolidation teraz również nowy sessionManager.
+Piny Auth sessionManager/useB1Lifecycle/B1App.test wymagają niezależnego review;
+nie aktualizowano ich automatycznie. Poprzedni patch przeglądowy dotyczy wyłącznie
+bab1acc i nie zatwierdza tej poprawki. Bez pełnej regresji, deployu i Cloud.
+Następny krok: odbiór pinów oraz pełna regresja przy osobno zatwierdzonym wdrożeniu.
+
+---
+
 # Przegląd strażników Premium — propozycja bez aktywacji
 
 2026-11-04, `feat/premium-legal-pages`, przegląd `bab1acc`. Zapisano dokładny diff
