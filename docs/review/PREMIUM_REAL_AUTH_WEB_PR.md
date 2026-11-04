@@ -13,4 +13,6 @@ Raport, konfiguracja i kolejność wdrożenia: docs/PREMIUM_REAL_AUTH_WEB.md. Rz
 
 Bez merge, deployu, migracji wykonanych w jakiejkolwiek bazie, zmian Cloud lub sekretów. Dokładne źródła: HEAD feat/premium-real-auth-web i manifest SHA256 w docs/review/premium-real-auth-web-manifest.json. PR pozostaje Draft do odbioru kontraktów i backendu.
 
-Uzupełnienie: odrzucanie callbacków localhost i wspólny budget4s dla hooka HTTP/SMTP, z propagacją anulowania. Odczytane źródła GoTrue mają limit5s; sprawdzone wyłącznie lokalnie na kontrolowanych transportach.
+Uzupełnienie: odrzucanie callbacków localhost i wspólny budżet4s dla hooka HTTP/SMTP, z propagacją anulowania. Odczytane źródła GoTrue mają limit5s; sprawdzone wyłącznie lokalnie na kontrolowanych transportach.
+
+Kod kontynuacji: 36ed569b62bb6861640d2f64c10ed12038c4b15a. Bez deployu i merge; wymagany niezależny przegląd pinów i realnego backendu.

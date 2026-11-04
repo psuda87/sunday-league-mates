@@ -265,7 +265,7 @@ Nie odczytano ani nie zmieniono konfiguracji zdalnego projektu.
 
 Odczytana referencja GoTrue: `d7955e9eb54003c4abbd7808e774c810d5d3e6cc`. W jej modelu `OTP`, `MagicLink` i `Recovery` spełniają `IsRecovery`; nasza operacja przyjmuje wyłącznie dowód zweryfikowany jako `type: recovery`. To weryfikacja źródeł, nie test zdalnego GoTrue.
 
-## Publikacja Git — bez deployu
+## Pierwsza publikacja Git — bez deployu
 
 Implementacja: `ee72959755f4db926c83d2566dc76b5b5aa8c940`, wypchnięta zwykłym push
 na `feat/premium-real-auth-web`. Dodatkowe sprawdzenie TypeScript testów backendu
@@ -311,3 +311,12 @@ GitHub REST odczytu repozytorium nadal zwraca Forbidden. Pobranie Cypress z
 `download.cypress.io` blokuje proxy403; CLI nie znajduje binarium. Cypress oraz
 realny GoTrue/SQL/RLS/SMTP/telefon/Cloud pozostają NOT RUN. Nie wykonano wdrożenia,
 zmian Cloud ani migracji. Konfiguracja do osobnego wdrożenia jest taka sama jak wyżej.
+
+## Aktualna publikacja kontynuacji — 2026-11-04 12:13 UTC
+
+Kod uzupełnień: `36ed569b62bb6861640d2f64c10ed12038c4b15a`, zwykły push na tę samą gałąź potwierdzony. Próba
+utworzenia Draft PR również przez REST `POST /repos/psuda87/sunday-league-mates/pulls`
+zakończyła się transportowym `Forbidden`; wcześniej GraphQL również był zablokowany.
+Numer PR nie został uzyskany. Gotowy opis i porównanie do main pozostają pod
+podanymi wyżej adresami. Nie tworzono kolejnego projektu ani gałęzi i nie wymagano
+tokenów Supabase/Vercel. Końcowy commit dokumentacyjny nie zmienia kodu.
