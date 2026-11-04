@@ -96,7 +96,7 @@
     {
       "path": "app/supabase/functions/accounts/emailFlows.test.ts",
       "base_sha256": null,
-      "proposed_sha256": "39d37404386aa187d788a17ec0d1515a8bd723dcac726a747d90390755032981"
+      "proposed_sha256": "ec5e66085339e224eb60d8f8509db41f1c7b2739a9993ee69ee4adf67776c52c"
     },
     {
       "path": "app/supabase/functions/accounts/emailFlows.ts",
@@ -106,7 +106,7 @@
     {
       "path": "app/supabase/functions/accounts/emailHook.test.ts",
       "base_sha256": null,
-      "proposed_sha256": "83c8e997946c2b07d70f8600111bbc297f4073f059d22b3be2453a5b8c82965a"
+      "proposed_sha256": "bce46172cf4bc03b31c981d0a79a6ee9c1df1d8c5ec03556a42562c119fa218e"
     },
     {
       "path": "app/supabase/functions/accounts/emailHook.ts",

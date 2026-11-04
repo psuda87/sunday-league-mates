@@ -5,8 +5,8 @@ const id='d00d0000-0000-4000-8000-000000000001',sid='d00d0000-0000-4000-8000-000
 const env={emailSignupEnabled:true,emailRedirectUrl:'https://slm.example.invalid/auth/callback',origins:['https://slm.example.invalid']};
 const proof={access_token:'proof-fixture',refresh_token:'never-to-browser',expires_in:3600};
 function deps(){
- const call=vi.fn(async(path:string)=>path==='/auth/v1/verify'?{ok:true,status:200,data:proof}:{ok:true,status:200,data:{}});
- const db=vi.fn(async(path:string)=>path.includes('slm_email_identity')?{user_id:id,email_account:true}:path.includes('slm_account_begin')?{operation_id:'fixture-operation',security_version:8}:true);
+ const call=vi.fn<EmailDependencies['call']>(async path=>path==='/auth/v1/verify'?{ok:true,status:200,data:proof}:{ok:true,status:200,data:{}});
+ const db=vi.fn<EmailDependencies['db']>(async path=>path.includes('slm_email_identity')?{user_id:id,email_account:true}:path.includes('slm_account_begin')?{operation_id:'fixture-operation',security_version:8}:true);
  const d:EmailDependencies={call,db,state:vi.fn(async()=>({active:true,operation_id:null,security_version:7,must_change_password:false})),verify:vi.fn(async()=>({id,sid})),accept:vi.fn(async()=>({})),rejectSession:vi.fn(async()=>{}),rate:vi.fn(async()=>{})};
  return {d,call,db};
 }

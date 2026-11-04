@@ -118,7 +118,7 @@ z tym samym Message-ID i jednorazowym dowodem; nie tworzy nowej sesji ani konta.
 
 ## Dokładna konfiguracja do wykonania osobno
 
-Nie wykonano poniższych operacji i nie wymagano tokenów Vercel/Supabase.
+Nie wykonano poniższych operacji i nie wymagano tokenów Vercel/Supabase. Przed aktywacją trzeba potwierdzić dostępność HTTP hooka oraz limitów Edge/SMTP na uzgodnionym bezpłatnym planie; brak dostępności jest blokadą, nie zgodą na płatny plan.
 
 ### Istniejący projekt Vercel `slm-ui-demo`
 
@@ -264,3 +264,19 @@ Istniejące migracje i `AUTH_MODULE.md`, `AUTH_MODEL_SLM_1_0.md`, kod GoTrue
 Nie odczytano ani nie zmieniono konfiguracji zdalnego projektu.
 
 Odczytana referencja GoTrue: `d7955e9eb54003c4abbd7808e774c810d5d3e6cc`. W jej modelu `OTP`, `MagicLink` i `Recovery` spełniają `IsRecovery`; nasza operacja przyjmuje wyłącznie dowód zweryfikowany jako `type: recovery`. To weryfikacja źródeł, nie test zdalnego GoTrue.
+
+## Publikacja Git — bez deployu
+
+Implementacja: `ee72959755f4db926c83d2566dc76b5b5aa8c940`, wypchnięta zwykłym push
+na `feat/premium-real-auth-web`. Dodatkowe sprawdzenie TypeScript testów backendu
+wykryło dwa zbyt wąskie typy mocków; poprawiono wyłącznie ich typowanie i ponowiono
+właściwe testy. Końcowy commit raportowy nie zmienia działania aplikacji.
+
+Próba `gh pr create --draft --base main --head feat/premium-real-auth-web` została
+odrzucona przez `https://api.github.com/graphql` komunikatem **Forbidden**.
+Nie uzyskano numeru PR. Dostęp Git nie oznacza dostępnego GitHub API.
+Nie wymagano nowych poświadczeń. Gotowy opis: [PREMIUM_REAL_AUTH_WEB_PR.md](review/PREMIUM_REAL_AUTH_WEB_PR.md).
+
+[Porównanie i formularz utworzenia PR do main](https://github.com/psuda87/sunday-league-mates/compare/main...feat/premium-real-auth-web?expand=1).
+Wymagane review przypięć oraz realnego backendu pozostaje blokadą integracji;
+nie wykonano merge ani wdrożenia.

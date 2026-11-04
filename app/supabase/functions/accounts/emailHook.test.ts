@@ -2,6 +2,7 @@ import {afterEach,describe,expect,it,vi} from 'vitest';
 import {webcrypto} from 'node:crypto';
 import {sendEmailHook} from './emailHook';
 import {createHandler} from './handler';
+import type {Mail} from './smtp';
 const now=1793786400000;
 const secret=btoa('fixture-key-with-at-least-32-bytes!');
 const env={emailSignupEnabled:true,emailRedirectUrl:'https://slm.example.invalid/auth/callback',origins:['https://slm.example.invalid'],emailHookSecret:'v1,whsec_'+secret};
@@ -15,12 +16,12 @@ async function signed(body:unknown=event(),timestamp=Math.floor(now/1000)){
  const sig=btoa(String.fromCharCode(...new Uint8Array(await webcrypto.subtle.sign('HMAC',key,new TextEncoder().encode(id+'.'+timestamp+'.'+raw)))));
  return new Request('https://example.invalid/accounts?hook=email',{method:'POST',headers:{'webhook-id':id,'webhook-timestamp':String(timestamp),'webhook-signature':'v1,'+sig},body:raw});
 }
-function dependencies(){return {aliases:vi.fn(async()=>false),send:vi.fn(async()=>{}),now:()=>now};}
+function dependencies(){return {aliases:vi.fn<(user:string)=>Promise<boolean>>(async()=>false),send:vi.fn<(mail:Mail)=>Promise<void>>(async()=>{}),now:()=>now};}
 describe('podpisany Send Email hook, bez prawdziwych wiadomości',()=>{
  it.each(['signup','recovery'])('wysyła %s wyłącznie na stały callback z fragmentem dowodu',async type=>{
   const d=dependencies(),r=await sendEmailHook(await signed(event(type)),env,d);expect(r.status).toBe(200);expect(await r.json()).toEqual({});
   expect(d.send).toHaveBeenCalledWith(expect.objectContaining({to:user.email,text:expect.stringContaining(env.emailRedirectUrl+'#type='+type+'&token_hash=')}));
-  const text=d.send.mock.calls[0][0] as unknown as {text:string};expect(text.text).not.toContain('evil.invalid');expect(r.headers.get('Cache-Control')).toBe('no-store');
+  expect(d.send.mock.calls[0][0].text).not.toContain('evil.invalid');expect(r.headers.get('Cache-Control')).toBe('no-store');
  });
  it.each(['email_change','magiclink','invite','reauthentication','password_changed_notification'])('zachowuje blokadę nieuzgodnionej wysyłki %s',async type=>{
   const d=dependencies();expect((await sendEmailHook(await signed(event(type)),env,d)).status).toBe(403);expect(d.send).not.toHaveBeenCalled();
