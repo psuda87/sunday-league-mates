@@ -1,5 +1,9 @@
 # Telefon i usuwanie konta — kandydat do przeglądu
 
+Aktualizacja 2026-11-04: właściciel zatwierdził wyjątki, a strażniki przeszły po
+aktualizacji pinów. Poniższy raport zachowuje historyczny stan implementacji.
+Bieżący odbiór i realne blokady Cloud: [AUTH_DEPLOYMENT_READINESS.md](AUTH_DEPLOYMENT_READINESS.md).
+
 2026-11-04. Gałąź `feat/premium-legal-pages`, baza `5d39c00`.
 Zmiany są lokalne i przygotowane do wdrożenia. Nie zmieniono produkcji,
 konfiguracji Vercel/Supabase/Brevo, sekretów, CI ani aktywnych pinów.

@@ -1,3 +1,28 @@
+# Auth — strażniki zamknięte, wdrożenie zablokowane zależnościami Cloud
+
+2026-11-04, `feat/premium-legal-pages`, baza2416945, czyste drzewo przed zmianami.
+Właściciel zatwierdził wyjątki prywatności/usuwania i powrotu do karty. Zastosowano
+aktualizację3 strażników i ich testów: dokładne21 źródeł bab1acc,4 źródła2416945,
+listy weryfikowane względem niezmiennych obiektów Git. Manifest55, historyczne
+hashe, CSS/karty/nawigacja/CI bez zmian. Zaktualizowany patch review dokumentuje
+zastosowany diff. Bez zmian implementacji i bez nadpisania sekretów/cudzej pracy.
+
+PASS: strażniki55/13,91policy; wstępne92 testy zmian; następnie jeden pełny przebieg:
+509Vitest/72pliki, TypeScript/strictEdge/lint, build LIVE/demo/Premium, izolacja16,
+3testy konfiguracji,46migracji scratch i SQL/RLS/FK, Cypress15/15 w6 plikach z
+kontrolowanym API na lokalnych buildach. Bez prawdziwych kont i realnych wysyłek.
+
+Read-only Cloud: Vault0.3.1, pg_cron/pg_net dostępne lecz niezainstalowane,
+wpis worker w Vault nie istnieje (sprawdzono wyłącznie liczbę, bez wartości).
+Cloud43 wpisy migracji: brakuje dwóch historycznych wpisów v2 i accounts_email_ui
+ma inny timestamp. Potwierdzony brak group_payment_identity_guard() blokuje SQL46.
+Vercel slm-ui-demo istnieje, produkcja READY, lokalny deploy Git nadal wyłączony.
+NO-GO wdrożenia do czasu selektywnego uzgodnienia schematu i przygotowania workera.
+Nie wykonano migracji, deployu, zmian kont ani konfiguracji. Następny krok i pełna
+kolejność wydania: [AUTH_DEPLOYMENT_READINESS.md](AUTH_DEPLOYMENT_READINESS.md).
+
+---
+
 # Premium web — powrót do karty bez migania
 
 2026-11-04, `feat/premium-legal-pages`. Przyczyna: visibility hidden wywoływało
