@@ -403,3 +403,18 @@ Fixed SLM crest, Ultimate card and natural pitch retain their approved artwork. 
  --slm-detail-rim:#D3AE6840;
  --slm-dark-texture:radial-gradient(ellipse at 80% 10%,#245A6928,transparent 70%);
 }
+
+/* Light v3: deliberately medium-gray neutral surfaces, independent of palette. */
+:root[data-theme]:not(.ion-palette-dark) {
+ --ion-background-color:#B4B9BF;
+ --ion-background-color-rgb:180,185,191;
+ --slm-panel:#C3C7CC;
+ --slm-card-bottom:#C3C7CC;
+ --slm-card-top:#A7ADB4;
+ --slm-field-bg:#C3C7CC;
+ --ion-item-background:#C3C7CC;
+ --ion-card-background:#C3C7CC;
+ --ion-tab-bar-background:#C3C7CC;
+ --ion-overlay-background-color:#C3C7CC;
+ --slm-canvas-shade:#B4B9BF00;
+}
