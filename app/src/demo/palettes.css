@@ -366,3 +366,40 @@ Fixed SLM crest, Ultimate card and natural pitch retain their approved artwork. 
 :root[data-theme="fcb"]:not(.ion-palette-dark),:root[data-theme="lime"]:not(.ion-palette-dark),:root[data-theme="deimos"]:not(.ion-palette-dark),:root[data-theme="midnight"]:not(.ion-palette-dark) {
  --slm-panel:#ECEEF0; --slm-card-bottom:#ECEEF0; --slm-field-bg:#ECEEF0;
 }
+
+/* Refinement v2: neutral light canvas and actual Ionic surfaces, not only cards. */
+:root[data-theme]:not(.ion-palette-dark) {
+ --ion-background-color:#D9DDE1;
+ --ion-background-color-rgb:217,221,225;
+ --slm-panel:#E3E6E9;
+ --slm-card-bottom:#E3E6E9;
+ --slm-field-bg:#E3E6E9;
+ --slm-card-top:#D4D9DE;
+ --ion-item-background:var(--slm-panel);
+ --ion-card-background:var(--slm-panel);
+ --ion-tab-bar-background:var(--slm-panel);
+ --ion-overlay-background-color:var(--slm-panel);
+ --slm-canvas-shade:#D9DDE100;
+}
+:root[data-theme="midnight"]:not(.ion-palette-dark) {
+ --slm-home-tint:#245A6910;
+ --slm-header-glow:#245A6918;
+ --slm-canvas-glow:#245A6918;
+ --slm-light-flare:#D3AE6818;
+ --slm-card-burgundy:#245A6918;
+ --slm-crest-burgundy:#245A6910;
+ --slm-photo-line:#D3AE6855;
+ --slm-detail-rim:#D3AE6840;
+}
+:root[data-theme="midnight"].ion-palette-dark {
+ --slm-home-tint:#245A6928;
+ --slm-header-glow:#245A6920;
+ --slm-canvas-glow:#245A6925;
+ --slm-canvas-shade:#101C2B20;
+ --slm-light-flare:#D3AE681A;
+ --slm-card-burgundy:#245A6926;
+ --slm-crest-burgundy:#245A691A;
+ --slm-photo-line:#D3AE6855;
+ --slm-detail-rim:#D3AE6840;
+ --slm-dark-texture:radial-gradient(ellipse at 80% 10%,#245A6928,transparent 70%);
+}
