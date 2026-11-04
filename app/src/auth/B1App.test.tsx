@@ -102,11 +102,11 @@ describe('B1 existing Auth into frozen account UI',()=>{
   visibility='visible';fireEvent(document,new Event('visibilitychange'));await screen.findByRole('heading',{name:'Sesja wygasła'});
   expect(screen.queryByText('Wybrany plik RAM')).toBeNull();expect(screen.queryByText('Chroniony świat demo')).toBeNull();
  });
- it('does not implement registration/recovery/profile or authorize callback URL',async()=>{
+ it('does not authorize an unverified callback, expose a fake profile, or register without policies',async()=>{
   const request=vi.fn();const {manager}=setup(request);const port=b1Port(manager);
-  await expect(port.requestPasswordReset('fictional@example.invalid')).rejects.toThrow('integration');
-  await expect(port.completeRedirect('verify')).rejects.toThrow('integration');
-  await expect(port.signUp({nickname:'Fikcyjny',fullName:'',phone:''},'fictional@example.invalid','test')).rejects.toThrow('integration');
+  await expect(port.completeRedirect('verify')).rejects.toThrow('link');
+  await expect(port.saveProfile({nickname:'Fikcyjny',fullName:'',phone:''})).rejects.toThrow('integration');
+  await expect(port.signUp({nickname:'Fikcyjny',fullName:'',phone:''},'fictional@example.invalid','test')).rejects.toThrow('Rejestracja oczekuje');
   expect(request).not.toHaveBeenCalled();
  });
 });

@@ -1,6 +1,10 @@
 import { isPhoneIdentifier, normalizeLoginPhone, normalizePhoneUpdate } from '../_shared/phone.ts';
 import { PhotoError, profilePhoto, readAccountBody } from './profilePhotos.ts';
-export interface Environment { url: string; anon: string; service: string; origins: string[]; emailSignupEnabled?: boolean }
+import { emailAction, EmailFlowError } from './emailFlows.ts';
+import { sendEmailHook } from './emailHook.ts';
+import { sendSmtp } from './smtp.ts';
+import type {ConnectSmtp,SmtpSettings} from './smtp.ts';
+export interface Environment { url: string; anon: string; service: string; origins: string[]; emailSignupEnabled?: boolean; emailRedirectUrl?:string; emailHookSecret?:string; smtp?:Partial<SmtpSettings>; connectSmtp?:ConnectSmtp }
 type Row = Record<string, unknown>;
 class ApiError extends Error {
   constructor(public status: number, public code: string, message: string) { super(message); }
@@ -135,6 +139,15 @@ export function createHandler(env: Environment) {
     return a;
   }
   return async (request: Request): Promise<Response> => {
+    if(new URL(request.url).searchParams.get('hook')==='email'){
+      return sendEmailHook(request,env,{
+        aliases:async user=>(await db(`slm_aliases?user_id=eq.${user}&select=user_id`)).length>0,
+        send:async mail=>{
+          if(!env.connectSmtp)throw Error('mail_unconfigured');
+          await sendSmtp(env.smtp??{},mail,env.connectSmtp);
+        },
+      });
+    }
     const origin = request.headers.get('origin');
     const headers: Record<string, string> = { 'Content-Type': 'application/json', 'Cache-Control': 'no-store',
       'Vary': 'Origin', 'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info',
@@ -164,25 +177,11 @@ export function createHandler(env: Environment) {
       const action = field(body, 'action', 40);
       if(uploadRequest&&action!=='profile_photo_upload')throw new ApiError(400,'invalid_input','Nieprawidłowe żądanie.');
       await rate('global', 300);
-      if (action === 'signup' || action === 'resend_verification' || action === 'recover_email') {
-        await rate('email-flow', 12);
-        if (!env.emailSignupEnabled) throw new ApiError(503, 'mail_unconfigured', 'Rejestracja i odzyskiwanie e-mail czekają na konfigurację poczty.');
-        // Enabling the environment flag alone must never bypass the existing blocking hook.
-        const email = field(body, 'email', 254).trim().toLowerCase();
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new ApiError(400, 'invalid_input', 'Podaj poprawny e-mail.');
-        const path = action === 'signup' ? '/auth/v1/signup' : action === 'resend_verification' ? '/auth/v1/resend' : '/auth/v1/recover';
-        const values = action === 'signup' ? { email, password: password(body, 'password', true) } : action === 'resend_verification' ? { email, type: 'signup' } : { email };
-        const result = await call(path, 'POST', values);
-        if (!result.ok) throw new ApiError(503, 'mail_unavailable', 'Nie udało się uruchomić procesu e-mail. Spróbuj później.');
-        if (result.data?.access_token) {
-          await rejectSession(result.data);
-          throw new ApiError(503, 'verification_required', 'Rejestracja wymaga weryfikacji adresu e-mail.');
-        }
-        return respond({ verification_required: true });
-      }
+      const emailResult=await emailAction(action,body,env,{call,db,state,verify,accept,rejectSession,rate});
+      if(emailResult)return respond(emailResult);
       if (action === 'login') {
         const start = Date.now();
-        const raw = field(body, 'identifier').trim();
+        const raw = field(body, 'identifier',254).trim();
         const pwd = password(body, 'password');
         let rows: Row[] = [];
         try {
@@ -567,7 +566,7 @@ export function createHandler(env: Environment) {
       }
       throw new ApiError(400, 'invalid_action', 'Nieznana operacja.');
     } catch (error) {
-      if (error instanceof ApiError || error instanceof PhotoError) return respond({ error: error.message, code: error.code }, error.status);
+      if (error instanceof ApiError || error instanceof PhotoError || error instanceof EmailFlowError) return respond({ error: error.message, code: error.code }, error.status);
       return respond({ error: 'Nie udało się wykonać operacji. Spróbuj ponownie.', code: 'server_error' }, 500);
     }
   };

@@ -1,3 +1,15 @@
+# Premium Auth web — kandydat do review, bez wdrożenia
+
+2026-11-04 10:32 UTC, `feat/premium-real-auth-web` z main`1b6ee83`. Istniejący Premium3.18/B1 i SessionManager: podłączone rejestracja, resend, potwierdzenie e-mail i recovery przez accounts; fragmentowe dowody czyszczone z URL, bez przyjmowania sesji z linku. Nowy podpisany Send Email hook w istniejącym accounts + SMTP/TLS465 zachowuje blokadę legacy i email_change. Build`build:premium-web`, Vercel root`app`, output`dist-premium-web`, SPA/CSP HTTPS. Brak dokumentów prawnych blokuje rejestrację.
+
+Przygotowano migrację45`20261104090000_accounts_email_ui.sql`, **nie wykonano**; stare44 bez zmian. Cloud44/v7 wyłącznie wg informacji właściciela; nie odczytywano i nie zmieniano Supabase/Vercel, danych, domen, RLS, istniejącego Auth ani sekretów. Nie aktywowano Auth18, CI ani deployu.
+
+PASS: TS frontend/strictEdge, lint,468Vitest/68plików,3 testy konfiguracji, build Premium/LIVE/demo i izolacja16, Chromium320/390/768 i12 wyborów palety/trybu (kontrolowany HTTP). NOT RUN: Cypress — brak binarium; SQL45/RLS/realny GoTrue/SMTP/Cloud/telefon/hosted CI. **FAIL aktywnych kontraktów**: nowe źródła Auth i funkcjonalna zmiana AccountScreens nie mają jeszcze niezależnie zaakceptowanych pinów. CSS/zasoby/karty/BottomNav bez zmian,54/55 plików identycznych z bazą; strażniki/manifest/CI nietknięte.
+
+Przed integracją: review dokładnych źródeł i kontraktów; izolowany odbiór backendu45 i SMTP/hooka; zatwierdzone dokumenty; osobne wdrożenie accounts i konfiguracja Auth/Vercel przez właściciela. Raport i dokładne ustawienia: [PREMIUM_REAL_AUTH_WEB.md](PREMIUM_REAL_AUTH_WEB.md). Manifest wyłącznie do przeglądu: [premium-real-auth-web-manifest.json](review/premium-real-auth-web-manifest.json). Brak deklaracji gotowości produkcyjnej i brak merge.
+
+---
+
 # Android/formularze — punkt kontrolny polish-stats
 
 2026-10-31 — PR31 guard review: **PASS**, kontrakty odblokowane bez zmiany aplikacji. Policy704e4a8 (dokładne UI3f181e9/nativef2edf56), CI implementacja7c45656 i osobny wskaźnik6e9ce9d; wcześniejsze piny i42 migracje/frozen55 bez zmian. Faktycznie ponowione: policy53 (stare45+8), consolidation42/55/11, LinuxSourceTests29, source guard Linux i kanoniczny Windows PASS,60 Premium/consolidation i69 source mutacji odrzuconych, TS/lint/Edge/Vitest372/build/Chrome6 PASS. GitHub-hosted NOT RUN. Android/SQL/HTTP niepowtarzane (implementacja niezmieniona); Cloud/bazy/POCO nietknięte. PR31 gotowy do dalszej integracji po decyzji właściciela, nadal Draft, bez merge. Raport:docs/SLM_V1_POLISH_STATS_REPORT.md. Poniższe wcześniejsze BLOCK kontraktów zostało usunięte; TODO produktu nadal aktualne.

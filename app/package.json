@@ -18,7 +18,8 @@
     "build:premium-finance-local": "tsc --noEmit && vite build --config vite.premium-finance-local.config.ts",
     "build:android-stage3": "tsc --noEmit && vite build --config vite.android-stage3.config.ts",
     "test:premium-policy": "node --test scripts/verify-premium-policy-cases.mjs",
-    "typecheck:edge": "tsc --noEmit --allowImportingTsExtensions --moduleResolution bundler --module esnext --target esnext --lib dom,esnext --skipLibCheck --strict supabase/functions/accounts/handler.ts supabase/functions/accounts/index.ts supabase/functions/push-worker/index.ts"
+    "typecheck:edge": "tsc --noEmit --allowImportingTsExtensions --moduleResolution bundler --module esnext --target esnext --lib dom,esnext --skipLibCheck --strict supabase/functions/accounts/handler.ts supabase/functions/accounts/index.ts supabase/functions/push-worker/index.ts",
+    "build:premium-web": "tsc --noEmit && node scripts/build-premium-web.mjs"
   },
   "dependencies": {
     "@aparajita/capacitor-secure-storage": "8.0.1",

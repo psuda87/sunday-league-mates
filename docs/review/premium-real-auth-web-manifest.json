@@ -1,0 +1,147 @@
+{
+  "status": "PROPOSED_ONLY_REQUIRES_OWNER_REVIEW",
+  "base": "1b6ee83356d53b7b34193af88802067dc9b2fede",
+  "normalization": "CRLF to LF before SHA256",
+  "ui_manifest_files": 55,
+  "ui_unchanged": 54,
+  "ui_changed_functional_only": [
+    "app/src/account-ui/AccountScreens.tsx"
+  ],
+  "historical_migrations_unchanged": 44,
+  "new_migrations": [
+    "app/supabase/migrations/20261104090000_accounts_email_ui.sql"
+  ],
+  "active_guards_or_ci_modified": false,
+  "files": [
+    {
+      "path": ".gitignore",
+      "base_sha256": "0a9c6b6c50d16d468108108a2640561c7b8a5dd8f04975582a3f6ac76e3c1690",
+      "proposed_sha256": "20cc3680b937f324623a4b9dcb41e219e6b3a41455d11718d13a7fae2abe4b52"
+    },
+    {
+      "path": "app/package.json",
+      "base_sha256": "2cf39fee7931afa6e307d3582a697af5fc0ccdcd3b9a3d5d1c7bdbe006b01ad5",
+      "proposed_sha256": "22d0a965201a61b92ba0dd71a527ade9330a52b2598e8edc082a12df013cbd74"
+    },
+    {
+      "path": "app/scripts/build-premium-web.mjs",
+      "base_sha256": null,
+      "proposed_sha256": "ec9305965f64592a0703cef1c12145667300e942bc52f9b62787691a53c2cae5"
+    },
+    {
+      "path": "app/scripts/check-premium-web-cases.mjs",
+      "base_sha256": null,
+      "proposed_sha256": "e968b6155e2ba881d86b259fc5dea2dd7c7081b0450d9c44266cd5a2ddbbacef"
+    },
+    {
+      "path": "app/scripts/test-premium-email-browser.py",
+      "base_sha256": null,
+      "proposed_sha256": "9a62e0d342a819f44e892503a6ecddabcd71efde226a8ec63a3411e613293d7b"
+    },
+    {
+      "path": "app/src/account-ui/AccountScreens.tsx",
+      "base_sha256": "32a36235bdb06f7ae2ee7ac0e4868859fb11be128a492d49d41b666a89111cde",
+      "proposed_sha256": "b6b970d6a298b747f5bb83496af26b5c7e4415a30f8d82147fab1de9b2c9c939"
+    },
+    {
+      "path": "app/src/auth/B1App.test.tsx",
+      "base_sha256": "b750e7075c0532c2bd071a3e341732caca2b6bb36f1368c3397b962ebd0032ae",
+      "proposed_sha256": "70c125efff3717c2238dd990e866601b81a364d1d1cfbdb83c8a30d1f8def6d9"
+    },
+    {
+      "path": "app/src/auth/B1App.tsx",
+      "base_sha256": "9a64c6152ff6af3de3ebc31269e9be111ceea5d77da5cf00d3f8bfc6fcea3662",
+      "proposed_sha256": "3aa5bc5045d4d36a4518da401adfa933afcc3826cc448ca11828d7c4a5e0bd89"
+    },
+    {
+      "path": "app/src/auth/B1Email.test.tsx",
+      "base_sha256": null,
+      "proposed_sha256": "fa2affe9d3a2a30fb15007ad860c6afd8204bcee4d9ea49faa81725159f7a1d8"
+    },
+    {
+      "path": "app/src/auth/b1Port.ts",
+      "base_sha256": "a54dacf202b79c45e6ecddac3d4260fc629166169b3051a099a55b65a534cb07",
+      "proposed_sha256": "3a65262bc8af9e62fd5322a5f501a738136cc73fcd8764372ceeed428912a3a3"
+    },
+    {
+      "path": "app/src/auth/emailCallback.test.ts",
+      "base_sha256": null,
+      "proposed_sha256": "346a827d8b59b4b100ccae85b7ae61d019dda9c313991424075451878bda05fc"
+    },
+    {
+      "path": "app/src/auth/emailCallback.ts",
+      "base_sha256": null,
+      "proposed_sha256": "03ff14b50153c6d4de9ff5c4394aa56175710fbda91a2a333ff47a17d3c84864"
+    },
+    {
+      "path": "app/src/auth/emailPort.test.ts",
+      "base_sha256": null,
+      "proposed_sha256": "d2b4ade56bf903e08a05afae9fc5547e7b1100cbfdbe93810fc1913192e9bf41"
+    },
+    {
+      "path": "app/src/auth/sessionManager.ts",
+      "base_sha256": "0e17626195b4f5c4b9b1e5114c2281fcf285548130f55f2bb0b3448051833c16",
+      "proposed_sha256": "867c1d9fe132a3129bfbd2edf093416bc895bffc34c758100b7e1631aa749b51"
+    },
+    {
+      "path": "app/src/auth/uiAdapter.ts",
+      "base_sha256": "372c6290749b9143390c4f18a7a733c9543d68af09d1557c9eda04fc7425f4cd",
+      "proposed_sha256": "6691269b5964a7cf27d28ba9bdc4fa3b34b2ef8f1102bc4e1de4105f61af0623"
+    },
+    {
+      "path": "app/src/auth/useB1Lifecycle.ts",
+      "base_sha256": "6bdad84f94fc436ecefb0ff463dea6fe1020130f92b3d637725d91c569c35772",
+      "proposed_sha256": "cbd5fe843ce20aaeb380589cffeba4fe82b31d81501af2ed0ab316bd96360878"
+    },
+    {
+      "path": "app/supabase/functions/accounts/emailFlows.test.ts",
+      "base_sha256": null,
+      "proposed_sha256": "39d37404386aa187d788a17ec0d1515a8bd723dcac726a747d90390755032981"
+    },
+    {
+      "path": "app/supabase/functions/accounts/emailFlows.ts",
+      "base_sha256": null,
+      "proposed_sha256": "2b3d558ebc34a4216bf592801258d8549911bca8d621a19508d9f4010a1bf504"
+    },
+    {
+      "path": "app/supabase/functions/accounts/emailHook.test.ts",
+      "base_sha256": null,
+      "proposed_sha256": "83c8e997946c2b07d70f8600111bbc297f4073f059d22b3be2453a5b8c82965a"
+    },
+    {
+      "path": "app/supabase/functions/accounts/emailHook.ts",
+      "base_sha256": null,
+      "proposed_sha256": "b04563452d7cf8dac7139114a5f25a7665b617b7f438d68e28d4e28411b229d8"
+    },
+    {
+      "path": "app/supabase/functions/accounts/handler.ts",
+      "base_sha256": "31b58889e48ed0da3f6eb6bead08c426fb741ea5cc88d9a24dc297f17c53682c",
+      "proposed_sha256": "a28330999ce2567acdd0dbc7888f48bbbdcc23cb7addeb7cda8477b42207b3bf"
+    },
+    {
+      "path": "app/supabase/functions/accounts/index.ts",
+      "base_sha256": "b29adcef44c6787dacc42efecb022e680cdfe027e5df6f6177362d8f5f1b0817",
+      "proposed_sha256": "8d4152f7f87198b2889efed2a8312889dbf5c26f3522fb9993e4bb3537ff9228"
+    },
+    {
+      "path": "app/supabase/functions/accounts/smtp.test.ts",
+      "base_sha256": null,
+      "proposed_sha256": "fc1e289e7c21c16277892117ed85ae6c3d1b1ba74ce7be3c86fe675658c9fc84"
+    },
+    {
+      "path": "app/supabase/functions/accounts/smtp.ts",
+      "base_sha256": null,
+      "proposed_sha256": "0cca5f31c7e96f8eb54c6ba9695cb667798f84ee755a7eba4e6edfad2483c3a5"
+    },
+    {
+      "path": "app/supabase/migrations/20261104090000_accounts_email_ui.sql",
+      "base_sha256": null,
+      "proposed_sha256": "f414c07cf2470746ef3a6ec506a98ae3b9bbe2d4ebc7811d8b0da005da5407d8"
+    },
+    {
+      "path": "app/vercel.json",
+      "base_sha256": "2b201804cc4338b6ac8da01debcaf066cd9709e7bbccd1cb4ca4921b3b05e8c7",
+      "proposed_sha256": "655cc075b3955dfeb73517d2820a2d17847b9232e5cce52697785c32acbd9a38"
+    }
+  ]
+}

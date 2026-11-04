@@ -6,7 +6,7 @@ import type { SessionManager, SessionState } from './sessionManager';
 // Lifecycle extracted from the existing Accounts controller; same server gate.
 const alwaysResume=()=>true;
 export function useB1Lifecycle(manager:SessionManager,auth:SessionState,mayResume:()=>boolean=alwaysResume){
- useEffect(()=>{void manager.refresh();},[manager]);
+ useEffect(()=>{if(mayResume())void manager.refresh();},[manager,mayResume]);
  useEffect(()=>{
   const retry=()=>{if(mayResume()&&manager.getSnapshot().phase!=='signed_out')void manager.refresh();};
   const visible=()=>{if(document.visibilityState==='visible')retry();else manager.suspend();};

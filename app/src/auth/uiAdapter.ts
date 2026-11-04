@@ -1,7 +1,8 @@
 import type { SessionManager } from './sessionManager';
 import type { Profile } from './api';
 // Binding to the EXISTING accounts contract. Never included in the isolated demo.
-// Email signup/verification/recovery have no compatible existing server operation.
+// Legacy methods remain unchanged; email proof operations live in b1Port and
+// SessionManager.emailAction against the same accounts function.
 export function legacyAccountUiAdapter(manager:SessionManager) {
  return {
   identityKind:'login-or-phone' as const,

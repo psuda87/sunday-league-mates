@@ -5,6 +5,7 @@ import type { TokenStore } from './tokenStore';
 export type SessionPhase = 'checking' | 'ready' | 'signed_out' | 'unavailable' | 'storage_error';
 export interface SessionState { phase: SessionPhase; session: Session | null; message: string }
 export type RequestAccount = <T>(action: string, values?: Record<string, unknown>, session?: Session | null) => Promise<T>;
+export type EmailAction = 'signup'|'resend_verification'|'recover_email'|'verify_email'|'recover_password';
 const signedOut = (): SessionState => ({ phase: 'signed_out', session: null, message: '' });
 const unavailableMessage = 'Nie można teraz sprawdzić sesji. Połącz się z internetem i spróbuj ponownie.';
 function validate(value: Session) {
@@ -27,6 +28,17 @@ export class SessionManager {
   constructor(private store: TokenStore, private request: RequestAccount, private now = () => Date.now()) {}
   getSnapshot = () => this.state;
   subscribe = (listener: () => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener); }; };
+  // Anonymous email operations can acknowledge a proof, NEVER adopt a URL session.
+  // The only routes into ready remain password login / server-verified refresh.
+  async emailAction(action:EmailAction,values:Record<string,unknown>):Promise<void>{
+    if(this.state.phase!=='signed_out')throw new AccountError('Najpierw zakończ bieżącą sesję.','access_unavailable');
+    const generation=this.generation;
+    const result=await this.request<Record<string,unknown>>(action,values);
+    if(generation!==this.generation)throw new AccountError('Operacja została przerwana.','session_invalid');
+    const key=action==='verify_email'?'email_verified':action==='recover_password'?'password_changed':'verification_required';
+    if(!result||result[key]!==true||'access_token' in result||'refresh_token' in result)
+      throw new AccountError('Serwer nie potwierdził operacji.','server_error');
+  }
   private publish(state: SessionState) { this.state = state; this.listeners.forEach(listener => listener()); }
   suspend() {
     if (this.state.phase === 'ready') this.publish({ phase: 'checking', session: null, message: '' });
