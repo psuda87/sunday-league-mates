@@ -1,3 +1,38 @@
+# Prywatność telefonu i usuwanie konta — implementacja bez wdrożenia
+
+2026-11-04, `feat/premium-legal-pages`, baza `5d39c00`. Przygotowano migrację46
+`20261104183413_account_privacy_lifecycle.sql`, opcjonalny telefon z domyślną
+prywatnością wszystkich kont, zgodę na udostępnianie aktualnym wspólnym członkom,
+projekcje SQL i Edge obejmujące legacy/administratorów oraz blokadę surowych API.
+Dodano usuwanie konta z hasłem/frazą, bezpiecznym przekazaniem administratora,
+odłączeniem i redakcją historii, usuwaniem Auth/Storage i trwałymi ponowieniami.
+Powiadomienie administracyjne korzysta z istniejącego Brevo i osobnej kolejki;
+awaria poczty nie cofa usunięcia. Dodano ochronę równoczesnego uploadu zdjęcia,
+zmiany formularzy i dokumentów prawnych. Bez przebudowy karty, CSS i nawigacji.
+
+PASS automatyczne: TypeScript frontend/strict Edge, lint, **503 Vitest/71 plików**,
+build LIVE/demo/Premium web, izolacja demo16 i3 testy konfiguracji. SQL/RLS/FK:
+odtworzono46 migracji z wersjonowanych źródeł w świeżej scratch bazie lokalnego
+slm-main-stabilization; existing minimum_phone + account_privacy PASS (również
+anon/authenticated, opt-in/out/wyjście, legacy, historia płatności i upload lease).
+Cypress2/2 PASS na lokalnym produkcyjnym Premium z fikcyjnym transportem API.
+Nie oznacza to rzeczywistego usunięcia przez GoTrue/Storage ani doręczenia Brevo.
+
+FAIL aktywnych strażników: lista45 nie obejmuje migracji46, `Profile.tsx` ma
+minimalne wejście „Usuń konto”, źródła Auth wymagają nowych pinów. 82 testy policy
+zatrzymują się na niezatwierdzonym źródle Profile; nie zaliczono kontraktu Premium.
+Strażniki, manifest55 iCI bez zmian. Niezależny przegląd właściciela wymagany przed
+aktualizacją pinów i publikacją. Brak deployu, migracji Cloud, merge i testów na
+prawdziwych kontach. Produkcyjna rejestracja/recovery pozostają w odebranej wersji.
+
+Następny krok: review, wdrożenie migracji46 i istniejącego accounts, konfiguracja
+worker pg_cron/pg_net/Vault z przygotowanego SQL, potem Premium na slm-ui-demo.
+Odbiór Vercel wyłącznie jednorazowymi kontami; dane administratora i prawne okresy
+retencji nadal do ustalenia. Szczegóły, ograniczenia i kolejność wdrożenia:
+[ACCOUNT_PRIVACY_LIFECYCLE.md](ACCOUNT_PRIVACY_LIFECYCLE.md).
+
+---
+
 # Brevo i rejestracja e-mail — działanie potwierdzone przez właściciela
 
 2026-11-04, `feat/premium-legal-pages`. Po wyraźnym potwierdzeniu właściciela

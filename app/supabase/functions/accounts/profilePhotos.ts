@@ -66,8 +66,14 @@ export async function profilePhoto(env:Env,ctx:{id:string;sid:string},action:str
     try{bytes=Uint8Array.from(atob(image.slice(image.indexOf(',')+1)),char=>char.charCodeAt(0));}catch{throw new PhotoError(400,'invalid_photo','Nieprawidłowy plik zdjęcia.');}
     if(bytes.length>webpMaxBytes||!webpSize(bytes))throw new PhotoError(400,'invalid_photo','Zdjęcie WebP musi mieć maksymalnie 150 KB i 800 × 800 pikseli.');
     path=ctx.id+'/'+crypto.randomUUID()+'.webp';
-    const r=await request('/storage/v1/object/'+bucket+'/'+path,'POST',bytes as BodyInit,'image/webp');
-    if(!r.ok)throw unavailable();
+    const lease=crypto.randomUUID();
+    const leaseBody=(release:boolean)=>JSON.stringify({p_user:ctx.id,p_session:ctx.sid,p_lease:lease,p_release:release});
+    const held=await request('/rest/v1/rpc/slm_photo_upload_lease','POST',leaseBody(false),'application/json');
+    if(!held.ok)throw unavailable();
+    // On timeout keep the lease until expiry: Storage may still be writing.
+    const uploaded=await request('/storage/v1/object/'+bucket+'/'+path,'POST',bytes as BodyInit,'image/webp');
+    await request('/rest/v1/rpc/slm_photo_upload_lease','POST',leaseBody(true),'application/json').catch(()=>undefined);
+    if(!uploaded.ok)throw unavailable();
   }else if(action!=='profile_photo_delete')throw new PhotoError(400,'invalid_action','Nieprawidłowa operacja zdjęcia.');
   let result:Response;
   try {result=await request('/rest/v1/rpc/slm_profile_photo_commit','POST',JSON.stringify({p_user:ctx.id,p_session:ctx.sid,p_expected:expected,p_path:path}),'application/json');}

@@ -3,6 +3,7 @@ import { legacyAccountUiAdapter } from './uiAdapter';
 import { profileProblems } from '../account-ui/model';
 import type { IdentityDraft,PersonalProfileData } from '../ui/personalProfile';
 import { normalizePhoneUpdate } from '../../supabase/functions/_shared/phone';
+import { accountRequest } from './api';
 
 export function fullNameProblem(fullName:string){
  return profileProblems({nickname:'Profil',fullName,phone:''})[0]??'';
@@ -17,21 +18,28 @@ export function profileAdapter(manager:SessionManager,userId:string){
    typeof p.display_name!=='string'||!p.display_name.trim()||p.display_name.length>254||
    !['nickname','first_name','full_name'].includes(p.display_as)||(p.jersey_number!=null&&(!Number.isInteger(p.jersey_number)||p.jersey_number<0||p.jersey_number>99)))throw new Error('profile_contract_invalid');
   // Pick only the existing contract; never project roles/metadata into the UI.
-  return {...(typeof p.email_account==='boolean'?{email_account:p.email_account}:{}),nickname:p.nickname,first_name:p.first_name,group_scope:p.group_scope,jersey_number:p.jersey_number??null,user_id:userId,login:p.login,phone:p.phone,full_name:p.full_name,display_as:p.display_as,display_name:p.display_name};
+  return {...(typeof p.email_account==='boolean'?{email_account:p.email_account}:{}),...(typeof p.share_phone==='boolean'?{share_phone:p.share_phone}:{}),nickname:p.nickname,first_name:p.first_name,group_scope:p.group_scope,jersey_number:p.jersey_number??null,user_id:userId,login:p.login,phone:p.phone,full_name:p.full_name,display_as:p.display_as,display_name:p.display_name};
  }
  return {
-  async changePhone(phone:string,currentPassword:string){
+  async deleteAccount(password:string,confirmation:string,ticket:{operation_id:string;proof:string},resume:boolean){
+   if(!resume&&manager.getSnapshot().session?.user_id!==userId)throw Error('profile_owner_changed');
+   const result=resume?await accountRequest<{deleted:boolean;operation_id:string}>('account_delete_resume',ticket):
+    await manager.call<{deleted:boolean;operation_id:string}>('account_delete',{...ticket,current_password:password,confirmation});
+   if(result.deleted!==true||result.operation_id!==ticket.operation_id)throw Error('deletion_unconfirmed');
+   if(manager.getSnapshot().session?.user_id===userId)await manager.logout();
+  },
+  async changePhone(phone:string,currentPassword:string,share?:boolean){
    const before=validate(await existing.readProfile());
    if(!before||!currentPassword)throw Error('phone_change_requires_password');
-   const normalized=phone.trim()===''&&before.email_account===true?'':normalizePhoneUpdate(phone,before.phone);
-   if(normalized===before.phone)return before;
-   if(before.email_account===false){
+   const normalized=phone.trim()===''?'':normalizePhoneUpdate(phone,before.phone);
+   const sharing=normalized!==''&&(share??before.share_phone??false);
+   if(normalized===before.phone&&sharing===before.share_phone)return before;
+   if(before.email_account===false&&normalized!==before.phone){
     await manager.changeSession('identifiers',{login:before.login,phone:normalized,current_password:currentPassword});
-   }else if(before.email_account===true){
-    await manager.call('save_email_profile',{nickname:before.nickname||before.login,phone:normalized,current_password:currentPassword});
-   }else throw Error('phone_contract_unavailable');
+   }
+   await manager.call('save_contact_phone',{phone:normalized,share_phone:sharing,current_password:currentPassword});
    const confirmed=validate(await existing.readProfile());
-   if(!confirmed||confirmed.phone!==normalized||confirmed.login!==before.login)throw Error('profile_readback_mismatch');
+   if(!confirmed||confirmed.phone!==normalized||confirmed.share_phone!==sharing||confirmed.login!==before.login)throw Error('profile_readback_mismatch');
    return confirmed;
   },
   async saveIdentity(draft:IdentityDraft){

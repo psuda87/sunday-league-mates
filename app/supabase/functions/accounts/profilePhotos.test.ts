@@ -10,7 +10,7 @@ const fixture=JSON.parse(readFileSync('supabase/functions/fixtures/webp.json','u
 const image='data:image/webp;base64,'+fixture.base64;
 const json=(value:unknown,status=200)=>new Response(JSON.stringify(value),{status,headers:{'Content-Type':'application/json'}});
 afterEach(()=>vi.unstubAllGlobals());
-function scenario(mode:'upload-fail'|'commit-fail'|'cleanup-fail'|'timeout-committed'|'timeout-unknown'|'gateway-committed'){
+function scenario(mode:'upload-fail'|'upload-timeout'|'lease-denied'|'commit-fail'|'cleanup-fail'|'timeout-committed'|'timeout-unknown'|'gateway-committed'){
  let committed=false,candidate='',deleted:string[]=[];
  vi.stubGlobal('crypto',{randomUUID:()=>revision});
  vi.stubGlobal('fetch',vi.fn(async(url:string,init:RequestInit={})=>{
@@ -21,6 +21,7 @@ function scenario(mode:'upload-fail'|'commit-fail'|'cleanup-fail'|'timeout-commi
    return json(committed?[{object_path:candidate,revision,cleanup_path:mode==='cleanup-fail'?ctx.id+'/old.jpg':null}]:[]);
   }
   if(url.includes('/object/list/'))return json([]);
+  if(url.includes('/rpc/slm_photo_upload_lease'))return json(null,mode==='lease-denied'?409:200);
   if(url.includes('/rpc/')){
    if(mode==='commit-fail')return json({message:'stale_photo'},409);
    if(mode==='timeout-unknown')throw Error('network');
@@ -34,6 +35,7 @@ function scenario(mode:'upload-fail'|'commit-fail'|'cleanup-fail'|'timeout-commi
    deleted=deleted.concat(body.prefixes);return json([]);
   }
   if(init.method==='POST'){
+   if(mode==='upload-timeout')throw Error('storage timeout');
    candidate=ctx.id+'/'+revision+'.webp';
    return json({},mode==='upload-fail'?503:200);
   }
@@ -43,7 +45,16 @@ function scenario(mode:'upload-fail'|'commit-fail'|'cleanup-fail'|'timeout-commi
 }
 it('does not commit after a Storage upload failure',async()=>{
  scenario('upload-fail');await expect(profilePhoto(env,ctx,'profile_photo_upload',{image_data_url:image,expected_revision:null})).rejects.toMatchObject({code:'photo_unavailable'});
- expect(vi.mocked(fetch).mock.calls.some(([url])=>String(url).includes('/rpc/'))).toBe(false);
+ expect(vi.mocked(fetch).mock.calls.some(([url])=>String(url).includes('/rpc/slm_profile_photo_commit'))).toBe(false);
+});
+it('does not upload after deletion has revoked the upload lease',async()=>{
+ scenario('lease-denied');await expect(profilePhoto(env,ctx,'profile_photo_upload',{image_data_url:image})).rejects.toMatchObject({code:'photo_unavailable'});
+ expect(vi.mocked(fetch).mock.calls.some(([url])=>String(url).includes('/storage/v1/object/slm-profile-photos'))).toBe(false);
+});
+it('keeps the lease on an ambiguous upload timeout so deletion cannot finish early',async()=>{
+ scenario('upload-timeout');await expect(profilePhoto(env,ctx,'profile_photo_upload',{image_data_url:image})).rejects.toMatchObject({code:'photo_unavailable'});
+ const leases=vi.mocked(fetch).mock.calls.filter(([url])=>String(url).includes('/rpc/slm_photo_upload_lease'));
+ expect(leases).toHaveLength(1);expect(JSON.parse(String(leases[0][1]?.body)).p_release).toBe(false);
 });
 it('removes the new candidate after a definitive stale commit',async()=>{
  const s=scenario('commit-fail');await expect(profilePhoto(env,ctx,'profile_photo_upload',{image_data_url:image})).rejects.toMatchObject({code:'stale_photo'});
