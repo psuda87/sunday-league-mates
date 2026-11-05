@@ -1,3 +1,4 @@
+import type {ReactNode} from 'react';
 // Presentation contract only. No Auth, API, tokens, persistence or demo world mutation.
 export interface PersonalProfileData {
  user_id:string;login:string;phone:string;full_name:string;
@@ -8,6 +9,7 @@ export interface PersonalProfileData {
  display_as:'nickname'|'first_name'|'full_name';display_name:string;
 }
 export interface PersonalProfileBinding {
+ payments?:ReactNode;
  phase:'loading'|'ready'|'missing'|'error';profile:PersonalProfileData|null;
  changeAlias?:(login:string,currentPassword:string)=>Promise<boolean>;
  changePhone?:(phone:string,currentPassword:string,share?:boolean)=>Promise<boolean>;

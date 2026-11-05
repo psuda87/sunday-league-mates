@@ -49,6 +49,7 @@ export default function DemoProfile({world,id,onBack,dispatch,personal=false,onP
       {editor==='identity'&&(!live||live.phase==='ready')&&<IdentityEditor key={profile?.user_id??id} personalProfile={live} player={player} dispatch={dispatch} onClose={closeEditor} onNumber={editNumber}/>}
       {editor==='portrait'&&<AvatarPicker key={(profile?.user_id??id)+(live?.photo?.image??'')} personalPhoto={live?.photo} player={player} dispatch={dispatch} onClose={closeEditor}/>}
       <details ref={settings} className="slm-identity-settings"><summary>Ustawienia aplikacji i konta</summary><AppearanceSettings enablePalettes/><section className="slm-identity-account"><h2>Konto</h2><ul>{['Dane konta','Powiadomienia'].map(label=><li key={label}><span>{label}</span><small>{live&&label==='Dane konta'?profile?`Login: ${profile.login} · Telefon: ${profile.phone||'brak'}`:'Profil niedostępny':live?'W przygotowaniu':'Niedostępne w demo'}</small></li>)}</ul>{onPassword&&<button type="button" onClick={onPassword}>{liveAuth?'Zmiana hasła':'Zmiana hasła · symulator'}</button>}{live?.deleteAccount&&<AccountDeletion binding={live}/>} {onLogout&&<button type="button" onClick={onLogout}>{liveAuth?'Wyloguj':'Wyloguj · symulator'}</button>}<p>{live?'Profil, logowanie i hasło są zapisane na Twoim koncie. Mecze i członkostwo znajdziesz w odpowiednich zakładkach.':liveAuth?'Logowanie i hasło: Supabase. Pozostałe dane i operacje są demonstracyjne.':'Demo nie ma prawdziwej sesji. Te operacje nie są wykonywane.'}</p></section></details>
+      {live?.payments}
     </div>}
   </div>;
 }

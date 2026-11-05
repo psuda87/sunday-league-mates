@@ -1,5 +1,6 @@
 import { useOwnPhoto } from './useOwnPhoto';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { createElement,useEffect, useMemo, useRef, useState } from 'react';
+import PersonalPayments from '../finance/PersonalPayments';
 import type { SessionManager } from './sessionManager';
 import { profileAdapter } from './profileAdapter';
 import type { IdentityDraft,PersonalProfileBinding,PersonalProfileData } from '../ui/personalProfile';
@@ -53,7 +54,7 @@ export function useOwnProfile(manager:SessionManager,userId:string|null,selectio
   catch{if(ticket===generation.current)setState(previous=>({...previous,notice:'Nie potwierdzono zmiany telefonu. Sprawdź obecne hasło i unikalność numeru; przy przerwanym połączeniu ponów odczyt profilu.'}));return false;}
   finally{if(ticket===generation.current){flight.current=false;setSaving(false);}}
  }
- return {...current,photo,saveIdentity,saveNumber,changeAlias,changePhone,deleteAccount:adapter?.deleteAccount,saving:current.phase==='ready'&&saving,reload:()=>setRevision(v=>v+1),
+ return {...current,photo,payments:userId?createElement(PersonalPayments,{key:userId,manager,userId}):undefined,saveIdentity,saveNumber,changeAlias,changePhone,deleteAccount:adapter?.deleteAccount,saving:current.phase==='ready'&&saving,reload:()=>setRevision(v=>v+1),
   async save(fullName,number){
    const auth=manager.getSnapshot();
    if(flight.current||!adapter||!current.profile||current.phase!=='ready'||auth.phase!=='ready'||auth.session?.user_id!==userId)return false;

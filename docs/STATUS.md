@@ -1,3 +1,19 @@
+# Płatności — nowy podgląd i backend
+
+2026-11-05, feat/premium-legal-pages. Kafelki decyzji administratora, ręczne wpłaty,
+anulowanie z kompensacją, osobna historia i zgłoszenie z własnego profilu.
+PASS: TypeScript, lint, Edge typecheck,518 Vitest,14 scoped po ostatniej poprawce,
+SQL47 migracji w izolowanej bazie i wyścig dwóch transakcji, Cypress mobilny,
+build Premium. FAIL: istniejący strażnik pinów Profile.tsx; kontroli nie zmieniono.
+Za wyraźną zgodą wdrożono tylko migrację payment_workflow i accounts17
+(trzy mapowania409 na bazie accounts16; wszystkie10 plików zweryfikowane).
+Podgląd5196 zaktualizowany HTTP200; Vercel bez zmian do osobnego przeglądu pinów.
+Bez zmian Auth i pozostałych modułów, bez migracji prywatności46 i kont realnych.
+Następny krok: odbiór fikcyjnych wpłat przez właściciela i przegląd pinów.
+Szczegóły: [PAYMENT_WORKFLOW.md](PAYMENT_WORKFLOW.md).
+
+---
+
 # Testowe mecze i składki — gotowe
 
 2026-11-05, `feat/premium-legal-pages`. Na wyraźne polecenie właściciela powstał
