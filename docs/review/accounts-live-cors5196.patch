@@ -1,0 +1,8 @@
+# Operational record: Supabase accounts v13 -> v14, 2026-11-05.
+# Only the user-approved local test origin was appended. Existing environment
+# values and all other deployed files were preserved. Not a branch deployment.
+--- a/accounts/index.ts
++++ b/accounts/index.ts
+@@ -15,1 +15,1 @@
+-    'http://localhost:5173,http://127.0.0.1:5173,https://localhost,capacitor://localhost').split(',').map(value=>value.trim()).filter(Boolean) }));
++    'http://localhost:5173,http://127.0.0.1:5173,https://localhost,capacitor://localhost').split(',').map(value=>value.trim()).filter(Boolean).concat('http://127.0.0.1:5196') }));

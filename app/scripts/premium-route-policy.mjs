@@ -61,7 +61,12 @@ export const AUTH_WEB_FILES=new Set([
  'app/supabase/migrations/20261104090000_accounts_email_ui.sql',
  'app/vercel.json',
  ]);
-export const authSource=(path,fallback)=>AUTH_WEB_FILES.has(path)?AUTH_WEB_SOURCE:fallback;
+export const PRIVACY_SOURCE='bab1acc209438dca841cdce2795dd6e52dd93e81';
+export const PRIVACY_MIGRATION='app/supabase/migrations/20261104183413_account_privacy_lifecycle.sql';
+export const PRIVACY_FILES=new Set(["app/cypress/e2e/account-privacy.cy.ts", "app/public/polityka-prywatnosci/index.html", "app/public/regulamin/index.html", "app/scripts/test-account-privacy-local.py", "app/src/auth/profileAdapter.test.tsx", "app/src/auth/profileAdapter.ts", "app/src/auth/useOwnProfile.ts", "app/src/demo/Profile.tsx", "app/src/profile/AccountDeletion.test.tsx", "app/src/profile/PhoneEditor.test.tsx", "app/src/profile/PhoneEditor.tsx", "app/src/ui/personalProfile.ts", "app/supabase/account-privacy-worker.sql", "app/supabase/functions/accounts/accountPrivacy.test.ts", "app/supabase/functions/accounts/accountPrivacy.ts", "app/supabase/functions/accounts/handler.ts", "app/supabase/functions/accounts/privacyHandler.test.ts", "app/supabase/functions/accounts/profilePhotos.test.ts", "app/supabase/functions/accounts/profilePhotos.ts", "app/supabase/migrations/20261104183413_account_privacy_lifecycle.sql", "app/supabase/tests/account_privacy.sql"]);
+export const RESUME_SOURCE='2416945ff5dc5994dce35877e52ec401aafc8550';
+export const RESUME_FILES=new Set(['app/src/auth/sessionManager.ts','app/src/auth/useB1Lifecycle.ts','app/src/auth/B1App.test.tsx','app/src/auth/sessionResume.test.tsx']);
+export const authSource=(path,fallback)=>RESUME_FILES.has(path)?RESUME_SOURCE:PRIVACY_FILES.has(path)?PRIVACY_SOURCE:AUTH_WEB_FILES.has(path)?AUTH_WEB_SOURCE:fallback;
 const polishUi=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/premiumEvents.css','app/src/events/GuestForm.tsx']);
 const discoveryUi=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/usePremiumEvents.ts','app/src/events/premiumContracts.ts']);
 const lineupStage1=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/PremiumTeams.tsx','app/src/events/lineupEditor.ts','app/src/events/LineupPlayerProfile.tsx']);
@@ -84,16 +89,20 @@ export function verifyPremiumRuntime(root,overrides={}){
   const current=original.files[path].text?read(path):Object.hasOwn(overrides,path)?overrides[path]:readFileSync(root+'/'+path);
   const expected=digest(raw);
   assert.equal(manifest.files[path].sha256,expected,'Unapproved contract hash: '+path);
-  assert.equal(digest(current),path===AUTH_WEB_PRESENTATION?digest(git(AUTH_WEB_SOURCE,path)):path==='app/src/demo/EventForm.tsx'?digest(git(MINIMUM_PHONE_SOURCE,path)):expected,'Unapproved visual source: '+path);
+  assert.equal(digest(current),path==='app/src/demo/Profile.tsx'?digest(git(PRIVACY_SOURCE,path)):path===AUTH_WEB_PRESENTATION?digest(git(authSource(path,AUTH_WEB_SOURCE),path)):path==='app/src/demo/EventForm.tsx'?digest(git(MINIMUM_PHONE_SOURCE,path)):expected,'Unapproved visual source: '+path);
  }
+ assert.deepEqual([...PRIVACY_FILES].sort(),JSON.parse(git(PRIVACY_SOURCE,'docs/review/account-privacy-manifest.json')).files.map(r=>r.path).sort(),'Approved privacy inventory changed');
+ assert.deepEqual([...RESUME_FILES].sort(),execFileSync('git',['diff-tree','--no-commit-id','--name-only','-r',RESUME_SOURCE,'--','app'],{cwd:root,encoding:'utf8'}).trim().split('\n').sort(),'Approved resume inventory changed');
+ for(const path of RESUME_FILES)assert.equal(digest(read(path)),digest(git(RESUME_SOURCE,path)),'Unreviewed resume source: '+path);
+ for(const path of PRIVACY_FILES)assert.equal(digest(read(path)),digest(git(PRIVACY_SOURCE,path)),'Unreviewed privacy source: '+path);
  // Newly approved files are pinned to fixed Git objects, including tests/build/CSP.
- for(const path of AUTH_WEB_FILES)assert.equal(digest(read(path)),digest(git(AUTH_WEB_SOURCE,path)),'Unreviewed real Auth source: '+path);
+ for(const path of AUTH_WEB_FILES)assert.equal(digest(read(path)),digest(git(authSource(path,AUTH_WEB_SOURCE),path)),'Unreviewed real Auth source: '+path);
  // The historical minimum control keeps exactly its prior field exception.
  const form=git(MINIMUM_PHONE_SOURCE,'app/src/demo/EventForm.tsx');
  assert.equal(form.replace("{field('minimum','Minimum zawodników','number',{min:1,max:100,step:1})}","{live?<p>Minimum zawodników: 10</p>:field('minimum','Minimum zawodników','number',{min:1,step:1})}"),git(APPROVED,'app/src/demo/EventForm.tsx'),'Minimum form exception exceeded its exact field');
  const mainSteps=execFileSync('git',['ls-tree','-r','--name-only',MAIN,'--','app/supabase/migrations'],{cwd:root,encoding:'utf8'}).trim().split('\n');
  const added=['20261028174603_premium_match_membership_visibility.sql','20261028174920_premium_member_creation_finance_guard.sql','20261028175508_premium_match_feed_filters.sql','20261028181054_premium_group_admin_only_finance.sql'].map(n=>'app/supabase/migrations/'+n);
- assert.deepEqual(readdirSync(root+'/app/supabase/migrations').filter(n=>n.endsWith('.sql')).sort(),[...mainSteps,...added,'app/supabase/migrations/20261028204500_restore_pr16_match_name_projection.sql',LINEUPS_MIGRATION,DISCOVERY_MIGRATION,MINIMUM_MIGRATION,ADMIN_MIGRATION,AUTH_WEB_MIGRATION].map(p=>p.split('/').at(-1)).sort(),'Unexpected migration/model activation');
+ assert.deepEqual(readdirSync(root+'/app/supabase/migrations').filter(n=>n.endsWith('.sql')).sort(),[...mainSteps,...added,'app/supabase/migrations/20261028204500_restore_pr16_match_name_projection.sql',LINEUPS_MIGRATION,DISCOVERY_MIGRATION,MINIMUM_MIGRATION,ADMIN_MIGRATION,AUTH_WEB_MIGRATION,PRIVACY_MIGRATION].map(p=>p.split('/').at(-1)).sort(),'Unexpected migration/model activation');
  for(const p of [...mainSteps,...added])assert.equal(digest(read(p)),digest(git(added.includes(p)?APPROVED:MAIN,p)),'Historical migration overwritten: '+p);
  assert.equal(digest(read(LINEUPS_MIGRATION)),digest(git(LINEUPS_STAGE2A,LINEUPS_MIGRATION)),'Unreviewed Stage 2A backend source: '+LINEUPS_MIGRATION);
  for(const p of [DISCOVERY_MIGRATION,'app/supabase/functions/accounts/handler.ts',MINIMUM_MIGRATION])

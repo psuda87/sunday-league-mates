@@ -21,3 +21,24 @@ export function detail(v:unknown,g:string,e:string):Detail {
  return {...d,payments:d.payments.map(p=>receipt(p,g))} as unknown as Detail;
 }
 export function receipts(v:unknown,g:string):Receipt[]{const d=row(v);if(!Array.isArray(d.payments))throw Error('Invalid pending payments');return d.payments.map(p=>receipt(p,g));}
+
+export interface PaymentEvent {id:string;name:string;starts_at:string}
+export interface PlayerAccount {user_id:string;name:string;account:Account}
+export interface PaymentRoster {group_id:string;players:PlayerAccount[];events:PaymentEvent[]}
+export interface WalletGroup {group_id:string;group_name:string;account:Account;events:PaymentEvent[]}
+function events(v:unknown):PaymentEvent[]{
+ if(!Array.isArray(v))throw Error('Invalid payment events');
+ for(const event of v){const e=row(event);if(!text(e.id)||!text(e.name)||!text(e.starts_at)||!Number.isFinite(Date.parse(String(e.starts_at))))throw Error('Invalid payment event');}
+ return v as PaymentEvent[];
+}
+export function paymentRoster(v:unknown,g:string):PaymentRoster{
+ const r=row(v);if(r.group_id!==g||!Array.isArray(r.players))throw Error('Invalid payment roster');
+ const players=r.players.map(value=>{const p=row(value);if(!text(p.user_id)||!text(p.name))throw Error('Invalid payer');return {user_id:String(p.user_id),name:String(p.name),account:account(p.account,g,String(p.user_id))};});
+ if(new Set(players.map(p=>p.user_id)).size!==players.length)throw Error('Duplicate payer');
+ return {group_id:g,players,events:events(r.events)};
+}
+export function paymentWallet(v:unknown,u:string):WalletGroup[]{
+ const r=row(v);if(!Array.isArray(r.accounts))throw Error('Invalid payment wallet');
+ const groups=r.accounts.map(value=>{const g=row(value);if(!text(g.group_id)||!text(g.group_name))throw Error('Invalid payment group');return {group_id:String(g.group_id),group_name:String(g.group_name),account:account(g.account,String(g.group_id),u),events:events(g.events)};});
+ if(new Set(groups.map(g=>g.group_id)).size!==groups.length)throw Error('Duplicate payment group');return groups;
+}

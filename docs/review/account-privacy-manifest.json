@@ -1,0 +1,115 @@
+{
+  "purpose": "Review candidate only; not an approval or active guard update",
+  "base": "5d39c003f3dd161bf1fb59a8e0021784f23ced81",
+  "normalization": "UTF-8 LF SHA-256",
+  "protectedChanges": [
+    "app/src/demo/Profile.tsx"
+  ],
+  "files": [
+    {
+      "path": "app/cypress/e2e/account-privacy.cy.ts",
+      "before": null,
+      "after": "71f660401de52b656204a0632a0a91dd0a994be49b50059ea49e4255857122b5"
+    },
+    {
+      "path": "app/public/polityka-prywatnosci/index.html",
+      "before": "9adbcd2af0035f5dcce3ba6400f9abc159d4de1f56d64e3f64ffe15bda98cc23",
+      "after": "85d6502da34c973b9711eeba0a279f289214461d0bffad725a08e49aca8f7ae7"
+    },
+    {
+      "path": "app/public/regulamin/index.html",
+      "before": "569486396f208af7f6b769e416c47054653e2122f04917f8fad2f5d23b4ce2dd",
+      "after": "1e8980f10885c85cb456fb5370f4618465be89141ee4c36f77c2eadc7870f02d"
+    },
+    {
+      "path": "app/scripts/test-account-privacy-local.py",
+      "before": null,
+      "after": "97243a6894fd0de539e6df89b6cd616d69e6ddc0ebbc30bde2fcf530e64fdf9f"
+    },
+    {
+      "path": "app/src/auth/profileAdapter.test.tsx",
+      "before": "144e5aa83b760daade81953419125be3ec53913e1b07761c640df306c37d4c11",
+      "after": "9856e65ee8d7e21900c486f393d174c1d712e6d8672663fea335a6e53521ab22"
+    },
+    {
+      "path": "app/src/auth/profileAdapter.ts",
+      "before": "a2f966448472643001722f445f5fe717eb38e2f3c6d444ca1dd1466d77007493",
+      "after": "0e16e7f016e2d93aec7682cf73735a614a0f868e09818abd3d48cacd7afad3a0"
+    },
+    {
+      "path": "app/src/auth/useOwnProfile.ts",
+      "before": "f62aa8c35f95907c743c7249a2386f09b5b14d6445974bcae18c528aced3fbd4",
+      "after": "fb7e957629b27e0949c4ce031dafdaafb3a4f9d9372993334f4434179e22ce5a"
+    },
+    {
+      "path": "app/src/demo/Profile.tsx",
+      "before": "ae9eb9d7c30b80cd210f01e312d5ea8d904bb79f744a7f11fd4ba1e95b31b82e",
+      "after": "e4857e4be1edf4a68476de992c42866d8bec89fdf0411a161d1b2eb79204c575"
+    },
+    {
+      "path": "app/src/profile/AccountDeletion.test.tsx",
+      "before": null,
+      "after": "d490aaa25367f8a57846cc33bb637a818e45233d930d65127871d0110102d036"
+    },
+    {
+      "path": "app/src/profile/PhoneEditor.test.tsx",
+      "before": "ce18dd841ae83a9c239c5f9b11e796f0c347e8bca0f5a2f8ebdd6cd60c090d97",
+      "after": "f50f6bc4b6fe2a289242e5b7bbc6a32cbc3fbefe7d8f647023b052f967364e94"
+    },
+    {
+      "path": "app/src/profile/PhoneEditor.tsx",
+      "before": "d8b43ae97009085c469756e649e0704cfeafe1c521fd2a1c37e74065d02c65f8",
+      "after": "2be96f79a28b22fd49da6dcd8a62dae2701d5f58037b3d8e0431e6014432a1dd"
+    },
+    {
+      "path": "app/src/ui/personalProfile.ts",
+      "before": "38ed951cbcc58bf972bd08c49cc54a4e461a5509c90bed795826423c65e8d6d9",
+      "after": "de382b3a5dc7e7f2da2dbcced02a6ae94800d2a876291a75d2de1d8e61b8a291"
+    },
+    {
+      "path": "app/supabase/account-privacy-worker.sql",
+      "before": null,
+      "after": "54b457189fc534f3ff0fe5340512c92f56c840928fd8d4778aedbc69d0e681ee"
+    },
+    {
+      "path": "app/supabase/functions/accounts/accountPrivacy.test.ts",
+      "before": null,
+      "after": "3e03270319a40b5324efda24e504e2ae3fa4aa1d0c3795c6081c830b403f398f"
+    },
+    {
+      "path": "app/supabase/functions/accounts/accountPrivacy.ts",
+      "before": null,
+      "after": "fde1d33756c68e8ce2be78d98e49ce31e3e172e487c5bbcc32a2929e25935ce1"
+    },
+    {
+      "path": "app/supabase/functions/accounts/handler.ts",
+      "before": "69c4e61d24c10817a94b54cf9f2fbfebb7f237598a6051c8fa1acbe44fbd34bc",
+      "after": "10ee838cd0f50dcfb52bf3f0dd4bff93137df0bc379f224e96227668e127c564"
+    },
+    {
+      "path": "app/supabase/functions/accounts/privacyHandler.test.ts",
+      "before": null,
+      "after": "54eaa690895a39fd701c75b368e46917a47b5bfaa93f782ceaf6355d2d9191e3"
+    },
+    {
+      "path": "app/supabase/functions/accounts/profilePhotos.test.ts",
+      "before": "b5a9401b7ed42464fb88aeada11738991a8d0e171059c955a02393efdd3154d7",
+      "after": "2f47e88b9af2d2e0004c10ca8355a68464c51758a5a105a436258a8e7b50103a"
+    },
+    {
+      "path": "app/supabase/functions/accounts/profilePhotos.ts",
+      "before": "297b29411fabc32bc8771e2e99e028031b4ceed80f5b00fca976d75df2441e15",
+      "after": "35feac97969753323e779af8e6dad75bd90a7172c2cd5085da528c5f0471e163"
+    },
+    {
+      "path": "app/supabase/migrations/20261104183413_account_privacy_lifecycle.sql",
+      "before": null,
+      "after": "9539caf6028d11761fd3ca1609d797c3632d509205665b4537f8cf67026654d8"
+    },
+    {
+      "path": "app/supabase/tests/account_privacy.sql",
+      "before": null,
+      "after": "9013811e6d88ab610c473631c492481ec5cfab287b6ce73d7275bd948d8ce615"
+    }
+  ]
+}

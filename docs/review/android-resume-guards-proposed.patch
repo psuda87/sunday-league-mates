@@ -1,0 +1,24 @@
+--- a/app/scripts/premium-route-policy.mjs
++++ b/app/scripts/premium-route-policy.mjs
+@@ -66,7 +66,9 @@
+ export const PRIVACY_FILES=new Set(["app/cypress/e2e/account-privacy.cy.ts", "app/public/polityka-prywatnosci/index.html", "app/public/regulamin/index.html", "app/scripts/test-account-privacy-local.py", "app/src/auth/profileAdapter.test.tsx", "app/src/auth/profileAdapter.ts", "app/src/auth/useOwnProfile.ts", "app/src/demo/Profile.tsx", "app/src/profile/AccountDeletion.test.tsx", "app/src/profile/PhoneEditor.test.tsx", "app/src/profile/PhoneEditor.tsx", "app/src/ui/personalProfile.ts", "app/supabase/account-privacy-worker.sql", "app/supabase/functions/accounts/accountPrivacy.test.ts", "app/supabase/functions/accounts/accountPrivacy.ts", "app/supabase/functions/accounts/handler.ts", "app/supabase/functions/accounts/privacyHandler.test.ts", "app/supabase/functions/accounts/profilePhotos.test.ts", "app/supabase/functions/accounts/profilePhotos.ts", "app/supabase/migrations/20261104183413_account_privacy_lifecycle.sql", "app/supabase/tests/account_privacy.sql"]);
+ export const RESUME_SOURCE='2416945ff5dc5994dce35877e52ec401aafc8550';
+ export const RESUME_FILES=new Set(['app/src/auth/sessionManager.ts','app/src/auth/useB1Lifecycle.ts','app/src/auth/B1App.test.tsx','app/src/auth/sessionResume.test.tsx']);
+-export const authSource=(path,fallback)=>RESUME_FILES.has(path)?RESUME_SOURCE:PRIVACY_FILES.has(path)?PRIVACY_SOURCE:AUTH_WEB_FILES.has(path)?AUTH_WEB_SOURCE:fallback;
++export const ANDROID_RESUME_SOURCE='2238513cf855be6b4342ace0b6dea48026d87c26';
++export const ANDROID_RESUME_FILES=new Set(['app/src/auth/useB1Lifecycle.ts','app/src/auth/B1App.test.tsx','app/src/auth/nativeResume.test.tsx']);
++export const authSource=(path,fallback)=>ANDROID_RESUME_FILES.has(path)?ANDROID_RESUME_SOURCE:RESUME_FILES.has(path)?RESUME_SOURCE:PRIVACY_FILES.has(path)?PRIVACY_SOURCE:AUTH_WEB_FILES.has(path)?AUTH_WEB_SOURCE:fallback;
+ const polishUi=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/premiumEvents.css','app/src/events/GuestForm.tsx']);
+ const discoveryUi=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/usePremiumEvents.ts','app/src/events/premiumContracts.ts']);
+ const lineupStage1=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/PremiumTeams.tsx','app/src/events/lineupEditor.ts','app/src/events/LineupPlayerProfile.tsx']);
+@@ -93,7 +95,9 @@
+  }
+  assert.deepEqual([...PRIVACY_FILES].sort(),JSON.parse(git(PRIVACY_SOURCE,'docs/review/account-privacy-manifest.json')).files.map(r=>r.path).sort(),'Approved privacy inventory changed');
+  assert.deepEqual([...RESUME_FILES].sort(),execFileSync('git',['diff-tree','--no-commit-id','--name-only','-r',RESUME_SOURCE,'--','app'],{cwd:root,encoding:'utf8'}).trim().split('\n').sort(),'Approved resume inventory changed');
+- for(const path of RESUME_FILES)assert.equal(digest(read(path)),digest(git(RESUME_SOURCE,path)),'Unreviewed resume source: '+path);
++ assert.deepEqual([...ANDROID_RESUME_FILES].sort(),execFileSync('git',['diff-tree','--no-commit-id','--name-only','-r',ANDROID_RESUME_SOURCE,'--','app'],{cwd:root,encoding:'utf8'}).trim().split('\n').sort(),'Approved Android resume inventory changed');
++ for(const path of ANDROID_RESUME_FILES)assert.equal(digest(read(path)),digest(git(ANDROID_RESUME_SOURCE,path)),'Unreviewed Android resume source: '+path);
++ for(const path of RESUME_FILES)assert.equal(digest(read(path)),digest(git(authSource(path,RESUME_SOURCE),path)),'Unreviewed resume source: '+path);
+  for(const path of PRIVACY_FILES)assert.equal(digest(read(path)),digest(git(PRIVACY_SOURCE,path)),'Unreviewed privacy source: '+path);
+  // Newly approved files are pinned to fixed Git objects, including tests/build/CSP.
+  for(const path of AUTH_WEB_FILES)assert.equal(digest(read(path)),digest(git(authSource(path,AUTH_WEB_SOURCE),path)),'Unreviewed real Auth source: '+path);

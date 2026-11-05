@@ -12,16 +12,17 @@ import type { PersonalProfileBinding } from '../ui/personalProfile';
 afterEach(cleanup);
 
 it.each([false,true])('changes own phone using existing secure backend, email=%s',async email_account=>{
- let stored={...profile(),email_account,nickname:'Testowy'};
+ let stored={...profile(),email_account,nickname:'Testowy',share_phone:false};
  const fresh:Session={access_token:'fresh-access',refresh_token:'fresh-refresh',expires_in:3600,user_id:'own',role:'member',must_change_password:false};
  const request=vi.fn(async(action:string,body?:Record<string,unknown>)=>{
-  if(action==='identifiers'||action==='save_email_profile'){stored={...stored,phone:String(body!.phone)};return action==='identifiers'?fresh:stored;}
+  if(action==='identifiers'||action==='save_contact_phone'){stored={...stored,phone:String(body!.phone),share_phone:body!.share_phone===true};return action==='identifiers'?fresh:stored;}
   return stored;
  });
  const m=manager(request);await m.signIn('own','initial-password');
  const saved=await profileAdapter(m,'own').changePhone('+48 000 000 222','current-password');
  expect(saved?.phone).toBe('+48000000222');
- expect(request).toHaveBeenCalledWith(email_account?'save_email_profile':'identifiers',email_account?{nickname:'Testowy',phone:'+48000000222',current_password:'current-password'}:{login:'Fikcyjny',phone:'+48000000222',current_password:'current-password'});
+ expect(request).toHaveBeenCalledWith('save_contact_phone',{phone:'+48000000222',share_phone:false,current_password:'current-password'});
+ if(!email_account)expect(request).toHaveBeenCalledWith('identifiers',{login:'Fikcyjny',phone:'+48000000222',current_password:'current-password'});
  expect(saved?.login).toBe('Fikcyjny');
 });
 it('does not report phone success when the explicit server read-back is unchanged',async()=>{
