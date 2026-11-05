@@ -8,7 +8,11 @@ PASS: build LIVE/demo6, izolacja16, lint, 479Vitest/69plików, Cypress1/1
 (390px, komplet pełnych podpisów, zamiany, reset/reload).
 Strażników nie zmieniano; wcześniejsza blokada palettes.css nadal otwarta,
 a zmiana źródła Teams wymaga osobnego przeglądu przed aktualizacją pinów.
-Preview poprawki w przygotowaniu; bez produkcji, migracji, Androida i merge.
+Preview poprawki READY: `8a5ab98`, `dpl_y6hgDiE4c13ZbV3yt5e7fzknWQ2W`.
+RĘCZNY PASS agenta w Work: wszystkie12 podpisów z DOM i widocznie pełne
+„adam p.”, „sebastian s.”, „tomek B”, zawinięty gość. Zakładka zaktualizowana.
+https://slm-ui-demo-gu28tujyi-peters-projects-97e42a0e.vercel.app/
+Bez produkcji, migracji, Androida i merge. Następny krok: odbiór poprawki.
 
 ---
 

@@ -10,6 +10,11 @@ PASS: build/demo6/izolacja16/lint, 479Vitest, Cypress1/1 z kontrolą wszystkich
 12 pełnych podpisów pod numerami. Nie zmieniono pinów Premium; zmiana Teams
 wymaga osobnego przeglądu przed ich aktualizacją. Dalsza historia poniżej
 opisuje wcześniejszy stan i nie stanowi zaliczenia kontraktu po poprawce.
+Preview poprawki READY, commit `8a5ab981a3a1152ca867e13b530cbb8f6717e593`:
+https://slm-ui-demo-gu28tujyi-peters-projects-97e42a0e.vercel.app/
+RĘCZNY PASS agenta Work: odczyt12 pełnych podpisów pod numerami, wizualnie
+pełne „adam p.”, „sebastian s.” i „tomek B”; dłuższy podpis gościa zawinięty.
+Otwartą zakładkę właściciela przełączono na poprawiony preview.
 
 2026-11-05 · `codex/demo-match-6v6` · baza ostatniego preview motywów
 `19913381f0b61c0cc64e3f6e81d99e371d3baeb1` z `feat/premium-theme-refinement`.
