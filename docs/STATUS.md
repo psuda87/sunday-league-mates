@@ -1,3 +1,19 @@
+# APK Premium odpowiadające Vercel62baac5
+
+2026-11-05, `feat/premium-legal-pages`, wejściowy HEAD dokumentacyjny `b46fd11`;
+kod aplikacji identyczny z wdrożonym `62baac5`. PASS build:premium-web, Capacitor
+sync wariantu B1 z HTTPS i Gradle assembleDebug --offline na JBR Android Studio.
+APK lokalne: `.cache/android-auth/slm-premium-62baac5-debug.apk`, 9629989 bajtów.
+SHA256: `c9f330ec49ef4dee83ec87d4d1fc2926b33629652f0bd96a9e9fe46ed0effe08`.
+PASS podpis APK v2/apksigner, aapt: pl.psuda87.slm / Sunday League Mates /1.0.
+PASS kontrola ZIP: identyczny JS Premium, właściwy HTTPS Supabase i nowe płatności,
+logging none, WebView debugging false, mixed content false, bez server override.
+Artefakt debug do testów ręcznych, poza Git; nie instalowano ani nie uruchamiano
+na urządzeniu. Nie zmieniano kodu, backendu, migracji lub Vercel; pełnej regresji
+nie powtarzano. Dwa pliki wygenerowane przez sync przywrócono do treści HEAD.
+
+---
+
 # Vercel — aktualny frontend opublikowany
 
 2026-11-05, `feat/premium-legal-pages`. Na wyraźne polecenie właściciela
