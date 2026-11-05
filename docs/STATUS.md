@@ -9,9 +9,13 @@ PASS: build LIVE i demo6, izolacja16, lint, 479Vitest/69plików, Cypress1/1
 (390px, zamiana/reset/reload/brak zapytań do backendu). Początkowe blokady
 EPERM/sieci/katalogu Cypress usunięto konfiguracją uruchomienia.
 FAIL: 82policy z powodu już istniejącego hasha palettes.css w gałęzi motywów;
-nie zmieniano pinów. Bez migracji/Edge/CI/Android/merge. Vercel preview w
-przygotowaniu, plan Hobby potwierdzony. Następny krok: wdrożenie i odbiór
-preview. Szczegóły: [DEMO_MATCH_6V6.md](DEMO_MATCH_6V6.md).
+nie zmieniano pinów. Bez migracji/Edge/CI/Android/merge. Vercel preview READY,
+commit `1dc182b`, build42s i HTTP200/CSP PASS, plan Hobby potwierdzony.
+RĘCZNY PASS agenta w Work na zdalnym preview: 6v6, zamiana sudy z gościem,
+reset/reload; aplikację pozostawiono otwartą. Adres:
+https://slm-ui-demo-qmj1fb5jl-peters-projects-97e42a0e.vercel.app/
+Następny krok: odbiór preview przez właściciela. Szczegóły:
+[DEMO_MATCH_6V6.md](DEMO_MATCH_6V6.md).
 
 ---
 

@@ -43,7 +43,21 @@ potwierdzony aktywny plan Hobby. Wyłącznie preview, bez produkcyjnego aliasu.
 Root dla tego wdrożenia: `app/demo-six`, źródła spoza root włączone tylko
 w parametrach tego wdrożenia; konfiguracja projektu nie jest aktualizowana.
 Instalacja i build wykonują się w nadrzędnym `app/`, wynik `../dist-demo-six`.
-Adres i faktyczny wynik zdalnego wdrożenia będą zapisane po weryfikacji.
+Preview **READY**, wdrożony commit `1dc182b8c44e9d4feb6a3f58daec972e3c48f783`:
+https://slm-ui-demo-qmj1fb5jl-peters-projects-97e42a0e.vercel.app/
+Identyfikator: `dpl_GfyPwnMWpbz5YYvj45eUGbuVtofN`, build Vercel 42 s
+(pełne przejście BUILDING → READY około 47 s), Node 22, statyczny Vite/Ionic React.
+Zdalna instalacja z lockfile, TypeScript, build i izolacja16 PASS.
+HTTP200 i nagłówki CSP/nosniff/no-referrer/noindex potwierdzone przez Vercel.
+Preview chroniony istniejącym Vercel Authentication; tymczasowy link dostępu
+przekazano właścicielowi w rozmowie, bez zapisu jego parametru w repozytorium.
+Bez zmiany ochrony, planu i produkcyjnego aliasu.
+
+RĘCZNY PASS agenta w przeglądarce Work na tym zdalnym preview: wszystkie
+12 nazwisk/nazw na liście, początkowe 6v6, włączenie zamian, wybór sudy z A
+i gościa z B, komunikat powodzenia i zmiana stron. Następnie reset i reload:
+suda znowu w A, gość w B, obie drużyny po6. Zakładkę pozostawiono otwartą.
+Automatyczny test mobilny wykonano lokalnie, nie jest to zdalny test Cypress.
 
 ## Kontrole
 
