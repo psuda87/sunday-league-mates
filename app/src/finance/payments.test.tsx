@@ -31,25 +31,31 @@ function fixture(initial:'none'|'pending'|'accepted'='pending',admin=true){
 }
 it('accepts directly inside a payer card without entering a reason, then can cancel with a correction',async()=>{
  const f=fixture();render(<PremiumFinance manager={f.manager} userId="u" groupId="g" eventId="e" manage/>);
- let card=await screen.findByRole('article',{name:'Płatności: Zawodnik fixture'});
+ const card=await screen.findByRole('article',{name:'Płatności: Zawodnik fixture'});
  expect(within(card).getByText(/Zgłoszono wpłatę/)).toBeTruthy();expect(screen.queryByRole('textbox')).toBeNull();
- fireEvent.click(within(card).getByRole('button',{name:'Akceptuj wpłatę'}));
- await screen.findByRole('button',{name:'Anuluj wpłatę'});
+ expect(within(card).getAllByRole('button').map(b=>b.textContent)).toEqual(['Akceptuj','Odrzuć','Anuluj']);
+ expect(within(card).getByRole('button',{name:'Akceptuj zgłoszoną wpłatę'})).toHaveClass('is-reported');
+ fireEvent.click(within(card).getByRole('button',{name:'Akceptuj zgłoszoną wpłatę'}));
+ await waitFor(()=>expect(screen.queryByRole('article',{name:'Płatności: Zawodnik fixture'})).toBeNull());
  expect(f.call).toHaveBeenCalledWith('group_finance_accept_payment',expect.objectContaining({payment_id:'r',expected_amount_cents:2300,reason:'Akceptacja zgłoszonej wpłaty',request_id:expect.any(String)}));
- card=screen.getByRole('article',{name:'Płatności: Zawodnik fixture'});fireEvent.click(within(card).getByRole('button',{name:'Anuluj wpłatę'}));
- await screen.findByRole('button',{name:'Oznacz jako opłacone'});expect(screen.queryByRole('button',{name:'Anuluj wpłatę'})).toBeNull();
- fireEvent.click(screen.getByRole('tab',{name:'Historia wpłat'}));await screen.findByText(/Anulowana/);
+ fireEvent.click(screen.getByRole('tab',{name:'Historia wpłat'}));await screen.findByText(/Opłacono/);
+ fireEvent.click(screen.getByRole('button',{name:'Anuluj'}));await screen.findByText(/Anulowana/);
+ expect(screen.getByRole('button',{name:'Anuluj'})).toBeDisabled();
+ fireEvent.click(screen.getByRole('tab',{name:'Bieżące płatności'}));await screen.findByRole('button',{name:'Akceptuj wpłatę bez zgłoszenia'});
 });
 it('rejects a pending contribution in the same card and leaves the debt payable',async()=>{
  const f=fixture();render(<PremiumFinance manager={f.manager} userId="u" groupId="g" eventId="e" manage/>);
- fireEvent.click(await screen.findByRole('button',{name:'Odrzuć wpłatę'}));
- await waitFor(()=>expect(screen.queryByRole('button',{name:'Odrzuć wpłatę'})).toBeNull());
- expect(await screen.findByRole('button',{name:'Oznacz jako opłacone'})).not.toBeDisabled();
+ fireEvent.click(await screen.findByRole('button',{name:'Odrzuć'}));
+ await waitFor(()=>expect(screen.getByRole('button',{name:'Odrzuć'})).toBeDisabled());
+ expect(await screen.findByRole('button',{name:'Akceptuj wpłatę bez zgłoszenia'})).not.toBeDisabled();
  fireEvent.click(screen.getByRole('tab',{name:'Historia wpłat'}));await screen.findByText(/Odrzucona/);
 });
 it('records a payment without a player notification and removes the paid match from profile choices',async()=>{
  const f=fixture('none');const page=render(<PremiumFinance manager={f.manager} userId="u" groupId="g" eventId="e" manage/>);
- fireEvent.click(await screen.findByRole('button',{name:'Oznacz jako opłacone'}));await screen.findByRole('button',{name:'Anuluj wpłatę'});page.unmount();
+ const accept=await screen.findByRole('button',{name:'Akceptuj wpłatę bez zgłoszenia'});
+ expect(accept).toHaveClass('is-unreported');
+ expect(screen.getByRole('button',{name:'Odrzuć'})).toBeDisabled();expect(screen.getByRole('button',{name:'Anuluj'})).toBeDisabled();
+ fireEvent.click(accept);await waitFor(()=>expect(screen.queryByRole('article',{name:'Płatności: Zawodnik fixture'})).toBeNull());page.unmount();
  render(<PersonalPayments manager={f.manager} userId="u"/>);fireEvent.click(screen.getByRole('button',{name:'Moje płatności'}));
  await screen.findByText(/Wszystkie należności są opłacone/);expect(screen.queryByRole('form')).toBeNull();expect(paymentChoices(f.own())).toEqual([]);
 });

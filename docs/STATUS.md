@@ -1,3 +1,30 @@
+# Kafelki płatności i odstępy szczegółów meczu
+
+2026-11-05, `feat/premium-legal-pages`; wejściowy HEAD `6ef348f` (nie cofano do
+historycznego281e4f1). Przeniesiono dokładnie77 dodanych linii premiumEvents.css
+z `bdfeff24b6ed6b3695fc4fc833daf6e720d6f6cd`, bez innych plików z tej gałęzi.
+Kafelek należności: zawodnik, mecz/kwota i3 przyciski w jednym rzędzie
+Akceptuj/Odrzuć/Anuluj. Zgłoszenie wyróżnia zielona obwódka Akceptuj i tekst;
+brak zgłoszenia czerwona obwódka. Pozostałe kolory z aktywnej palety Premium.
+Akceptuj bez zgłoszenia używa istniejącej ręcznej wpłaty, po pełnym opłaceniu
+pozycja znika z bieżących; anulowanie zatwierdzonej wpłaty dostępne w historii.
+Przyciski niepasujące do stanu pozostają widoczne i nieaktywne. Częściowa wpłata
+zachowuje rzeczywistą pozostałą należność, nie oznacza jej fałszywie jako opłaconej.
+PASS:14 scoped Vitest, TypeScript, lint, składnia CSS/PostCSS, dokładna zgodność
+event CSS z bdfeff24, produkcyjny build Premium i git diff --check.
+Nie powtarzano pełnej regresji/strażników; wcześniejsza blokada pinów pozostaje.
+Bez zmian backendu, Auth, migracji, CI i historycznych manifestów; bez deployu
+Vercel, instalacji APK i merge do main. Lokalny podgląd5196 odświeżony nowym buildem.
+
+Android Studio, istniejący lokalny build HTTPS w tej kopii: w katalogu `app`
+skopiować `dist-premium-web/*` do `dist-b1` (rekurencyjnie), ustawić
+`$env:SLM_B1_ANDROID='1'` oraz `$env:SLM_ANDROID_STAGE3='0'`, wykonać
+`npx cap sync android`, otworzyć `app/android`, wybrać urządzenie i Run.
+Nie używać build:demo ani starszego build:premium-local z lokalnym endpointem.
+W tym zadaniu natywnego sync/build/uruchomienia nie wykonywano.
+
+---
+
 # Płatności — nowy podgląd i backend
 
 2026-11-05, feat/premium-legal-pages. Kafelki decyzji administratora, ręczne wpłaty,
