@@ -38,3 +38,80 @@
 .slm-guest-form button {white-space:normal;min-height:44px;}
 .slm-lineup-confirm-actions {display:flex;flex-wrap:wrap;gap:8px;min-width:0;}
 .slm-lineup-confirm-actions button {flex:1 1 160px;box-sizing:border-box;min-width:0;max-width:100%;min-height:44px;white-space:normal;overflow-wrap:anywhere;}
+
+
+/* Match details: spacing and readable information blocks, scoped to Premium events. */
+.slm-premium-events .slm-match-info {
+  display: grid;
+  gap: 10px;
+}
+.slm-premium-events .slm-match-info > h2 {
+  margin: 0 0 4px;
+}
+.slm-premium-events .slm-match-info > p {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--slm-border);
+  border-radius: 12px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.slm-premium-events .slm-match-info > p:nth-of-type(even) {
+  background: var(--slm-card-bottom, var(--slm-panel));
+}
+.slm-premium-events .slm-match-info > details {
+  margin-top: 8px;
+  border-top: 1px solid var(--slm-border);
+  padding-top: 10px;
+}
+.slm-premium-events .slm-match-info > details > summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--slm-border);
+  border-radius: 10px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+.slm-premium-events .slm-match-info > details[open] > summary {
+  margin-bottom: 12px;
+}
+.slm-premium-events .slm-match-info > details > label {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.slm-premium-events .slm-match-info > details input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--slm-border);
+  border-radius: 10px;
+  background: var(--slm-field-bg, var(--slm-panel));
+  color: var(--slm-text);
+}
+.slm-premium-events .slm-roster-group .slm-roster-list > li {
+  gap: 12px;
+  padding: 12px 14px;
+  min-height: 60px;
+  box-sizing: border-box;
+}
+.slm-premium-events .slm-live-entry .slm-demo-person-meta {
+  display: grid;
+  align-content: center;
+  gap: 4px;
+  line-height: 1.4;
+}
+.slm-premium-events .slm-live-entry .slm-demo-person-meta small {
+  line-height: 1.4;
+}
+.slm-premium-events .slm-team-actions {
+  margin: 12px 0;
+}
+.slm-premium-events .slm-team-actions > button {
+  min-height: 44px;
+  padding: 10px 14px;
+  box-sizing: border-box;
+}
