@@ -9,12 +9,13 @@ import ParticipantGroup, { RosterSummary } from '../ui/ParticipantGroup';
 import '../pages/Accounts.css';
 import '../demo/palettes.css';
 import { createMatchDemo } from './fixture';
+import './match.css';
 
 export default function MatchDemo() {
   const [world, dispatch] = useReducer(reduceWorld, undefined, createMatchDemo);
   const [profile, setProfile] = useState<string | null>(null);
   const game = world.games[0];
-  return <IonPage className="slm-demo"><IonContent><main className="slm-accounts">
+  return <IonPage className="slm-demo slm-demo-six"><IonContent><main className="slm-accounts">
     {profile ? <DemoProfile world={world} id={profile} dispatch={dispatch} onBack={() => setProfile(null)}/> : <>
       <MatchHeader title="Sparing 6 na 6"/>
       <p className="slm-demo-badge">Fikcyjny mecz testowy · dane tylko w pamięci przeglądarki</p>
@@ -23,7 +24,7 @@ export default function MatchDemo() {
         <p>Składy dobrano automatycznie, naprzemiennie z listy. To test obsługi składów, bez ocen umiejętności.</p>
         <p>Aby zamienić zawodników, włącz „Zamień zawodników” i wybierz po jednej osobie z każdej drużyny. Gościa również można zamienić.</p>
       </section>
-      <DemoTeams world={world} game={game} dispatch={dispatch} onPlayer={setProfile}/>
+      <DemoTeams world={world} game={game} dispatch={dispatch} onPlayer={setProfile} fullNames/>
       <section className="slm-demo-roster" aria-label="Uczestnicy meczu testowego">
         <RosterSummary occupied={game.entries.length} capacity={12} reserve={0}/>
         <ParticipantGroup title="Uczestnicy" emptyText="Brak uczestników.">

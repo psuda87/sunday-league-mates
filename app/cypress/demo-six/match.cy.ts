@@ -13,6 +13,7 @@ describe('Fikcyjny mecz 6 na 6', () => {
     cy.get(b).find('[data-entry]').should('have.length', 6);
     ['suda', 'adam p.', 'sebastian s.', 'ariel', 'marek', 'michał', 'tomek B', 'Mateusz', 'dawid', 'kuba', 'krystian', 'kolega krystiana'].forEach(name => {
       cy.get('[aria-label="Uczestnicy meczu testowego"] .slm-demo-person-meta').contains(name).should('exist');
+      cy.get('.slm-football-pitch .slm-pitch-name').contains(name).should('have.text', name);
     });
     cy.contains('button', 'Zamień zawodników').click();
     cy.get(a).find('button[aria-label="Wybierz do zamiany: suda"]').click();

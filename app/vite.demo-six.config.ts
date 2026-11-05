@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 const app = fileURLToPath(new URL('.', import.meta.url));
 // Explicit allowlist: accidentally importing App/Auth/Edge fails the build.
 const allowed = new Set([
-  'src/demo-six/fixture.ts', 'src/demo-six/MatchDemo.tsx', 'demo-six/main.tsx', 'demo-six/index.html',
+  'src/demo-six/fixture.ts', 'src/demo-six/MatchDemo.tsx', 'src/demo-six/match.css', 'demo-six/main.tsx', 'demo-six/index.html',
   'src/profile/PremiumIdentityEditor.tsx',
   'src/profile/PhoneEditor.tsx', // Pure controlled form; optional binding, no Auth/API.
   'supabase/functions/_shared/phone.ts', // Pure existing normalizer only, never handler/client.

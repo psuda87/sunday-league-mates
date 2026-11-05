@@ -1,5 +1,16 @@
 # Fikcyjny mecz 6 na 6
 
+## Poprawka podpisów — 2026-11-05
+
+Na zgłoszenie właściciela dodano opcjonalny `fullNames` w DemoTeams i włączono
+go w demo6: podpis to pełna nazwa, np. „adam p.”, „sebastian s.” i „tomek B”.
+CSS ograniczony do `.slm-demo-six` pozwala zawijać długie nazwy. Pozostałe
+wywołania modułu zachowują domyślne skróty; logika podziału i zamian bez zmian.
+PASS: build/demo6/izolacja16/lint, 479Vitest, Cypress1/1 z kontrolą wszystkich
+12 pełnych podpisów pod numerami. Nie zmieniono pinów Premium; zmiana Teams
+wymaga osobnego przeglądu przed ich aktualizacją. Dalsza historia poniżej
+opisuje wcześniejszy stan i nie stanowi zaliczenia kontraktu po poprawce.
+
 2026-11-05 · `codex/demo-match-6v6` · baza ostatniego preview motywów
 `19913381f0b61c0cc64e3f6e81d99e371d3baeb1` z `feat/premium-theme-refinement`.
 Osobne prace `feat/premium-legal-pages` pozostają na swojej gałęzi.

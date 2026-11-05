@@ -1,3 +1,17 @@
+# Pełne podpisy na boisku demo6
+
+2026-11-05, `codex/demo-match-6v6`. Poprawiono zgłoszone skracanie „adam p.”
+do „p.”: opcjonalne pełne podpisy w DemoTeams włączone wyłącznie w demo6.
+Lokalny CSS zawija długie nazwy. Pozostałe wywołania zachowują dotychczasowy
+domyślny sposób podpisów. Bez zmian Auth, danych i logiki zamian.
+PASS: build LIVE/demo6, izolacja16, lint, 479Vitest/69plików, Cypress1/1
+(390px, komplet pełnych podpisów, zamiany, reset/reload).
+Strażników nie zmieniano; wcześniejsza blokada palettes.css nadal otwarta,
+a zmiana źródła Teams wymaga osobnego przeglądu przed aktualizacją pinów.
+Preview poprawki w przygotowaniu; bez produkcji, migracji, Androida i merge.
+
+---
+
 # Fikcyjny mecz 6 na 6 — odizolowany wariant web
 
 2026-11-05, `codex/demo-match-6v6`, baza ostatniego preview motywów `1991338`.
