@@ -1,3 +1,20 @@
+# Fikcyjny mecz 6 na 6 — odizolowany wariant web
+
+2026-11-05, `codex/demo-match-6v6`, baza ostatniego preview motywów `1991338`.
+12 wskazanych uczestników, automatyczny naprzemienny podział 6v6 i zamiany
+z istniejącego modułu demo, także dla gościa. Dane wyłącznie w pamięci,
+osobny build bez Auth/API/.env i CSP blokująca połączenia. Istniejące Premium
+3.18, CSS, routing, Auth, backend i strażniki bez zmian względem bazy.
+PASS: build LIVE i demo6, izolacja16, lint, 479Vitest/69plików, Cypress1/1
+(390px, zamiana/reset/reload/brak zapytań do backendu). Początkowe blokady
+EPERM/sieci/katalogu Cypress usunięto konfiguracją uruchomienia.
+FAIL: 82policy z powodu już istniejącego hasha palettes.css w gałęzi motywów;
+nie zmieniano pinów. Bez migracji/Edge/CI/Android/merge. Vercel preview w
+przygotowaniu, plan Hobby potwierdzony. Następny krok: wdrożenie i odbiór
+preview. Szczegóły: [DEMO_MATCH_6V6.md](DEMO_MATCH_6V6.md).
+
+---
+
 # Uruchomienie Vercel — repozytorium gotowe, dostęp zdalny zablokowany
 
 2026-11-04 13:06 UTC, `feat/premium-real-auth-web`, PR34 wg właściciela. Zatwierdzone Auth36ed569 przypięte w strażnikach: PASS45migracji/55plików/13granic i82policy (stare71+11),476Vitest,TS/strictEdge/lint,buildPremium i3testy konfiguracji. Manifest55 i aplikacja bez zmian. Lokalny produkcyjny preview: HTTP200, logowanie390px, SPA/czyszczeniecallbacku, bez JS/overflow. Vercel rootapp/build:premium-web/dist-premium-web przygotowany. Bez migracji45/deployaccounts/Cloud/merge. Dostęp Vercel/Supabase: proxy403, brak aktywnego dostępu. Jedyny krok zewnętrzny: ChatGPT ma ręcznie wdrożyć PR34 w istniejącym slm-ui-demo i ustawić CORS oraz backend hjtcyybkxebvdropchac według [instrukcji](PREMIUM_REAL_AUTH_WEB.md). Brak SMTP nie blokuje pierwszego testu istniejącego logowania. Cypress/realny backend/telefon/hostedCI niezaliczone; bez instalacji CLI i żądania tokenów. Osobny snapshot SQL/Edge CI nie był częścią frontendowego uruchomienia.

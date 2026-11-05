@@ -12,6 +12,8 @@
     "lint": "eslint",
     "build:demo": "tsc --noEmit && tsc --project tsconfig.demo.json && vite build --config vite.demo.config.ts && node scripts/verify-demo-build.mjs",
     "preview:demo": "vite preview --config vite.demo.config.ts",
+    "build:demo-six": "tsc --noEmit && tsc --project tsconfig.demo-six.json && vite build --config vite.demo-six.config.ts && node scripts/verify-demo-six-build.mjs",
+    "preview:demo-six": "vite preview --config vite.demo-six.config.ts",
     "build:premium-local": "tsc --noEmit && vite build --config vite.b1.config.ts",
     "build:live-local": "tsc --noEmit && vite build --config vite.live-local.config.ts",
     "verify:consolidation": "node scripts/verify-consolidation.mjs && node scripts/verify-frozen-ui.mjs",

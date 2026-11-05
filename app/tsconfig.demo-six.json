@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["demo-six/main.tsx"],
+  "references": []
+}

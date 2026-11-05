@@ -59,6 +59,7 @@ Pods/
 
 # Local demo build and Python test caches
 /dist-demo/
+/dist-demo-six/
 __pycache__/
 *.pyc
 

@@ -1,0 +1,33 @@
+{
+  "git": {
+    "deploymentEnabled": false
+  },
+  "installCommand": "npm --prefix .. ci --ignore-scripts --no-audit --no-fund",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    }
+  ],
+  "buildCommand": "npm --prefix .. run build:demo-six",
+  "framework": null,
+  "outputDirectory": "../dist-demo-six",
+  "$schema": "https://openapi.vercel.sh/vercel.json"
+}
