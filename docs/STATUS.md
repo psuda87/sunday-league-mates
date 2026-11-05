@@ -1,3 +1,24 @@
+# Lokalny podgląd Premium — CORS5196 dopuszczony
+
+2026-11-05, `feat/premium-legal-pages`. Właściciel zezwolił na dopuszczenie
+http://127.0.0.1:5196 do testów poprawionej wersji. Panel/edycja sekretów nie były
+dostępne przez narzędzia, więc zmieniono wyłącznie projekcję listy CORS aktualnie
+wdrożonego accounts13: dopisano dokładny origin po istniejącej liście z konfiguracji.
+Wdrożony accounts14 zachowuje wszystkie10 plików poza jedną zmianą index.ts;
+porównano je po wdrożeniu. Nie wdrażano źródeł nowego backendu z gałęzi ani SQL.
+Nie zmieniano sekretów, listy istniejących originów, Auth, Brevo i Vercel.
+
+Rzeczywisty PASS: OPTIONS lokalny5196/Vercel/Android https://localhost zwracają204
+z dokładnym Allow-Origin; obcy origin403 bez Allow-Origin; POST status bez sesji
+z lokalnego originu401 z poprawnym CORS. To potwierdza komunikację i ochronę,
+nie jest testem poprawnego logowania użytkownika. Może być wymagane odświeżenie
+lokalnego podglądu. Wartości sekretów i dane kont nie były odczytywane.
+Wyjątek testowy opisuje docs/review/accounts-live-cors5196.patch; nie stosować go
+zbiorczo do backendu tej gałęzi. Przy przyszłym wydaniu zachować lub świadomie
+usunąć wyjątek testowy; następny deploy nie może niejawnie zmienić tej decyzji.
+
+---
+
 # SLM01 — odbiór właściciela i poprawka powrotu Androida
 
 2026-11-05, `feat/premium-legal-pages`, baza660719c. RĘCZNY PASS według właściciela
