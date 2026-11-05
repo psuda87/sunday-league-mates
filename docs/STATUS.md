@@ -1,3 +1,70 @@
+# SLM01 — odbiór właściciela i poprawka powrotu Androida
+
+2026-11-05, `feat/premium-legal-pages`, baza660719c. RĘCZNY PASS według właściciela
+na telefonie: rejestracja, logowanie, recovery, wylogowanie, trwałość sesji oraz
+wszystkie ekrany poprzedniego APK. Agent nie powtarzał tych prób i nie pozyskiwał
+danych konta. Właściciel zatwierdził usunięcie migania po minimalizacji/powrocie.
+
+Zmieniono tylko useB1Lifecycle: Android nie ustawia checking po samym ukryciu,
+powrót używa istniejącego współdzielonego resume i ograniczenia60s, okresowy
+refresh ważnej sesji działa w tle. Pierwszy start, wygasła sesja, utrata sieci,
+serwerowe uprawnienia, Keystore i blokada operacji do wyniku refresh bez zmian.
+Zmieniono2 stare testy natywnej galerii i dodano5 przypadków appStateChange,
+visibility/focus, równoległości, wygaśnięcia, cofnięcia oraz błędu sieci.
+
+PASS37 testów Auth w5 plikach, TypeScript i lint; pojedynczy testowy błąd lint
+naprawiono i sprawdzono ponownie. Build natywny B1 z istniejącą konfiguracją HTTPS,
+cap sync i Gradle :app:assembleDebug PASS. CSS index-ChAQUkSI bez zmian. Emulator
+Android16: install-r, cold start i powrót z Home PASS bez kasowania danych.
+Nowy scenariusz zalogowany na fizycznym telefonie wymaga odbioru właściciela.
+Bez pełnej regresji, SQL, zmian usług lub produkcji. Generowane pliki sync cofnięto.
+
+Kontrakt55 plików UI PASS; kontrola runtime FAIL na dokładnym starym pinie
+useB1Lifecycle — wymagany osobny przegląd pinów nowego źródła. Strażników nie
+zmieniano automatycznie. Przygotowana propozycja w docs/review/android-resume-guards-proposed.patch.
+APK: `.cache/android-auth/slm-auth-android-resume-debug.apk`.
+
+---
+
+# SLM01 — Android Auth, częściowy odbiór na emulatorze
+
+2026-11-05, `feat/premium-legal-pages`, HEAD660719c. Początkowo czysta gałąź
+codex/demo-match-6v6; przełączono na wskazaną gałąź bez nadpisania pracy. Widoczny
+po przełączeniu artefakt app/dist-demo-six pozostawiono nietknięty. Bez zmian kodu,
+commitów/push, usług zdalnych i migracji. Zmiana tego raportu wyłącznie lokalna.
+
+PASS: istniejący build Premium B1 przez build:premium-web, jawne publiczne linki
+HTTPS dokumentów, skopiowany do dist-b1 i cap sync z SLM_B1_ANDROID=1. Stage3
+pozostaje wariantem lokalnego backendu; nie użyto go do Cloud Auth. Gradle8.14.3,
+AGP8.13.0, Studio JBR21 (systemowy PATH ma JDK17), compile/target36, min24.
+assembleDebug PASS. Archiwum APK zawiera właściwy endpoint hjtcyybkxebvdropchac,
+brak localhost54321, logging none i zarejestrowany SecureStorage. Własne zmiany
+generowane cap sync cofnięto; pliki implementacji identyczne z HEAD.
+
+Na emulatorze Medium_Phone_API_36.1 / Android16 rzeczywiście: install-r zachował
+dane wcześniejszej instalacji; cold start i ekran logowania PASS; rejestracja
+pokazuje opcjonalny telefon; formularz recovery otwiera się; systemowe Wstecz
+wraca z obu formularzy do logowania. Fikcyjne dane zostały odrzucone. Próba
+logowania offline pokazała Brak połączenia i ukryła chronione widoki; Wi-Fi/dane
+przywrócone. Powrót z tła sprawdzony wyłącznie w stanie wylogowanym.
+
+BLOCKED: poprawne logowanie i wylogowanie, zapis/odtworzenie zalogowanej sesji,
+rzeczywista rejestracja, poczta weryfikacyjna i reset — brak dostarczonego konta
+testowego i ręcznej obsługi jego skrzynki. Nie zaliczono ich na podstawie weba.
+Manifest nie deklaruje App Links/deep links Auth, a B1App nie odbiera appUrlOpen:
+linki pocztowe kierują do dotychczasowego callbacku web. Potwierdzenie przez
+przeglądarkę i późniejsze logowanie do APK wymaga ręcznego odbioru. Jeśli wymagany
+jest automatyczny powrót z linku do aplikacji, minimalna przyszła zmiana obejmie
+AndroidManifest.xml, obsługę callbacku w B1App/emailCallback i weryfikację domeny;
+nie zaimplementowano jej bez zgody. Nie zmieniano UI ani konfiguracji callbacku.
+
+APK: `.cache/android-auth/slm-auth-660719c-debug.apk` (także standardowy
+app/android/app/build/outputs/apk/debug/app-debug.apk), SHA256
+800030d767d42553ca07b2212779e7d2b1c91a802418d299575566c2d8221eb7.
+Następny krok: ręczny odbiór poprawnego konta i jego poczty na Androidzie.
+
+---
+
 # Auth — strażniki zamknięte, wdrożenie zablokowane zależnościami Cloud
 
 2026-11-04, `feat/premium-legal-pages`, baza2416945, czyste drzewo przed zmianami.
