@@ -1,3 +1,25 @@
+# Testowe mecze i składki — gotowe
+
+2026-11-05, `feat/premium-legal-pages`. Na wyraźne polecenie właściciela powstał
+odseparowany fikcyjny zestaw e55e1aef: nowa grupa,12 kont i2 mecze (nadchodzący
+oraz rozegrany). Osobne konta admina grupy i gracza; żadne nie ma globalnej roli
+admin. Oba mecze90min/270zł/12 zapisanych. Rozegrany zatwierdzono normalnym API:
+12 należności po23zł, admin ma własne23zł do zapłaty, dokładnie2 zgłoszenia po23zł
+pending i0 accepted. Konto gracza nie otrzymuje danych administracyjnych.
+
+Konta utworzone oficjalnym Auth Admin API. Za dodatkową zgodą wykonano jednorazową
+zabezpieczoną operację accounts15 i natychmiast przywrócono oryginalne accounts14
+jako16; zgodność wszystkich10 plików oraz verify_jwt potwierdzona. Brak pozostawionego
+bootstrapu. Bez modyfikacji istniejących danych, haseł, konfiguracji Auth, sekretów,
+SQL DDL/migracji, Vercel i UI. Pierwsza transakcja danych cofnięta w całości po
+błędzie aliasu; poprawiona przeszła. Nie wykonano pełnej regresji aplikacji.
+PASS rzeczywiste API nowych kont i niezależne kontrole SQL stanów/uprawnień.
+Sesje robocze wylogowano. Dane dostępowe poza repo i poza tym raportem.
+Szczegóły i zakres sprzątania: [TEST_FINANCE_FIXTURE_E55E1AEF.md](TEST_FINANCE_FIXTURE_E55E1AEF.md).
+Następny krok: właściciel loguje się nowym kontem admina i odbiera scenariusz.
+
+---
+
 # Lokalny podgląd Premium — CORS5196 dopuszczony
 
 2026-11-05, `feat/premium-legal-pages`. Właściciel zezwolił na dopuszczenie
