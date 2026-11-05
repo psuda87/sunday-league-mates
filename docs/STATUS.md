@@ -1,3 +1,21 @@
+# Profil płatności — rozróżnienie zgłoszeń i odświeżanie
+
+2026-11-05, `feat/premium-legal-pages`, baza `e560e01`.
+Odczyt Cloud bez zmian danych potwierdził: u fikcyjnego administratora zaakceptowane
+23zł dotyczy rozegranego meczu4.11, a osobne oczekujące23zł nadchodzącego6.11,
+bez zatwierdzonego naliczenia składek. Nie był to duplikat dla tego samego meczu.
+Stare zgłoszenie powstało przed blokadą47; nie akceptowano ani nie usuwano go.
+Profil uzupełnia brakującą nazwę meczu wyłącznie przez autoryzowany matches_detail,
+sprawdza identyfikator/grupę/dostęp i ignoruje nieaktualne odpowiedzi sesji.
+Pokazuje odrębnie brak naliczenia i rzeczywiste oczekiwanie; pending dla faktycznie
+opłaconego tego samego meczu ma opis nieaktualnego zgłoszenia, bez fałszywej
+zmiany statusu na accepted. Odśwież płatności odczytuje też konto, nie tylko portfel.
+PASS:17 testów finansów (w tym3 nowe regresje), TypeScript, lint, build Premium,
+git diff --check. Podgląd5196 zaktualizowany. Bez migracji, zmian backendu/Auth,
+Vercel, istniejących wpłat i pozostałych modułów. Pełnej regresji nie powtarzano.
+
+---
+
 # Kafelki płatności i odstępy szczegółów meczu
 
 2026-11-05, `feat/premium-legal-pages`; wejściowy HEAD `6ef348f` (nie cofano do

@@ -3,7 +3,7 @@ import {cleanup,fireEvent,render,screen,waitFor,within} from '@testing-library/r
 import type {SessionManager} from '../auth/sessionManager';
 import PremiumFinance from './PremiumFinance';
 import PersonalPayments from './PersonalPayments';
-import {paymentChoices,receiptStatus} from './paymentModel';
+import {isSettledReport,paymentChoices,receiptStatus} from './paymentModel';
 import {paymentRoster,paymentWallet} from './contracts';
 import type {Account,Receipt} from './contracts';
 afterEach(cleanup);
@@ -73,4 +73,38 @@ it('rejects foreign wallet accounts and roster payloads and distinguishes cancel
  const f=fixture();expect(()=>paymentWallet({accounts:[{group_id:'g',group_name:'Fixture',account:f.own(),events:[]}]},'foreign')).toThrow();
  expect(()=>paymentRoster({group_id:'other',players:[],events:[]},'g')).toThrow();
  expect(receiptStatus({...receipt,status:'accepted',corrected_amount_cents:0})).toBe('Anulowana');
+});
+it('labels a pending duplicate on a settled match without pretending the report was accepted',async()=>{
+ const f=fixture('accepted',false);
+ const own=()=>({...f.own(),payments:[...f.own().payments,{...receipt,id:'duplicate'}]});
+ const manager={...f.manager,call:vi.fn(async(action:string)=>{
+  if(action==='group_finance_account')return own();
+  if(action==='group_finance_wallet')return {accounts:[{group_id:'g',group_name:'Fixture',account:own(),events:[]}]};
+  throw Error('Unexpected write');
+ })} as unknown as SessionManager;
+ render(<PersonalPayments manager={manager} userId="u"/>);fireEvent.click(screen.getByRole('button',{name:'Moje płatności'}));
+ await screen.findByText(/nieaktualne zgłoszenie — należność już opłacona/);
+ expect(screen.queryByText(/oczekiwanie na decyzję/)).toBeNull();
+ expect(isSettledReport(own(),receipt)).toBe(true);expect(receipt.status).toBe('pending');
+ expect(isSettledReport({...own(),dues:[]},receipt)).toBe(false);
+});
+it('refreshes the own account as well as the wallet when the profile refresh button is pressed',async()=>{
+ const f=fixture('pending',false);render(<PersonalPayments manager={f.manager} userId="u"/>);
+ fireEvent.click(screen.getByRole('button',{name:'Moje płatności'}));await screen.findByText(/oczekiwanie na decyzję/);
+ await f.call('group_finance_accept_payment');
+ fireEvent.click(screen.getByRole('button',{name:'Odśwież płatności'}));
+ await screen.findByText(/Wszystkie należności są opłacone/);expect(screen.queryByText(/oczekiwanie na decyzję/)).toBeNull();
+});
+it('names an old report for a different unassessed match and does not mark it accepted because the balance is zero',async()=>{
+ const f=fixture('accepted',false),own={...f.own(),payments:[...f.own().payments,{...receipt,id:'future-report',event_id:'future'}]};
+ const manager={...f.manager,call:vi.fn(async(action:string)=>{
+  if(action==='group_finance_account')return own;
+  if(action==='group_finance_wallet')return {accounts:[{group_id:'g',group_name:'Fixture',account:own,events:[]}]};
+  if(action==='matches_detail')return {event:{id:'future',group_id:'g',group_name:'Fixture',created_by:'u',name:'Mecz nadchodzący',location:'Fixture',starts_at:'2026-11-06T18:00:00Z',visibility:'private',status:'scheduled',access:'own',own_participation:true,duration_minutes:90,capacity:12,cost_cents:27000,minimum_players:10,version:1,registration_open:true,decision_required:false,can_manage:false,can_edit:false}};
+  throw Error('Unexpected write');
+ })} as unknown as SessionManager;
+ render(<PersonalPayments manager={manager} userId="u"/>);fireEvent.click(screen.getByRole('button',{name:'Moje płatności'}));
+ await screen.findByText(/Mecz nadchodzący · oczekiwanie na decyzję — za ten mecz nie ma obecnie naliczonej składki/);
+ expect(screen.queryByText(/nieaktualne zgłoszenie/)).toBeNull();expect(isSettledReport(own,own.payments[1])).toBe(false);
+ expect(own.payments[1].status).toBe('pending');
 });

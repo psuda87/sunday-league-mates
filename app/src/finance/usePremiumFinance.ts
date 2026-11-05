@@ -6,7 +6,7 @@ import { AccountError } from '../auth/api';
 // Preserve an uncertain intent across view navigation in this authenticated RAM session.
 const intents=new WeakMap<SessionManager,{owner:string;keys:Map<string,string>;watching:boolean}>();
 function requestRegistry(manager:SessionManager,owner:string){let entry=intents.get(manager);if(!entry){entry={owner,keys:new Map(),watching:false};intents.set(manager,entry);}if(entry.owner!==owner){entry.keys.clear();entry.owner=owner;}return entry;}
-export function usePremiumFinance(manager:SessionManager,userId:string,groupId:string,eventId?:string,manage=false,onChanged?:()=>void,adminView=true){
+export function usePremiumFinance(manager:SessionManager,userId:string,groupId:string,eventId?:string,manage=false,onChanged?:()=>void,adminView=true,refreshVersion=0){
  const scope=`${userId}:${groupId}:${eventId??''}:${manage}`,currentScope=useRef(scope);currentScope.current=scope;
  const empty={scope,own:null,detail:null,pending:[],names:{},players:[],events:[]};
  const [state,setState]=useState<{scope:string;own:Account|null;detail:Detail|null;pending:Receipt[];names:Record<string,string>;players:PlayerAccount[];events:PaymentEvent[]}>(empty),[loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
@@ -31,7 +31,7 @@ export function usePremiumFinance(manager:SessionManager,userId:string,groupId:s
   }catch{if(valid()&&generation.current===ticket)setError('Nie udało się potwierdzić rozliczeń. Odśwież i spróbuj ponownie.');return false;}
   finally{if(alive.current&&generation.current===ticket)setLoading(false);}
  },[manager,userId,groupId,eventId,manage,valid,scope,adminView]);
- useEffect(()=>{alive.current=true;void reload();return()=>{alive.current=false;};},[reload]);
+ useEffect(()=>{alive.current=true;void reload();return()=>{alive.current=false;};},[reload,refreshVersion]);
  useEffect(()=>{const changed=()=>{void reload();};window.addEventListener('slm-groups-changed',changed);return()=>window.removeEventListener('slm-groups-changed',changed);},[reload]);
  useEffect(()=>{let previous=manager.getSnapshot().phase;return manager.subscribe(()=>{const phase=manager.getSnapshot().phase;if(phase===previous)return;previous=phase;if(phase==='signed_out'||phase==='storage_error')keys.current.clear();if(phase!=='ready'){generation.current++;setState({scope,own:null,detail:null,pending:[],names:{},players:[],events:[]});setLoading(true);}else void reload();});},[manager,reload,scope]);
  async function mutate(action:string,body:Record<string,unknown>){
