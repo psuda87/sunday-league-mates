@@ -1,3 +1,12 @@
+# Status per gałąź — zasada obowiązująca od 2026-11-05
+
+- `docs/STATUS.md` opisuje **tylko aktualną gałąź roboczą**: cel, ostatnie zmiany, wyniki testów (PASS/FAIL/BLOCKED), ryzyka, odbiór właściciela, commit i następny krok. Utrzymuj krótki dokument (orientacyjnie 30–60 linii); nie dopisuj pełnych dzienników.
+- Przy utworzeniu nowej gałęzi przygotuj jej własne krótkie podsumowanie; nie kopiuj całej historii z gałęzi źródłowej. Git przechowuje odrębne wersje tego samego pliku.
+- Długie raporty zapisuj wyłącznie gdy potrzebne, w tematycznych plikach `docs/history/` lub `docs/review/`, a w STATUS podaj odnośnik. Nie czytaj archiwum automatycznie przy każdym zadaniu.
+- Przy PR/merge nie przenoś bezrefleksyjnie gałęziowego `docs/STATUS.md` do `main`; zachowaj lub zaktualizuj zwięzły status `main` na podstawie **zatwierdzonych** zmian. W razie konfliktu statusu rozwiąż go świadomie.
+- Zatwierdzenia właściciela dla SLM 01–08 rejestruj oddzielnie w `docs/acceptance/` (bez deklarowania odbioru na podstawie samych testów). Merge do `main` wymaga wyraźnej zgody.
+- Historia sprzed podziału: `docs/history/STATUS_PRE_BRANCH_SPLIT_2026-11-05.md`; nie usuwać jej ani nie skracać. Zasady bezpieczeństwa i testowania poniżej nadal obowiązują.
+
 # Automatyczny push — decyzja właściciela 2026-11-04
 
 - Po każdej zakończonej zmianie wykonaj odpowiednie kontrole, zapisz własne zmiany w commicie i automatycznie wykonaj zwykły push na bieżącą gałąź roboczą. Raportuj rzeczywiste wyniki kontroli, także niezaliczone; push nie oznacza gotowości do wdrożenia. Bez force push, dołączania cudzych zmian ani sekretów. Merge do main, wdrożenia i zdalne migracje nadal wymagają osobnej wyraźnej zgody. W razie blokady push zgłoś ją zamiast deklarować wysłanie.
