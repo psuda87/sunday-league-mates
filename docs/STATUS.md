@@ -1,3 +1,23 @@
+# Vercel — aktualny frontend opublikowany
+
+2026-11-05, `feat/premium-legal-pages`. Na wyraźne polecenie właściciela
+wdrożono commit aplikacji `62baac5a1983b09b48c7b2ecbdaa3f005a6fc6dd` do istniejącego
+`slm-ui-demo`, production, deployment `dpl_G6oR3jvvNW7CHNCqRkKRerXmWikT`.
+Vercel READY; publiczny alias https://slm-ui-demo.vercel.app wskazuje ten deployment.
+Root app, build npm run build:premium-web, output dist-premium-web; konfiguracja
+repo/CSP, Auth, Supabase, migracje, sekrety i CI nie były zmieniane w tym zadaniu.
+PASS zdalny build Premium. PASS rzeczywiste HTTPS200 dla strony głównej,
+regulaminu, polityki i JS /assets/index-BDtDeAiT.js. W serwowanym JS potwierdzono
+ostatnie kafelki/odświeżanie płatności i oba prawidłowe adresy HTTPS dokumentów.
+To kontrola publikacji, nie nowy test rzeczywistego logowania lub płatności.
+Git push i ls-remote potwierdziły62baac5 na origin; raport zapisany później jako
+osobny commit dokumentacyjny. Pozostawiono zastany nieśledzony build dist-demo-six.
+Nie powtarzano zaliczonych testów. Znane ograniczenia: strażniki wymagają przeglądu
+pinów (bez wyłączania kontroli); backend prywatności/usuwania46 nadal niewdrożony.
+Sam deploy frontendu nie oznacza aktywacji tych funkcji ani gotowości merge do main.
+
+---
+
 # Profil płatności — rozróżnienie zgłoszeń i odświeżanie
 
 2026-11-05, `feat/premium-legal-pages`, baza `e560e01`.
