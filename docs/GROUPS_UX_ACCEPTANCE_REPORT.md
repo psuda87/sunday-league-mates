@@ -1,6 +1,6 @@
 # Aktualny odbiór grup — 2026-11-06, po zgodzie właściciela
 
-**PASS przed publikacją.** Obie blokady strażników usunięte po przeglądzie zawartości. Vercel: przygotowana publikacja gałęzi, wynik zostanie dopisany po weryfikacji.
+**PEŁNY PASS — WERSJA TESTOWA OPUBLIKOWANA.** Obie blokady strażników usunięte po przeglądzie zawartości. Vercel READY, publiczny adres: https://slm-ui-demo.vercel.app. Brak otwartych blokad tego odbioru.
 
 | Punkt | Status | Weryfikacja końcowa |
 | --- | --- | --- |
@@ -43,7 +43,18 @@
 
 - `3596de1` — implementacja siedmiu punktów i atomowej unikalności nicków.
 - `fe18662` — raport poprzedniego etapu.
-- Aktualizacja strażników, testów Cloud i tego odbioru: commit przygotowany w bieżącym etapie; jego SHA podane przy publikacji.
+- `3235037a7c3bffee9f92a0bf13540a13278070b3` — strażniki, testy i raport Cloud; dokładnie ten commit opublikowano na Vercel.
+- Końcowy commit dokumentacyjny zapisuje wynik publikacji; nie zmienia opublikowanego kodu.
+
+## Vercel — wynik publikacji
+
+- Deployment `dpl_5Mk9J2YHJVSpAYRErqKuSZgCRUDE`, **production / READY**, commit `3235037`, branch `feat/groups-ux-acceptance`.
+- Główny adres **https://slm-ui-demo.vercel.app** wskazuje ten deployment (potwierdzone przez odczyt aliasu). Nie wymaga autoryzacji Vercel; nie podmieniano go adresem Preview. Dotychczasowa ochrona Vercel pozostała bez zmian.
+- Root `app`, build `npm run build:premium-web`, output `dist-premium-web`, instalacja bez lifecycle scripts. Zdalny build zakończony poprawnie.
+- PASS rzeczywiste HTTPS 200: strona, produkcyjny JS, regulamin i polityka. W dostarczonym JS potwierdzono nowy moduł grup i zatwierdzony endpoint Supabase; CSP zachowane.
+- PASS renderowanie aplikacji w przeglądarce: Sunday League Mates, obsługa starej wygasłej sesji i powrót do prawidłowego formularza logowania. To kontrola renderowania; pełne przepływy UI sprawdzono wcześniej w mobilnym Cypress.
+- PASS ponowne rzeczywiste logowanie do accounts po publikacji, z Origin publicznego adresu. Wcześniejsze testy Cloud potwierdzają zapis/odczyt nicków, członkostwa i liczników. Brak fikcyjnego backendu.
+- Bez merge do main. Następny krok: odbiór użytkownika na publicznym adresie. Ograniczenia: brak testu na fizycznym telefonie/APK; ostrzeżenie o wielkości JS pozostaje. Wcześniejsze niewdrożone funkcje prywatności/workerów nadal nie są objęte publikacją backendu.
 
 Poniżej zachowano raport poprzedniego etapu wraz z ówczesnymi FAIL i ograniczeniami. To historia, nie aktualna blokada.
 
