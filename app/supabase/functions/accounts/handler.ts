@@ -1,6 +1,12 @@
 import { isPhoneIdentifier, normalizeLoginPhone, normalizePhoneUpdate } from '../_shared/phone.ts';
 import { PhotoError, profilePhoto, readAccountBody } from './profilePhotos.ts';
-export interface Environment { url: string; anon: string; service: string; origins: string[]; emailSignupEnabled?: boolean }
+import { emailAction, EmailFlowError } from './emailFlows.ts';
+import { sendEmailHook } from './emailHook.ts';
+import { sendSmtp } from './smtp.ts';
+import {privatePhones,deletionProof,finishDeletion} from './accountPrivacy.ts';
+import type {DeletionJob,DeletionDependencies} from './accountPrivacy.ts';
+import type {ConnectSmtp,SmtpSettings} from './smtp.ts';
+export interface Environment { url: string; anon: string; service: string; origins: string[]; emailSignupEnabled?: boolean; emailRedirectUrl?:string; emailHookSecret?:string; smtp?:Partial<SmtpSettings>; connectSmtp?:ConnectSmtp }
 type Row = Record<string, unknown>;
 class ApiError extends Error {
   constructor(public status: number, public code: string, message: string) { super(message); }
@@ -37,7 +43,7 @@ export function displayName(login: string, fullName: string, mode: string) {
 }
 
 export function createHandler(env: Environment) {
-  async function call(path: string, method = 'GET', body?: unknown, token?: string, admin = false) {
+  async function call(path: string, method = 'GET', body?: unknown, token?: string, admin = false, signal?:AbortSignal) {
     const headers: Record<string, string> = { apikey: admin ? env.service : env.anon,
       Authorization: `Bearer ${token ?? (admin ? env.service : env.anon)}` };
     if (body !== undefined) headers['Content-Type'] = 'application/json';
@@ -45,7 +51,7 @@ export function createHandler(env: Environment) {
     let r: Response;
     try {
       r = await fetch(env.url + path, { method, headers,
-        body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(15000) });
+        body: body === undefined ? undefined : JSON.stringify(body), signal: signal?AbortSignal.any([signal,AbortSignal.timeout(15000)]):AbortSignal.timeout(15000) });
     } catch { throw new ApiError(503, 'service_unavailable', 'Serwer jest chwilowo niedostępny. Spróbuj ponownie.'); }
     const data = await r.json().catch(() => null);
     return { ok: r.ok, status: r.status, data };
@@ -61,6 +67,41 @@ export function createHandler(env: Environment) {
     return r.data;
   }
   const rpc = (name: string, body: Row) => db('rpc/slm_account_' + name, 'POST', body);
+  async function privacyRpc(name:string,body:Row){
+    const r=await call('/rest/v1/rpc/slm_'+name,'POST',body,undefined,true);
+    if(!r.ok){
+      const code=String(r.data?.message??'');
+      if(code==='group_transfer_required')throw new ApiError(409,code,'Najpierw przekaż zarządzanie grupami innemu aktywnemu członkowi w ustawieniach grupy. Grupa z innymi członkami nie może pozostać bez administratora.');
+      if(code==='deletion_invalid')throw new ApiError(403,code,'Nieprawidłowe potwierdzenie operacji usuwania.');
+      if(code==='deletion_busy')throw new ApiError(409,code,'Usuwanie trwa. Ponów sprawdzenie za chwilę.');
+      throw new ApiError(503,'deletion_pending','Nie potwierdzono zakończenia operacji. Ponów sprawdzenie z tym samym identyfikatorem.');
+    }return r.data;
+  }
+  const deletion:DeletionDependencies={
+    step:async(operation,proof,step,lease)=>await privacyRpc('deletion_step',{p_operation:operation,p_proof:proof,p_step:step,p_lease:lease}) as DeletionJob,
+    async removePhotos(user){
+      // Always list from offset zero after deletion, including old orphan files.
+      for(let page=0;page<100;page++){
+        const listed=await call('/storage/v1/object/list/slm-profile-photos','POST',{prefix:user+'/',limit:100,offset:0},undefined,true);
+        if(!listed.ok||!Array.isArray(listed.data))throw new ApiError(503,'deletion_pending','Nie potwierdzono usunięcia zdjęć. Ponów operację.');
+        if(!listed.data.length)return;
+        const paths=listed.data.map((item:Row)=>user+'/'+item.name);
+        const removed=await call('/storage/v1/object/slm-profile-photos','DELETE',{prefixes:paths},undefined,true);
+        if(!removed.ok)throw new ApiError(503,'deletion_pending','Nie potwierdzono usunięcia zdjęć. Ponów operację.');
+      }throw new ApiError(503,'deletion_pending','Usuwanie zdjęć wymaga kolejnego przebiegu.');
+    },
+    async deleteAuth(user){
+      const r=await call('/auth/v1/admin/users/'+user,'DELETE',undefined,undefined,true);
+      if(!r.ok&&r.status!==404)throw new ApiError(503,'deletion_pending','Nie potwierdzono usunięcia konta Auth. Ponów sprawdzenie.');
+      const check=await call('/auth/v1/admin/users/'+user,'GET',undefined,undefined,true);
+      if(check.status!==404)throw new ApiError(503,'deletion_pending','Auth nie potwierdził usunięcia konta.');
+    },
+    async notify(operation,date){
+      if(!env.connectSmtp)throw Error('mail_unconfigured');
+      await sendSmtp(env.smtp??{},{to:'activehub.dev@gmail.com',subject:'SLM — usunięto konto użytkownika',id:'delete-'+operation,
+        text:`Data i godzina (UTC): ${date}\nIdentyfikator operacji: ${operation}\nUsuwanie konta zakończone i potwierdzone.\nZachowano zredagowane fakty historyczne meczów i rozliczeń potrzebne dla integralności ewidencji; bez bezpośrednich danych konta.`},env.connectSmtp);
+    },
+  };
   async function rate(key: string, limit: number, seconds = 60) {
     const hash = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(key))))
       .map(x => x.toString(16).padStart(2, '0')).join('');
@@ -121,7 +162,7 @@ export function createHandler(env: Environment) {
     const [a, profiles, players] = await Promise.all([alias(id), db(`slm_profiles?user_id=eq.${id}`), db(`slm_player_profiles?user_id=eq.${id}&select=jersey_number,nickname`)]);
     const p = profiles[0];
     if (!p) throw unauthorized();
-    return { user_id: id, jersey_number: players[0]?.jersey_number ?? null, login: a.login, phone: a.phone, email_account: a.email_account === true, full_name: p.full_name,
+    return { user_id: id, share_phone:p.share_phone===true, jersey_number: players[0]?.jersey_number ?? null, login: a.login, phone: a.phone??'', email_account: a.email_account === true, full_name: p.full_name,
       nickname: players[0]?.nickname || (a.login.includes('@')?'Zawodnik':a.login), first_name: p.first_name??'',
       group_scope: await db(`slm_group_members?user_id=eq.${id}&select=group_id,share_full_name,share_first_name,slm_groups!inner(archived)&slm_groups.archived=eq.false`),
       display_as: p.display_as, display_name: p.display_as==='first_name'?(p.first_name?.trim()||players[0]?.nickname||'Zawodnik'):displayName(players[0]?.nickname||a.login, p.full_name, p.display_as) };
@@ -135,12 +176,30 @@ export function createHandler(env: Environment) {
     return a;
   }
   return async (request: Request): Promise<Response> => {
+    if(new URL(request.url).searchParams.get('hook')==='email'){
+      return sendEmailHook(request,env,{
+        aliases:async(user,signal)=>{
+          const r=await call(`/rest/v1/slm_aliases?user_id=eq.${user}&select=user_id`,'GET',undefined,undefined,true,signal);
+          if(!r.ok||!Array.isArray(r.data))throw Error('mail_unconfirmed');
+          return r.data.length>0;
+        },
+        send:async(mail,signal)=>{
+          if(!env.connectSmtp)throw Error('mail_unconfigured');
+          await sendSmtp(env.smtp??{},mail,env.connectSmtp,signal);
+        },
+      });
+    }
     const origin = request.headers.get('origin');
     const headers: Record<string, string> = { 'Content-Type': 'application/json', 'Cache-Control': 'no-store',
       'Vary': 'Origin', 'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info',
       'Access-Control-Allow-Methods': 'POST, OPTIONS' };
     if (origin && env.origins.includes(origin)) headers['Access-Control-Allow-Origin'] = origin;
-    const respond = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status, headers });
+    let viewer:string|null=null;
+    const respond = async(data: unknown, status = 200) => {
+      try{return new Response(JSON.stringify(await privatePhones(data,viewer,async ids=>
+        await db('rpc/slm_phone_visibility','POST',{p_viewer:viewer,p_targets:ids}))), { status, headers });}
+      catch{return new Response(JSON.stringify({code:'service_unavailable',error:'Nie można potwierdzić dostępu do danych. Spróbuj ponownie.'}),{status:503,headers});}
+    };
     if (origin && !env.origins.includes(origin)) return respond({ error: 'Niedozwolony adres aplikacji.' }, 403);
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers });
     if (request.method !== 'POST') return respond({ error: 'Niedozwolona metoda.' }, 405);
@@ -164,25 +223,23 @@ export function createHandler(env: Environment) {
       const action = field(body, 'action', 40);
       if(uploadRequest&&action!=='profile_photo_upload')throw new ApiError(400,'invalid_input','Nieprawidłowe żądanie.');
       await rate('global', 300);
-      if (action === 'signup' || action === 'resend_verification' || action === 'recover_email') {
-        await rate('email-flow', 12);
-        if (!env.emailSignupEnabled) throw new ApiError(503, 'mail_unconfigured', 'Rejestracja i odzyskiwanie e-mail czekają na konfigurację poczty.');
-        // Enabling the environment flag alone must never bypass the existing blocking hook.
-        const email = field(body, 'email', 254).trim().toLowerCase();
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new ApiError(400, 'invalid_input', 'Podaj poprawny e-mail.');
-        const path = action === 'signup' ? '/auth/v1/signup' : action === 'resend_verification' ? '/auth/v1/resend' : '/auth/v1/recover';
-        const values = action === 'signup' ? { email, password: password(body, 'password', true) } : action === 'resend_verification' ? { email, type: 'signup' } : { email };
-        const result = await call(path, 'POST', values);
-        if (!result.ok) throw new ApiError(503, 'mail_unavailable', 'Nie udało się uruchomić procesu e-mail. Spróbuj później.');
-        if (result.data?.access_token) {
-          await rejectSession(result.data);
-          throw new ApiError(503, 'verification_required', 'Rejestracja wymaga weryfikacji adresu e-mail.');
-        }
-        return respond({ verification_required: true });
+      if(action==='account_privacy_worker'){
+        if(origin||request.headers.get('authorization')!==`Bearer ${env.service}`||!env.service)throw unauthorized();
+        const jobs=await privacyRpc('deletion_work',{});
+        let finished=0;
+        for(const job of jobs){try{await finishDeletion(job.operation_id,null,deletion);finished++;}catch{/* Durable retry/backoff. */}}
+        return respond({processed:finished});
       }
+      if(action==='account_delete_resume'){
+        await rate('deletion-resume',12);
+        let ticket;try{ticket=deletionProof(body);}catch{throw new ApiError(400,'deletion_invalid','Nieprawidłowa operacja usuwania.');}
+        return respond(await finishDeletion(ticket.operation,ticket.proof,deletion));
+      }
+      const emailResult=await emailAction(action,body,env,{call,db,state,verify,accept,rejectSession,rate});
+      if(emailResult)return respond(emailResult);
       if (action === 'login') {
         const start = Date.now();
-        const raw = field(body, 'identifier').trim();
+        const raw = field(body, 'identifier',254).trim();
         const pwd = password(body, 'password');
         let rows: Row[] = [];
         try {
@@ -246,9 +303,26 @@ export function createHandler(env: Environment) {
         return respond({ ok: true });
       }
       const ctx = uploadContext ?? await context(token);
+      viewer=ctx.id;
       if (action === 'status') return respond({ must_change_password: ctx.must_change_password, role: ctx.role, user_id: ctx.id });
       if (ctx.must_change_password && action !== 'password')
         throw new ApiError(403, 'password_required', 'Najpierw zmień hasło tymczasowe.');
+      if(action==='save_contact_phone'){
+        await rate('sensitive:'+ctx.id,8);
+        const a=await verifyPassword(ctx,password(body,'current_password'));
+        const raw=field(body,'phone',32).trim(),phone=raw?normalizePhone(raw,a.phone as string):'';
+        if(typeof body.share_phone!=='boolean')throw new ApiError(400,'invalid_input','Potwierdź ustawienie widoczności numeru.');
+        await privacyRpc('phone_save',{p_user:ctx.id,p_session:ctx.sid,p_phone:phone,p_share:body.share_phone});
+        return respond(await profile(ctx.id));
+      }
+      if(action==='account_delete'){
+        await rate('sensitive:'+ctx.id,4);
+        if(body.confirmation!=='USUŃ KONTO')throw new ApiError(400,'deletion_confirmation','Wpisz USUŃ KONTO, aby potwierdzić usunięcie.');
+        await verifyPassword(ctx,password(body,'current_password'));
+        let ticket;try{ticket=deletionProof(body);}catch{throw new ApiError(400,'deletion_invalid','Nieprawidłowa operacja usuwania.');}
+        await privacyRpc('deletion_begin',{p_user:ctx.id,p_session:ctx.sid,p_operation:ticket.operation,p_proof:ticket.proof});
+        return respond(await finishDeletion(ticket.operation,ticket.proof,deletion));
+      }
       if (['profile_photo_get','profile_photo_upload','profile_photo_delete'].includes(action)) {
         if(!uploadRequest)await rate('photo:'+ctx.id,action==='profile_photo_get'?60:10);
         return respond(await profilePhoto(env,ctx,action,body));
@@ -330,6 +404,9 @@ export function createHandler(env: Environment) {
             idempotency_conflict: [409, 'Identyfikator dotyczy innej operacji.'],
             consent_required: [409, 'Potwierdź przejście na pseudonim, aby ukryć dane.'],
             payment_processed: [409, 'Wp?ata zosta?a ju? rozpatrzona.'],
+            already_paid: [409, 'Należność jest już opłacona. Odśwież płatności.'],
+            overpayment: [409, 'Kwota przewyższa pozostałą należność za mecz.'],
+            pending_payment_exists: [409, 'Wpłata czeka już na decyzję administratora.'],
             request_processed: [409, 'Pro?ba zosta?a ju? rozpatrzona.'],
             already_member: [409, 'Zawodnik ju? nale?y do grupy.'],
             group_archived: [409, 'Grupa jest zarchiwizowana.'],
@@ -505,7 +582,8 @@ export function createHandler(env: Environment) {
         const login = action === 'identifiers' ? normalizeLogin(field(body, 'login')) : null;
         const a = await verifyPassword(ctx, current);
         if (action === 'identifiers' && a.email_account === true) throw new ApiError(400, 'legacy_only', 'Konto e-mail nie używa aliasów logowania legacy.');
-        const phone = action === 'identifiers' ? normalizePhone(field(body, 'phone'), a.phone as string) : null;
+        const rawIdentifierPhone=action==='identifiers'?field(body,'phone').trim():'';
+        const phone = action === 'identifiers'&&rawIdentifierPhone ? normalizePhone(rawIdentifierPhone, a.phone as string) : null;
         if (action === 'identifiers') {
           const conflicts = await db(`slm_aliases?or=(login_normalized.eq.${encodeURIComponent(login!.toLowerCase())},phone.eq.${encodeURIComponent(phone!)})`);
           const contacts = await db(`slm_player_profiles?contact_phone=eq.${encodeURIComponent(phone!)}&select=user_id`);
@@ -567,7 +645,7 @@ export function createHandler(env: Environment) {
       }
       throw new ApiError(400, 'invalid_action', 'Nieznana operacja.');
     } catch (error) {
-      if (error instanceof ApiError || error instanceof PhotoError) return respond({ error: error.message, code: error.code }, error.status);
+      if (error instanceof ApiError || error instanceof PhotoError || error instanceof EmailFlowError) return respond({ error: error.message, code: error.code }, error.status);
       return respond({ error: 'Nie udało się wykonać operacji. Spróbuj ponownie.', code: 'server_error' }, 500);
     }
   };

@@ -1,3 +1,386 @@
+# APK Premium odpowiadające Vercel62baac5
+
+2026-11-05, `feat/premium-legal-pages`, wejściowy HEAD dokumentacyjny `b46fd11`;
+kod aplikacji identyczny z wdrożonym `62baac5`. PASS build:premium-web, Capacitor
+sync wariantu B1 z HTTPS i Gradle assembleDebug --offline na JBR Android Studio.
+APK lokalne: `.cache/android-auth/slm-premium-62baac5-debug.apk`, 9629989 bajtów.
+SHA256: `c9f330ec49ef4dee83ec87d4d1fc2926b33629652f0bd96a9e9fe46ed0effe08`.
+PASS podpis APK v2/apksigner, aapt: pl.psuda87.slm / Sunday League Mates /1.0.
+PASS kontrola ZIP: identyczny JS Premium, właściwy HTTPS Supabase i nowe płatności,
+logging none, WebView debugging false, mixed content false, bez server override.
+Artefakt debug do testów ręcznych, poza Git; nie instalowano ani nie uruchamiano
+na urządzeniu. Nie zmieniano kodu, backendu, migracji lub Vercel; pełnej regresji
+nie powtarzano. Dwa pliki wygenerowane przez sync przywrócono do treści HEAD.
+
+---
+
+# Vercel — aktualny frontend opublikowany
+
+2026-11-05, `feat/premium-legal-pages`. Na wyraźne polecenie właściciela
+wdrożono commit aplikacji `62baac5a1983b09b48c7b2ecbdaa3f005a6fc6dd` do istniejącego
+`slm-ui-demo`, production, deployment `dpl_G6oR3jvvNW7CHNCqRkKRerXmWikT`.
+Vercel READY; publiczny alias https://slm-ui-demo.vercel.app wskazuje ten deployment.
+Root app, build npm run build:premium-web, output dist-premium-web; konfiguracja
+repo/CSP, Auth, Supabase, migracje, sekrety i CI nie były zmieniane w tym zadaniu.
+PASS zdalny build Premium. PASS rzeczywiste HTTPS200 dla strony głównej,
+regulaminu, polityki i JS /assets/index-BDtDeAiT.js. W serwowanym JS potwierdzono
+ostatnie kafelki/odświeżanie płatności i oba prawidłowe adresy HTTPS dokumentów.
+To kontrola publikacji, nie nowy test rzeczywistego logowania lub płatności.
+Git push i ls-remote potwierdziły62baac5 na origin; raport zapisany później jako
+osobny commit dokumentacyjny. Pozostawiono zastany nieśledzony build dist-demo-six.
+Nie powtarzano zaliczonych testów. Znane ograniczenia: strażniki wymagają przeglądu
+pinów (bez wyłączania kontroli); backend prywatności/usuwania46 nadal niewdrożony.
+Sam deploy frontendu nie oznacza aktywacji tych funkcji ani gotowości merge do main.
+
+---
+
+# Profil płatności — rozróżnienie zgłoszeń i odświeżanie
+
+2026-11-05, `feat/premium-legal-pages`, baza `e560e01`.
+Odczyt Cloud bez zmian danych potwierdził: u fikcyjnego administratora zaakceptowane
+23zł dotyczy rozegranego meczu4.11, a osobne oczekujące23zł nadchodzącego6.11,
+bez zatwierdzonego naliczenia składek. Nie był to duplikat dla tego samego meczu.
+Stare zgłoszenie powstało przed blokadą47; nie akceptowano ani nie usuwano go.
+Profil uzupełnia brakującą nazwę meczu wyłącznie przez autoryzowany matches_detail,
+sprawdza identyfikator/grupę/dostęp i ignoruje nieaktualne odpowiedzi sesji.
+Pokazuje odrębnie brak naliczenia i rzeczywiste oczekiwanie; pending dla faktycznie
+opłaconego tego samego meczu ma opis nieaktualnego zgłoszenia, bez fałszywej
+zmiany statusu na accepted. Odśwież płatności odczytuje też konto, nie tylko portfel.
+PASS:17 testów finansów (w tym3 nowe regresje), TypeScript, lint, build Premium,
+git diff --check. Podgląd5196 zaktualizowany. Bez migracji, zmian backendu/Auth,
+Vercel, istniejących wpłat i pozostałych modułów. Pełnej regresji nie powtarzano.
+
+---
+
+# Kafelki płatności i odstępy szczegółów meczu
+
+2026-11-05, `feat/premium-legal-pages`; wejściowy HEAD `6ef348f` (nie cofano do
+historycznego281e4f1). Przeniesiono dokładnie77 dodanych linii premiumEvents.css
+z `bdfeff24b6ed6b3695fc4fc833daf6e720d6f6cd`, bez innych plików z tej gałęzi.
+Kafelek należności: zawodnik, mecz/kwota i3 przyciski w jednym rzędzie
+Akceptuj/Odrzuć/Anuluj. Zgłoszenie wyróżnia zielona obwódka Akceptuj i tekst;
+brak zgłoszenia czerwona obwódka. Pozostałe kolory z aktywnej palety Premium.
+Akceptuj bez zgłoszenia używa istniejącej ręcznej wpłaty, po pełnym opłaceniu
+pozycja znika z bieżących; anulowanie zatwierdzonej wpłaty dostępne w historii.
+Przyciski niepasujące do stanu pozostają widoczne i nieaktywne. Częściowa wpłata
+zachowuje rzeczywistą pozostałą należność, nie oznacza jej fałszywie jako opłaconej.
+PASS:14 scoped Vitest, TypeScript, lint, składnia CSS/PostCSS, dokładna zgodność
+event CSS z bdfeff24, produkcyjny build Premium i git diff --check.
+Nie powtarzano pełnej regresji/strażników; wcześniejsza blokada pinów pozostaje.
+Bez zmian backendu, Auth, migracji, CI i historycznych manifestów; bez deployu
+Vercel, instalacji APK i merge do main. Lokalny podgląd5196 odświeżony nowym buildem.
+
+Android Studio, istniejący lokalny build HTTPS w tej kopii: w katalogu `app`
+skopiować `dist-premium-web/*` do `dist-b1` (rekurencyjnie), ustawić
+`$env:SLM_B1_ANDROID='1'` oraz `$env:SLM_ANDROID_STAGE3='0'`, wykonać
+`npx cap sync android`, otworzyć `app/android`, wybrać urządzenie i Run.
+Nie używać build:demo ani starszego build:premium-local z lokalnym endpointem.
+W tym zadaniu natywnego sync/build/uruchomienia nie wykonywano.
+
+---
+
+# Płatności — nowy podgląd i backend
+
+2026-11-05, feat/premium-legal-pages. Kafelki decyzji administratora, ręczne wpłaty,
+anulowanie z kompensacją, osobna historia i zgłoszenie z własnego profilu.
+PASS: TypeScript, lint, Edge typecheck,518 Vitest,14 scoped po ostatniej poprawce,
+SQL47 migracji w izolowanej bazie i wyścig dwóch transakcji, Cypress mobilny,
+build Premium. FAIL: istniejący strażnik pinów Profile.tsx; kontroli nie zmieniono.
+Za wyraźną zgodą wdrożono tylko migrację payment_workflow i accounts17
+(trzy mapowania409 na bazie accounts16; wszystkie10 plików zweryfikowane).
+Podgląd5196 zaktualizowany HTTP200; Vercel bez zmian do osobnego przeglądu pinów.
+Bez zmian Auth i pozostałych modułów, bez migracji prywatności46 i kont realnych.
+Następny krok: odbiór fikcyjnych wpłat przez właściciela i przegląd pinów.
+Szczegóły: [PAYMENT_WORKFLOW.md](PAYMENT_WORKFLOW.md).
+
+---
+
+# Testowe mecze i składki — gotowe
+
+2026-11-05, `feat/premium-legal-pages`. Na wyraźne polecenie właściciela powstał
+odseparowany fikcyjny zestaw e55e1aef: nowa grupa,12 kont i2 mecze (nadchodzący
+oraz rozegrany). Osobne konta admina grupy i gracza; żadne nie ma globalnej roli
+admin. Oba mecze90min/270zł/12 zapisanych. Rozegrany zatwierdzono normalnym API:
+12 należności po23zł, admin ma własne23zł do zapłaty, dokładnie2 zgłoszenia po23zł
+pending i0 accepted. Konto gracza nie otrzymuje danych administracyjnych.
+
+Konta utworzone oficjalnym Auth Admin API. Za dodatkową zgodą wykonano jednorazową
+zabezpieczoną operację accounts15 i natychmiast przywrócono oryginalne accounts14
+jako16; zgodność wszystkich10 plików oraz verify_jwt potwierdzona. Brak pozostawionego
+bootstrapu. Bez modyfikacji istniejących danych, haseł, konfiguracji Auth, sekretów,
+SQL DDL/migracji, Vercel i UI. Pierwsza transakcja danych cofnięta w całości po
+błędzie aliasu; poprawiona przeszła. Nie wykonano pełnej regresji aplikacji.
+PASS rzeczywiste API nowych kont i niezależne kontrole SQL stanów/uprawnień.
+Sesje robocze wylogowano. Dane dostępowe poza repo i poza tym raportem.
+Szczegóły i zakres sprzątania: [TEST_FINANCE_FIXTURE_E55E1AEF.md](TEST_FINANCE_FIXTURE_E55E1AEF.md).
+Następny krok: właściciel loguje się nowym kontem admina i odbiera scenariusz.
+
+---
+
+# Lokalny podgląd Premium — CORS5196 dopuszczony
+
+2026-11-05, `feat/premium-legal-pages`. Właściciel zezwolił na dopuszczenie
+http://127.0.0.1:5196 do testów poprawionej wersji. Panel/edycja sekretów nie były
+dostępne przez narzędzia, więc zmieniono wyłącznie projekcję listy CORS aktualnie
+wdrożonego accounts13: dopisano dokładny origin po istniejącej liście z konfiguracji.
+Wdrożony accounts14 zachowuje wszystkie10 plików poza jedną zmianą index.ts;
+porównano je po wdrożeniu. Nie wdrażano źródeł nowego backendu z gałęzi ani SQL.
+Nie zmieniano sekretów, listy istniejących originów, Auth, Brevo i Vercel.
+
+Rzeczywisty PASS: OPTIONS lokalny5196/Vercel/Android https://localhost zwracają204
+z dokładnym Allow-Origin; obcy origin403 bez Allow-Origin; POST status bez sesji
+z lokalnego originu401 z poprawnym CORS. To potwierdza komunikację i ochronę,
+nie jest testem poprawnego logowania użytkownika. Może być wymagane odświeżenie
+lokalnego podglądu. Wartości sekretów i dane kont nie były odczytywane.
+Wyjątek testowy opisuje docs/review/accounts-live-cors5196.patch; nie stosować go
+zbiorczo do backendu tej gałęzi. Przy przyszłym wydaniu zachować lub świadomie
+usunąć wyjątek testowy; następny deploy nie może niejawnie zmienić tej decyzji.
+
+---
+
+# SLM01 — odbiór właściciela i poprawka powrotu Androida
+
+2026-11-05, `feat/premium-legal-pages`, baza660719c. RĘCZNY PASS według właściciela
+na telefonie: rejestracja, logowanie, recovery, wylogowanie, trwałość sesji oraz
+wszystkie ekrany poprzedniego APK. Agent nie powtarzał tych prób i nie pozyskiwał
+danych konta. Właściciel zatwierdził usunięcie migania po minimalizacji/powrocie.
+
+Zmieniono tylko useB1Lifecycle: Android nie ustawia checking po samym ukryciu,
+powrót używa istniejącego współdzielonego resume i ograniczenia60s, okresowy
+refresh ważnej sesji działa w tle. Pierwszy start, wygasła sesja, utrata sieci,
+serwerowe uprawnienia, Keystore i blokada operacji do wyniku refresh bez zmian.
+Zmieniono2 stare testy natywnej galerii i dodano5 przypadków appStateChange,
+visibility/focus, równoległości, wygaśnięcia, cofnięcia oraz błędu sieci.
+
+PASS37 testów Auth w5 plikach, TypeScript i lint; pojedynczy testowy błąd lint
+naprawiono i sprawdzono ponownie. Build natywny B1 z istniejącą konfiguracją HTTPS,
+cap sync i Gradle :app:assembleDebug PASS. CSS index-ChAQUkSI bez zmian. Emulator
+Android16: install-r, cold start i powrót z Home PASS bez kasowania danych.
+Nowy scenariusz zalogowany na fizycznym telefonie wymaga odbioru właściciela.
+Bez pełnej regresji, SQL, zmian usług lub produkcji. Generowane pliki sync cofnięto.
+
+Kontrakt55 plików UI PASS; kontrola runtime FAIL na dokładnym starym pinie
+useB1Lifecycle — wymagany osobny przegląd pinów nowego źródła. Strażników nie
+zmieniano automatycznie. Przygotowana propozycja w docs/review/android-resume-guards-proposed.patch.
+APK: `.cache/android-auth/slm-auth-android-resume-debug.apk`.
+
+---
+
+# SLM01 — Android Auth, częściowy odbiór na emulatorze
+
+2026-11-05, `feat/premium-legal-pages`, HEAD660719c. Początkowo czysta gałąź
+codex/demo-match-6v6; przełączono na wskazaną gałąź bez nadpisania pracy. Widoczny
+po przełączeniu artefakt app/dist-demo-six pozostawiono nietknięty. Bez zmian kodu,
+commitów/push, usług zdalnych i migracji. Zmiana tego raportu wyłącznie lokalna.
+
+PASS: istniejący build Premium B1 przez build:premium-web, jawne publiczne linki
+HTTPS dokumentów, skopiowany do dist-b1 i cap sync z SLM_B1_ANDROID=1. Stage3
+pozostaje wariantem lokalnego backendu; nie użyto go do Cloud Auth. Gradle8.14.3,
+AGP8.13.0, Studio JBR21 (systemowy PATH ma JDK17), compile/target36, min24.
+assembleDebug PASS. Archiwum APK zawiera właściwy endpoint hjtcyybkxebvdropchac,
+brak localhost54321, logging none i zarejestrowany SecureStorage. Własne zmiany
+generowane cap sync cofnięto; pliki implementacji identyczne z HEAD.
+
+Na emulatorze Medium_Phone_API_36.1 / Android16 rzeczywiście: install-r zachował
+dane wcześniejszej instalacji; cold start i ekran logowania PASS; rejestracja
+pokazuje opcjonalny telefon; formularz recovery otwiera się; systemowe Wstecz
+wraca z obu formularzy do logowania. Fikcyjne dane zostały odrzucone. Próba
+logowania offline pokazała Brak połączenia i ukryła chronione widoki; Wi-Fi/dane
+przywrócone. Powrót z tła sprawdzony wyłącznie w stanie wylogowanym.
+
+BLOCKED: poprawne logowanie i wylogowanie, zapis/odtworzenie zalogowanej sesji,
+rzeczywista rejestracja, poczta weryfikacyjna i reset — brak dostarczonego konta
+testowego i ręcznej obsługi jego skrzynki. Nie zaliczono ich na podstawie weba.
+Manifest nie deklaruje App Links/deep links Auth, a B1App nie odbiera appUrlOpen:
+linki pocztowe kierują do dotychczasowego callbacku web. Potwierdzenie przez
+przeglądarkę i późniejsze logowanie do APK wymaga ręcznego odbioru. Jeśli wymagany
+jest automatyczny powrót z linku do aplikacji, minimalna przyszła zmiana obejmie
+AndroidManifest.xml, obsługę callbacku w B1App/emailCallback i weryfikację domeny;
+nie zaimplementowano jej bez zgody. Nie zmieniano UI ani konfiguracji callbacku.
+
+APK: `.cache/android-auth/slm-auth-660719c-debug.apk` (także standardowy
+app/android/app/build/outputs/apk/debug/app-debug.apk), SHA256
+800030d767d42553ca07b2212779e7d2b1c91a802418d299575566c2d8221eb7.
+Następny krok: ręczny odbiór poprawnego konta i jego poczty na Androidzie.
+
+---
+
+# Auth — strażniki zamknięte, wdrożenie zablokowane zależnościami Cloud
+
+2026-11-04, `feat/premium-legal-pages`, baza2416945, czyste drzewo przed zmianami.
+Właściciel zatwierdził wyjątki prywatności/usuwania i powrotu do karty. Zastosowano
+aktualizację3 strażników i ich testów: dokładne21 źródeł bab1acc,4 źródła2416945,
+listy weryfikowane względem niezmiennych obiektów Git. Manifest55, historyczne
+hashe, CSS/karty/nawigacja/CI bez zmian. Zaktualizowany patch review dokumentuje
+zastosowany diff. Bez zmian implementacji i bez nadpisania sekretów/cudzej pracy.
+
+PASS: strażniki55/13,91policy; wstępne92 testy zmian; następnie jeden pełny przebieg:
+509Vitest/72pliki, TypeScript/strictEdge/lint, build LIVE/demo/Premium, izolacja16,
+3testy konfiguracji,46migracji scratch i SQL/RLS/FK, Cypress15/15 w6 plikach z
+kontrolowanym API na lokalnych buildach. Bez prawdziwych kont i realnych wysyłek.
+
+Read-only Cloud: Vault0.3.1, pg_cron/pg_net dostępne lecz niezainstalowane,
+wpis worker w Vault nie istnieje (sprawdzono wyłącznie liczbę, bez wartości).
+Cloud43 wpisy migracji: brakuje dwóch historycznych wpisów v2 i accounts_email_ui
+ma inny timestamp. Potwierdzony brak group_payment_identity_guard() blokuje SQL46.
+Vercel slm-ui-demo istnieje, produkcja READY, lokalny deploy Git nadal wyłączony.
+NO-GO wdrożenia do czasu selektywnego uzgodnienia schematu i przygotowania workera.
+Nie wykonano migracji, deployu, zmian kont ani konfiguracji. Następny krok i pełna
+kolejność wydania: [AUTH_DEPLOYMENT_READINESS.md](AUTH_DEPLOYMENT_READINESS.md).
+
+---
+
+# Premium web — powrót do karty bez migania
+
+2026-11-04, `feat/premium-legal-pages`. Przyczyna: visibility hidden wywoływało
+suspend, a każde visible uruchamiało refresh ustawiający checking; B1App pokazywał
+wtedy pełnoekranowy AccountScreens. FocusVisibility obsługuje tylko przewijanie
+natywnych pól, nie odpowiada za ten objaw. Zmieniono sessionManager/useB1Lifecycle:
+web nie zawiesza ważnej sesji przy ukryciu; resume współdzieli refresh i pomija
+ponowienie przez60s od weryfikacji, o ile token ma ponad60s ważności. Weryfikacja
+w tle nie zmienia ready; chronione wywołania czekają na wynik. Wygaśnięcie w trakcie
+żądania blokuje widok timerem; nieważna sesja blokuje dostęp przed czyszczeniem
+magazynu, błąd sieci usuwa dostęp i pozostawia bezpieczny stan unavailable.
+Pierwsze uruchomienie i native suspend zachowane. Bez CSS/UI/backendu/migracji.
+
+PASS:32 testy jednostkowe w4 plikach (6 nowych przypadków powrotu/równoległości,
+ważna/wygasła sesja, błąd sieci/cofnięcie, termin ważności w trakcie żądania),
+TypeScript i lint4 zmienionych plików. Dwa dotychczasowe testy galerii jawnie
+testują natywny lifecycle. Początkowy runner miał ograniczenie katalogu temp;
+ponowienie poza ograniczeniem wykonało testy. FAIL strażników: frozen UI nadal
+blokuje wcześniejszy Profile, consolidation teraz również nowy sessionManager.
+Piny Auth sessionManager/useB1Lifecycle/B1App.test wymagają niezależnego review;
+nie aktualizowano ich automatycznie. Poprzedni patch przeglądowy dotyczy wyłącznie
+bab1acc i nie zatwierdza tej poprawki. Bez pełnej regresji, deployu i Cloud.
+Następny krok: odbiór pinów oraz pełna regresja przy osobno zatwierdzonym wdrożeniu.
+
+---
+
+# Przegląd strażników Premium — propozycja bez aktywacji
+
+2026-11-04, `feat/premium-legal-pages`, przegląd `bab1acc`. Zapisano dokładny diff
+chronionych źródeł względem ich indywidualnych zatwierdzonych baseline oraz
+nieaktywny patch trzech strażników w docs/review/account-privacy-*. Historyczny
+manifest55 pozostaje bez zmian. Przycisk w zamkniętych ustawieniach rozszerza
+ich zawartość i jest wymaganym wyjątkiem funkcjonalnym od zamrożonego źródła;
+karta, CSS i pozostały profil bez zmian. Rekomendacja: NO-GO publikacji do odbioru
+wyjątku przez właściciela. Nie powtarzano testów, nie wdrażano, nie migrowano.
+Sprawdzono wyłącznie stosowalność propozycji przez git apply --check.
+
+---
+
+# Automatyczny push — zasada pracy
+
+2026-11-04, `feat/premium-legal-pages`. Na polecenie właściciela zapisano w AGENTS.md
+obowiązek zwykłego push po każdej zakończonej zmianie i odpowiednich kontrolach.
+Nie stanowi to zgody na merge, deploy ani zdalne migracje. Zmiana wyłącznie
+dokumentacyjna: sprawdzono diff; testów aplikacji nie powtarzano. Przygotowano
+wysłanie zaległego commita prywatności `bab1acc` oraz tej zasady; wynik push
+potwierdzany bezpośrednio na GitHub w raporcie rozmowy.
+
+---
+
+# Prywatność telefonu i usuwanie konta — implementacja bez wdrożenia
+
+2026-11-04, `feat/premium-legal-pages`, baza `5d39c00`. Przygotowano migrację46
+`20261104183413_account_privacy_lifecycle.sql`, opcjonalny telefon z domyślną
+prywatnością wszystkich kont, zgodę na udostępnianie aktualnym wspólnym członkom,
+projekcje SQL i Edge obejmujące legacy/administratorów oraz blokadę surowych API.
+Dodano usuwanie konta z hasłem/frazą, bezpiecznym przekazaniem administratora,
+odłączeniem i redakcją historii, usuwaniem Auth/Storage i trwałymi ponowieniami.
+Powiadomienie administracyjne korzysta z istniejącego Brevo i osobnej kolejki;
+awaria poczty nie cofa usunięcia. Dodano ochronę równoczesnego uploadu zdjęcia,
+zmiany formularzy i dokumentów prawnych. Bez przebudowy karty, CSS i nawigacji.
+
+PASS automatyczne: TypeScript frontend/strict Edge, lint, **503 Vitest/71 plików**,
+build LIVE/demo/Premium web, izolacja demo16 i3 testy konfiguracji. SQL/RLS/FK:
+odtworzono46 migracji z wersjonowanych źródeł w świeżej scratch bazie lokalnego
+slm-main-stabilization; existing minimum_phone + account_privacy PASS (również
+anon/authenticated, opt-in/out/wyjście, legacy, historia płatności i upload lease).
+Cypress2/2 PASS na lokalnym produkcyjnym Premium z fikcyjnym transportem API.
+Nie oznacza to rzeczywistego usunięcia przez GoTrue/Storage ani doręczenia Brevo.
+
+FAIL aktywnych strażników: lista45 nie obejmuje migracji46, `Profile.tsx` ma
+minimalne wejście „Usuń konto”, źródła Auth wymagają nowych pinów. 82 testy policy
+zatrzymują się na niezatwierdzonym źródle Profile; nie zaliczono kontraktu Premium.
+Strażniki, manifest55 iCI bez zmian. Niezależny przegląd właściciela wymagany przed
+aktualizacją pinów i publikacją. Brak deployu, migracji Cloud, merge i testów na
+prawdziwych kontach. Produkcyjna rejestracja/recovery pozostają w odebranej wersji.
+
+Następny krok: review, wdrożenie migracji46 i istniejącego accounts, konfiguracja
+worker pg_cron/pg_net/Vault z przygotowanego SQL, potem Premium na slm-ui-demo.
+Odbiór Vercel wyłącznie jednorazowymi kontami; dane administratora i prawne okresy
+retencji nadal do ustalenia. Szczegóły, ograniczenia i kolejność wdrożenia:
+[ACCOUNT_PRIVACY_LIFECYCLE.md](ACCOUNT_PRIVACY_LIFECYCLE.md).
+
+---
+
+# Brevo i rejestracja e-mail — działanie potwierdzone przez właściciela
+
+2026-11-04, `feat/premium-legal-pages`. Po wyraźnym potwierdzeniu właściciela
+włączono samorejestrację Supabase i `SLM_EMAIL_SIGNUP_ENABLED=true`. Zachowano
+Confirm email, secure email change, wymaganie obecnego hasła, wyłączone konta
+anonimowe/manual linking/telefon oraz blokadę SMS. Zapisano konfigurację Brevo
+i dokładny callback `https://slm-ui-demo.vercel.app/auth/callback`; SMTP i sekret
+podpisu hooka wprowadził właściciel bezpośrednio w panelu. Send Email hook HTTPS
+jest włączony. W tym etapie bez zmian kodu, migracji, Edge Functions i Vercel.
+PASS: UI potwierdza zapis; puste POST signup zwraca400`invalid_input` i dokładny
+CORS zamiast wcześniejszego503`mail_unconfigured`. To nie dowodzi wysłania poczty.
+RĘCZNY PASS według potwierdzenia właściciela w tej rozmowie: rzeczywista
+rejestracja przez Vercel, dostarczenie wiadomości Brevo, kliknięcie linku,
+potwierdzenie konta i skuteczne logowanie. Agent nie wykonywał tych kroków
+samodzielnie; nie zapisano danych konta ani dowodów weryfikacyjnych.
+RĘCZNY PASS według kolejnego potwierdzenia właściciela: reset hasła działa
+prawidłowo. Podstawowe ścieżki konta (rejestracja, weryfikacja e-mail, logowanie,
+odzyskiwanie hasła) odebrane ręcznie przez właściciela; nie jest to pełny audyt
+wszystkich przypadków bezpieczeństwa. Następny krok: uzupełnić oznaczone dane
+w nadal testowych dokumentach prawnych.
+
+---
+
+# Dokumenty testowe Premium — opublikowane
+
+2026-11-04, `feat/premium-legal-pages`, baza faktycznie wdrożonego PR34 `2d568f3`.
+Dodano statyczne `/regulamin/` i `/polityka-prywatnosci/` z oznaczeniem brakujących
+danych administratora, dostawców, transferów i retencji. Bez zmian UI, Auth,
+strażników, migracji i Edge Functions. Vercel istniejący `slm-ui-demo`, plan Hobby;
+obie publiczne zmienne VITE ustawione na HTTPS tego projektu. PASS: buildPremium,
+TS/lint/build,476Vitest/68plików,82policy,3testy konfiguracji,kontrakt55/13granic.
+Cypress nie wykonał scenariuszy (brak serwera localhost5173). Backend accounts v8
+odczytany; bezdane POST signup:503`mail_unconfigured`, poprawny CORS. Rejestracja
+i rzeczywista wysyłka niezaliczone z powodu wyłączonego procesu poczty. Następny
+krok: uzupełnić dane administratora i dostawców, skonfigurować pocztę zgodnie z
+PREMIUM_REAL_AUTH_WEB.md i dopiero wtedy sprawdzić pełną rejestrację. Produkcja
+Vercel READY: `023ebcd`, alias slm-ui-demo.vercel.app. Obie strony HTTP200,
+formularz ma linki i nadal wymaga zgody oraz walidacji. PR35 pozostaje Draft.
+Raport: [PREMIUM_LEGAL_PAGES.md](PREMIUM_LEGAL_PAGES.md). Bez merge do main.
+
+---
+
+# Uruchomienie Vercel — repozytorium gotowe, dostęp zdalny zablokowany
+
+2026-11-04 13:06 UTC, `feat/premium-real-auth-web`, PR34 wg właściciela. Zatwierdzone Auth36ed569 przypięte w strażnikach: PASS45migracji/55plików/13granic i82policy (stare71+11),476Vitest,TS/strictEdge/lint,buildPremium i3testy konfiguracji. Manifest55 i aplikacja bez zmian. Lokalny produkcyjny preview: HTTP200, logowanie390px, SPA/czyszczeniecallbacku, bez JS/overflow. Vercel rootapp/build:premium-web/dist-premium-web przygotowany. Bez migracji45/deployaccounts/Cloud/merge. Dostęp Vercel/Supabase: proxy403, brak aktywnego dostępu. Jedyny krok zewnętrzny: ChatGPT ma ręcznie wdrożyć PR34 w istniejącym slm-ui-demo i ustawić CORS oraz backend hjtcyybkxebvdropchac według [instrukcji](PREMIUM_REAL_AUTH_WEB.md). Brak SMTP nie blokuje pierwszego testu istniejącego logowania. Cypress/realny backend/telefon/hostedCI niezaliczone; bez instalacji CLI i żądania tokenów. Osobny snapshot SQL/Edge CI nie był częścią frontendowego uruchomienia.
+
+---
+
+# Premium Auth web — ponowna weryfikacja
+
+2026-11-04 12:09 UTC, ta sama gałąź `feat/premium-real-auth-web`, main nadal `1b6ee83`. Uzupełniono instrukcję logowania e-mailem, blokadę lokalnych callbacków i wspólny budżet4s HTTP hook/SMTP wobec domyślnego limitu5s GoTrue. PASS: TS/strictEdge/typy testów, lint,476Vitest/68plików,3 testy konfiguracji, build Premium/demo i izolacja16, Chromium320/390/768 oraz12 kombinacji palet/trybów. Logowanie Dark/Light na zrzutach bez zmian bajtowych. Aktywne source/UI/policy nadalFAIL do osobnego review; piny/manifest55/CI bez zmian. Cypress nadalNOTRUN (binarium/download403), realneSQL/RLS/GoTrue/SMTP/telefon/CloudNOTRUN. Migracja45 wyłącznie przygotowana; poprzednie44 nietknięte, bez deployu i merge. Kod kontynuacji `36ed569b62bb6861640d2f64c10ed12038c4b15a` wypchnięty; utworzenie Draft PR zablokowane przez REST i GraphQL Forbidden. [Gotowe porównanie do main](https://github.com/psuda87/sunday-league-mates/compare/main...feat/premium-real-auth-web?expand=1). Raport i dokładne ustawienia: [PREMIUM_REAL_AUTH_WEB.md](PREMIUM_REAL_AUTH_WEB.md).
+
+---
+
+# Premium Auth web — kandydat do review, bez wdrożenia
+
+2026-11-04 10:32 UTC, `feat/premium-real-auth-web` z main`1b6ee83`. Istniejący Premium3.18/B1 i SessionManager: podłączone rejestracja, resend, potwierdzenie e-mail i recovery przez accounts; fragmentowe dowody czyszczone z URL, bez przyjmowania sesji z linku. Nowy podpisany Send Email hook w istniejącym accounts + SMTP/TLS465 zachowuje blokadę legacy i email_change. Build`build:premium-web`, Vercel root`app`, output`dist-premium-web`, SPA/CSP HTTPS. Brak dokumentów prawnych blokuje rejestrację.
+
+Przygotowano migrację45`20261104090000_accounts_email_ui.sql`, **nie wykonano**; stare44 bez zmian. Cloud44/v7 wyłącznie wg informacji właściciela; nie odczytywano i nie zmieniano Supabase/Vercel, danych, domen, RLS, konfiguracji Auth w Cloud ani sekretów. Nie aktywowano Auth18, CI ani deployu.
+
+PASS: TS frontend/strictEdge, lint,468Vitest/68plików,3 testy konfiguracji, build Premium/LIVE/demo i izolacja16, Chromium320/390/768 i12 wyborów palety/trybu (kontrolowany HTTP). NOT RUN: Cypress — brak binarium; SQL45/RLS/realny GoTrue/SMTP/Cloud/telefon/hosted CI. **FAIL aktywnych kontraktów**: nowe źródła Auth i funkcjonalna zmiana AccountScreens nie mają jeszcze niezależnie zaakceptowanych pinów. CSS/zasoby/karty/BottomNav bez zmian,54/55 plików identycznych z bazą; strażniki/manifest/CI nietknięte.
+
+Przed integracją: review dokładnych źródeł i kontraktów; izolowany odbiór backendu45 i SMTP/hooka; zatwierdzone dokumenty; osobne wdrożenie accounts i konfiguracja Auth/Vercel przez właściciela. Implementacja `ee72959755f4db926c83d2566dc76b5b5aa8c940` wypchnięta. Draft PR zablokowany przez GitHub GraphQL Forbidden; [porównanie do main](https://github.com/psuda87/sunday-league-mates/compare/main...feat/premium-real-auth-web?expand=1), gotowy opis w `docs/review/PREMIUM_REAL_AUTH_WEB_PR.md`. Raport i dokładne ustawienia: [PREMIUM_REAL_AUTH_WEB.md](PREMIUM_REAL_AUTH_WEB.md). Manifest wyłącznie do przeglądu: [premium-real-auth-web-manifest.json](review/premium-real-auth-web-manifest.json). Brak deklaracji gotowości produkcyjnej i brak merge.
+
+---
+
 # Android/formularze — punkt kontrolny polish-stats
 
 2026-10-31 — PR31 guard review: **PASS**, kontrakty odblokowane bez zmiany aplikacji. Policy704e4a8 (dokładne UI3f181e9/nativef2edf56), CI implementacja7c45656 i osobny wskaźnik6e9ce9d; wcześniejsze piny i42 migracje/frozen55 bez zmian. Faktycznie ponowione: policy53 (stare45+8), consolidation42/55/11, LinuxSourceTests29, source guard Linux i kanoniczny Windows PASS,60 Premium/consolidation i69 source mutacji odrzuconych, TS/lint/Edge/Vitest372/build/Chrome6 PASS. GitHub-hosted NOT RUN. Android/SQL/HTTP niepowtarzane (implementacja niezmieniona); Cloud/bazy/POCO nietknięte. PR31 gotowy do dalszej integracji po decyzji właściciela, nadal Draft, bez merge. Raport:docs/SLM_V1_POLISH_STATS_REPORT.md. Poniższe wcześniejsze BLOCK kontraktów zostało usunięte; TODO produktu nadal aktualne.

@@ -1,39 +1,55 @@
 import './premiumFinance.css';
-import { useEffect,useMemo,useState } from 'react';
-import type { SessionManager } from '../auth/sessionManager';
-import { usePremiumFinance } from './usePremiumFinance';
-import { account } from './contracts';
-import type { Account } from './contracts';
-import { parseCents,formatCents,paymentStatus,ledgerKind } from '../settlements/model';
-import { matchDate } from '../events/model';
+import {useState} from 'react';
+import type {SessionManager} from '../auth/sessionManager';
+import {usePremiumFinance} from './usePremiumFinance';
+import {formatCents,ledgerKind} from '../settlements/model';
+import {matchDate} from '../events/model';
+import {receiptStatus} from './paymentModel';
 export default function PremiumFinance({manager,userId,groupId,eventId,manage=false,onChanged}:{manager:SessionManager;userId:string;groupId:string;eventId?:string;manage?:boolean;onChanged?:()=>void}){
  const f=usePremiumFinance(manager,userId,groupId,eventId,manage,onChanged);
- const [amount,setAmount]=useState(''),[reason,setReason]=useState(''),[payer,setPayer]=useState(''),[payerAccount,setPayerAccount]=useState<Account|null>(null),[payerError,setPayerError]=useState(''),[validation,setValidation]=useState('');
- const admin=f.own?.surplus!==null&&!!f.own,rows=f.detail?.participants??[];
- const people=useMemo(()=>[...new Set(f.detail?.participants.map(p=>p.user_id)??[])],[f.detail]);
- useEffect(()=>{let active=true;setPayerAccount(null);setPayerError('');if(admin&&people.includes(payer))void manager.call('group_finance_account',{group_id:groupId,user_id:payer}).then(v=>{const a=account(v,groupId,payer);if(active)setPayerAccount(a);}).catch(()=>{if(active)setPayerError('Nie potwierdzono należności wybranej osoby. Wybierz ponownie lub odśwież.');});return()=>{active=false;};},[manager,groupId,payer,admin,f.own,people]);
- const selected=f.own?.dues.filter(d=>!eventId||d.event_id===eventId)??[];
- const due=selected.reduce((sum,d)=>sum+d.due_cents,0),left=selected.reduce((sum,d)=>sum+d.outstanding_cents,0),covered=selected.reduce((sum,d)=>sum+d.covered_cents,0);
- const pending=f.pending.filter(p=>!eventId||p.event_id===eventId);
- async function pay(record=false){setValidation('');try{const cents=parseCents(amount);if(record&&(!reason.trim()||!people.includes(payer)))throw Error('Wybierz płatnika i podaj powód decyzji.');const saved=await f.mutate(record?'record_payment':'submit_payment',{...(eventId?{event_id:eventId}:{}),amount_cents:cents,reason:reason.trim(),...(record?{user_id:payer}:{})});if(saved){setAmount('');setReason('');}}catch(e){setValidation(e instanceof Error?e.message:'Sprawdź kwotę.');}}
- return <section className="slm-finance slm-premium-finance" aria-label="Rzeczywiste rozliczenia grupy" aria-busy={f.loading||f.busy}>
- <div className="slm-finance-list-heading"><h2>Rozliczenia grupy</h2><button type="button" disabled={f.busy||f.loading} onClick={()=>{void f.reload();}}>Odśwież</button></div>
- {(f.error||validation)&&<p role="alert">{validation||f.error}</p>}{f.error&&<button type="button" disabled={f.busy||f.loading} onClick={()=>{void f.reload();}}>Spróbuj ponownie</button>}{f.notice&&<p role="status">{f.notice}</p>}{f.loading&&<p role="status">Wczytywanie rzeczywistych rozliczeń…</p>}
- {f.own&&!f.loading&&<>
- <dl className="slm-finance-tiles"><div><dt>Saldo w grupie</dt><dd>{formatCents(f.own.balance_cents)}</dd></div><div><dt>Twoje należności{eventId?' za mecz':''}</dt><dd>{formatCents(due)}</dd></div><div><dt>Pokryto należności</dt><dd>{formatCents(covered)}</dd></div><div><dt>Pozostało</dt><dd>{formatCents(left)}</dd></div></dl>
- <p>Saldo dodatnie oznacza nadpłatę, ujemne zadłużenie. Goście obciążają zapraszającego; własny udział i goście w jednym meczu to jeden mecz przy ocenie blokady.</p>
- <p role="status">{f.own.registration_allowed?'Możesz zapisywać się na płatne mecze.':'Blokada nowych płatnych zapisów: co najmniej dwa kwalifikujące się nieopłacone mecze. Odśwież po uregulowaniu należności.'}</p>
- <h3>Moje należności</h3>{!selected.length&&<p>Brak zatwierdzonych należności{eventId?' za ten mecz':''}. Wstępny indywidualny podział dla zawodnika nie jest udostępniony przez API.</p>}
- <ul className="slm-finance-rows">{selected.map(d=><li key={d.event_id}><strong>{matchDate(d.starts_at)}</strong><p>{d.due_cents===0?'Brak należności':d.outstanding_cents===0?'Opłacono':d.covered_cents>0?'Częściowo opłacono':'Do zapłaty'} · należne {formatCents(d.due_cents)} · pozostało {formatCents(d.outstanding_cents)}</p>{d.legacy&&<small>Historia: rozlicz przez ogólną wpłatę FIFO do grupy.</small>}</li>)}</ul>
- <form className="slm-finance-form" noValidate aria-label="Wpłata do grupy" onSubmit={e=>{e.preventDefault();void pay();}}><h3>Zgłoś wpłatę</h3><p>{eventId?'Wpłata celowa na ten mecz.':'Ogólna wpłata FIFO pokrywa najstarsze należności wyłącznie w tej grupie.'} Zgłoszenie nie zmienia salda przed akceptacją.</p><label>Kwota (zł)<input inputMode="decimal" autoComplete="off" value={amount} onChange={e=>setAmount(e.target.value)} disabled={f.busy}/></label><label>Opis / powód decyzji<textarea maxLength={500} value={reason} onChange={e=>setReason(e.target.value)} disabled={f.busy}/></label><button type="submit" disabled={f.busy}>Zgłoś do zatwierdzenia</button></form>
- <h3>Moje wpłaty</h3>{!f.own.payments.length&&<p>Brak wpłat.</p>}{f.own.payments.filter(p=>!eventId||p.event_id===eventId).map(p=><p key={p.id}>{formatCents(p.corrected_amount_cents)} · {paymentStatus[p.status]}</p>)}
- {f.detail&&<section className="slm-panel"><h3>Administracja rozliczeniem meczu</h3><p>Koszt: {formatCents(f.detail.event.cost_cents)} · {f.detail.event.approved_at?'Zatwierdzone':'Wstępny podział serwera'}</p>{!f.detail.event.approved_at&&<button type="button" disabled={f.busy||!reason.trim()} onClick={()=>{void f.mutate('approve',{event_id:eventId,expected_version:f.detail!.event.version,reason:reason.trim()});}}>Zatwierdź zakończony mecz</button>}
- <ul className="slm-finance-rows">{rows.map(p=><li key={p.entry_id}><strong>{p.name}</strong><p>{p.payable?formatCents(p.amount_cents):'Zwolniony z opłaty'} · {f.detail!.event.approved_at?'należność zatwierdzona':'wstępna należność'}</p></li>)}</ul>
- <label>Płatnik<select aria-label="Płatnik" value={payer} onChange={e=>setPayer(e.target.value)} disabled={f.busy}><option value="">Wybierz płatnika</option>{people.map(id=><option key={id} value={id} disabled={!f.names[id]}>{f.names[id]??'Płatnik z historii meczu'} · odpowiedzialny za przypisane udziały</option>)}</select></label>
- {payerError&&<p role="alert">{payerError}</p>}{payerAccount&&<p data-testid="payer-due">{payerAccount.dues.filter(d=>d.event_id===eventId).map(d=>`${d.due_cents===0?'Brak należności':d.outstanding_cents===0?'Opłacono':'Do zapłaty'}: ${formatCents(d.outstanding_cents)}`).join(' · ')||'Brak zatwierdzonej należności za ten mecz.'}</p>}
- <p>Kwota i powód z formularza wyżej. Otrzymana gotówka zostanie zaksięgowana dla wskazanego płatnika, nie osobno dla każdego gościa.</p><button type="button" disabled={f.busy||!people.includes(payer)||!reason.trim()||!amount} onClick={()=>{void pay(true);}}>Potwierdź otrzymaną wpłatę</button></section>}
- {(admin||manage)&&<section className="slm-panel"><h3>Wpłaty do zatwierdzenia</h3>{!pending.length&&<p>Brak oczekujących zgłoszeń w tym zakresie.</p>}{pending.map(p=><article key={p.id}><p>{f.names[p.user_id]??'Osoba spoza aktualnej listy grupy — weryfikacja tożsamości wymagana'} · {formatCents(p.corrected_amount_cents)} · zgłoszenie oczekujące</p><button type="button" disabled={f.busy||!reason.trim()||!f.names[p.user_id]} onClick={()=>{void f.mutate('accept_payment',{payment_id:p.id,...(p.event_id?{event_id:p.event_id}:{}),expected_amount_cents:p.corrected_amount_cents,reason:reason.trim()});}}>Zatwierdź wpłatę</button><button type="button" disabled={f.busy||!reason.trim()||!f.names[p.user_id]} onClick={()=>{void f.mutate('reject_payment',{payment_id:p.id,...(p.event_id?{event_id:p.event_id}:{}),expected_amount_cents:p.corrected_amount_cents,reason:reason.trim()});}}>Odrzuć wpłatę</button></article>)}</section>}
- <h3>Moja historia finansowa</h3><p className="slm-muted">Ostatnie do 100 operacji udostępnionych przez serwer.</p>{!f.own.history.length&&<p>Brak operacji.</p>}{f.own.history.map(h=><p key={h.id}>{matchDate(h.created_at)} · {ledgerKind[h.kind as keyof typeof ledgerKind]??'Operacja'} · {formatCents(h.amount_cents)} · {h.reason}</p>)}
- </>}
+ const [tab,setTab]=useState<'current'|'history'>('current');
+ const admin=!!f.own&&f.own.surplus!==null;
+ const title=(id:string)=>f.events.find(e=>e.id===id)?.name??'Mecz';
+ const people=f.players.filter(p=>!eventId||f.detail?.participants.some(r=>r.user_id===p.user_id));
+ const history=admin?people.flatMap(p=>p.account.payments.map(receipt=>({receipt,name:p.name}))):f.own?.payments.map(receipt=>({receipt,name:'Twoja wpłata'}))??[];
+ return <section className="slm-finance slm-premium-finance" aria-label="Płatności" aria-busy={f.loading||f.busy}>
+  <div className="slm-finance-list-heading"><h2>Płatności</h2><button type="button" disabled={f.busy||f.loading} onClick={()=>{void f.reload();}}>Odśwież</button></div>
+  {f.error&&<p role="alert">{f.error}</p>}{f.notice&&<p role="status">{f.notice}</p>}{f.loading&&<p role="status">Wczytywanie płatności…</p>}
+  {f.own&&!f.loading&&<>
+   <div role="tablist" aria-label="Widok płatności"><button role="tab" aria-selected={tab==='current'} onClick={()=>setTab('current')}>Bieżące płatności</button><button role="tab" aria-selected={tab==='history'} onClick={()=>setTab('history')}>Historia wpłat</button></div>
+   {tab==='current'?<div role="tabpanel" aria-label="Bieżące płatności">
+    <p>Twoje saldo: <strong>{formatCents(f.own.balance_cents)}</strong></p>
+    {!admin&&<><p>Zgłoszenie wpłaty znajdziesz w swoim profilu, w sekcji „Moje płatności”.</p>{f.own.dues.filter(d=>!eventId||d.event_id===eventId).map(d=><p key={d.event_id}>{matchDate(d.starts_at)} · {d.outstanding_cents>0?'Do zapłaty':'Opłacono'}: {formatCents(d.outstanding_cents)}</p>)}</>}
+    {f.detail&&!f.detail.event.approved_at&&<article className="slm-payment-card"><h3>Rozliczenie meczu</h3><p>Koszt {formatCents(f.detail.event.cost_cents)}. Składki zostaną naliczone po zatwierdzeniu zakończonego meczu.</p><button disabled={f.busy} onClick={()=>{void f.mutate('approve',{event_id:eventId,expected_version:f.detail!.event.version});}}>Zatwierdź zakończony mecz</button></article>}
+    {admin&&people.map(person=>{
+     const dues=person.account.dues.filter(d=>(!eventId||d.event_id===eventId)&&d.outstanding_cents>0);
+     const payments=person.account.payments.filter(p=>!eventId||p.event_id===null||p.event_id===eventId);
+     const pending=payments.filter(p=>p.status==='pending');
+     const accepted=payments.filter(p=>p.status==='accepted'&&p.corrected_amount_cents>0);
+     const items=[...dues.map(d=>({due:d,payment:pending.find(p=>p.event_id===d.event_id)})),...pending.filter(p=>!dues.some(d=>d.event_id===p.event_id)).map(payment=>({due:undefined,payment}))];
+     return items.map(({due:d,payment:p})=>{
+      const id=d?.event_id??p?.event_id;
+      const remaining=person.account.dues.filter(d=>!id||d.event_id===id).reduce((sum,d)=>sum+d.outstanding_cents,0);
+      const previous=accepted.find(r=>r.event_id===id);
+      const generalPending=!p&&pending.some(r=>r.event_id===null);
+      return <article className="slm-payment-card" key={`${person.user_id}:${d?.event_id??p!.id}`} aria-label={`Płatności: ${person.name}`}>
+       <h3>{person.name}{person.user_id===userId?' · Ty':''}</h3>
+       <p><strong>{id?title(id):'Wpłata ogólna'}</strong>{d&&<><br/>{matchDate(d.starts_at)}</>}<br/>Do zapłaty: {formatCents(remaining)}</p>
+       <p className="slm-payment-report">{p?`Zgłoszono wpłatę: ${formatCents(p.corrected_amount_cents)}`:generalPending?'Zgłoszono wpłatę ogólną — rozpatrz jej kafelek.':'Brak zgłoszenia wpłaty'}</p>
+       <div className="slm-payment-actions" role="group" aria-label="Decyzje dotyczące wpłaty">
+        <button className={`slm-payment-accept ${p?'is-reported':'is-unreported'}`} aria-label={p?'Akceptuj zgłoszoną wpłatę':'Akceptuj wpłatę bez zgłoszenia'} disabled={f.busy||remaining<=0||generalPending||!!d?.legacy||!!p&&p.event_id!==null&&p.corrected_amount_cents>remaining} onClick={()=>{void(p?f.mutate('accept_payment',{payment_id:p.id,expected_amount_cents:p.corrected_amount_cents,...(p.event_id?{event_id:p.event_id}:{})}):f.mutate('record_payment',{event_id:d!.event_id,user_id:person.user_id,amount_cents:d!.outstanding_cents}));}}>Akceptuj</button>
+        <button disabled={f.busy||!p} onClick={()=>{if(p)void f.mutate('reject_payment',{payment_id:p.id,...(p.event_id?{event_id:p.event_id}:{})});}}>Odrzuć</button>
+        <button disabled={f.busy||!previous} title={previous?'Cofnij zatwierdzoną wpłatę':'Nie ma zatwierdzonej wpłaty do anulowania'} onClick={()=>{if(previous)void f.mutate('cancel_payment',{payment_id:previous.id,expected_amount_cents:previous.corrected_amount_cents,...(previous.event_id?{event_id:previous.event_id}:{})});}}>Anuluj</button>
+       </div>
+       {p&&remaining===0&&<small>Należność została już pokryta. Odrzuć nieaktualne zgłoszenie.</small>}
+      </article>;
+     });
+    })}
+   </div>:<div role="tabpanel" aria-label="Historia wpłat">
+    <h3>Historia wpłat</h3>{!history.length&&<p>Brak wpłat.</p>}
+    {history.filter(({receipt:p})=>!eventId||p.event_id===null||p.event_id===eventId).map(({receipt:p,name})=><article className="slm-payment-card" key={p.id}><h3>{name}</h3><p>{p.event_id?title(p.event_id):'Wpłata ogólna'}<br/>{formatCents(p.corrected_amount_cents)} · {receiptStatus(p)}</p>{admin&&<div className="slm-payment-actions" role="group" aria-label="Decyzje dotyczące wpłaty"><button disabled>Akceptuj</button><button disabled>Odrzuć</button><button disabled={f.busy||p.status!=='accepted'||p.corrected_amount_cents<=0} onClick={()=>{void f.mutate('cancel_payment',{payment_id:p.id,expected_amount_cents:p.corrected_amount_cents,...(p.event_id?{event_id:p.event_id}:{})});}}>Anuluj</button></div>}</article>)}
+    <h3>Twoje operacje księgowe</h3>{f.own.history.filter(h=>!eventId||h.event_id===eventId).map(h=><p key={h.id}>{matchDate(h.created_at)} · {ledgerKind[h.kind as keyof typeof ledgerKind]??'Operacja'} · {formatCents(h.amount_cents)}</p>)}
+   </div>}
+  </>}
  </section>;
 }

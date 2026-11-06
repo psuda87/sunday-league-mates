@@ -6,6 +6,9 @@ import { SessionManager } from './sessionManager';
 import { AccountError } from './api';
 import type { Session } from './api';
 import { b1Port } from './b1Port';
+import {Capacitor} from '@capacitor/core';
+import {App} from '@capacitor/app';
+vi.mock('@capacitor/app',()=>({App:{addListener:vi.fn(async()=>({remove:async()=>{}}))}}));
 vi.mock('./useOwnProfile',()=>({useOwnProfile:(_manager:unknown,_owner:unknown,selection?:{begin:()=>void;end:()=>void})=>({photo:{beginSelection:selection?.begin,endSelection:selection?.end}})}));
 const worldLifecycle=vi.hoisted(()=>({mounts:0,unmounts:0}));
 vi.mock('../events/PremiumWorld',()=>({default:function MockWorld({onLogout,onAccount,personalProfile}:{personalProfile?:{photo:{beginSelection:()=>void;endSelection:()=>void}};onLogout:()=>void;onAccount:(view:string)=>void}){
@@ -69,44 +72,37 @@ describe('B1 existing Auth into frozen account UI',()=>{
   await screen.findByRole('heading',{name:'Sesja wygasła'});expect(peek()).toBeNull();expect(screen.queryByText('Chroniony świat demo')).toBeNull();
   fireEvent.click(screen.getByRole('button',{name:'Wróć do logowania'}));await screen.findByRole('heading',{name:'Zaloguj się'});
  });
- it('preserves the hidden RAM screen through verified resume without remounting',async()=>{
-  let visibility:DocumentVisibilityState='visible';
-  vi.spyOn(document,'visibilityState','get').mockImplementation(()=>visibility);
-  let finishRefresh!:(value:Session)=>void;
-  const request=vi.fn().mockResolvedValueOnce(session()).mockImplementationOnce(()=>new Promise<Session>(resolve=>{finishRefresh=resolve;}));
-  const {manager}=setup(request,'saved-test-refresh');render(<B1App manager={manager}/>);
-  await screen.findByText('Chroniony świat demo');expect(worldLifecycle.mounts).toBe(1);
-  visibility='hidden';fireEvent(document,new Event('visibilitychange'));
-  await screen.findByRole('heading',{name:'Sprawdzanie sesji'});
-  expect(screen.getByText('Chroniony świat demo')).not.toBeVisible();expect(worldLifecycle.unmounts).toBe(0);
-  expect(request).toHaveBeenCalledTimes(1);expect(screen.queryByRole('heading',{name:'Zaloguj się'})).toBeNull();
-  visibility='visible';fireEvent(document,new Event('visibilitychange'));
-  await waitFor(()=>expect(request).toHaveBeenCalledTimes(2));
-  expect(manager.getSnapshot().phase).toBe('checking');expect(screen.getByText('Chroniony świat demo')).not.toBeVisible();
-  await act(async()=>{finishRefresh(session());});
-  await waitFor(()=>expect(screen.getByText('Chroniony świat demo')).toBeVisible());expect(worldLifecycle.mounts).toBe(1);
-  expect(manager.getSnapshot().phase).toBe('ready');expect(screen.queryByRole('heading',{name:'Zaloguj się'})).toBeNull();
- });
- it('keeps only a pending picker hidden through verification, then drops it on revoked session',async()=>{
+ it('keeps the native world visible through short minimize/resume without remounting',async()=>{
+  vi.spyOn(Capacitor,'isNativePlatform').mockReturnValue(true);
+  vi.spyOn(App,'addListener').mockResolvedValue({remove:async()=>{}});
   let visibility:DocumentVisibilityState='visible';vi.spyOn(document,'visibilityState','get').mockImplementation(()=>visibility);
+  const request=vi.fn().mockResolvedValue(session());const {manager}=setup(request,'saved-test-refresh');render(<B1App manager={manager}/>);
+  await screen.findByText('Chroniony \u015bwiat demo');
+  visibility='hidden';fireEvent(document,new Event('visibilitychange'));
+  expect(screen.getByText('Chroniony \u015bwiat demo')).toBeVisible();
+  visibility='visible';fireEvent(document,new Event('visibilitychange'));fireEvent(window,new Event('focus'));
+  await act(async()=>{await Promise.resolve();});
+  expect(request).toHaveBeenCalledTimes(1);expect(worldLifecycle.mounts).toBe(1);expect(worldLifecycle.unmounts).toBe(0);
+  expect(screen.queryByRole('heading',{name:'Sprawdzanie sesji'})).toBeNull();
+ });
+ it('retains a native picker during background verification and removes it on revocation',async()=>{
+  vi.spyOn(Capacitor,'isNativePlatform').mockReturnValue(true);
+  vi.spyOn(App,'addListener').mockResolvedValue({remove:async()=>{}});
   let finishRefresh!:(value:Session)=>void;
   const request=vi.fn().mockResolvedValueOnce(session()).mockImplementationOnce(()=>new Promise<Session>(resolve=>{finishRefresh=resolve;})).mockRejectedValueOnce(new AccountError('Revoked','session_invalid'));
   const {manager}=setup(request,'saved-test-refresh');render(<B1App manager={manager}/>);
-  await screen.findByText('Chroniony świat demo');fireEvent.click(screen.getByText('Otwórz galerię'));
-  visibility='hidden';fireEvent(document,new Event('visibilitychange'));await screen.findByRole('heading',{name:'Sprawdzanie sesji'});
-  expect(screen.getByText('Wybrany plik RAM')).not.toBeVisible();expect(worldLifecycle.unmounts).toBe(0);
-  visibility='visible';fireEvent(document,new Event('visibilitychange'));await waitFor(()=>expect(request).toHaveBeenCalledTimes(2));
-  fireEvent.click(screen.getByText('Zakończ wybór'));expect(screen.getByText('Wybrany plik RAM')).not.toBeVisible();
-  await act(async()=>{finishRefresh(session());});await waitFor(()=>expect(screen.getByText('Wybrany plik RAM')).toBeVisible());expect(worldLifecycle.mounts).toBe(1);
-  fireEvent.click(screen.getByText('Otwórz galerię'));visibility='hidden';fireEvent(document,new Event('visibilitychange'));
-  visibility='visible';fireEvent(document,new Event('visibilitychange'));await screen.findByRole('heading',{name:'Sesja wygasła'});
-  expect(screen.queryByText('Wybrany plik RAM')).toBeNull();expect(screen.queryByText('Chroniony świat demo')).toBeNull();
+  await screen.findByText('Chroniony \u015bwiat demo');fireEvent.click(screen.getByText('Otw\u00f3rz galeri\u0119'));
+  let pending!:Promise<void>;act(()=>{pending=manager.refresh(true);});
+  expect(screen.getByText('Wybrany plik RAM')).toBeVisible();expect(screen.queryByRole('heading',{name:'Sprawdzanie sesji'})).toBeNull();
+  await act(async()=>{finishRefresh(session());await pending;});expect(worldLifecycle.mounts).toBe(1);
+  await act(async()=>{await manager.refresh(true);});await screen.findByRole('heading',{name:'Sesja wygas\u0142a'});
+  expect(screen.queryByText('Wybrany plik RAM')).toBeNull();expect(screen.queryByText('Chroniony \u015bwiat demo')).toBeNull();
  });
- it('does not implement registration/recovery/profile or authorize callback URL',async()=>{
+ it('does not authorize an unverified callback, expose a fake profile, or register without policies',async()=>{
   const request=vi.fn();const {manager}=setup(request);const port=b1Port(manager);
-  await expect(port.requestPasswordReset('fictional@example.invalid')).rejects.toThrow('integration');
-  await expect(port.completeRedirect('verify')).rejects.toThrow('integration');
-  await expect(port.signUp({nickname:'Fikcyjny',fullName:'',phone:''},'fictional@example.invalid','test')).rejects.toThrow('integration');
+  await expect(port.completeRedirect('verify')).rejects.toThrow('link');
+  await expect(port.saveProfile({nickname:'Fikcyjny',fullName:'',phone:''})).rejects.toThrow('integration');
+  await expect(port.signUp({nickname:'Fikcyjny',fullName:'',phone:''},'fictional@example.invalid','test')).rejects.toThrow('Rejestracja oczekuje');
   expect(request).not.toHaveBeenCalled();
  });
 });

@@ -1,3 +1,7 @@
+# Automatyczny push — decyzja właściciela 2026-11-04
+
+- Po każdej zakończonej zmianie wykonaj odpowiednie kontrole, zapisz własne zmiany w commicie i automatycznie wykonaj zwykły push na bieżącą gałąź roboczą. Raportuj rzeczywiste wyniki kontroli, także niezaliczone; push nie oznacza gotowości do wdrożenia. Bez force push, dołączania cudzych zmian ani sekretów. Merge do main, wdrożenia i zdalne migracje nadal wymagają osobnej wyraźnej zgody. W razie blokady push zgłoś ją zamiast deklarować wysłanie.
+
 # Konsolidacja 2026-10-28 — bieżące zasady, nadrzędne wobec historii poniżej
 
 - Jeden moduł: nowa gałąź od aktualnego main → testy → akceptacja właściciela → PR → merge wyłącznie po wyraźnej zgodzie → kolejny moduł od zaktualizowanego main. Przygotowanie PR nie upoważnia do merge.

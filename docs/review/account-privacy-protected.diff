@@ -1,0 +1,311 @@
+diff --git a/app/src/demo/Profile.tsx b/app/src/demo/Profile.tsx
+index 0f5e141..b0578cd 100644
+--- a/app/src/demo/Profile.tsx
++++ b/app/src/demo/Profile.tsx
+@@ -1,6 +1,7 @@
+ import { useEffect, useId, useRef, useState } from 'react';
+ import type { Dispatch, FormEvent } from 'react';
+ import { AvatarPicker, IdentityEditor } from './Identity';
++import {AccountDeletion} from '../profile/PhoneEditor';
+ import AppearanceSettings from '../ui/AppearanceSettings';
+ import MatchHeader from '../ui/MatchHeader';
+ import UltimatePlayerCard from './UltimatePlayerCard';
+@@ -47,7 +48,7 @@ export default function DemoProfile({world,id,onBack,dispatch,personal=false,onP
+       <div className="slm-identity-actions slm-my-actions"><button type="button" disabled={!!live&&(live.phase==='loading'||live.saving)} aria-expanded={editor==='identity'} onClick={()=>{if(live&&live.phase!=='ready'){live.reload();return;}setEditing(false);setEditor(editor==='identity'?null:'identity');}}>{live&&live.phase!=='ready'?'Ponów odczyt profilu':'Edytuj profil'}</button><button type="button" disabled={!!live&&(live.phase!=='ready'||live.photo?.saving||!live.photo)} aria-expanded={editor==='portrait'} onClick={()=>{setEditing(false);if(live?.photo?.phase==='error')live.photo.reload();setEditor(editor==='portrait'?null:'portrait');}}>Zmień zdjęcie</button><button type="button" onClick={()=>{if(settings.current){settings.current.open=!settings.current.open;if(settings.current.open)settings.current.scrollIntoView?.({block:'start',behavior:'smooth'});}}}>Ustawienia</button></div>
+       {editor==='identity'&&(!live||live.phase==='ready')&&<IdentityEditor key={profile?.user_id??id} personalProfile={live} player={player} dispatch={dispatch} onClose={closeEditor} onNumber={editNumber}/>}
+       {editor==='portrait'&&<AvatarPicker key={(profile?.user_id??id)+(live?.photo?.image??'')} personalPhoto={live?.photo} player={player} dispatch={dispatch} onClose={closeEditor}/>}
+-      <details ref={settings} className="slm-identity-settings"><summary>Ustawienia aplikacji i konta</summary><AppearanceSettings enablePalettes/><section className="slm-identity-account"><h2>Konto</h2><ul>{['Dane konta','Powiadomienia'].map(label=><li key={label}><span>{label}</span><small>{live&&label==='Dane konta'?profile?`Login: ${profile.login} · Telefon: ${profile.phone||'brak'}`:'Profil niedostępny':live?'W przygotowaniu':'Niedostępne w demo'}</small></li>)}</ul>{onPassword&&<button type="button" onClick={onPassword}>{liveAuth?'Zmiana hasła':'Zmiana hasła · symulator'}</button>}{onLogout&&<button type="button" onClick={onLogout}>{liveAuth?'Wyloguj':'Wyloguj · symulator'}</button>}<p>{live?'Profil, logowanie i hasło są zapisane na Twoim koncie. Mecze i członkostwo znajdziesz w odpowiednich zakładkach.':liveAuth?'Logowanie i hasło: Supabase. Pozostałe dane i operacje są demonstracyjne.':'Demo nie ma prawdziwej sesji. Te operacje nie są wykonywane.'}</p></section></details>
++      <details ref={settings} className="slm-identity-settings"><summary>Ustawienia aplikacji i konta</summary><AppearanceSettings enablePalettes/><section className="slm-identity-account"><h2>Konto</h2><ul>{['Dane konta','Powiadomienia'].map(label=><li key={label}><span>{label}</span><small>{live&&label==='Dane konta'?profile?`Login: ${profile.login} · Telefon: ${profile.phone||'brak'}`:'Profil niedostępny':live?'W przygotowaniu':'Niedostępne w demo'}</small></li>)}</ul>{onPassword&&<button type="button" onClick={onPassword}>{liveAuth?'Zmiana hasła':'Zmiana hasła · symulator'}</button>}{live?.deleteAccount&&<AccountDeletion binding={live}/>} {onLogout&&<button type="button" onClick={onLogout}>{liveAuth?'Wyloguj':'Wyloguj · symulator'}</button>}<p>{live?'Profil, logowanie i hasło są zapisane na Twoim koncie. Mecze i członkostwo znajdziesz w odpowiednich zakładkach.':liveAuth?'Logowanie i hasło: Supabase. Pozostałe dane i operacje są demonstracyjne.':'Demo nie ma prawdziwej sesji. Te operacje nie są wykonywane.'}</p></section></details>
+     </div>}
+   </div>;
+ }
+diff --git a/app/src/auth/profileAdapter.ts b/app/src/auth/profileAdapter.ts
+index a5606b0..89d490e 100644
+--- a/app/src/auth/profileAdapter.ts
++++ b/app/src/auth/profileAdapter.ts
+@@ -3,6 +3,7 @@ import { legacyAccountUiAdapter } from './uiAdapter';
+ import { profileProblems } from '../account-ui/model';
+ import type { IdentityDraft,PersonalProfileData } from '../ui/personalProfile';
+ import { normalizePhoneUpdate } from '../../supabase/functions/_shared/phone';
++import { accountRequest } from './api';
+ 
+ export function fullNameProblem(fullName:string){
+  return profileProblems({nickname:'Profil',fullName,phone:''})[0]??'';
+@@ -17,21 +18,28 @@ export function profileAdapter(manager:SessionManager,userId:string){
+    typeof p.display_name!=='string'||!p.display_name.trim()||p.display_name.length>254||
+    !['nickname','first_name','full_name'].includes(p.display_as)||(p.jersey_number!=null&&(!Number.isInteger(p.jersey_number)||p.jersey_number<0||p.jersey_number>99)))throw new Error('profile_contract_invalid');
+   // Pick only the existing contract; never project roles/metadata into the UI.
+-  return {...(typeof p.email_account==='boolean'?{email_account:p.email_account}:{}),nickname:p.nickname,first_name:p.first_name,group_scope:p.group_scope,jersey_number:p.jersey_number??null,user_id:userId,login:p.login,phone:p.phone,full_name:p.full_name,display_as:p.display_as,display_name:p.display_name};
++  return {...(typeof p.email_account==='boolean'?{email_account:p.email_account}:{}),...(typeof p.share_phone==='boolean'?{share_phone:p.share_phone}:{}),nickname:p.nickname,first_name:p.first_name,group_scope:p.group_scope,jersey_number:p.jersey_number??null,user_id:userId,login:p.login,phone:p.phone,full_name:p.full_name,display_as:p.display_as,display_name:p.display_name};
+  }
+  return {
+-  async changePhone(phone:string,currentPassword:string){
++  async deleteAccount(password:string,confirmation:string,ticket:{operation_id:string;proof:string},resume:boolean){
++   if(!resume&&manager.getSnapshot().session?.user_id!==userId)throw Error('profile_owner_changed');
++   const result=resume?await accountRequest<{deleted:boolean;operation_id:string}>('account_delete_resume',ticket):
++    await manager.call<{deleted:boolean;operation_id:string}>('account_delete',{...ticket,current_password:password,confirmation});
++   if(result.deleted!==true||result.operation_id!==ticket.operation_id)throw Error('deletion_unconfirmed');
++   if(manager.getSnapshot().session?.user_id===userId)await manager.logout();
++  },
++  async changePhone(phone:string,currentPassword:string,share?:boolean){
+    const before=validate(await existing.readProfile());
+    if(!before||!currentPassword)throw Error('phone_change_requires_password');
+-   const normalized=phone.trim()===''&&before.email_account===true?'':normalizePhoneUpdate(phone,before.phone);
+-   if(normalized===before.phone)return before;
+-   if(before.email_account===false){
++   const normalized=phone.trim()===''?'':normalizePhoneUpdate(phone,before.phone);
++   const sharing=normalized!==''&&(share??before.share_phone??false);
++   if(normalized===before.phone&&sharing===before.share_phone)return before;
++   if(before.email_account===false&&normalized!==before.phone){
+     await manager.changeSession('identifiers',{login:before.login,phone:normalized,current_password:currentPassword});
+-   }else if(before.email_account===true){
+-    await manager.call('save_email_profile',{nickname:before.nickname||before.login,phone:normalized,current_password:currentPassword});
+-   }else throw Error('phone_contract_unavailable');
++   }
++   await manager.call('save_contact_phone',{phone:normalized,share_phone:sharing,current_password:currentPassword});
+    const confirmed=validate(await existing.readProfile());
+-   if(!confirmed||confirmed.phone!==normalized||confirmed.login!==before.login)throw Error('profile_readback_mismatch');
++   if(!confirmed||confirmed.phone!==normalized||confirmed.share_phone!==sharing||confirmed.login!==before.login)throw Error('profile_readback_mismatch');
+    return confirmed;
+   },
+   async saveIdentity(draft:IdentityDraft){
+diff --git a/app/src/auth/useOwnProfile.ts b/app/src/auth/useOwnProfile.ts
+index a370178..467e980 100644
+--- a/app/src/auth/useOwnProfile.ts
++++ b/app/src/auth/useOwnProfile.ts
+@@ -45,15 +45,15 @@ export function useOwnProfile(manager:SessionManager,userId:string|null,selectio
+   finally{if(ticket===generation.current){flight.current=false;setSaving(false);}}
+  }
+  useEffect(()=>{const reload=()=>setRevision(v=>v+1);window.addEventListener('slm-profile-changed',reload);return()=>window.removeEventListener('slm-profile-changed',reload);},[]);
+- async function changePhone(phone:string,currentPassword:string){
++ async function changePhone(phone:string,currentPassword:string,share?:boolean){
+   const auth=manager.getSnapshot();
+   if(flight.current||!adapter||current.phase!=='ready'||auth.phase!=='ready'||auth.session?.user_id!==userId)return false;
+   const ticket=generation.current;flight.current=true;setSaving(true);
+-  try{const profile=await adapter.changePhone(phone,currentPassword);if(ticket!==generation.current)return false;setState({owner:userId,phase:'ready',profile,notice:'Zmieniono i potwierdzono numer telefonu.'});return true;}
++  try{const profile=await adapter.changePhone(phone,currentPassword,share);if(ticket!==generation.current)return false;setState({owner:userId,phase:'ready',profile,notice:'Potwierdzono telefon i ustawienie widoczności.'});return true;}
+   catch{if(ticket===generation.current)setState(previous=>({...previous,notice:'Nie potwierdzono zmiany telefonu. Sprawdź obecne hasło i unikalność numeru; przy przerwanym połączeniu ponów odczyt profilu.'}));return false;}
+   finally{if(ticket===generation.current){flight.current=false;setSaving(false);}}
+  }
+- return {...current,photo,saveIdentity,saveNumber,changeAlias,changePhone,saving:current.phase==='ready'&&saving,reload:()=>setRevision(v=>v+1),
++ return {...current,photo,saveIdentity,saveNumber,changeAlias,changePhone,deleteAccount:adapter?.deleteAccount,saving:current.phase==='ready'&&saving,reload:()=>setRevision(v=>v+1),
+   async save(fullName,number){
+    const auth=manager.getSnapshot();
+    if(flight.current||!adapter||!current.profile||current.phase!=='ready'||auth.phase!=='ready'||auth.session?.user_id!==userId)return false;
+diff --git a/app/src/ui/personalProfile.ts b/app/src/ui/personalProfile.ts
+index 70b3230..b201b9b 100644
+--- a/app/src/ui/personalProfile.ts
++++ b/app/src/ui/personalProfile.ts
+@@ -3,13 +3,15 @@ export interface PersonalProfileData {
+  user_id:string;login:string;phone:string;full_name:string;
+  nickname?:string;first_name?:string;group_scope?:{group_id:string;share_full_name:boolean;share_first_name:boolean}[];
+  email_account?:boolean;
++ share_phone?:boolean;
+  jersey_number?:number|null;
+  display_as:'nickname'|'first_name'|'full_name';display_name:string;
+ }
+ export interface PersonalProfileBinding {
+  phase:'loading'|'ready'|'missing'|'error';profile:PersonalProfileData|null;
+  changeAlias?:(login:string,currentPassword:string)=>Promise<boolean>;
+- changePhone?:(phone:string,currentPassword:string)=>Promise<boolean>;
++ changePhone?:(phone:string,currentPassword:string,share?:boolean)=>Promise<boolean>;
++ deleteAccount?:(password:string,confirmation:string,ticket:{operation_id:string;proof:string},resume:boolean)=>Promise<void>;
+  photo?:PersonalPhotoBinding;saveNumber?:(number:number)=>Promise<boolean>;
+  saveIdentity?:(draft:IdentityDraft)=>Promise<boolean>;
+  saving:boolean;notice:string;reload:()=>void;save:(fullName:string,number?:number)=>Promise<boolean>;
+diff --git a/app/src/profile/PhoneEditor.tsx b/app/src/profile/PhoneEditor.tsx
+index 39467a4..63be06d 100644
+--- a/app/src/profile/PhoneEditor.tsx
++++ b/app/src/profile/PhoneEditor.tsx
+@@ -4,24 +4,53 @@ import type { PersonalProfileBinding } from '../ui/personalProfile';
+ export default function PhoneEditor({binding,onClose}:{binding:PersonalProfileBinding;onClose:()=>void}){
+  const profile=binding.profile!;
+  const [phone,setPhone]=useState(profile.phone),[password,setPassword]=useState(''),[error,setError]=useState('');
++ const [share,setShare]=useState(profile.share_phone===true);
+  const flight=useRef(false);
+  return <form className="slm-identity-editor slm-premium-identity" aria-label="Zmiana telefonu" noValidate onSubmit={async e=>{
+   e.preventDefault();if(flight.current||binding.saving)return;
+   let normalized:string;
+-  try{normalized=phone.trim()===''&&profile.email_account===true?'':normalizePhoneUpdate(phone,profile.phone);}catch{setError(PHONE_ERROR);return;}
+-  if(normalized===profile.phone){setError('Numer nie został zmieniony.');return;}
++  try{normalized=phone.trim()===''?'':normalizePhoneUpdate(phone,profile.phone);}catch{setError(PHONE_ERROR);return;}
++  if(normalized===profile.phone&&share===(profile.share_phone===true)){setError('Numer i widoczność nie zostały zmienione.');return;}
+   if(!password){setError('Potwierdź zmianę obecnym hasłem.');return;}
+   flight.current=true;const proof=password;setPassword('');setError('');
+-  try{if(await binding.changePhone?.(normalized,proof))onClose();else setError('Nie potwierdzono zmiany. Sprawdź hasło, dostępność numeru i ponów odczyt profilu.');}
++  try{if(await binding.changePhone?.(normalized,proof,share&&normalized!==''))onClose();else setError('Nie potwierdzono zmiany. Sprawdź hasło, dostępność numeru i ponów odczyt profilu.');}
+   catch{setError('Nie potwierdzono zmiany. Ponów odczyt profilu.');}
+   finally{flight.current=false;}
+  }}>
+   <h2>Numer telefonu</h2>
+-  <p>{profile.email_account===false?'Numer jest także identyfikatorem logowania. Zmiana wymaga obecnego hasła i potwierdzenia nowej sesji.':'Opcjonalny numer kontaktowy. Logowanie e-mailem pozostaje bez zmian; zmiana numeru wymaga obecnego hasła.'}</p>
++  <p>Numer jest opcjonalny i domyślnie prywatny. Puste pole usuwa numer. {profile.email_account===false?'Po usunięciu numeru nadal możesz logować się swoim loginem; usunięty numer przestanie służyć do logowania.':'Logowanie e-mailem pozostaje bez zmian.'}</p>
+   <label>Telefon<input type="tel" autoComplete="tel" maxLength={32} value={phone} disabled={binding.saving} onChange={e=>{setPhone(e.target.value);setError('');}}/></label>
+   <p>9 cyfr, także z prefiksem +48 lub 0048.</p>
++  <label><input type="checkbox" checked={share} disabled={binding.saving} onChange={e=>setShare(e.target.checked)}/>Udostępniaj mój numer telefonu członkom moich grup</label>
++  <p>Dotyczy wyłącznie aktualnych członków wspólnych aktywnych grup. Wyłączenie lub usunięcie numeru blokuje jego kolejne odczyty; nie usuwa kopii wcześniej zapisanych przez odbiorców.</p>
+   <label>Obecne hasło do zmiany telefonu<input type="password" autoComplete="current-password" maxLength={128} value={password} disabled={binding.saving} onChange={e=>setPassword(e.target.value)}/></label>
+   {error&&<p role="alert">{error}</p>}
+   <div className="slm-identity-actions"><button type="submit" disabled={binding.saving}>Zmień telefon</button><button type="button" disabled={binding.saving} onClick={onClose}>Anuluj zmianę telefonu</button></div>
+  </form>;
+ }
++
++export function AccountDeletion({binding}:{binding:PersonalProfileBinding}){
++ const [open,setOpen]=useState(false),[password,setPassword]=useState(''),[confirmation,setConfirmation]=useState(''),[busy,setBusy]=useState(false),[pending,setPending]=useState(false),[error,setError]=useState('');
++ const flight=useRef(false),ticket=useRef<{operation_id:string;proof:string}|null>(null);
++ if(!binding.deleteAccount)return null;
++ if(!open)return <button type="button" onClick={()=>setOpen(true)}>Usuń konto</button>;
++ return <form className="slm-identity-editor slm-premium-identity" aria-label="Usuwanie konta" onSubmit={async e=>{
++  e.preventDefault();if(flight.current)return;setError('');
++  if(!pending&&(!password||confirmation!=='USUŃ KONTO')){setError('Podaj obecne hasło i wpisz USUŃ KONTO.');return;}
++  if(!ticket.current)ticket.current={operation_id:crypto.randomUUID(),proof:Array.from(crypto.getRandomValues(new Uint8Array(32)),v=>v.toString(16).padStart(2,'0')).join('')};
++  flight.current=true;setBusy(true);const proof=password;setPassword('');
++  try{await binding.deleteAccount!(proof,confirmation,ticket.current,pending);}
++  catch(ex){
++   const code=ex instanceof Error&&'code' in ex&&typeof ex.code==='string'?ex.code:'';
++   if(['group_transfer_required','invalid_credentials','deletion_confirmation','deletion_invalid'].includes(code)){
++    setPending(false);setError(code==='group_transfer_required'?'Przekaż administratora grupy innemu aktywnemu członkowi w ustawieniach grupy i spróbuj ponownie.':code==='deletion_invalid'?'Operacja nie została rozpoczęta. Potwierdź ją ponownie hasłem.':'Sprawdź hasło i potwierdzenie.');
++   }else{setPending(true);setError('Nie potwierdzono zakończenia usuwania. Konto może już być zablokowane. Ponów sprawdzenie; nie zamykaj tej strony.');}
++  }finally{flight.current=false;setBusy(false);}
++ }}>
++ <h2>Usuń konto</h2><p>Operacja jest nieodwracalna. Usuniemy konto logowania, profil, telefon, zdjęcia i członkostwa. Pozostaną wyłącznie zredagowane fakty historyczne potrzebne dla integralności rozliczeń i meczów. Grupa z innymi członkami wymaga wcześniejszego przekazania administratora; Twoje grupy jednoosobowe zostaną zamknięte.</p>
++ {!pending&&<><label>Obecne hasło do usunięcia konta<input type="password" autoComplete="current-password" value={password} disabled={busy} onChange={e=>setPassword(e.target.value)}/></label><label>Wpisz USUŃ KONTO<input value={confirmation} disabled={busy} onChange={e=>setConfirmation(e.target.value)}/></label></>}
++ {error&&<p role="alert">{error}</p>}{busy&&<p role="status">Trwa sprawdzanie operacji…</p>}
++ <button type="submit" disabled={busy}>{pending?'Ponów sprawdzenie usuwania':'Nieodwracalnie usuń moje konto'}</button>
++ {!pending&&<button type="button" disabled={busy} onClick={()=>{setOpen(false);setPassword('');setConfirmation('');}}>Anuluj usunięcie</button>}
++ </form>;
++}
+diff --git a/app/supabase/functions/accounts/handler.ts b/app/supabase/functions/accounts/handler.ts
+index 472d5b3..76cd6ea 100644
+--- a/app/supabase/functions/accounts/handler.ts
++++ b/app/supabase/functions/accounts/handler.ts
+@@ -3,6 +3,8 @@ import { PhotoError, profilePhoto, readAccountBody } from './profilePhotos.ts';
+ import { emailAction, EmailFlowError } from './emailFlows.ts';
+ import { sendEmailHook } from './emailHook.ts';
+ import { sendSmtp } from './smtp.ts';
++import {privatePhones,deletionProof,finishDeletion} from './accountPrivacy.ts';
++import type {DeletionJob,DeletionDependencies} from './accountPrivacy.ts';
+ import type {ConnectSmtp,SmtpSettings} from './smtp.ts';
+ export interface Environment { url: string; anon: string; service: string; origins: string[]; emailSignupEnabled?: boolean; emailRedirectUrl?:string; emailHookSecret?:string; smtp?:Partial<SmtpSettings>; connectSmtp?:ConnectSmtp }
+ type Row = Record<string, unknown>;
+@@ -65,6 +67,41 @@ export function createHandler(env: Environment) {
+     return r.data;
+   }
+   const rpc = (name: string, body: Row) => db('rpc/slm_account_' + name, 'POST', body);
++  async function privacyRpc(name:string,body:Row){
++    const r=await call('/rest/v1/rpc/slm_'+name,'POST',body,undefined,true);
++    if(!r.ok){
++      const code=String(r.data?.message??'');
++      if(code==='group_transfer_required')throw new ApiError(409,code,'Najpierw przekaż zarządzanie grupami innemu aktywnemu członkowi w ustawieniach grupy. Grupa z innymi członkami nie może pozostać bez administratora.');
++      if(code==='deletion_invalid')throw new ApiError(403,code,'Nieprawidłowe potwierdzenie operacji usuwania.');
++      if(code==='deletion_busy')throw new ApiError(409,code,'Usuwanie trwa. Ponów sprawdzenie za chwilę.');
++      throw new ApiError(503,'deletion_pending','Nie potwierdzono zakończenia operacji. Ponów sprawdzenie z tym samym identyfikatorem.');
++    }return r.data;
++  }
++  const deletion:DeletionDependencies={
++    step:async(operation,proof,step,lease)=>await privacyRpc('deletion_step',{p_operation:operation,p_proof:proof,p_step:step,p_lease:lease}) as DeletionJob,
++    async removePhotos(user){
++      // Always list from offset zero after deletion, including old orphan files.
++      for(let page=0;page<100;page++){
++        const listed=await call('/storage/v1/object/list/slm-profile-photos','POST',{prefix:user+'/',limit:100,offset:0},undefined,true);
++        if(!listed.ok||!Array.isArray(listed.data))throw new ApiError(503,'deletion_pending','Nie potwierdzono usunięcia zdjęć. Ponów operację.');
++        if(!listed.data.length)return;
++        const paths=listed.data.map((item:Row)=>user+'/'+item.name);
++        const removed=await call('/storage/v1/object/slm-profile-photos','DELETE',{prefixes:paths},undefined,true);
++        if(!removed.ok)throw new ApiError(503,'deletion_pending','Nie potwierdzono usunięcia zdjęć. Ponów operację.');
++      }throw new ApiError(503,'deletion_pending','Usuwanie zdjęć wymaga kolejnego przebiegu.');
++    },
++    async deleteAuth(user){
++      const r=await call('/auth/v1/admin/users/'+user,'DELETE',undefined,undefined,true);
++      if(!r.ok&&r.status!==404)throw new ApiError(503,'deletion_pending','Nie potwierdzono usunięcia konta Auth. Ponów sprawdzenie.');
++      const check=await call('/auth/v1/admin/users/'+user,'GET',undefined,undefined,true);
++      if(check.status!==404)throw new ApiError(503,'deletion_pending','Auth nie potwierdził usunięcia konta.');
++    },
++    async notify(operation,date){
++      if(!env.connectSmtp)throw Error('mail_unconfigured');
++      await sendSmtp(env.smtp??{},{to:'activehub.dev@gmail.com',subject:'SLM — usunięto konto użytkownika',id:'delete-'+operation,
++        text:`Data i godzina (UTC): ${date}\nIdentyfikator operacji: ${operation}\nUsuwanie konta zakończone i potwierdzone.\nZachowano zredagowane fakty historyczne meczów i rozliczeń potrzebne dla integralności ewidencji; bez bezpośrednich danych konta.`},env.connectSmtp);
++    },
++  };
+   async function rate(key: string, limit: number, seconds = 60) {
+     const hash = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(key))))
+       .map(x => x.toString(16).padStart(2, '0')).join('');
+@@ -125,7 +162,7 @@ export function createHandler(env: Environment) {
+     const [a, profiles, players] = await Promise.all([alias(id), db(`slm_profiles?user_id=eq.${id}`), db(`slm_player_profiles?user_id=eq.${id}&select=jersey_number,nickname`)]);
+     const p = profiles[0];
+     if (!p) throw unauthorized();
+-    return { user_id: id, jersey_number: players[0]?.jersey_number ?? null, login: a.login, phone: a.phone, email_account: a.email_account === true, full_name: p.full_name,
++    return { user_id: id, share_phone:p.share_phone===true, jersey_number: players[0]?.jersey_number ?? null, login: a.login, phone: a.phone??'', email_account: a.email_account === true, full_name: p.full_name,
+       nickname: players[0]?.nickname || (a.login.includes('@')?'Zawodnik':a.login), first_name: p.first_name??'',
+       group_scope: await db(`slm_group_members?user_id=eq.${id}&select=group_id,share_full_name,share_first_name,slm_groups!inner(archived)&slm_groups.archived=eq.false`),
+       display_as: p.display_as, display_name: p.display_as==='first_name'?(p.first_name?.trim()||players[0]?.nickname||'Zawodnik'):displayName(players[0]?.nickname||a.login, p.full_name, p.display_as) };
+@@ -157,7 +194,12 @@ export function createHandler(env: Environment) {
+       'Vary': 'Origin', 'Access-Control-Allow-Headers': 'authorization, apikey, content-type, x-client-info',
+       'Access-Control-Allow-Methods': 'POST, OPTIONS' };
+     if (origin && env.origins.includes(origin)) headers['Access-Control-Allow-Origin'] = origin;
+-    const respond = (data: unknown, status = 200) => new Response(JSON.stringify(data), { status, headers });
++    let viewer:string|null=null;
++    const respond = async(data: unknown, status = 200) => {
++      try{return new Response(JSON.stringify(await privatePhones(data,viewer,async ids=>
++        await db('rpc/slm_phone_visibility','POST',{p_viewer:viewer,p_targets:ids}))), { status, headers });}
++      catch{return new Response(JSON.stringify({code:'service_unavailable',error:'Nie można potwierdzić dostępu do danych. Spróbuj ponownie.'}),{status:503,headers});}
++    };
+     if (origin && !env.origins.includes(origin)) return respond({ error: 'Niedozwolony adres aplikacji.' }, 403);
+     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers });
+     if (request.method !== 'POST') return respond({ error: 'Niedozwolona metoda.' }, 405);
+@@ -181,6 +223,18 @@ export function createHandler(env: Environment) {
+       const action = field(body, 'action', 40);
+       if(uploadRequest&&action!=='profile_photo_upload')throw new ApiError(400,'invalid_input','Nieprawidłowe żądanie.');
+       await rate('global', 300);
++      if(action==='account_privacy_worker'){
++        if(origin||request.headers.get('authorization')!==`Bearer ${env.service}`||!env.service)throw unauthorized();
++        const jobs=await privacyRpc('deletion_work',{});
++        let finished=0;
++        for(const job of jobs){try{await finishDeletion(job.operation_id,null,deletion);finished++;}catch{/* Durable retry/backoff. */}}
++        return respond({processed:finished});
++      }
++      if(action==='account_delete_resume'){
++        await rate('deletion-resume',12);
++        let ticket;try{ticket=deletionProof(body);}catch{throw new ApiError(400,'deletion_invalid','Nieprawidłowa operacja usuwania.');}
++        return respond(await finishDeletion(ticket.operation,ticket.proof,deletion));
++      }
+       const emailResult=await emailAction(action,body,env,{call,db,state,verify,accept,rejectSession,rate});
+       if(emailResult)return respond(emailResult);
+       if (action === 'login') {
+@@ -249,9 +303,26 @@ export function createHandler(env: Environment) {
+         return respond({ ok: true });
+       }
+       const ctx = uploadContext ?? await context(token);
++      viewer=ctx.id;
+       if (action === 'status') return respond({ must_change_password: ctx.must_change_password, role: ctx.role, user_id: ctx.id });
+       if (ctx.must_change_password && action !== 'password')
+         throw new ApiError(403, 'password_required', 'Najpierw zmień hasło tymczasowe.');
++      if(action==='save_contact_phone'){
++        await rate('sensitive:'+ctx.id,8);
++        const a=await verifyPassword(ctx,password(body,'current_password'));
++        const raw=field(body,'phone',32).trim(),phone=raw?normalizePhone(raw,a.phone as string):'';
++        if(typeof body.share_phone!=='boolean')throw new ApiError(400,'invalid_input','Potwierdź ustawienie widoczności numeru.');
++        await privacyRpc('phone_save',{p_user:ctx.id,p_session:ctx.sid,p_phone:phone,p_share:body.share_phone});
++        return respond(await profile(ctx.id));
++      }
++      if(action==='account_delete'){
++        await rate('sensitive:'+ctx.id,4);
++        if(body.confirmation!=='USUŃ KONTO')throw new ApiError(400,'deletion_confirmation','Wpisz USUŃ KONTO, aby potwierdzić usunięcie.');
++        await verifyPassword(ctx,password(body,'current_password'));
++        let ticket;try{ticket=deletionProof(body);}catch{throw new ApiError(400,'deletion_invalid','Nieprawidłowa operacja usuwania.');}
++        await privacyRpc('deletion_begin',{p_user:ctx.id,p_session:ctx.sid,p_operation:ticket.operation,p_proof:ticket.proof});
++        return respond(await finishDeletion(ticket.operation,ticket.proof,deletion));
++      }
+       if (['profile_photo_get','profile_photo_upload','profile_photo_delete'].includes(action)) {
+         if(!uploadRequest)await rate('photo:'+ctx.id,action==='profile_photo_get'?60:10);
+         return respond(await profilePhoto(env,ctx,action,body));
+@@ -508,7 +579,8 @@ export function createHandler(env: Environment) {
+         const login = action === 'identifiers' ? normalizeLogin(field(body, 'login')) : null;
+         const a = await verifyPassword(ctx, current);
+         if (action === 'identifiers' && a.email_account === true) throw new ApiError(400, 'legacy_only', 'Konto e-mail nie używa aliasów logowania legacy.');
+-        const phone = action === 'identifiers' ? normalizePhone(field(body, 'phone'), a.phone as string) : null;
++        const rawIdentifierPhone=action==='identifiers'?field(body,'phone').trim():'';
++        const phone = action === 'identifiers'&&rawIdentifierPhone ? normalizePhone(rawIdentifierPhone, a.phone as string) : null;
+         if (action === 'identifiers') {
+           const conflicts = await db(`slm_aliases?or=(login_normalized.eq.${encodeURIComponent(login!.toLowerCase())},phone.eq.${encodeURIComponent(phone!)})`);
+           const contacts = await db(`slm_player_profiles?contact_phone=eq.${encodeURIComponent(phone!)}&select=user_id`);
