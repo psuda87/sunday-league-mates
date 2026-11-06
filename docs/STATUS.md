@@ -1,3 +1,20 @@
+# Grupy — odbiór UX, 2026-11-06
+
+`feat/groups-ux-acceptance`, implementacja `3596de1`, push wykonany.
+Uzupełnione 7 punktów: popup, zgłoszenia, panele, przycisk grup, wyniki,
+dzwonek administratora i licznik zarządzania; nicki z atomowym ograniczeniem SQL.
+PASS: build LIVE/Premium, TypeScript, lint, Edge typecheck, 524 Vitest,
+4 mobilne Cypress z fikcyjnym API, 48 lokalnych migracji i SQL/RLS/uprawnienia,
+race rejestracji nicku, diff --check. Oględziny zrzutów mobilnych; bez telefonu/APK.
+FAIL: verify:consolidation (lista migracji) i verify-frozen-ui (GroupScreens).
+Strażników nie zmieniono: wymagany osobny przegląd właściciela. Brak pełnego PASS.
+Cloud tylko odczyt schematu/RLS; zero wdrożonych migracji/Edge Functions,
+bez resetu, Vercel i merge. Testy SQL w tymczasowej bazie slm-main-stabilization.
+Następny krok: przegląd chronionych zmian i strażników, ponowny odbiór.
+Pełna tabela 7 punktów, wyniki i ograniczenia: [raport](GROUPS_UX_ACCEPTANCE_REPORT.md).
+
+---
+
 # APK Premium odpowiadające Vercel62baac5
 
 2026-11-05, `feat/premium-legal-pages`, wejściowy HEAD dokumentacyjny `b46fd11`;
