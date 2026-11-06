@@ -92,3 +92,13 @@ describe('email accounts (kontrolowany transport GoTrue/RPC, nie Cloud)',()=>{
   for(const p of [{nickname:'<admin>'},{nickname:'',jerseyNumber:7},{nickname:'Valid',jerseyNumber:100},{nickname:'Valid',phone:'foreign'}])expect(()=>signupProfile({profile:{fullName:'',phone:'',...p}})).toThrow();
  });
 });
+
+it('rejects an occupied nickname before signup and after a concurrent signup wins',async()=>{
+ const profile={nickname:'CaseNick',fullName:'',phone:''},body={email:'fixture@example.invalid',password:'Fixture-password',profile,accept_policies:true};
+ const env={emailSignupEnabled:true,emailRedirectUrl:'https://fixture.invalid/auth/callback',origins:['https://fixture.invalid']};
+ const call=vi.fn(async()=>({ok:false,status:500,data:{}}));
+ const d={call,db:vi.fn().mockResolvedValue(false),rate:vi.fn(async()=>{})} as unknown as EmailDependencies;
+ await expect(emailAction('signup',body,env,d)).rejects.toMatchObject({code:'nickname_taken',status:409});expect(call).not.toHaveBeenCalled();
+ vi.mocked(d.db).mockResolvedValueOnce(true).mockResolvedValueOnce(false);
+ await expect(emailAction('signup',body,env,d)).rejects.toMatchObject({code:'nickname_taken',status:409});expect(call).toHaveBeenCalledOnce();
+});

@@ -61,6 +61,7 @@ export function createHandler(env: Environment) {
     if (!r.ok) {
       if (r.status >= 500) throw new ApiError(503, 'service_unavailable', 'Serwer jest chwilowo niedostępny. Spróbuj ponownie.');
       if (r.status === 429) throw new ApiError(429, 'rate_limited', 'Zbyt wiele prób. Spróbuj ponownie za minutę.');
+      if(r.data?.code==='23505'&&/nickname/i.test(String(r.data?.message)))throw new ApiError(409,'nickname_taken','Ten pseudonim jest już zajęty. Wybierz inny.');
       if (r.data?.code === '23505') throw new ApiError(409, 'identifier_taken', 'Login lub numer telefonu jest już zajęty.');
       throw new ApiError(409, 'operation_failed', 'Operacja nie została zakończona. Skontaktuj się z administratorem.');
     }
@@ -564,6 +565,7 @@ export function createHandler(env: Environment) {
       if (action === 'save_premium_profile') {
         await rate('scoped:' + ctx.id,90);
         const r = await call('/rest/v1/rpc/slm_premium_profile_save','POST',{p_user:ctx.id,p_session:ctx.sid,p_body:body},undefined,true);
+        if(!r.ok&&r.data?.code==='23505'&&/nickname/i.test(String(r.data?.message)))throw new ApiError(409,'nickname_taken','Ten pseudonim jest już zajęty. Wybierz inny.');
         if(!r.ok)throw new ApiError(409,'profile_not_saved','Nie potwierdzono zapisu. Odśwież profil i sprawdź dane oraz zakres zgody.');
         return respond(await profile(ctx.id));
       }
