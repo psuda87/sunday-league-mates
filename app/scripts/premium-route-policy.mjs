@@ -66,7 +66,18 @@ export const PRIVACY_MIGRATION='app/supabase/migrations/20261104183413_account_p
 export const PRIVACY_FILES=new Set(["app/cypress/e2e/account-privacy.cy.ts", "app/public/polityka-prywatnosci/index.html", "app/public/regulamin/index.html", "app/scripts/test-account-privacy-local.py", "app/src/auth/profileAdapter.test.tsx", "app/src/auth/profileAdapter.ts", "app/src/auth/useOwnProfile.ts", "app/src/demo/Profile.tsx", "app/src/profile/AccountDeletion.test.tsx", "app/src/profile/PhoneEditor.test.tsx", "app/src/profile/PhoneEditor.tsx", "app/src/ui/personalProfile.ts", "app/supabase/account-privacy-worker.sql", "app/supabase/functions/accounts/accountPrivacy.test.ts", "app/supabase/functions/accounts/accountPrivacy.ts", "app/supabase/functions/accounts/handler.ts", "app/supabase/functions/accounts/privacyHandler.test.ts", "app/supabase/functions/accounts/profilePhotos.test.ts", "app/supabase/functions/accounts/profilePhotos.ts", "app/supabase/migrations/20261104183413_account_privacy_lifecycle.sql", "app/supabase/tests/account_privacy.sql"]);
 export const RESUME_SOURCE='2416945ff5dc5994dce35877e52ec401aafc8550';
 export const RESUME_FILES=new Set(['app/src/auth/sessionManager.ts','app/src/auth/useB1Lifecycle.ts','app/src/auth/B1App.test.tsx','app/src/auth/sessionResume.test.tsx']);
-export const authSource=(path,fallback)=>RESUME_FILES.has(path)?RESUME_SOURCE:PRIVACY_FILES.has(path)?PRIVACY_SOURCE:AUTH_WEB_FILES.has(path)?AUTH_WEB_SOURCE:fallback;
+
+// Owner approval 2026-11-06: preserve the PR37 baseline and the reviewed seven
+// groups fixes. Exact immutable Git objects; no editable hash can approve itself.
+export const GROUPS_SOURCE='3596de1';
+export const PR37_SOURCE='c27a84f';
+export const GROUPS_MIGRATION='app/supabase/migrations/20261106220609_groups_nickname_uniqueness.sql';
+export const PAYMENT_MIGRATION='app/supabase/migrations/20261105220005_payment_workflow.sql';
+export const GROUPS_FILES=new Set(["app/cypress/e2e/groups-acceptance.cy.ts", "app/scripts/test-groups-nicknames-local.py", "app/src/auth/useOwnProfile.ts", "app/src/demo/GroupScreens.tsx", "app/src/events/PremiumEvents.tsx", "app/src/events/PremiumScrollHeader.tsx", "app/src/groups/GroupControls.css", "app/src/groups/GroupNotifications.test.tsx", "app/src/groups/GroupNotifications.tsx", "app/supabase/functions/accounts/emailFlows.test.ts", "app/supabase/functions/accounts/emailFlows.ts", "app/supabase/functions/accounts/handler.ts", "app/supabase/migrations/20261106220609_groups_nickname_uniqueness.sql", "app/supabase/tests/groups_acceptance.sql", "app/supabase/tests/groups_nicknames.sql"]);
+const PR37_FILES=new Set(["app/src/demo/Profile.tsx", "app/src/ui/personalProfile.ts", "app/src/finance/PremiumFinance.tsx", "app/src/finance/premiumFinance.css", "app/src/events/premiumEvents.css", "app/src/auth/useB1Lifecycle.ts", "app/src/auth/B1App.test.tsx", "app/src/auth/nativeResume.test.tsx", "app/supabase/migrations/20261105220005_payment_workflow.sql"]);
+export const reviewedSource=(path,fallback)=>GROUPS_FILES.has(path)?GROUPS_SOURCE:PR37_FILES.has(path)?PR37_SOURCE:fallback;
+
+export const authSource=(path,fallback)=>reviewedSource(path,RESUME_FILES.has(path)?RESUME_SOURCE:PRIVACY_FILES.has(path)?PRIVACY_SOURCE:AUTH_WEB_FILES.has(path)?AUTH_WEB_SOURCE:fallback);
 const polishUi=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/premiumEvents.css','app/src/events/GuestForm.tsx']);
 const discoveryUi=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/usePremiumEvents.ts','app/src/events/premiumContracts.ts']);
 const lineupStage1=new Set(['app/src/events/PremiumEvents.tsx','app/src/events/PremiumTeams.tsx','app/src/events/lineupEditor.ts','app/src/events/LineupPlayerProfile.tsx']);
@@ -89,20 +100,23 @@ export function verifyPremiumRuntime(root,overrides={}){
   const current=original.files[path].text?read(path):Object.hasOwn(overrides,path)?overrides[path]:readFileSync(root+'/'+path);
   const expected=digest(raw);
   assert.equal(manifest.files[path].sha256,expected,'Unapproved contract hash: '+path);
-  assert.equal(digest(current),path==='app/src/demo/Profile.tsx'?digest(git(PRIVACY_SOURCE,path)):path===AUTH_WEB_PRESENTATION?digest(git(authSource(path,AUTH_WEB_SOURCE),path)):path==='app/src/demo/EventForm.tsx'?digest(git(MINIMUM_PHONE_SOURCE,path)):expected,'Unapproved visual source: '+path);
+  assert.equal(digest(current),GROUPS_FILES.has(path)||PR37_FILES.has(path)?digest(git(reviewedSource(path,null),path)):path==='app/src/demo/Profile.tsx'?digest(git(reviewedSource(path,PRIVACY_SOURCE),path)):path===AUTH_WEB_PRESENTATION?digest(git(reviewedSource(path,authSource(path,AUTH_WEB_SOURCE)),path)):path==='app/src/demo/EventForm.tsx'?digest(git(reviewedSource(path,MINIMUM_PHONE_SOURCE),path)):expected,'Unapproved visual source: '+path);
  }
  assert.deepEqual([...PRIVACY_FILES].sort(),JSON.parse(git(PRIVACY_SOURCE,'docs/review/account-privacy-manifest.json')).files.map(r=>r.path).sort(),'Approved privacy inventory changed');
  assert.deepEqual([...RESUME_FILES].sort(),execFileSync('git',['diff-tree','--no-commit-id','--name-only','-r',RESUME_SOURCE,'--','app'],{cwd:root,encoding:'utf8'}).trim().split('\n').sort(),'Approved resume inventory changed');
- for(const path of RESUME_FILES)assert.equal(digest(read(path)),digest(git(RESUME_SOURCE,path)),'Unreviewed resume source: '+path);
- for(const path of PRIVACY_FILES)assert.equal(digest(read(path)),digest(git(PRIVACY_SOURCE,path)),'Unreviewed privacy source: '+path);
+ assert.deepEqual([...GROUPS_FILES].sort(),execFileSync('git',['diff','--name-only',PR37_SOURCE+'..'+GROUPS_SOURCE,'--','app'],{cwd:root,encoding:'utf8'}).trim().split('\n').sort(),'Reviewed groups inventory changed');
+ for(const path of GROUPS_FILES)assert.equal(digest(read(path)),digest(git(GROUPS_SOURCE,path)),'Unreviewed groups acceptance source: '+path);
+ assert.equal(digest(read(PAYMENT_MIGRATION)),digest(git(PR37_SOURCE,PAYMENT_MIGRATION)),'Unreviewed existing payment migration');
+ for(const path of RESUME_FILES)assert.equal(digest(read(path)),digest(git(reviewedSource(path,RESUME_SOURCE),path)),'Unreviewed resume source: '+path);
+ for(const path of PRIVACY_FILES)assert.equal(digest(read(path)),digest(git(reviewedSource(path,PRIVACY_SOURCE),path)),'Unreviewed privacy source: '+path);
  // Newly approved files are pinned to fixed Git objects, including tests/build/CSP.
- for(const path of AUTH_WEB_FILES)assert.equal(digest(read(path)),digest(git(authSource(path,AUTH_WEB_SOURCE),path)),'Unreviewed real Auth source: '+path);
+ for(const path of AUTH_WEB_FILES)assert.equal(digest(read(path)),digest(git(reviewedSource(path,authSource(path,AUTH_WEB_SOURCE)),path)),'Unreviewed real Auth source: '+path);
  // The historical minimum control keeps exactly its prior field exception.
  const form=git(MINIMUM_PHONE_SOURCE,'app/src/demo/EventForm.tsx');
  assert.equal(form.replace("{field('minimum','Minimum zawodników','number',{min:1,max:100,step:1})}","{live?<p>Minimum zawodników: 10</p>:field('minimum','Minimum zawodników','number',{min:1,step:1})}"),git(APPROVED,'app/src/demo/EventForm.tsx'),'Minimum form exception exceeded its exact field');
  const mainSteps=execFileSync('git',['ls-tree','-r','--name-only',MAIN,'--','app/supabase/migrations'],{cwd:root,encoding:'utf8'}).trim().split('\n');
  const added=['20261028174603_premium_match_membership_visibility.sql','20261028174920_premium_member_creation_finance_guard.sql','20261028175508_premium_match_feed_filters.sql','20261028181054_premium_group_admin_only_finance.sql'].map(n=>'app/supabase/migrations/'+n);
- assert.deepEqual(readdirSync(root+'/app/supabase/migrations').filter(n=>n.endsWith('.sql')).sort(),[...mainSteps,...added,'app/supabase/migrations/20261028204500_restore_pr16_match_name_projection.sql',LINEUPS_MIGRATION,DISCOVERY_MIGRATION,MINIMUM_MIGRATION,ADMIN_MIGRATION,AUTH_WEB_MIGRATION,PRIVACY_MIGRATION].map(p=>p.split('/').at(-1)).sort(),'Unexpected migration/model activation');
+ assert.deepEqual(readdirSync(root+'/app/supabase/migrations').filter(n=>n.endsWith('.sql')).sort(),[...mainSteps,...added,'app/supabase/migrations/20261028204500_restore_pr16_match_name_projection.sql',LINEUPS_MIGRATION,DISCOVERY_MIGRATION,MINIMUM_MIGRATION,ADMIN_MIGRATION,AUTH_WEB_MIGRATION,PRIVACY_MIGRATION,PAYMENT_MIGRATION,GROUPS_MIGRATION].map(p=>p.split('/').at(-1)).sort(),'Unexpected migration/model activation');
  for(const p of [...mainSteps,...added])assert.equal(digest(read(p)),digest(git(added.includes(p)?APPROVED:MAIN,p)),'Historical migration overwritten: '+p);
  assert.equal(digest(read(LINEUPS_MIGRATION)),digest(git(LINEUPS_STAGE2A,LINEUPS_MIGRATION)),'Unreviewed Stage 2A backend source: '+LINEUPS_MIGRATION);
  for(const p of [DISCOVERY_MIGRATION,'app/supabase/functions/accounts/handler.ts',MINIMUM_MIGRATION])
@@ -133,11 +147,11 @@ export function verifyPremiumRuntime(root,overrides={}){
  }
  // These reviewed controllers are part of the approved runtime, not spare files next to a replacement.
  for(const path of ['app/src/events/PremiumWorld.tsx','app/src/events/PremiumEvents.tsx','app/src/events/PremiumTeams.tsx','app/src/events/PremiumScrollHeader.tsx','app/src/ui/PremiumPitch.tsx','app/src/finance/PremiumFinance.tsx','app/src/finance/premiumFinance.css','app/src/events/premiumEvents.css','app/src/events/lineupEditor.ts','app/src/events/LineupPlayerProfile.tsx','app/src/events/lineupContracts.ts','app/src/events/usePremiumLineup.ts'])
-  assert.equal(digest(read(path)),digest(git(STABILIZATION_RUNTIME.has(path)?STABILIZATION_SOURCE:MINIMUM_PHONE_RUNTIME.has(path)?MINIMUM_PHONE_SOURCE:polishUi.has(path)?POLISH_UI:discoveryUi.has(path)?DISCOVERY_UI:lineupStage2b.has(path)?LINEUPS_STAGE2B:lineupStage1.has(path)?LINEUP_STAGE1:APPROVED,path)),'Approved runtime replaced/condition changed: '+path);
- for(const path of discoveryUi)assert.equal(digest(read(path)),digest(git(STABILIZATION_RUNTIME.has(path)?STABILIZATION_SOURCE:MINIMUM_PHONE_RUNTIME.has(path)?MINIMUM_PHONE_SOURCE:polishUi.has(path)?POLISH_UI:DISCOVERY_UI,path)),'Unreviewed discovery UI: '+path);
- for(const path of polishUi)assert.equal(digest(read(path)),digest(git(STABILIZATION_RUNTIME.has(path)?STABILIZATION_SOURCE:MINIMUM_PHONE_RUNTIME.has(path)?MINIMUM_PHONE_SOURCE:POLISH_UI,path)),'Unreviewed PR31 control: '+path);
+  assert.equal(digest(read(path)),digest(git(reviewedSource(path,STABILIZATION_RUNTIME.has(path)?STABILIZATION_SOURCE:MINIMUM_PHONE_RUNTIME.has(path)?MINIMUM_PHONE_SOURCE:polishUi.has(path)?POLISH_UI:discoveryUi.has(path)?DISCOVERY_UI:lineupStage2b.has(path)?LINEUPS_STAGE2B:lineupStage1.has(path)?LINEUP_STAGE1:APPROVED),path)),'Approved runtime replaced/condition changed: '+path);
+ for(const path of discoveryUi)assert.equal(digest(read(path)),digest(git(reviewedSource(path,STABILIZATION_RUNTIME.has(path)?STABILIZATION_SOURCE:MINIMUM_PHONE_RUNTIME.has(path)?MINIMUM_PHONE_SOURCE:polishUi.has(path)?POLISH_UI:DISCOVERY_UI),path)),'Unreviewed discovery UI: '+path);
+ for(const path of polishUi)assert.equal(digest(read(path)),digest(git(reviewedSource(path,STABILIZATION_RUNTIME.has(path)?STABILIZATION_SOURCE:MINIMUM_PHONE_RUNTIME.has(path)?MINIMUM_PHONE_SOURCE:POLISH_UI),path)),'Unreviewed PR31 control: '+path);
  for(const path of ['app/android/app/src/main/java/pl/psuda87/slm/MainActivity.java','app/android/app/src/main/java/pl/psuda87/slm/SlmWindowInsets.java','app/android/app/src/androidTest/java/pl/psuda87/slm/SlmWindowInsetsTest.java'])
-  assert.equal(digest(read(path)),digest(git(STABILIZATION_RUNTIME.has(path)?STABILIZATION_SOURCE:POLISH_ANDROID,path)),'Unreviewed PR31 native source: '+path);
+  assert.equal(digest(read(path)),digest(git(reviewedSource(path,STABILIZATION_RUNTIME.has(path)?STABILIZATION_SOURCE:POLISH_ANDROID),path)),'Unreviewed PR31 native source: '+path);
  assert.equal(digest(read('app/src/groups/PremiumGroups.tsx')),digest(git(STABILIZATION_SOURCE,'app/src/groups/PremiumGroups.tsx')),'Group UI wrapper replaced');
  const old=git(MAIN,'app/src/auth/B1App.tsx');
  const expected=old.replace("import WorldApp from '../demo/App';","import WorldApp from '../events/PremiumWorld';").replace("<WorldApp key={owner??'none'}","<WorldApp key={owner??'none'} manager={manager} userId={owner??''}");
@@ -148,9 +162,9 @@ export function verifyPremiumRuntime(root,overrides={}){
  assert.match(read('app/android-stage3/index.html'),/src=\"\.\/main\.tsx\"/,'Android HTML entry changed');
  assert.match(read('app/b1/index.html'),/src=\"\.\/main\.tsx\"/,'Premium HTML entry changed');
  for(const path of ['app/capacitor.config.ts','app/vite.android-stage3.config.ts','app/vite.premium-finance-local.config.ts','app/android-stage3/index.html'])
-  assert.equal(digest(read(path)),digest(git(STABILIZATION_RUNTIME.has(path)?STABILIZATION_SOURCE:APPROVED,path)),'Build/entry configuration changed: '+path);
+  assert.equal(digest(read(path)),digest(git(reviewedSource(path,STABILIZATION_RUNTIME.has(path)?STABILIZATION_SOURCE:APPROVED),path)),'Build/entry configuration changed: '+path);
  for(const path of ['app/vite.config.ts','app/vite.b1.config.ts','app/vite.live-local.config.ts','app/index.html','app/b1/index.html','app/b1/main.tsx','app/src/main.tsx'])
-  assert.equal(digest(read(path)),digest(git(MAIN,path)),'Existing entry configuration changed: '+path);
+  assert.equal(digest(read(path)),digest(git(reviewedSource(path,MAIN),path)),'Existing entry configuration changed: '+path);
  const android=git(APPROVED,'app/android-stage3/main.tsx').replace(' accountModel={false}','');
  assert.equal(digest(read('app/android-stage3/main.tsx')),digest(android),'Android render condition changed');
  const configs=readdirSync(root+'/app').filter(p=>/^vite\..*config\.ts$/.test(p)).sort();

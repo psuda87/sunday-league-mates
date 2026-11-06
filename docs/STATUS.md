@@ -1,3 +1,16 @@
+# Grupy — PASS przed publikacją, 2026-11-06
+
+`feat/groups-ux-acceptance`. Zgoda właściciela na przegląd strażników, Cloud i Vercel po PASS.
+PASS: oba strażniki, 107 testów ich odporności, 524 Vitest, 4 mobilne Cypress,
+TypeScript, lint, build Premium, Edge typecheck, lokalne SQL/RLS48 i test wyścigu.
+Cloud: tylko migracja nicków 20261106223406 i accounts18 (patch2 plików);
+CORS/SMTP/Brevo/Auth/sekrety zachowane. PASS signup race200/409, Gmail verify,
+login, rename/case change/konflikt409 oraz grupy/uprawnienia/liczniki.
+Vercel: publikacja przygotowana, wynik po kontroli. Bez merge do main.
+Pełna tabela7 i zachowane wcześniejsze wyniki: [raport](GROUPS_UX_ACCEPTANCE_REPORT.md).
+
+---
+
 # Grupy — odbiór UX, 2026-11-06
 
 `feat/groups-ux-acceptance`, implementacja `3596de1`, push wykonany.
