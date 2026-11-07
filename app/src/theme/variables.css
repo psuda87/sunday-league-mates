@@ -3963,9 +3963,9 @@ button.slm-group-card {
 }
 /* Personal photos: keep forehead and face opaque; fade only outer edges. */
 .slm-ultimate-portrait[data-layout="single"] {
-  mask-image:
-    linear-gradient(to bottom, transparent 0%, black 12%, black 85%, transparent 100%),
-    linear-gradient(to right, transparent 0%, black 18%, black 82%, transparent 100%);
+  mask-image: radial-gradient(ellipse 66% 64% at 50% 49%, black 55%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 66% 64% at 50% 49%, black 55%, transparent 100%);
+  mask-composite: add;
 }
 .slm-ultimate-portrait[data-layout="sheet"] > img {
   position: absolute;
