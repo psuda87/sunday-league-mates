@@ -4088,3 +4088,5 @@ button.slm-group-card {
 .slm-photo-crop-surface>img{position:absolute;max-width:none;transform:translate(-50%,-50%);pointer-events:none;user-select:none}
 .slm-photo-crop-guide{position:absolute;inset:12% 12%;border:1px dashed rgba(255,255,255,.55);pointer-events:none}
 .slm-photo-crop input[type="range"]{display:block;width:100%;margin:12px 0}
+
+.slm-photo-crop-surface::before{content:'';position:absolute;inset:-24px;background:inherit;filter:blur(18px) brightness(.65);pointer-events:none}
