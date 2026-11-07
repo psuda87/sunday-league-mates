@@ -20,7 +20,8 @@ export default function PhotoCropEditor({file,onCancel,onApply}:Props){
   try{
    const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;
    const ctx=canvas.getContext('2d');if(!ctx)throw Error('Brak obsługi kadrowania.');
-   // A blurred full-bleed copy fills exposed edges when zoomed out.\n   ctx.save();ctx.filter='blur(18px) brightness(0.65)';const bgScale=base*1.25;ctx.drawImage(image.current,(W-size.w*bgScale)/2,(H-size.h*bgScale)/2,size.w*bgScale,size.h*bgScale);ctx.restore();
+   // A blurred full-bleed copy fills exposed edges when zoomed out.
+   ctx.save();ctx.filter='blur(18px) brightness(0.65)';const bgScale=base*1.25;ctx.drawImage(image.current,(W-size.w*bgScale)/2,(H-size.h*bgScale)/2,size.w*bgScale,size.h*bgScale);ctx.restore();
    ctx.drawImage(image.current,(W-size.w*scale)/2+offset.x,(H-size.h*scale)/2+offset.y,size.w*scale,size.h*scale);
    const blob=await new Promise<Blob|null>(resolve=>canvas.toBlob(resolve,'image/png'));
    canvas.width=0;canvas.height=0;
