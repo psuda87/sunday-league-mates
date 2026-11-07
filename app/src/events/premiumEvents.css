@@ -197,3 +197,8 @@
  .slm-premium-events .slm-match-detail + .slm-detail-tabs {margin-top:8px;}
  .slm-premium-events .slm-detail-tabs [role="tablist"] {margin-top:0;}
 }
+
+/* Real participant details: only fields authorized by the match roster. */
+.slm-premium-events .slm-participant-profile-link {appearance:none;background:none;border:0;padding:0;margin:0;color:inherit;font:inherit;font-weight:inherit;text-align:left;text-decoration:underline;text-decoration-color:var(--slm-gold);text-underline-offset:3px;cursor:pointer;min-height:44px;}
+.slm-premium-events .slm-participant-profile-identity {display:flex;align-items:center;gap:12px;margin:12px 0;}
+.slm-premium-events .slm-participant-profile > button {min-height:44px;padding:8px 12px;border:1px solid var(--slm-gold);border-radius:10px;background:var(--slm-panel);color:var(--slm-gold);font:inherit;cursor:pointer;}
