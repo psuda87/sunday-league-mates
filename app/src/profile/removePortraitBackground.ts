@@ -1,38 +1,42 @@
-type Segmenter = {
-  onResults: (callback:(result:{segmentationMask:CanvasImageSource})=>void)=>void;
-  send:(input:{image:HTMLImageElement|HTMLCanvasElement})=>Promise<void>;
-  close:()=>void;
+// The model and runtime are copied to our own origin at build time. No photo leaves the device.
+type Mask={getAsUint8Array:()=>Uint8Array;close:()=>void};
+type SegmentResult={categoryMask?:Mask;close?:()=>void};
+type Segmenter={segment:(image:HTMLCanvasElement)=>SegmentResult;close:()=>void};
+type VisionModule={
+ FilesetResolver:{forVisionTasks:(url:string)=>Promise<unknown>};
+ ImageSegmenter:{createFromOptions:(fileset:unknown,options:unknown)=>Promise<Segmenter>};
 };
-declare global { interface Window { SelfieSegmentation?:new(config:{locateFile:(file:string)=>string})=>Segmenter } }
-const CDN='/mediapipe/selfie_segmentation/';
-let loader:Promise<void>|null=null;
-function loadModel():Promise<void>{
-  if(window.SelfieSegmentation)return Promise.resolve();
-  if(!loader)loader=new Promise<void>((resolve,reject)=>{
-    const script=document.createElement('script');
-    script.src=CDN+'selfie_segmentation.js';script.crossOrigin='anonymous';
-    script.onload=()=>window.SelfieSegmentation?resolve():reject(Error('Nie udało się uruchomić wycinania tła.'));
-    script.onerror=()=>reject(Error('Nie można pobrać modelu wycinania tła. Sprawdź połączenie.'));
-    document.head.appendChild(script);
-  }).catch(e=>{loader=null;throw e;});
-  return loader;
+const ROOT='/mediapipe/vision/';
+let modulePromise:Promise<VisionModule>|null=null;
+async function visionModule():Promise<VisionModule>{
+ if(!modulePromise){
+  const path=ROOT+'tasks-vision.mjs';
+  modulePromise=import(/* @vite-ignore */ path).then(m=>m as VisionModule).catch(error=>{modulePromise=null;throw error;});
+ }
+ return modulePromise;
 }
 export async function removePortraitBackground(image:HTMLCanvasElement):Promise<HTMLCanvasElement>{
-  await loadModel();
-  const SegmenterClass=window.SelfieSegmentation;
-  if(!SegmenterClass)throw Error('Model wycinania tła jest niedostępny.');
-  const segmenter=new SegmenterClass({locateFile:file=>CDN+file});
+ const {FilesetResolver,ImageSegmenter}=await visionModule();
+ const fileset=await FilesetResolver.forVisionTasks(ROOT);
+ const segmenter=await ImageSegmenter.createFromOptions(fileset,{
+  baseOptions:{modelAssetPath:ROOT+'selfie_segmenter.tflite',delegate:'CPU'},
+  runningMode:'IMAGE',
+  outputCategoryMask:true,
+  outputConfidenceMasks:false
+ });
+ try{
+  const result=segmenter.segment(image);
+  const mask=result.categoryMask;
+  if(!mask)throw Error('Nie udało się wyznaczyć sylwetki.');
+  const pixels=mask.getAsUint8Array();
   const canvas=document.createElement('canvas');canvas.width=image.width;canvas.height=image.height;
-  const ctx=canvas.getContext('2d');if(!ctx)throw Error('Brak obsługi przetwarzania zdjęć.');
-  try{
-    const mask=await new Promise<CanvasImageSource>((resolve,reject)=>{
-      segmenter.onResults(result=>resolve(result.segmentationMask));
-      segmenter.send({image}).catch(reject);
-    });
-    ctx.drawImage(image,0,0);
-    ctx.globalCompositeOperation='destination-in';
-    ctx.drawImage(mask,0,0,canvas.width,canvas.height);
-    ctx.globalCompositeOperation='source-over';
-    return canvas;
-  }finally{segmenter.close();}
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)throw Error('Brak obsługi przetwarzania zdjęć.');
+  ctx.drawImage(image,0,0);
+  const data=ctx.getImageData(0,0,canvas.width,canvas.height);
+  if(pixels.length!==canvas.width*canvas.height)throw Error('Nieprawidłowy rozmiar maski sylwetki.');
+  for(let i=0;i<pixels.length;i++)data.data[i*4+3]=pixels[i]===1?255:0;
+  ctx.putImageData(data,0,0);
+  result.close?.();
+  return canvas;
+ }finally{segmenter.close();}
 }
