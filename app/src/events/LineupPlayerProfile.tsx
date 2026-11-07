@@ -8,7 +8,7 @@ import {useFrozenBack} from '../native/frozenDemoAndroid';
 export interface LineupProfileContext {manager: SessionManager; userId: string; groupId: string}
 
 // Same group-profile API/card as PremiumGroups. No roster name as a privacy fallback.
-export default function LineupPlayerProfile({context, memberId, onBack}: {context: LineupProfileContext; memberId: string; onBack: () => void}) {
+export default function LineupPlayerProfile({context, memberId, onBack, backLabel = 'Wróć do składów'}: {context: LineupProfileContext; memberId: string; onBack: () => void; backLabel?: string}) {
   const {manager, userId, groupId} = context;
   const auth = useSyncExternalStore(manager.subscribe, manager.getSnapshot);
   const ready = auth.phase === 'ready' && auth.session?.user_id === userId;
@@ -29,7 +29,7 @@ export default function LineupPlayerProfile({context, memberId, onBack}: {contex
   }, [manager, userId, groupId, memberId, ready, revision]);
   const p = ready ? state.value : null;
   return <section ref={area} className="slm-players-screen slm-ultimate-profile" aria-label="Profil zawodnika ze składów">
-    <div className="slm-team-actions"><button type="button" onClick={onBack}>Wróć do składów</button></div>
+    <div className="slm-team-actions"><button type="button" onClick={onBack}>{backLabel}</button></div>
     {!ready ? <p role="status">Profil wymaga potwierdzonej sesji.</p> : state.error ? <>
       <p role="alert">Nie udało się potwierdzić dostępu do profilu w tej grupie.</p>
       <button type="button" onClick={() => setRevision(n => n + 1)}>Spróbuj ponownie</button>
