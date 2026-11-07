@@ -24,6 +24,15 @@ export default function PhotoCropEditor({file,onCancel,onApply}:Props){
    if(!removeBackground){ctx.save();ctx.filter='blur(18px) brightness(0.65)';const bgScale=base*1.25;ctx.drawImage(image.current,(W-size.w*bgScale)/2,(H-size.h*bgScale)/2,size.w*bgScale,size.h*bgScale);ctx.restore();}
    ctx.drawImage(image.current,(W-size.w*scale)/2+offset.x,(H-size.h*scale)/2+offset.y,size.w*scale,size.h*scale);
    const result=removeBackground?await removePortraitBackground(canvas):canvas;
+   if(removeBackground){
+    // Fade only the bottom of the cut-out, leaving face and hair untouched.
+    const fadeCtx=result.getContext('2d');
+    if(!fadeCtx)throw Error('Nie można przygotować przejścia sylwetki.');
+    const fade=fadeCtx.createLinearGradient(0,H*0.73,0,H*0.99);
+    fade.addColorStop(0,'rgba(0,0,0,1)');fade.addColorStop(1,'rgba(0,0,0,0)');
+    fadeCtx.save();fadeCtx.globalCompositeOperation='destination-in';
+    fadeCtx.fillStyle=fade;fadeCtx.fillRect(0,0,W,H);fadeCtx.restore();
+   }
    const verify=result.getContext('2d',{willReadFrequently:true});
    if(!verify)throw Error('Nie można sprawdzić kadru.');
    const rgba=verify.getImageData(0,0,W,H).data;
@@ -39,7 +48,7 @@ export default function PhotoCropEditor({file,onCancel,onApply}:Props){
  }
  return <div className="slm-photo-crop" aria-label="Kadrowanie zdjęcia">
   <h3>Ustaw zdjęcie na karcie</h3>
-  <p>Przesuń zdjęcie palcem, przybliż lub oddal, aby pokazać również ramiona. Przy oddaleniu wolne miejsce wypełni rozmyte tło.</p>
+  <p>Ustaw głowę wewnątrz złotego owalu. Dopasuj jej wielkość suwakiem i przesuwaj zdjęcie palcem. Owal jest tylko wskazówką — nie pojawi się na karcie.</p>
   <div ref={surface} className="slm-photo-crop-surface"  onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onPointerCancel={pointerUp}>
    {url&&<img ref={image} src={url} alt="Zdjęcie do kadrowania" draggable={false} onLoad={e=>{const i=e.currentTarget;setSize({w:i.naturalWidth,h:i.naturalHeight});setZoom(INITIAL_ZOOM);setOffset({x:0,y:0});}} style={{width:size.w*scale/W*100+'%',height:size.h*scale/H*100+'%',left:'calc(50% + '+offset.x/W*100+'%)',top:'calc(50% + '+offset.y/H*100+'%)'}}/>}
    <span className="slm-photo-crop-guide" aria-hidden="true"/>
