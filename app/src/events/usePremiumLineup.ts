@@ -88,10 +88,10 @@ export function usePremiumLineup(eventId: string, context: LineupProfileContext 
     put({...empty(eventId), detail, snapshot, lastChange: snapshot.last_change, receivedAt: Date.now(), verifiedFor: sessionStamp,
       editor: editLineup(emptyLineup(eventId), {type: 'load', eventId, baseline, proposal})});
   }, [eventId, put, sessionStamp]);
-  const load = useCallback(async (preserve = false) => {
+  const load = useCallback(async (preserve = false, silent = false) => {
     if (!authorized() || flight.current !== null) return;
     const ticket = ++epoch.current; flight.current = ticket;
-    put({...stateRef.current, pending: 'load', error: ''});
+    if (!silent) put({...stateRef.current, pending: 'load', error: ''});
     try { const value = await pair(); if (authorized() && epoch.current === ticket) acceptPair(value, preserve); }
     catch (e) {
       const code = codeOf(e);
@@ -115,6 +115,26 @@ export function usePremiumLineup(eventId: string, context: LineupProfileContext 
     if (ready && active) void load(true);
     // load changes only with actor/session, not with draft edits.
   }, [ready, active, load]);
+  // No realtime client is installed in this app. Until server push is configured,
+  // check the authoritative roster only while the lineup is visible and online.
+  // Keep local unsaved edits; acceptPair detects roster/version conflicts.
+  useEffect(() => {
+    if (!ready || !active) return;
+    const refreshIfVisible = () => {
+      if (document.visibilityState === 'visible' && navigator.onLine !== false && !stateRef.current.intent) void load(true, true);
+    };
+    const timer = window.setInterval(refreshIfVisible, 15000);
+    const onReturn = () => refreshIfVisible();
+    document.addEventListener('visibilitychange', onReturn);
+    window.addEventListener('focus', onReturn);
+    window.addEventListener('online', onReturn);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener('visibilitychange', onReturn);
+      window.removeEventListener('focus', onReturn);
+      window.removeEventListener('online', onReturn);
+    };
+  }, [ready, active, load]);
   const priorRoster = useRef(incomingRoster);
   useEffect(() => {
     if (priorRoster.current === incomingRoster) return;
@@ -122,7 +142,8 @@ export function usePremiumLineup(eventId: string, context: LineupProfileContext 
     if (stateRef.current.snapshot && authorized()) put({...stateRef.current,
       editor: editLineup(stateRef.current.editor, {type: 'roster', eventId, ids: incomingRoster ? incomingRoster.split('|') : []}),
       blocked: true, error: 'lineup_roster_conflict'});
-  }, [incomingRoster, authorized, put, eventId]);
+    if (authorized()) void load(true, true);
+  }, [incomingRoster, authorized, put, eventId, load]);
   useEffect(() => {
     if (!state.detail) return;
     const left = Date.parse(state.detail.event.starts_at) + state.detail.event.duration_minutes! * 60000 - Date.parse(state.detail.server_now) - (Date.now() - state.receivedAt);
