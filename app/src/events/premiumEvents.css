@@ -167,3 +167,16 @@
  .slm-premium-events .slm-detail-tabs [role="tab"] ion-icon {font-size:19px;}
  .slm-premium-events .slm-detail-tabs .slm-panel {padding:12px;}
 }
+
+/* Match detail: privacy badge shares the title row instead of reserving a blank top strip. */
+@media (max-width: 600px) {
+ .slm-premium-events .slm-match-detail .slm-hero-card {padding-top:12px;}
+ .slm-premium-events .slm-match-detail .slm-detail-title-row {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px 8px;margin-bottom:3px;}
+ .slm-premium-events .slm-match-detail .slm-detail-title-row .slm-detail-name {flex:1 1 125px;min-width:0;margin:0;}
+ .slm-premium-events .slm-match-detail .slm-detail-title-row .slm-event-privacy {position:static;flex:none;max-width:100%;font-size:.6rem;padding:3px 6px;}
+ .slm-premium-events .slm-match-detail.slm-has-privacy-badge .slm-match-top {padding-top:0;}
+ .slm-premium-events .slm-match-cta {min-height:44px;margin:8px 0 0;--padding-top:5px;--padding-bottom:5px;font-size:.8125rem;}
+ .slm-premium-events .slm-match-cta::part(native) {min-height:44px;padding-block:5px;}
+ .slm-premium-events .slm-detail-tabs details.slm-panel {padding:10px 12px;}
+ .slm-premium-events .slm-detail-tabs details.slm-panel > summary {font-size:.875rem;line-height:1.3;min-height:44px;display:flex;align-items:center;}
+}
