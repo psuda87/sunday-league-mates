@@ -4,7 +4,7 @@ type Segmenter = {
   close:()=>void;
 };
 declare global { interface Window { SelfieSegmentation?:new(config:{locateFile:(file:string)=>string})=>Segmenter } }
-const CDN='https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1.1675465747/';
+const CDN='/mediapipe/selfie_segmentation/';
 let loader:Promise<void>|null=null;
 function loadModel():Promise<void>{
   if(window.SelfieSegmentation)return Promise.resolve();
