@@ -129,3 +129,20 @@
 .slm-lineup-confirm-actions button:last-child {background:var(--slm-gold);color:var(--ion-background-color,#101114);}
 .slm-lineup-confirm-actions button:disabled {opacity:.55;cursor:not-allowed;}
 .slm-lineup-confirm-actions button:focus-visible {outline:2px solid var(--slm-gold);outline-offset:3px;}
+
+/* Compact event controls without changing the frozen Premium palette. */
+.slm-premium-events .slm-match-cta {--padding-top:8px;--padding-bottom:8px;--padding-start:12px;--padding-end:12px;min-height:44px;font-size:.875rem;margin:10px 0;}
+.slm-premium-events .slm-match-cta::part(native) {min-height:44px;}
+.slm-premium-events .slm-team-actions {gap:6px;margin:8px 0;}
+.slm-premium-events .slm-team-actions > button {min-height:44px;padding:7px 10px;font-size:.8125rem;line-height:1.25;}
+.slm-premium-events .slm-lineup-confirm-actions {margin:10px 0;gap:8px;}
+.slm-premium-events .slm-lineup-confirm-actions button {min-height:44px;padding:7px 8px;font-size:.8125rem;}
+.slm-premium-events .slm-match-info ion-button,.slm-premium-events .slm-events-controls ion-button {--padding-top:8px;--padding-bottom:8px;font-size:.875rem;min-height:44px;}
+.slm-premium-events .slm-join-dialog-backdrop {position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.7);box-sizing:border-box;}
+.slm-premium-events .slm-join-dialog {width:min(100%,420px);max-height:calc(100dvh - 32px);overflow:auto;padding:18px;border:1px solid var(--slm-gold);border-radius:14px;background:var(--slm-panel);color:var(--slm-text);box-shadow:0 12px 36px rgba(0,0,0,.5);}
+.slm-premium-events .slm-join-dialog h2 {margin:0 0 10px;font-size:1.1rem;}
+.slm-premium-events .slm-join-dialog p {margin:0 0 16px;line-height:1.45;font-size:.9rem;}
+.slm-premium-events .slm-join-dialog-actions {display:flex;gap:8px;flex-wrap:wrap;}
+.slm-premium-events .slm-join-dialog-actions button {flex:1 1 130px;min-height:44px;padding:8px 10px;border:1px solid var(--slm-gold);border-radius:10px;background:var(--slm-panel);color:var(--slm-gold);font-size:.8125rem;font-weight:600;cursor:pointer;}
+.slm-premium-events .slm-join-dialog-actions button:last-child {background:var(--slm-gold);color:var(--ion-background-color,#101114);}
+.slm-premium-events .slm-join-dialog-actions button:disabled {opacity:.5;cursor:not-allowed;}
