@@ -1,3 +1,5 @@
+> **Uwaga:** akapity o `feat/integration` i `feat/auth` poniżej opisują etapy historyczne, a nie stan `main`. Aktualną konsolidację opisuje [docs/MAIN_CONSOLIDATION_REPORT.md](docs/MAIN_CONSOLIDATION_REPORT.md), a zasady pracy nad repozytorium: [AGENTS.md](AGENTS.md).
+
 # Sunday League Mates
 
 Na `feat/integration` połączono lokalnie moduły wydarzeń, rozliczeń i powiadomień.
