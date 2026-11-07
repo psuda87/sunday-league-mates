@@ -12,6 +12,15 @@ it('validates login, normalizes email, toggles password, serializes submits and 
  const secret=crypto.randomUUID();fireEvent.change(screen.getByLabelText('Adres e-mail'),{target:{value:'  GRACZ@example.invalid  '}});fireEvent.change(screen.getByLabelText('Hasło'),{target:{value:secret}});fireEvent.click(screen.getByRole('button',{name:'Pokaż hasło: Hasło'}));expect(screen.getByLabelText('Hasło')).toHaveAttribute('type','text');
  const form=screen.getByRole('form');fireEvent.submit(form);fireEvent.submit(form);expect(adapter.signIn).toHaveBeenCalledTimes(1);expect(adapter.signIn).toHaveBeenCalledWith('gracz@example.invalid',secret);finish();await waitFor(()=>expect(screen.getByLabelText('Hasło')).toHaveValue(''));
 });
+it('shows a clear, neutral message for incorrect login or password',async()=>{
+ const adapter=port();adapter.signIn=vi.fn().mockRejectedValue(new AccountUiFailure('credentials'));
+ render(<AccountScreens view="login" port={adapter} onNavigate={vi.fn()} loginOrPhone/>);
+ fireEvent.change(screen.getByLabelText('Login lub numer telefonu'),{target:{value:'nieznany'}});
+ fireEvent.change(screen.getByLabelText('Hasło'),{target:{value:'bledne-haslo'}});
+ fireEvent.submit(screen.getByRole('form'));
+ await waitFor(()=>expect(screen.getByRole('alert')).toHaveTextContent('Nieprawidłowy login, numer telefonu lub hasło.'));
+ expect(screen.getByRole('alert')).not.toHaveTextContent('AccountUiFailure');
+});
 it('registers only after consent and matching policy, with optional phone/number and no group',async()=>{
  const adapter=port();render(<AccountScreens view="register" port={adapter} onNavigate={vi.fn()} demo/>);
  const secret=crypto.randomUUID();fireEvent.change(screen.getByLabelText('Nazwa zawodnika / pseudonim'),{target:{value:'Debiutant'}});fireEvent.change(screen.getByLabelText('Adres e-mail'),{target:{value:'demo@example.invalid'}});fireEvent.change(screen.getByLabelText('Hasło'),{target:{value:secret}});fireEvent.change(screen.getByLabelText('Powtórz hasło'),{target:{value:secret}});
