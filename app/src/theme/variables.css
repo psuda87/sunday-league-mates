@@ -3961,6 +3961,12 @@ button.slm-group-card {
     linear-gradient(90deg, transparent, black 35%, black 65%, transparent);
   mask-composite: intersect;
 }
+/* Personal photos: keep forehead and face opaque; fade only outer edges. */
+.slm-ultimate-portrait[data-layout="single"] {
+  mask-image: radial-gradient(ellipse 66% 64% at 50% 49%, black 55%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 66% 64% at 50% 49%, black 55%, transparent 100%);
+  mask-composite: add;
+}
 .slm-ultimate-portrait[data-layout="sheet"] > img {
   position: absolute;
   width: 200%;
@@ -4075,3 +4081,24 @@ button.slm-group-card {
   box-sizing: border-box;
 }
 .slm-premium-identity select {width:100%;min-height:44px;padding:9px 12px;border:1px solid var(--slm-border);border-radius:9px;color:var(--slm-text);background:var(--slm-panel);font:inherit;}
+
+/* Photo crop editor — isolated from frozen Premium card layout. */
+.slm-photo-crop{margin:12px 0;padding:12px;border:1px solid var(--slm-border);border-radius:12px}
+.slm-photo-crop-surface{position:relative;width:min(100%,270px);aspect-ratio:3/4;overflow:hidden;margin:12px auto;background:#121820;touch-action:none;user-select:none;border:1px solid #b99a5b;border-radius:8px}
+.slm-photo-crop-surface>img{position:absolute;max-width:none;transform:translate(-50%,-50%);pointer-events:none;user-select:none}
+.slm-photo-crop-guide{position:absolute;left:25%;top:13%;width:50%;height:48%;box-sizing:border-box;border:2px dashed rgba(236,195,113,.95);border-radius:50%;box-shadow:0 0 0 1px rgba(0,0,0,.3),0 0 16px rgba(218,168,75,.22);pointer-events:none}
+.slm-photo-crop input[type="range"]{display:block;width:100%;margin:12px 0}
+
+
+
+/* Compact mobile crop editor: keep controls visible above the bottom navigation. */
+.slm-photo-crop{position:relative;padding:10px;margin:8px 0}
+.slm-photo-crop-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:4px}
+.slm-photo-crop-heading h3{margin:0;font-size:1.12rem;line-height:1.25}
+.slm-photo-crop-help-button{width:34px;min-width:34px;height:34px;border-radius:50%;border:1px solid #b99a5b;color:#e9c77e;background:#20252b;font-weight:700;font-size:1rem;cursor:pointer}
+.slm-photo-crop-help{position:absolute;z-index:8;top:49px;left:8px;right:8px;padding:12px;background:#1d232a;border:1px solid #b99a5b;border-radius:10px;box-shadow:0 12px 28px #0009}
+.slm-photo-crop-help p{margin:0 0 10px;line-height:1.4}
+.slm-photo-crop-surface{width:min(100%,270px,calc(39dvh * .75));margin:6px auto 8px}
+.slm-photo-crop input[type="range"]{margin:6px 0}
+.slm-photo-crop .slm-identity-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.slm-photo-crop .slm-identity-actions button{min-width:0;flex:1 1 auto;padding:9px 8px;font-size:.88rem}
