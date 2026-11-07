@@ -1,3 +1,36 @@
+# Patch code review — zastosowanie i weryfikacja, 2026-11-07
+
+`patch-code-review` od main `2ed8a64`. Zastosowano wskazany plik
+`slm-review-cleanup.patch` przez git am --3way, bez konfliktów. Commit patcha:
+`3c469e5e5ecff49354c57d9dfc46bd01988d19e4`. Autor/committer z lokalnej konfiguracji
+Git właściciela, komunikat zachowany. Zlecony zapis --noedit Git odrzucił;
+wykonano poprawne git commit --amend --reset-author --no-edit przed push.
+
+Zmiany: README oznacza historyczne etapy; manifest ma ciemne kolory #0b0c10;
+usunięto dwa nieużywane pliki ExploreContainer (brak odwołań); tsconfig używa
+Bundler/esModuleInterop oraz jawnych typów i obejmuje wejścia Premium/demo/Android.
+Bez modyfikacji logiki Auth, SQL, strażników, manifestów historycznych lub CI.
+
+PASS: TypeScript aplikacji i demo (5.9.3), lint,524 Vitest/75 plików,
+build LIVE, build demo z kontrolą izolacji, build Premium web,
+verify:consolidation (55 chronionych plików i13 granic importów),
+107 testów premium-policy,3 testy kontraktu builda Premium, poprawność manifestu,
+5 Cypress LIVE/test.cy.ts na produkcyjnym buildzie z kontrolowanym API,
+git diff --check. Nie wykonywano operacji na rzeczywistych kontach.
+
+FAIL dodatkowej kontroli: npx tsc --project tsconfig.node.json --noEmit.
+Pozostają TS18028 (domyślny target poniżej ES2015 w narzędziowym tsconfig)
+i TS2769 (pole test w vite.config.ts importującym defineConfig z vite).
+Odrębna kompilacja narzędziowego tsconfig z origin/main także nie przechodzi:
+TS2307 dla eksportów pakietów przy starym Node resolution oraz TS18028.
+Patch usuwa TS2307, a pełniejsze rozwiązanie typów ujawnia też TS2769;
+nie jest to pełny PASS konfiguracji narzędziowej. Standardowe buildy przechodzą.
+Nie rozszerzano patcha o naprawy tych ustawień; kolejny krok to ich osobny przegląd.
+TypeScript6 nie instalowano ani nie testowano. Bez migracji, wdrożeń, merge do main
+i builda/instalacji APK. Zachowano istniejący nieśledzony app/dist-demo-six.
+
+---
+
 # Grupy — odbiór właściciela, 2026-11-07
 
 Właściciel zaakceptował 7 poprawek i wyraził zgodę na scalenie `feat/groups-ux-acceptance` do `main` przez [PR #39](https://github.com/psuda87/sunday-league-mates/pull/39). Przed scaleniem ponownie przeszły oba strażniki. Wersja testowa na Vercel pozostaje na `3235037`; etap odbioru nie uruchamia kolejnego wdrożenia ani migracji. Następny moduł rozpoczynamy od zaktualizowanego `main` po potwierdzeniu scalenia.
