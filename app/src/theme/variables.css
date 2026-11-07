@@ -4081,3 +4081,10 @@ button.slm-group-card {
   box-sizing: border-box;
 }
 .slm-premium-identity select {width:100%;min-height:44px;padding:9px 12px;border:1px solid var(--slm-border);border-radius:9px;color:var(--slm-text);background:var(--slm-panel);font:inherit;}
+
+/* Photo crop editor — isolated from frozen Premium card layout. */
+.slm-photo-crop{margin:12px 0;padding:12px;border:1px solid var(--slm-border);border-radius:12px}
+.slm-photo-crop-surface{position:relative;width:min(100%,270px);aspect-ratio:3/4;overflow:hidden;margin:12px auto;background:#121820;touch-action:none;user-select:none;border:1px solid #b99a5b;border-radius:8px}
+.slm-photo-crop-surface>img{position:absolute;max-width:none;transform:translate(-50%,-50%);pointer-events:none;user-select:none}
+.slm-photo-crop-guide{position:absolute;inset:12% 12%;border:1px dashed rgba(255,255,255,.55);pointer-events:none}
+.slm-photo-crop input[type="range"]{display:block;width:100%;margin:12px 0}
