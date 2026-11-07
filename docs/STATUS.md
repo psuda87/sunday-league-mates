@@ -1,3 +1,9 @@
+# Grupy — odbiór właściciela, 2026-11-07
+
+Właściciel zaakceptował 7 poprawek i wyraził zgodę na scalenie `feat/groups-ux-acceptance` do `main` przez [PR #39](https://github.com/psuda87/sunday-league-mates/pull/39). Przed scaleniem ponownie przeszły oba strażniki. Wersja testowa na Vercel pozostaje na `3235037`; etap odbioru nie uruchamia kolejnego wdrożenia ani migracji. Następny moduł rozpoczynamy od zaktualizowanego `main` po potwierdzeniu scalenia.
+
+---
+
 # Grupy — pełny PASS i publikacja, 2026-11-06
 
 `feat/groups-ux-acceptance`, wdrożony commit `3235037`.
