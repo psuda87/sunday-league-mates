@@ -34,7 +34,14 @@ export async function removePortraitBackground(image:HTMLCanvasElement):Promise<
   ctx.drawImage(image,0,0);
   const data=ctx.getImageData(0,0,canvas.width,canvas.height);
   if(pixels.length!==canvas.width*canvas.height)throw Error('Nieprawidłowy rozmiar maski sylwetki.');
-  for(let i=0;i<pixels.length;i++)data.data[i*4+3]=pixels[i]===1?255:0;
+  let foreground=0;
+  for(let i=0;i<pixels.length;i++){
+   const person=pixels[i]===1;
+   if(person)foreground++;
+   data.data[i*4+3]=person?255:0;
+  }
+  const coverage=foreground/pixels.length;
+  if(coverage<0.03||coverage>0.97)throw Error('Model nie wyodrębnił prawidłowo sylwetki. Zmień kadr lub wyłącz automatyczne usuwanie tła.');
   ctx.putImageData(data,0,0);
   result.close?.();
   return canvas;
