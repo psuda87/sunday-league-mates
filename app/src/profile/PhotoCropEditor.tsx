@@ -24,6 +24,12 @@ export default function PhotoCropEditor({file,onCancel,onApply}:Props){
    if(!removeBackground){ctx.save();ctx.filter='blur(18px) brightness(0.65)';const bgScale=base*1.25;ctx.drawImage(image.current,(W-size.w*bgScale)/2,(H-size.h*bgScale)/2,size.w*bgScale,size.h*bgScale);ctx.restore();}
    ctx.drawImage(image.current,(W-size.w*scale)/2+offset.x,(H-size.h*scale)/2+offset.y,size.w*scale,size.h*scale);
    const result=removeBackground?await removePortraitBackground(canvas):canvas;
+   const verify=result.getContext('2d',{willReadFrequently:true});
+   if(!verify)throw Error('Nie można sprawdzić kadru.');
+   const rgba=verify.getImageData(0,0,W,H).data;
+   let visible=0;
+   for(let i=3;i<rgba.length;i+=16)if(rgba[i]>64)visible++;
+   if(visible<rgba.length/16*0.03)throw Error('Wynik wycinania jest przezroczysty. Zdjęcie nie zostało zapisane.');
    const blob=await new Promise<Blob|null>(resolve=>result.toBlob(resolve,'image/png'));
    canvas.width=0;canvas.height=0;result.width=0;result.height=0;
    if(!blob||blob.size<1000)throw Error('Wynik kadrowania jest pusty. Zdjęcie nie zostało zapisane.');
