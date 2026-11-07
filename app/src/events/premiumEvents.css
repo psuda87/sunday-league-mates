@@ -181,21 +181,27 @@
  .slm-premium-events .slm-detail-tabs details.slm-panel > summary {font-size:.875rem;line-height:1.3;min-height:44px;display:flex;align-items:center;}
 }
 
-/* Final mobile rhythm: 8px between match card, CTA and tabs; 44px CTA. */
+/* Mobile match detail: 44px tap target, 34px visible button and even 8px gaps.
+   Ionic button's shadow part owns the painted surface; shrinking only the host
+   previously left the button looking too tall. */
 @media (max-width:600px) {
- .slm-premium-events .slm-match-detail {margin-bottom:0;}
- .slm-premium-events .slm-match-detail .slm-hero-card {padding-bottom:10px;}
- .slm-premium-events .slm-match-detail .slm-match-cta {
-   display:block;height:44px;min-height:44px;max-height:44px;
-   margin:8px 0 0;--padding-top:0px;--padding-bottom:0px;
+ .slm-premium-events .slm-match-detail {margin:0 0 8px;}
+ .slm-premium-events .slm-match-detail > .slm-hero-card {margin-bottom:0;}
+ .slm-premium-events .slm-match-detail > ion-button.slm-match-cta {
+   display:flex;align-items:center;justify-content:stretch;
+   height:44px;min-height:44px;max-height:44px;
+   margin:8px 0 0;padding:0;box-sizing:border-box;
+   --padding-top:0px;--padding-bottom:0px;
    --padding-start:10px;--padding-end:10px;
+   --border-radius:10px;
    font-size:.8125rem;line-height:1.2;
  }
- .slm-premium-events .slm-match-detail .slm-match-cta::part(native) {
-   height:44px;min-height:44px;box-sizing:border-box;padding:0 10px;
+ .slm-premium-events .slm-match-detail > ion-button.slm-match-cta::part(native) {
+   height:34px;min-height:34px;max-height:34px;
+   padding:0 10px;box-sizing:border-box;
  }
- .slm-premium-events .slm-match-detail + .slm-detail-tabs {margin-top:8px;}
- .slm-premium-events .slm-detail-tabs [role="tablist"] {margin-top:0;}
+ .slm-premium-events .slm-detail-tabs {margin:0;}
+ .slm-premium-events .slm-detail-tabs [role="tablist"] {margin:0 0 8px;}
 }
 
 /* Real participant details: only fields authorized by the match roster. */
