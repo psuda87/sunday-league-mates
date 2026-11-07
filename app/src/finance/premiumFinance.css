@@ -20,3 +20,17 @@
 .slm-premium-finance .slm-payment-report {font-size:.8rem;}
 .slm-premium-finance [role=tab][aria-selected=true] {border-color:var(--slm-gold);color:var(--slm-gold);}
 .slm-premium-finance input {min-height:44px;box-sizing:border-box;width:100%;max-width:100%;border:1px solid var(--slm-border);border-radius:10px;padding:8px 12px;background:var(--slm-panel);color:var(--slm-text);font:inherit;}
+
+/* Compact payment controls on mobile, preserve touch targets and financial logic. */
+@media (max-width:600px) {
+ .slm-premium-finance .slm-finance-list-heading {gap:8px;margin-bottom:8px;align-items:center;}
+ .slm-premium-finance .slm-finance-list-heading h2 {font-size:1.25rem;line-height:1.2;margin:0;}
+ .slm-premium-finance .slm-finance-list-heading button {min-height:44px;margin:0;padding:6px 10px;font-size:.82rem;}
+ .slm-premium-finance [role=tablist] {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin:8px 0;}
+ .slm-premium-finance [role=tablist] button {min-width:0;min-height:44px;margin:0;padding:7px 6px;font-size:.75rem;line-height:1.2;white-space:normal;}
+ .slm-premium-finance [role=tabpanel] > p {margin:8px 0;font-size:.875rem;line-height:1.35;}
+ .slm-premium-finance .slm-payment-card {margin-block:8px;padding:12px;}
+ .slm-premium-finance .slm-payment-card h3 {font-size:.94rem;margin-bottom:6px;}
+ .slm-premium-finance .slm-payment-card p {font-size:.875rem;line-height:1.4;margin:7px 0;}
+ .slm-premium-finance .slm-payment-card > button {min-height:44px;margin:5px 0 0;padding:7px 10px;font-size:.8125rem;line-height:1.25;}
+}
