@@ -2,23 +2,20 @@ import {build,loadConfigFromFile} from 'vite';
 import {fileURLToPath} from 'node:url';
 import {resolve} from 'node:path';
 
-const MEDIAPIPE_VERSION='0.1.1675465747';
-const MEDIAPIPE_FILES=[
- 'selfie_segmentation.js',
- 'selfie_segmentation.binarypb',
- 'selfie_segmentation.tflite',
- 'selfie_segmentation_landscape.tflite',
- 'selfie_segmentation_solution_simd_wasm_bin.js',
- 'selfie_segmentation_solution_simd_wasm_bin.wasm',
- 'selfie_segmentation_solution_wasm_bin.js',
- 'selfie_segmentation_solution_wasm_bin.wasm'
+const VISION_VERSION='0.10.22';
+const VISION_ASSETS=[
+ ['tasks-vision.mjs','https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@'+VISION_VERSION+'/+esm'],
+ ['vision_wasm_internal.wasm','https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@'+VISION_VERSION+'/wasm/vision_wasm_internal.wasm'],
+ ['vision_wasm_internal.js','https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@'+VISION_VERSION+'/wasm/vision_wasm_internal.js'],
+ ['vision_wasm_nosimd_internal.wasm','https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@'+VISION_VERSION+'/wasm/vision_wasm_nosimd_internal.wasm'],
+ ['vision_wasm_nosimd_internal.js','https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@'+VISION_VERSION+'/wasm/vision_wasm_nosimd_internal.js'],
+ ['selfie_segmenter.tflite','https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/1/selfie_segmenter.tflite']
 ];
-const mediaPipeAssets={name:'slm-local-mediapipe-assets',apply:'build',async generateBundle(){
- for(const file of MEDIAPIPE_FILES){
-  const url='https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@'+MEDIAPIPE_VERSION+'/'+file;
-  const response=await fetch(url,{signal:AbortSignal.timeout(30000)});
-  if(!response.ok)throw Error('MediaPipe asset unavailable: '+file+' HTTP '+response.status);
-  this.emitFile({type:'asset',fileName:'mediapipe/selfie_segmentation/'+file,source:new Uint8Array(await response.arrayBuffer())});
+const mediaPipeAssets={name:'slm-local-vision-assets',apply:'build',async generateBundle(){
+ for(const [file,url] of VISION_ASSETS){
+  const response=await fetch(url,{signal:AbortSignal.timeout(45000)});
+  if(!response.ok)throw Error('Vision asset unavailable: '+file+' HTTP '+response.status);
+  this.emitFile({type:'asset',fileName:'mediapipe/vision/'+file,source:new Uint8Array(await response.arrayBuffer())});
  }
 }};
 export const ACCOUNTS='https://hjtcyybkxebvdropchac.supabase.co/functions/v1/accounts';
