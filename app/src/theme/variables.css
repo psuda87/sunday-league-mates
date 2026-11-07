@@ -4039,6 +4039,11 @@ button.slm-group-card {
 }
 
 /* Własne zdjęcie: dopasowanie i miejsce na border-radius. */
+/* Keep the forehead clear of the top feathered mask on personal photos. */
+.slm-ultimate-portrait[data-personal="true"] {
+  transform: translateY(14px);
+}
+
 .slm-ultimate-portrait[data-layout="single"] > img {
   width: 100%;
   height: 100%;
