@@ -26,7 +26,7 @@ export default function PhotoCropEditor({file,onCancel,onApply}:Props){
    const result=removeBackground?await removePortraitBackground(canvas):canvas;
    const blob=await new Promise<Blob|null>(resolve=>result.toBlob(resolve,'image/png'));
    canvas.width=0;canvas.height=0;result.width=0;result.height=0;
-   if(!blob)throw Error('Nie udało się przygotować kadru.');
+   if(!blob||blob.size<1000)throw Error('Wynik kadrowania jest pusty. Zdjęcie nie zostało zapisane.');
    await onApply(new File([blob],'slm-crop.png',{type:'image/png'}));
   }catch(e){setError(e instanceof Error?e.message:'Nie udało się wykadrować zdjęcia.');}
   finally{setBusy(false);}
