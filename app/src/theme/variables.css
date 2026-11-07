@@ -4090,3 +4090,15 @@ button.slm-group-card {
 .slm-photo-crop input[type="range"]{display:block;width:100%;margin:12px 0}
 
 
+
+/* Compact mobile crop editor: keep controls visible above the bottom navigation. */
+.slm-photo-crop{position:relative;padding:10px;margin:8px 0}
+.slm-photo-crop-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:4px}
+.slm-photo-crop-heading h3{margin:0;font-size:1.12rem;line-height:1.25}
+.slm-photo-crop-help-button{width:34px;min-width:34px;height:34px;border-radius:50%;border:1px solid #b99a5b;color:#e9c77e;background:#20252b;font-weight:700;font-size:1rem;cursor:pointer}
+.slm-photo-crop-help{position:absolute;z-index:8;top:49px;left:8px;right:8px;padding:12px;background:#1d232a;border:1px solid #b99a5b;border-radius:10px;box-shadow:0 12px 28px #0009}
+.slm-photo-crop-help p{margin:0 0 10px;line-height:1.4}
+.slm-photo-crop-surface{width:min(100%,270px,calc(39dvh * .75));margin:6px auto 8px}
+.slm-photo-crop input[type="range"]{margin:6px 0}
+.slm-photo-crop .slm-identity-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.slm-photo-crop .slm-identity-actions button{min-width:0;flex:1 1 auto;padding:9px 8px;font-size:.88rem}
