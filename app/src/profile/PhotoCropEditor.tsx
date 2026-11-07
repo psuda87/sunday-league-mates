@@ -9,7 +9,7 @@ export default function PhotoCropEditor({file,onCancel,onApply}:Props){
  useEffect(()=>{const u=URL.createObjectURL(file);setUrl(u);return()=>URL.revokeObjectURL(u);},[file]);
  const base=size.w&&size.h?Math.max(W/size.w,H/size.h):1;
  const scale=base*zoom;
- const maxX=Math.max(0,(size.w*scale-W)/2),maxY=Math.max(0,(size.h*scale-H)/2);
+ const maxX=W*0.5+size.w*scale*0.5-W*0.28,maxY=H*0.5+size.h*scale*0.5-H*0.28;
  const clamp=(x:number,y:number)=>({x:Math.max(-maxX,Math.min(maxX,x)),y:Math.max(-maxY,Math.min(maxY,y))});
  function pointerDown(e:PointerEvent<HTMLDivElement>){if(busy)return;e.currentTarget.setPointerCapture(e.pointerId);drag.current={x:e.clientX,y:e.clientY,ox:offset.x,oy:offset.y};}
  function pointerMove(e:PointerEvent<HTMLDivElement>){if(!drag.current||!surface.current)return;const rect=surface.current.getBoundingClientRect(),d=drag.current;setOffset(clamp(d.ox+(e.clientX-d.x)*W/rect.width,d.oy+(e.clientY-d.y)*H/rect.height));}
@@ -37,7 +37,7 @@ export default function PhotoCropEditor({file,onCancel,onApply}:Props){
    <span className="slm-photo-crop-guide" aria-hidden="true"/>
   </div>
   <label htmlFor="slm-photo-crop-zoom">Powiększenie: {zoom.toFixed(2)}×</label>
-  <input id="slm-photo-crop-zoom" type="range" min={MIN_ZOOM} max="3" step="0.05" value={zoom} disabled={busy||!size.w} onChange={e=>{const z=Number(e.target.value);const mx=Math.max(0,(size.w*base*z-W)/2),my=Math.max(0,(size.h*base*z-H)/2);setZoom(z);setOffset(p=>({x:Math.max(-mx,Math.min(mx,p.x)),y:Math.max(-my,Math.min(my,p.y))}));}}/>
+  <input id="slm-photo-crop-zoom" type="range" min={MIN_ZOOM} max="3" step="0.05" value={zoom} disabled={busy||!size.w} onChange={e=>{const z=Number(e.target.value);const mx=W*0.22+size.w*base*z/2,my=H*0.22+size.h*base*z/2;setZoom(z);setOffset(p=>({x:Math.max(-mx,Math.min(mx,p.x)),y:Math.max(-my,Math.min(my,p.y))}));}}/>
   {error&&<p role="alert">{error}</p>}
   <div className="slm-identity-actions"><button type="button" disabled={busy||!size.w} onClick={()=>{setZoom(INITIAL_ZOOM);setOffset({x:0,y:0});}}>Wyśrodkuj</button><button type="button" disabled={busy||!size.w} onClick={()=>void apply()}>{busy?'Przetwarzanie…':'Zastosuj kadr'}</button><button type="button" disabled={busy} onClick={onCancel}>Anuluj</button></div>
  </div>;
