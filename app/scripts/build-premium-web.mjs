@@ -4,7 +4,7 @@ import {resolve} from 'node:path';
 
 const VISION_VERSION='0.10.22';
 const VISION_ASSETS=[
- ['tasks-vision.mjs','https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@'+VISION_VERSION+'/+esm'],
+ ['tasks-vision.mjs','https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@'+VISION_VERSION+'/vision_bundle.mjs'],
  ['vision_wasm_internal.wasm','https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@'+VISION_VERSION+'/wasm/vision_wasm_internal.wasm'],
  ['vision_wasm_internal.js','https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@'+VISION_VERSION+'/wasm/vision_wasm_internal.js'],
  ['vision_wasm_nosimd_internal.wasm','https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@'+VISION_VERSION+'/wasm/vision_wasm_nosimd_internal.wasm'],
