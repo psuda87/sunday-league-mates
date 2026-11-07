@@ -48,7 +48,7 @@ export default function B1App({manager:provided}:{manager?:SessionManager}){
   if(picker&&(auth.phase!=='checking'&&(auth.phase!=='ready'||forced||auth.session?.user_id!==picker.owner)||ready&&picker.done))setPicker(null);
  },[auth.phase,auth.session,forced,ready,picker]);
  const signedOutView:AccountView=requested??(auth.message?'expired':'login');
- const view:AccountView|null=emailGate?'checking':pending??(auth.phase==='checking'?'checking':auth.phase==='unavailable'||auth.phase==='storage_error'?'network':forced?'password':ready?requested:signedOutView);
+ const view:AccountView|null=emailGate?'checking':pending??(auth.phase==='checking'&&picker?.owner===owner?null:auth.phase==='checking'?'checking':auth.phase==='unavailable'||auth.phase==='storage_error'?'network':forced?'password':ready?requested:signedOutView);
  const legal=useMemo(()=>legalDocuments(import.meta.env.VITE_SLM_TERMS_URL,import.meta.env.VITE_SLM_PRIVACY_URL),[]);
  const base=useMemo(()=>b1Port(manager,{callback,legal}),[manager,callback,legal]);
  useEffect(()=>{
