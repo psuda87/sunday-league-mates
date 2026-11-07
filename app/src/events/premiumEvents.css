@@ -146,3 +146,24 @@
 .slm-premium-events .slm-join-dialog-actions button {flex:1 1 130px;min-height:44px;padding:8px 10px;border:1px solid var(--slm-gold);border-radius:10px;background:var(--slm-panel);color:var(--slm-gold);font-size:.8125rem;font-weight:600;cursor:pointer;}
 .slm-premium-events .slm-join-dialog-actions button:last-child {background:var(--slm-gold);color:var(--ion-background-color,#101114);}
 .slm-premium-events .slm-join-dialog-actions button:disabled {opacity:.5;cursor:not-allowed;}
+
+/* Compact live match details on phones; keep the approved stadium and palette. */
+@media (max-width: 600px) {
+ .slm-premium-events .slm-match-detail {margin-bottom:8px;}
+ .slm-premium-events .slm-match-detail .slm-hero-card {padding:44px 12px 12px;}
+ .slm-premium-events .slm-match-detail .slm-match-top {grid-template-columns:50px minmax(0,1fr);gap:10px;align-items:center;padding-top:0;}
+ .slm-premium-events .slm-match-detail .slm-date-tile {min-height:70px;padding:4px 0;}
+ .slm-premium-events .slm-match-detail .slm-date-tile strong {font-size:1.65rem;}
+ .slm-premium-events .slm-match-detail .slm-date-tile span {font-size:.59rem;}
+ .slm-premium-events .slm-match-detail .slm-detail-name {font-size:1.05rem;line-height:1.2;margin:0 0 2px;}
+ .slm-premium-events .slm-match-detail .slm-kickoff {font-size:1.5rem;line-height:1.1;}
+ .slm-premium-events .slm-match-detail .slm-location,
+ .slm-premium-events .slm-match-detail .slm-match-date {font-size:.7rem;margin:3px 0 0;line-height:1.3;}
+ .slm-premium-events .slm-match-detail .slm-capacity {margin-top:9px;}
+ .slm-premium-events .slm-match-detail .slm-capacity p {margin-bottom:5px;font-size:.7rem;}
+ .slm-premium-events .slm-match-detail .slm-capacity small {margin-top:4px;}
+ .slm-premium-events .slm-detail-tabs [role="tablist"] {margin-bottom:10px;}
+ .slm-premium-events .slm-detail-tabs [role="tab"] {min-height:48px;gap:3px;padding:5px 3px;}
+ .slm-premium-events .slm-detail-tabs [role="tab"] ion-icon {font-size:19px;}
+ .slm-premium-events .slm-detail-tabs .slm-panel {padding:12px;}
+}
