@@ -2,6 +2,25 @@ import {build,loadConfigFromFile} from 'vite';
 import {fileURLToPath} from 'node:url';
 import {resolve} from 'node:path';
 
+const MEDIAPIPE_VERSION='0.1.1675465747';
+const MEDIAPIPE_FILES=[
+ 'selfie_segmentation.js',
+ 'selfie_segmentation.binarypb',
+ 'selfie_segmentation.tflite',
+ 'selfie_segmentation_landscape.tflite',
+ 'selfie_segmentation_solution_simd_wasm_bin.js',
+ 'selfie_segmentation_solution_simd_wasm_bin.wasm',
+ 'selfie_segmentation_solution_wasm_bin.js',
+ 'selfie_segmentation_solution_wasm_bin.wasm'
+];
+const mediaPipeAssets={name:'slm-local-mediapipe-assets',apply:'build',async generateBundle(){
+ for(const file of MEDIAPIPE_FILES){
+  const url='https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@'+MEDIAPIPE_VERSION+'/'+file;
+  const response=await fetch(url,{signal:AbortSignal.timeout(30000)});
+  if(!response.ok)throw Error('MediaPipe asset unavailable: '+file+' HTTP '+response.status);
+  this.emitFile({type:'asset',fileName:'mediapipe/selfie_segmentation/'+file,source:new Uint8Array(await response.arrayBuffer())});
+ }
+}};
 export const ACCOUNTS='https://hjtcyybkxebvdropchac.supabase.co/functions/v1/accounts';
 export const CSP="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://hjtcyybkxebvdropchac.supabase.co; font-src 'self' data:; connect-src 'self' https://hjtcyybkxebvdropchac.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'";
 export function premiumWebConfig(base,env=process.env){
@@ -13,7 +32,7 @@ export function premiumWebConfig(base,env=process.env){
   define['import.meta.env.'+name]=JSON.stringify(value);
  }
  return {...base,configFile:false,envDir:false,envPrefix:[],define,
-  plugins:[...base.plugins,{name:'premium-web-document',transformIndexHtml(html){
+  plugins:[...base.plugins,mediaPipeAssets,{name:'premium-web-document',transformIndexHtml(html){
    const old="connect-src 'self' http://127.0.0.1:54321";
    if(!html.includes(old))throw new Error('Unexpected Premium source CSP');
    // frame-ancestors is sent as an HTTP header by Vercel, not an ineffective meta.
