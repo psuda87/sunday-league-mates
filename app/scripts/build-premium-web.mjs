@@ -2,7 +2,7 @@ import {build,loadConfigFromFile} from 'vite';
 import {fileURLToPath} from 'node:url';
 import {resolve} from 'node:path';
 
-const VISION_VERSION='0.10.22';
+const VISION_VERSION='0.10.14';
 const VISION_ASSETS=[
  ['tasks-vision.mjs','https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@'+VISION_VERSION+'/vision_bundle.mjs'],
  ['vision_wasm_internal.wasm','https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@'+VISION_VERSION+'/wasm/vision_wasm_internal.wasm'],
