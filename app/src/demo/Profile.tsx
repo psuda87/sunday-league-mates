@@ -17,6 +17,12 @@ export default function DemoProfile({world,id,onBack,dispatch,personal=false,onP
   const own=world.userId===id;
   const [editor,setEditor]=useState<'identity'|'portrait'|null>(null);
   const settings=useRef<HTMLDetailsElement>(null);
+  const portraitPanel=useRef<HTMLDivElement>(null);
+  useEffect(()=>{
+    if(editor!=='portrait')return;
+    const frame=requestAnimationFrame(()=>portraitPanel.current?.scrollIntoView({behavior:'smooth',block:'center'}));
+    return ()=>cancelAnimationFrame(frame);
+  },[editor]);
   const editNumber=()=>{if(live){setEditing(false);setEditor('identity');return;}setEditor(null);setNumber(String((live?profile?.jersey_number:player.jerseyNumber)??''));setError('');setEditing(true);};
   useEffect(()=>{heading.current?.focus({preventScroll:true});},[]);
   const closeEditor=()=>{setEditor(null);requestAnimationFrame(()=>heading.current?.focus());};
@@ -47,7 +53,7 @@ export default function DemoProfile({world,id,onBack,dispatch,personal=false,onP
     {personal&&own&&<div className="slm-my-identity">
       <div className="slm-identity-actions slm-my-actions"><button type="button" disabled={!!live&&(live.phase==='loading'||live.saving)} aria-expanded={editor==='identity'} onClick={()=>{if(live&&live.phase!=='ready'){live.reload();return;}setEditing(false);setEditor(editor==='identity'?null:'identity');}}>{live&&live.phase!=='ready'?'Ponów odczyt profilu':'Edytuj profil'}</button><button type="button" disabled={!!live&&(live.phase!=='ready'||live.photo?.saving||!live.photo)} aria-expanded={editor==='portrait'} onClick={()=>{setEditing(false);if(live?.photo?.phase==='error')live.photo.reload();setEditor(editor==='portrait'?null:'portrait');}}>Zmień zdjęcie</button><button type="button" onClick={()=>{if(settings.current){settings.current.open=!settings.current.open;if(settings.current.open)settings.current.scrollIntoView?.({block:'start',behavior:'smooth'});}}}>Ustawienia</button></div>
       {editor==='identity'&&(!live||live.phase==='ready')&&<IdentityEditor key={'identity:'+(profile?.user_id??id)} personalProfile={live} player={player} dispatch={dispatch} onClose={closeEditor} onNumber={editNumber}/>}
-      {editor==='portrait'&&<AvatarPicker key={'portrait:'+(profile?.user_id??id)+(live?.photo?.image??'')} personalPhoto={live?.photo} player={player} dispatch={dispatch} onClose={closeEditor}/>}
+      {editor==='portrait'&&<div ref={portraitPanel}><AvatarPicker key={'portrait:'+(profile?.user_id??id)+(live?.photo?.image??'')} personalPhoto={live?.photo} player={player} dispatch={dispatch} onClose={closeEditor}/></div>}
       <details ref={settings} className="slm-identity-settings"><summary>Ustawienia aplikacji i konta</summary><AppearanceSettings enablePalettes/><section className="slm-identity-account"><h2>Konto</h2><ul>{['Dane konta','Powiadomienia'].map(label=><li key={label}><span>{label}</span><small>{live&&label==='Dane konta'?profile?`Login: ${profile.login} · Telefon: ${profile.phone||'brak'}`:'Profil niedostępny':live?'W przygotowaniu':'Niedostępne w demo'}</small></li>)}</ul>{onPassword&&<button type="button" onClick={onPassword}>{liveAuth?'Zmiana hasła':'Zmiana hasła · symulator'}</button>}{live?.deleteAccount&&<AccountDeletion binding={live}/>} {onLogout&&<button type="button" onClick={onLogout}>{liveAuth?'Wyloguj':'Wyloguj · symulator'}</button>}<p>{live?'Profil, logowanie i hasło są zapisane na Twoim koncie. Mecze i członkostwo znajdziesz w odpowiednich zakładkach.':liveAuth?'Logowanie i hasło: Supabase. Pozostałe dane i operacje są demonstracyjne.':'Demo nie ma prawdziwej sesji. Te operacje nie są wykonywane.'}</p></section></details>
       {live?.payments}
     </div>}
