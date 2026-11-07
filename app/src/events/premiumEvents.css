@@ -116,17 +116,16 @@
   box-sizing: border-box;
 }
 
-/* Premium confirmation actions: readable and touch-friendly on narrow phones. */
-.slm-lineup-confirm-actions {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:16px 0;}
+/* Compact lineup refresh confirmation; keep both actions side by side on phones. */
+.slm-lineup-confirm-actions {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0;}
 .slm-lineup-confirm-actions button {
  display:flex;align-items:center;justify-content:center;flex:none;width:100%;min-width:0;
- min-height:48px;padding:12px 14px;box-sizing:border-box;
- border:1px solid var(--slm-gold);border-radius:12px;
+ min-height:44px;padding:8px 10px;box-sizing:border-box;
+ border:1px solid var(--slm-gold);border-radius:10px;
  background:var(--slm-panel);color:var(--slm-gold);
- font:inherit;font-weight:650;line-height:1.35;text-align:center;
+ font-size:.875rem;font-weight:600;line-height:1.25;text-align:center;
  white-space:normal;overflow-wrap:anywhere;cursor:pointer;
 }
 .slm-lineup-confirm-actions button:last-child {background:var(--slm-gold);color:var(--ion-background-color,#101114);}
 .slm-lineup-confirm-actions button:disabled {opacity:.55;cursor:not-allowed;}
 .slm-lineup-confirm-actions button:focus-visible {outline:2px solid var(--slm-gold);outline-offset:3px;}
-@media(max-width:390px){.slm-lineup-confirm-actions {grid-template-columns:minmax(0,1fr);}}
