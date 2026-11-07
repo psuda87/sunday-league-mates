@@ -34,6 +34,8 @@ export async function removePortraitBackground(image:HTMLCanvasElement):Promise<
   ctx.drawImage(image,0,0);
   const data=ctx.getImageData(0,0,canvas.width,canvas.height);
   if(pixels.length!==canvas.width*canvas.height)throw Error('Nieprawidłowy rozmiar maski sylwetki.');
+  // Selfie segmenter category labels: 0=background, 1=person.
+  // Validate foreground coverage before allowing the result to reach Storage.
   let foreground=0;
   for(let i=0;i<pixels.length;i++){
    const person=pixels[i]===1;
