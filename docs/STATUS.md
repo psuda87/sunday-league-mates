@@ -1,3 +1,57 @@
+# Grupy — odbiór właściciela, 2026-11-07
+
+Właściciel zaakceptował 7 poprawek i wyraził zgodę na scalenie `feat/groups-ux-acceptance` do `main` przez [PR #39](https://github.com/psuda87/sunday-league-mates/pull/39). Przed scaleniem ponownie przeszły oba strażniki. Wersja testowa na Vercel pozostaje na `3235037`; etap odbioru nie uruchamia kolejnego wdrożenia ani migracji. Następny moduł rozpoczynamy od zaktualizowanego `main` po potwierdzeniu scalenia.
+
+---
+
+# Grupy — pełny PASS i publikacja, 2026-11-06
+
+`feat/groups-ux-acceptance`, wdrożony commit `3235037`.
+Vercel production READY: https://slm-ui-demo.vercel.app,
+deployment dpl_5Mk9J2YHJVSpAYRErqKuSZgCRUDE. PASS HTTPS200 strony/JS/dokumentów,
+renderowanie logowania, poprawny endpoint i CORS oraz rzeczywiste logowanie po publikacji.
+7/7 punktów GOTOWE. PASS: oba strażniki, 107 testów ich odporności,
+524 Vitest, 4 mobilne Cypress, TypeScript/lint/build Premium/Edge, lokalne SQL/RLS48.
+Cloud: tylko migracja nicków20261106223406 i accounts18; signup race200/409,
+Gmail verify, login, edycja/case/rename i konflikty409, grupy/uprawnienia/liczniki PASS.
+Zachowane CORS/SMTP/Brevo/Auth/sekrety. Bez migracji prywatności, workerów,
+resetu i merge do main. Dwa fikcyjne konta i grupa pozostawione jako dane odbioru.
+Brak otwartych blokad; następny krok: odbiór użytkownika, osobna decyzja o merge.
+Pełna tabela, commity, manifest Cloud i zachowana historia wyników:
+[raport](GROUPS_UX_ACCEPTANCE_REPORT.md).
+
+---
+
+# Grupy — PASS przed publikacją, 2026-11-06
+
+`feat/groups-ux-acceptance`. Zgoda właściciela na przegląd strażników, Cloud i Vercel po PASS.
+PASS: oba strażniki, 107 testów ich odporności, 524 Vitest, 4 mobilne Cypress,
+TypeScript, lint, build Premium, Edge typecheck, lokalne SQL/RLS48 i test wyścigu.
+Cloud: tylko migracja nicków 20261106223406 i accounts18 (patch2 plików);
+CORS/SMTP/Brevo/Auth/sekrety zachowane. PASS signup race200/409, Gmail verify,
+login, rename/case change/konflikt409 oraz grupy/uprawnienia/liczniki.
+Vercel: publikacja przygotowana, wynik po kontroli. Bez merge do main.
+Pełna tabela7 i zachowane wcześniejsze wyniki: [raport](GROUPS_UX_ACCEPTANCE_REPORT.md).
+
+---
+
+# Grupy — odbiór UX, 2026-11-06
+
+`feat/groups-ux-acceptance`, implementacja `3596de1`, push wykonany.
+Uzupełnione 7 punktów: popup, zgłoszenia, panele, przycisk grup, wyniki,
+dzwonek administratora i licznik zarządzania; nicki z atomowym ograniczeniem SQL.
+PASS: build LIVE/Premium, TypeScript, lint, Edge typecheck, 524 Vitest,
+4 mobilne Cypress z fikcyjnym API, 48 lokalnych migracji i SQL/RLS/uprawnienia,
+race rejestracji nicku, diff --check. Oględziny zrzutów mobilnych; bez telefonu/APK.
+FAIL: verify:consolidation (lista migracji) i verify-frozen-ui (GroupScreens).
+Strażników nie zmieniono: wymagany osobny przegląd właściciela. Brak pełnego PASS.
+Cloud tylko odczyt schematu/RLS; zero wdrożonych migracji/Edge Functions,
+bez resetu, Vercel i merge. Testy SQL w tymczasowej bazie slm-main-stabilization.
+Następny krok: przegląd chronionych zmian i strażników, ponowny odbiór.
+Pełna tabela 7 punktów, wyniki i ograniczenia: [raport](GROUPS_UX_ACCEPTANCE_REPORT.md).
+
+---
+
 # APK Premium odpowiadające Vercel62baac5
 
 2026-11-05, `feat/premium-legal-pages`, wejściowy HEAD dokumentacyjny `b46fd11`;

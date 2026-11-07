@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {verifyPremiumRuntime,APPROVED,LINEUPS_MIGRATION,DISCOVERY_MIGRATION,MINIMUM_MIGRATION,ADMIN_MIGRATION,AUTH_WEB_MIGRATION,AUTH_WEB_FILES,PRIVACY_FILES,RESUME_FILES} from './premium-route-policy.mjs';
+import {verifyPremiumRuntime,APPROVED,LINEUPS_MIGRATION,DISCOVERY_MIGRATION,MINIMUM_MIGRATION,ADMIN_MIGRATION,AUTH_WEB_MIGRATION,AUTH_WEB_FILES,PRIVACY_FILES,RESUME_FILES,GROUPS_FILES,PAYMENT_MIGRATION} from './premium-route-policy.mjs';
 const root=fileURLToPath(new URL('../../',import.meta.url));
 const read=p=>readFileSync(root+'/'+p,'utf8');
 test('actual source graph passes',()=>assert.equal(verifyPremiumRuntime(root).frozen,55));
@@ -103,3 +103,5 @@ for(const path of ['app/src/profile/PhoneEditor.tsx','app/supabase/functions/acc
 for(const [name,inventory,path] of [['privacy',PRIVACY_FILES,'app/src/profile/PhoneEditor.tsx'],['resume',RESUME_FILES,'app/src/auth/sessionManager.ts']])test('cannot remove approved '+name+' inventory entry',()=>{
  inventory.delete(path);try{assert.throws(()=>verifyPremiumRuntime(root),/inventory changed/);}finally{inventory.add(path);}
 });
+
+for(const path of [...GROUPS_FILES,PAYMENT_MIGRATION])test('reject changed reviewed groups/payment source: '+path,()=>assert.throws(()=>verifyPremiumRuntime(root,{[path]:read(path)+'\n// unreviewed change\n'})));

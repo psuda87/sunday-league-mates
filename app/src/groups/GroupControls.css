@@ -19,3 +19,24 @@
 @media (prefers-reduced-motion:reduce) { .slm-group-refresh[aria-busy="true"] ion-icon { animation:none; } .slm-group-consent button[role="switch"] span { transition:none; } }
 
 .slm-groups .slm-group-hide-first { width:auto; min-height:44px; padding:8px 10px; margin-top:8px; border:1px solid var(--slm-border); border-radius:10px; color:var(--ion-text-color); background:var(--slm-panel); }
+/* Zatwierdzone poprawki grup; selektory ograniczone do modułu. */
+.slm-group-count {display:inline-grid;place-items:center;min-width:24px;min-height:24px;margin-left:8px;padding:2px 6px;border-radius:12px;background:var(--slm-gold);color:var(--ion-background-color);font-weight:700;}
+.slm-groups .slm-group-invite,.slm-groups .slm-group-management {padding:16px;margin:16px 0;border:1px solid var(--slm-border);border-radius:16px;background:var(--slm-panel);}
+.slm-groups .slm-group-management h3 {margin-top:24px;}
+.slm-groups .slm-group-actions {flex-wrap:wrap;gap:10px;}
+.slm-groups .slm-group-actions button {min-height:44px;white-space:normal;}
+.slm-groups .slm-group-search-result {display:flex;flex-direction:column;align-items:stretch;gap:10px;padding:18px;text-align:left;}
+.slm-groups .slm-group-search-result h2 {font-size:1.2rem;margin:0;overflow-wrap:anywhere;}
+.slm-groups .slm-group-search-result p {margin:0;color:var(--slm-text-secondary);overflow-wrap:anywhere;}
+.slm-groups .slm-group-search-result small {color:var(--slm-gold);}
+.slm-groups .slm-group-search-result .slm-group-actions {display:flex;align-items:center;justify-content:space-between;}
+.slm-premium-events .slm-groups-cta,.slm-group-bell {display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:12px 18px;border:1px solid var(--slm-gold);border-radius:14px;background:var(--slm-panel);color:var(--slm-gold);font:inherit;font-weight:700;}
+.slm-groups-cta ion-icon,.slm-group-bell ion-icon {font-size:24px;}
+.slm-group-notifications {position:relative;display:flex;flex:none;z-index:4;}
+.slm-group-bell {min-width:48px;padding:8px;}
+.slm-group-notifications section {position:absolute;right:0;top:54px;width:min(340px,calc(100vw - 32px));padding:16px;background:var(--slm-panel);border:1px solid var(--slm-border);border-radius:16px;}
+.slm-group-notifications h2 {font-size:1rem;margin:0 0 12px;}
+.slm-group-notifications ul {list-style:none;padding:0;margin:0;}
+.slm-group-notifications li button {width:100%;display:flex;flex-direction:column;gap:8px;min-height:48px;padding:12px;text-align:left;background:transparent;color:var(--ion-text-color);border:0;border-bottom:1px solid var(--slm-border);font:inherit;overflow-wrap:anywhere;}
+.slm-group-notifications button:focus-visible,.slm-groups-cta:focus-visible {outline:2px solid var(--slm-gold);outline-offset:3px;}
+@media(max-width:420px){.slm-groups .slm-group-actions button {flex:1 1 140px;}.slm-groups .slm-group-management,.slm-groups .slm-group-invite {padding:12px;}}

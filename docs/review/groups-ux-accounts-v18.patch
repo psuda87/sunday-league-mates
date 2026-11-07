@@ -1,0 +1,35 @@
+--- a/accounts/handler.ts
++++ b/accounts/handler.ts
+@@ -59,6 +59,7 @@
+     if (!r.ok) {
+       if (r.status >= 500) throw new ApiError(503, 'service_unavailable', 'Serwer jest chwilowo niedostępny. Spróbuj ponownie.');
+       if (r.status === 429) throw new ApiError(429, 'rate_limited', 'Zbyt wiele prób. Spróbuj ponownie za minutę.');
++      if(r.data?.code==='23505'&&/nickname/i.test(String(r.data?.message)))throw new ApiError(409,'nickname_taken','Ten pseudonim jest już zajęty. Wybierz inny.');
+       if (r.data?.code === '23505') throw new ApiError(409, 'identifier_taken', 'Login lub numer telefonu jest już zajęty.');
+       throw new ApiError(409, 'operation_failed', 'Operacja nie została zakończona. Skontaktuj się z administratorem.');
+     }
+@@ -493,6 +494,7 @@
+       if (action === 'save_premium_profile') {
+         await rate('scoped:' + ctx.id,90);
+         const r = await call('/rest/v1/rpc/slm_premium_profile_save','POST',{p_user:ctx.id,p_session:ctx.sid,p_body:body},undefined,true);
++        if(!r.ok&&r.data?.code==='23505'&&/nickname/i.test(String(r.data?.message)))throw new ApiError(409,'nickname_taken','Ten pseudonim jest już zajęty. Wybierz inny.');
+         if(!r.ok)throw new ApiError(409,'profile_not_saved','Nie potwierdzono zapisu. Odśwież profil i sprawdź dane oraz zakres zgody.');
+         return respond(await profile(ctx.id));
+       }
+--- a/accounts/emailFlows.ts
++++ b/accounts/emailFlows.ts
+@@ -59,11 +59,14 @@
+     await d.rate('email:'+email,5,300);
+     const profile=action==='signup'?signupProfile(body):undefined;
+     if(action==='signup'&&body.accept_policies!==true)throw input();
++    const nicknameTaken=async()=>profile&&await d.db('rpc/slm_nickname_available','POST',{p_nickname:profile.nickname})===false;
++    if(await nicknameTaken())throw new EmailFlowError(409,'nickname_taken','Ten pseudonim jest już zajęty. Wybierz inny.');
+     const values=action==='signup'?{email,password:newPassword(body,'password'),data:{slm_signup_profile:profile}}:action==='resend_verification'?{email,type:'signup'}:{email};
+     const path=action==='signup'?'/auth/v1/signup':action==='resend_verification'?'/auth/v1/resend':'/auth/v1/recover';
+     const r=await d.call(path+'?redirect_to='+encodeURIComponent(redirect),'POST',values);
+     // Never expose provider messages or disclose whether this email already exists.
+     if(!r.ok){
++      if(action==='signup'&&await nicknameTaken())throw new EmailFlowError(409,'nickname_taken','Ten pseudonim jest już zajęty. Wybierz inny.');
+       if(r.status===429)throw new EmailFlowError(429,'rate_limited','Zbyt wiele prób. Spróbuj ponownie później.');
+       if(r.status>=500)throw new EmailFlowError(503,'mail_unavailable','Nie udało się uruchomić procesu e-mail. Spróbuj później.');
+       if(!['user_already_exists','email_exists','user_not_found'].includes(String(r.data?.code)))throw new EmailFlowError(503,'mail_unavailable','Nie udało się uruchomić procesu e-mail. Spróbuj później.');

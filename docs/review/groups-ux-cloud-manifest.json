@@ -1,0 +1,74 @@
+{
+  "project": "hjtcyybkxebvdropchac",
+  "baseline_version": 17,
+  "deployed_version": 18,
+  "verify_jwt": false,
+  "preserved_config": [
+    "CORS",
+    "SMTP/Brevo",
+    "Auth",
+    "secrets"
+  ],
+  "files": [
+    {
+      "path": "accounts/index.ts",
+      "before_sha256": "560ede01b85d365393db8598257b586d424846255f6fadc5cfe7155cab823c02",
+      "after_sha256": "560ede01b85d365393db8598257b586d424846255f6fadc5cfe7155cab823c02",
+      "changed": false
+    },
+    {
+      "path": "accounts/handler.ts",
+      "before_sha256": "4f6c8a245162fee38f15a077071998d8d3c92f61aef8478917bc7d549e78733d",
+      "after_sha256": "e240eecf5451f64b2e36208164e1a2edab89e0fd400aab84480930284b55a26f",
+      "changed": true
+    },
+    {
+      "path": "_shared/phone.ts",
+      "before_sha256": "82096cc0441388c167865667007d7d56b660c048c729ffc0c4aad2d2f83a20b0",
+      "after_sha256": "82096cc0441388c167865667007d7d56b660c048c729ffc0c4aad2d2f83a20b0",
+      "changed": false
+    },
+    {
+      "path": "accounts/profilePhotos.ts",
+      "before_sha256": "297b29411fabc32bc8771e2e99e028031b4ceed80f5b00fca976d75df2441e15",
+      "after_sha256": "297b29411fabc32bc8771e2e99e028031b4ceed80f5b00fca976d75df2441e15",
+      "changed": false
+    },
+    {
+      "path": "_shared/webp.ts",
+      "before_sha256": "5b9b4d3c99bd503b2bece1b6e537a403395c10758162b9f54a9f06004eda8b8d",
+      "after_sha256": "5b9b4d3c99bd503b2bece1b6e537a403395c10758162b9f54a9f06004eda8b8d",
+      "changed": false
+    },
+    {
+      "path": "_shared/profilePhoto.ts",
+      "before_sha256": "b1ecd9c6710911e1cd7f6015ecf91c1a6c388de6397658436dcfb69de4c90023",
+      "after_sha256": "b1ecd9c6710911e1cd7f6015ecf91c1a6c388de6397658436dcfb69de4c90023",
+      "changed": false
+    },
+    {
+      "path": "accounts/emailFlows.ts",
+      "before_sha256": "d5de20b8c4c447aeb30801845950c6ab6d96d81a52599098871354d5a1c4102e",
+      "after_sha256": "fa8c495431a93d3d738cd02ea5cef75f6b09f89436d95bb6e6e6fbfbb302a1af",
+      "changed": true
+    },
+    {
+      "path": "accounts/emailHook.ts",
+      "before_sha256": "36e39e625601c8a4f2f3a2c3c74096fcecd877a77bea1a5a30a526d9a1f24552",
+      "after_sha256": "36e39e625601c8a4f2f3a2c3c74096fcecd877a77bea1a5a30a526d9a1f24552",
+      "changed": false
+    },
+    {
+      "path": "accounts/smtp.ts",
+      "before_sha256": "dd83756140e4da3d0c56a51dfb034a8561819fe686317c6ec04fa14f96e594a6",
+      "after_sha256": "dd83756140e4da3d0c56a51dfb034a8561819fe686317c6ec04fa14f96e594a6",
+      "changed": false
+    },
+    {
+      "path": "accounts/deno.json",
+      "before_sha256": "a7506b680cdc1eb81864d01d961b2eb49d7f9c88bed2a8ec8492c87843ff396c",
+      "after_sha256": "a7506b680cdc1eb81864d01d961b2eb49d7f9c88bed2a8ec8492c87843ff396c",
+      "changed": false
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import {AccountError} from './api';
 import { useOwnPhoto } from './useOwnPhoto';
 import { createElement,useEffect, useMemo, useRef, useState } from 'react';
 import PersonalPayments from '../finance/PersonalPayments';
@@ -42,7 +43,7 @@ export function useOwnProfile(manager:SessionManager,userId:string|null,selectio
   const auth=manager.getSnapshot();if(flight.current||!adapter||current.phase!=='ready'||auth.phase!=='ready'||auth.session?.user_id!==userId)return false;
   const ticket=generation.current;flight.current=true;setSaving(true);
   try{const profile=await adapter.saveIdentity(draft);if(ticket!==generation.current)return false;setState({owner:userId,phase:'ready',profile,notice:'Zapisano i ponownie odczytano profil.'});return true;}
-  catch{if(ticket===generation.current)setState({owner:userId,phase:'error',profile:null,notice:'Nie potwierdzono zapisu. Ponów odczyt profilu.'});return false;}
+  catch(error){if(ticket===generation.current){if(error instanceof AccountError&&error.code==='nickname_taken')setState(previous=>({...previous,notice:error.message}));else setState({owner:userId,phase:'error',profile:null,notice:'Nie potwierdzono zapisu. Ponów odczyt profilu.'});}return false;}
   finally{if(ticket===generation.current){flight.current=false;setSaving(false);}}
  }
  useEffect(()=>{const reload=()=>setRevision(v=>v+1);window.addEventListener('slm-profile-changed',reload);return()=>window.removeEventListener('slm-profile-changed',reload);},[]);

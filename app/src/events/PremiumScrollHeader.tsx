@@ -1,9 +1,9 @@
 import { useEffect,useRef,useState } from 'react';
-import type { ComponentProps } from 'react';
+import type { ComponentProps,ReactNode } from 'react';
 import { IonButton } from '@ionic/react';
 import MatchHeader from '../ui/MatchHeader';
 // The decorative logo scrolls away. Only the small title/action bar sticks.
-export default function PremiumScrollHeader(props:ComponentProps<typeof MatchHeader>){
+export default function PremiumScrollHeader({primaryAction,...props}:ComponentProps<typeof MatchHeader>&{primaryAction?:ReactNode}){
  const marker=useRef<HTMLDivElement>(null),[stuck,setStuck]=useState(false);
  useEffect(()=>{
   let observer:IntersectionObserver|undefined,alive=true;
@@ -18,7 +18,7 @@ export default function PremiumScrollHeader(props:ComponentProps<typeof MatchHea
   });
   return()=>{alive=false;observer?.disconnect();if(scrollRoot)scrollRoot.style.scrollPaddingTop=previousPadding;};
  },[]);
- return <><MatchHeader {...props}/><div ref={marker} className="slm-scroll-header-marker" aria-hidden="true"/>
+ return <><MatchHeader {...props} action={<>{props.action}{primaryAction}</>}/><div ref={marker} className="slm-scroll-header-marker" aria-hidden="true"/>
   <header className="slm-scroll-header" data-stuck={stuck} aria-hidden={!stuck} inert={!stuck}>
    {props.onBack&&<IonButton fill="clear" aria-label="Wróć do meczów" onClick={props.onBack}>←</IonButton>}
    <strong>{props.title??'Mecze'}</strong>{props.action}

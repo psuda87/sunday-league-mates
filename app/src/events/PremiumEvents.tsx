@@ -1,3 +1,4 @@
+import GroupNotifications from '../groups/GroupNotifications';
 import GuestForm from './GuestForm';
 import { visiblePremiumEvents } from './eventFilters';
 import PremiumScrollHeader from './PremiumScrollHeader';
@@ -6,7 +7,7 @@ import PremiumGroupFinance from '../finance/PremiumGroupFinance';
 import type { SessionManager } from '../auth/sessionManager';
 import { useEffect,useRef,useState } from 'react';
 import { IonButton,IonIcon } from '@ionic/react';
-import { refreshOutline } from 'ionicons/icons';
+import { peopleOutline,refreshOutline } from 'ionicons/icons';
 import MatchHero from '../ui/MatchHero';
 import MatchFilters from '../ui/MatchFilters';
 import type { MatchFilter } from '../ui/MatchFilters';
@@ -50,7 +51,7 @@ function PremiumEventsScreen({data,userId,onGroups,manager}:{manager?:SessionMan
   if(finance&&manager)return <section ref={area} className="slm-premium-events"><PremiumScrollHeader title="Rozliczenia" onBack={()=>setFinance(false)}/><PremiumGroupFinance manager={manager} userId={userId} initialGroup={data.groups.some(g=>g.id===data.activeGroup)?data.activeGroup:undefined}/></section>;
   return <section ref={area} className="slm-premium-events" aria-label="Mecze" aria-busy={writeDisabled}>
     {(data.creating||editing&&e?.can_edit&&full)&&data.serverNow?<>{messages}{editConflict&&<p role="alert">{editConflict}</p>}<EventForm onBack={()=>editing?setEditing(false):data.back()} onSave={async input=>{if(editing){if(editVersion.current!==e?.version){setEditConflict('Mecz zmienił się podczas edycji. Szkic zachowano. Anuluj edycję i otwórz aktualny mecz przed nowym zapisem.');return;}if(await data.edit(input))setEditing(false);}else await data.create(input);}} live={{editing,canEdit:e?.can_edit,occupied:e?.registered_count??0,groups:editing&&e?data.groups.filter(g=>g.id===e.group_id):data.organizers,initial:editing&&e?premiumEventInput(e):premiumDefaults(data.serverNow,data.organizers.some(g=>g.id===data.activeGroup)?data.activeGroup:data.organizers[0]?.id),busy:data.busy}}/></>:<>
-    <PremiumScrollHeader title={e?'Szczegóły meczu':'Mecze'} action={refresh} onBack={e?data.back:undefined}/>{messages}
+    <PremiumScrollHeader title={e?'Szczegóły meczu':'Mecze'} action={refresh} primaryAction={!e&&manager?<GroupNotifications manager={manager} userId={userId} onGroups={onGroups} refreshKey={data.loading}/>:undefined} onBack={e?data.back:undefined}/>{messages}
     {e&&d?<>
       {full?<><p className="slm-event-label"><span>{e.group_name}</span></p><MatchHero match={heroMatch(e)} minimum={e.minimum_players} displayName={e.name} badge={badge(e)} title="Szczegóły meczu">{ownAction}</MatchHero></>:<section className="slm-panel"><h2>{e.name}</h2><p>{matchDate(e.starts_at)} · {e.location} · {e.group_name}</p><p>{e.access==='none'?'Szczegóły tego prywatnego meczu są dostępne dla członków grupy.':'Widoczny jest wyłącznie Twój udział po opuszczeniu grupy.'}</p>{e.access==='own'&&ownAction}</section>}
       {e.access!=='none'&&<MatchTabs key={e.id} panels={[<section className="slm-panel slm-match-info"><h2>Informacje</h2><p>{e.group_name} · {matchDate(e.starts_at)}</p><p>{e.location} · {e.duration_minutes} minut</p><p>Koszt meczu: {money(e.cost_cents!/100)} · minimum {e.minimum_players} uczestników</p><p>Rezygnacja do 17:00 w dniu meczu. Później obowiązują zasady odpowiedzialności finansowej, a zastępstwa rozliczane są według kolejności zwolnionych miejsc.</p>{e.decision_required&&<p role="status">Nie ma minimum {e.minimum_players} osób. Administrator podejmuje decyzję o odwołaniu.</p>}{e.can_edit&&e.registration_open&&e.status!=='cancelled'&&<IonButton disabled={writeDisabled} onClick={()=>{editVersion.current=e.version;setEditConflict('');setEditing(true);}}>Edytuj mecz</IonButton>}{e.can_manage&&e.status!=='cancelled'&&<details><summary>Zarządzanie meczem</summary><label>Powód odwołania<input value={reason} maxLength={200} onChange={ev=>setReason(ev.target.value)}/></label><IonButton disabled={writeDisabled||!reason.trim()} color="danger" onClick={()=>{if(window.confirm('Odwołać mecz z zachowaniem historii i rozliczeń?'))void data.act('cancel',{reason});}}>Odwołaj mecz</IonButton></details>}</section> ,<>
@@ -63,7 +64,7 @@ function PremiumEventsScreen({data,userId,onGroups,manager}:{manager?:SessionMan
     :<section className="slm-matches-screen">
       <div className="slm-events-controls"><label>Aktywna grupa<select aria-label="Aktywna grupa" value={data.activeGroup} onChange={ev=>data.selectGroup(ev.target.value)}><option value="">Wszystkie</option><option value="groups" disabled={!data.discoveryEnabled}>Moje grupy</option><option value="public" disabled={!data.discoveryEnabled}>Publiczne</option><option value="mine">Moje mecze</option>{data.groups.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></label>
       {data.activeGroup==='public'&&<label className="slm-player-search">Szukaj meczu lub grupy<input type="search" value={data.search??''} maxLength={100} onChange={ev=>data.changeSearch(ev.target.value)}/></label>}
-      {!data.groups.length&&<section className="slm-group-empty"><h2>Znajdź swoją ekipę</h2><p>Utwórz grupę albo przyjmij zaproszenie, aby grać razem.</p><button type="button" className="slm-group-primary" onClick={onGroups}>Przejdź do grup</button></section>}
+      {!data.groups.length&&<section className="slm-group-empty"><h2>Znajdź swoją ekipę</h2><p>Utwórz grupę albo przyjmij zaproszenie, aby grać razem.</p><button type="button" className="slm-groups-cta" onClick={onGroups}><IonIcon icon={peopleOutline} aria-hidden="true"/>Przejdź do grup</button></section>}
       {manager&&<IonButton fill="outline" onClick={()=>setFinance(true)}>Moje rozliczenia grupowe</IonButton>}</div>
       <MatchFilters value={filter} onChange={value=>{if(data.changeFilter)data.changeFilter(value);else{setLocalFilter(value);if(data.offset)void data.refresh();}}}/>
       <div className="slm-match-list">{!data.loading&&!data.error&&filtered.map(m=><div key={m.id} data-event={m.id}>

@@ -59,11 +59,14 @@ export async function emailAction(action:string,body:Row,env:EmailEnvironment,d:
     await d.rate('email:'+email,5,300);
     const profile=action==='signup'?signupProfile(body):undefined;
     if(action==='signup'&&body.accept_policies!==true)throw input();
+    const nicknameTaken=async()=>profile&&await d.db('rpc/slm_nickname_available','POST',{p_nickname:profile.nickname})===false;
+    if(await nicknameTaken())throw new EmailFlowError(409,'nickname_taken','Ten pseudonim jest już zajęty. Wybierz inny.');
     const values=action==='signup'?{email,password:newPassword(body,'password'),data:{slm_signup_profile:profile}}:action==='resend_verification'?{email,type:'signup'}:{email};
     const path=action==='signup'?'/auth/v1/signup':action==='resend_verification'?'/auth/v1/resend':'/auth/v1/recover';
     const r=await d.call(path+'?redirect_to='+encodeURIComponent(redirect),'POST',values);
     // Never expose provider messages or disclose whether this email already exists.
     if(!r.ok){
+      if(action==='signup'&&await nicknameTaken())throw new EmailFlowError(409,'nickname_taken','Ten pseudonim jest już zajęty. Wybierz inny.');
       if(r.status===429)throw new EmailFlowError(429,'rate_limited','Zbyt wiele prób. Spróbuj ponownie później.');
       if(r.status>=500)throw new EmailFlowError(503,'mail_unavailable','Nie udało się uruchomić procesu e-mail. Spróbuj później.');
       if(!['user_already_exists','email_exists','user_not_found'].includes(String(r.data?.code)))throw new EmailFlowError(503,'mail_unavailable','Nie udało się uruchomić procesu e-mail. Spróbuj później.');
