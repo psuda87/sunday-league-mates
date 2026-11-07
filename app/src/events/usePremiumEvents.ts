@@ -66,6 +66,26 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
     if(phase!=='ready'||current.session?.user_id!==userId){invalidate();setVerifiedSession(null);if(debounce.current)clearTimeout(debounce.current);query.current={scope:'all',period:'upcoming'};setSearch('');setActiveGroup('');setOffset(0);setListFilter('upcoming');setDiscoveryEnabled(false);setMinimumEnabled(false);setHasMore(false);setNextOffset(null);setEvents([]);setGroups([]);setDetail(null);setLoading(true);}
     else{refreshFlight.current=null;void revalidate();}
   });},[manager,userId,revalidate,invalidate]);
+  // Keep participant counts, reserve list and match details current while open.
+  // Refresh only the active match, not the full feed, to minimize API usage.
+  useEffect(()=>{
+    if(!detail?.event.id || !authorized())return;
+    const id=detail.event.id;
+    const check=async()=>{
+      if(document.visibilityState!=='visible'||navigator.onLine===false||flight.current)return;
+      const ticket=++detailEpoch.current;
+      try{
+        const fresh=matchDetail(await manager.call('matches_detail',{event_id:id}),id);
+        if(authorized()&&ticket===detailEpoch.current&&route.current.eventId===id){setDetail(fresh);setServerNow(fresh.server_now);}
+      }catch{/* Keep the last verified view; normal actions still report failures. */}
+    };
+    const timer=window.setInterval(()=>{void check();},15000);
+    const onReturn=()=>{void check();};
+    document.addEventListener('visibilitychange',onReturn);
+    window.addEventListener('focus',onReturn);
+    window.addEventListener('online',onReturn);
+    return()=>{window.clearInterval(timer);document.removeEventListener('visibilitychange',onReturn);window.removeEventListener('focus',onReturn);window.removeEventListener('online',onReturn);};
+  },[detail?.event.id,manager,authorized]);
   const open=useCallback(async(id:string)=>{
     const ticket=++detailEpoch.current;setDetail(null);setLoading(true);setError('');setCreating(false);
     try{const d=matchDetail(await manager.call('matches_detail',{event_id:id}),id);if(authorized()&&ticket===detailEpoch.current){setDetail(d);setServerNow(d.server_now);return true;}return false;}
