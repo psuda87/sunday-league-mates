@@ -22,7 +22,7 @@ const mediaPipeAssets={name:'slm-local-mediapipe-assets',apply:'build',async gen
  }
 }};
 export const ACCOUNTS='https://hjtcyybkxebvdropchac.supabase.co/functions/v1/accounts';
-export const CSP="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://hjtcyybkxebvdropchac.supabase.co; font-src 'self' data:; connect-src 'self' https://hjtcyybkxebvdropchac.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'";
+export const CSP="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://hjtcyybkxebvdropchac.supabase.co; font-src 'self' data:; connect-src 'self' https://hjtcyybkxebvdropchac.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'";
 export function premiumWebConfig(base,env=process.env){
  if(env.VITE_SLM_FUNCTION_URL&&env.VITE_SLM_FUNCTION_URL!==ACCOUNTS)throw new Error('Only the approved HTTPS accounts endpoint is allowed');
  const define={...base.define,'import.meta.env.VITE_SLM_FUNCTION_URL':JSON.stringify(ACCOUNTS)};
