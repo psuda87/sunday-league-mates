@@ -42,7 +42,7 @@ export function useGroups(manager:SessionManager,userId:string){
    if(selected.current&&groups.some(g=>g.id===selected.current))detail=details(await manager.call('groups_detail',{group_id:selected.current}),selected.current,userId);
    const photoIds=detail?.members.map(m=>m.user_id)??[];
    const publicPhotos=photoIds.length?await manager.call<{photos:Record<string,string>}>('profile_photo_public_list',{user_ids:photoIds}):{photos:{}};
-   if(alive.current&&ticket===generation.current)setPhotos(publicPhotos.photos);
+   if(alive.current&&ticket===generation.current)setPhotos(publicPhotos.photos??{});
    if(alive.current&&ticket===generation.current&&manager.getSnapshot().session===session){setState({groups,inbox,detail});setVerifiedSession(session);}
   } catch(e){if(ticket===generation.current){setState({groups:[],inbox:[],detail:null});setPhotos({});fail(e);}}
   finally {if(alive.current&&ticket===generation.current)setLoading(false);}
