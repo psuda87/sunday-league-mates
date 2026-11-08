@@ -7,13 +7,13 @@ import { summary,details,requests,member } from './contracts';
 import { normalizePolishPhone } from '../../supabase/functions/_shared/phone';
 
 // Only real DTOs enter this legacy presentation shape. No initialWorld/reducer or fixtures.
-const player=(id:string,name:string):GroupPerson=>({id,name,nick:name});
-export function groupWorld(userId:string,groups:GroupSummary[],inbox:GroupRequest[],detail:GroupDetail|null):GroupWorld {
+const player=(id:string,name:string,photo?:string):GroupPerson=>({id,name,nick:name,...(photo?{portrait:{src:photo},portraitEdited:true}:{})});
+export function groupWorld(userId:string,groups:GroupSummary[],inbox:GroupRequest[],detail:GroupDetail|null,photos:Record<string,string>={}):GroupWorld {
  const groupRows=new Map<string,GroupIdentity>(groups.map(g=>[g.id,g]));
  for(const request of inbox)if(!groupRows.has(request.group_id))groupRows.set(request.group_id,{id:request.group_id,name:request.group_name??'',description:'',admin_id:''});
  const players=new Map<string,GroupPerson>();
  const members=groups.filter(g=>g.id!==detail?.group.id).map(g=>({groupId:g.id,playerId:userId,organizer:g.organizer,joinedAt:''}));
- if(detail){groupRows.set(detail.group.id,detail.group);for(const m of detail.members){players.set(m.user_id,player(m.user_id,m.display_name??m.nickname));members.push({groupId:detail.group.id,playerId:m.user_id,organizer:m.organizer,joinedAt:m.joined_at});}}
+ if(detail){groupRows.set(detail.group.id,detail.group);for(const m of detail.members){players.set(m.user_id,player(m.user_id,m.display_name??m.nickname,photos[m.user_id]));members.push({groupId:detail.group.id,playerId:m.user_id,organizer:m.organizer,joinedAt:m.joined_at});}}
  const requests=new Map([...inbox,...(detail?.requests??[])].map(r=>[r.id,r]));
  for(const r of requests.values()){
   if(r.actor_id&&r.actor_name&&!players.has(r.actor_id))players.set(r.actor_id,player(r.actor_id,r.actor_name));
@@ -27,6 +27,7 @@ export function useGroups(manager:SessionManager,userId:string){
  const auth=useSyncExternalStore(manager.subscribe,manager.getSnapshot);
  const [verifiedSession,setVerifiedSession]=useState(auth.session);
  const [state,setState]=useState<{groups:GroupSummary[];inbox:GroupRequest[];detail:GroupDetail|null}>({groups:[],inbox:[],detail:null});
+ const [photos,setPhotos]=useState<Record<string,string>>({});
  const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState(''),[found,setFound]=useState<GroupBinding['found']>([]),[candidates,setCandidates]=useState<GroupBinding['candidates']>([]);
  const [searching,setSearching]=useState(false),[finding,setFinding]=useState(false);
  const alive=useRef(true),generation=useRef(0),searchEpoch=useRef(0),candidateEpoch=useRef(0),flight=useRef(false),selected=useRef<string|null>(window.location.hash.startsWith('#group/')?window.location.hash.slice(7):null),keys=useRef(new Map<string,string>());
@@ -39,8 +40,11 @@ export function useGroups(manager:SessionManager,userId:string){
    const groups=a.groups.map(summary),inbox=[...requests(b.requests),...requests(b.outgoing??[])];
    let detail:GroupDetail|null=null;
    if(selected.current&&groups.some(g=>g.id===selected.current))detail=details(await manager.call('groups_detail',{group_id:selected.current}),selected.current,userId);
+   const photoIds=detail?.members.map(m=>m.user_id)??[];
+   const publicPhotos=photoIds.length?await manager.call<{photos:Record<string,string>}>('profile_photo_public_list',{user_ids:photoIds}):{photos:{}};
+   if(alive.current&&ticket===generation.current)setPhotos(publicPhotos.photos);
    if(alive.current&&ticket===generation.current&&manager.getSnapshot().session===session){setState({groups,inbox,detail});setVerifiedSession(session);}
-  } catch(e){if(ticket===generation.current){setState({groups:[],inbox:[],detail:null});fail(e);}}
+  } catch(e){if(ticket===generation.current){setState({groups:[],inbox:[],detail:null});setPhotos({});fail(e);}}
   finally {if(alive.current&&ticket===generation.current)setLoading(false);}
  },[manager,userId,fail]);
  // Coalesce manual refreshes synchronously, before React disables the button.
@@ -92,5 +96,5 @@ export function useGroups(manager:SessionManager,userId:string){
   });},
  };
  const readMember=useCallback(async(id:string,groupId:string)=>{const m=member(await manager.call('groups_profile',{group_id:groupId,user_id:id}));if(m.user_id!==id)throw Error('Nieprawidłowy profil.');return m;},[manager]);
- return {verified:auth.phase==='ready'&&verifiedSession===auth.session,verifiedSession,world:groupWorld(userId,state.groups,state.inbox,state.detail),binding,readMember};
+ return {verified:auth.phase==='ready'&&verifiedSession===auth.session,verifiedSession,world:groupWorld(userId,state.groups,state.inbox,state.detail,photos),binding,readMember};
 }
