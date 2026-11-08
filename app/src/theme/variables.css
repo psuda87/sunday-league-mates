@@ -4102,3 +4102,7 @@ button.slm-group-card {
 .slm-photo-crop input[type="range"]{margin:6px 0}
 .slm-photo-crop .slm-identity-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .slm-photo-crop .slm-identity-actions button{min-width:0;flex:1 1 auto;padding:9px 8px;font-size:.88rem}
+
+/* Match location remains clickable above the full-card navigation overlay. */
+.slm-location-map-link{position:relative;z-index:3;color:inherit;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;cursor:pointer}
+.slm-location-map-link:focus-visible{outline:2px solid var(--slm-gold-edge);outline-offset:3px;border-radius:2px}
