@@ -62,7 +62,7 @@ export function useGroups(manager:SessionManager,userId:string){
  },[refresh]);
  const invalidate=useCallback(()=>{generation.current++;searchEpoch.current++;candidateEpoch.current++;},[]);
  useEffect(()=>{alive.current=true;void refresh();return()=>{alive.current=false;invalidate();};},[refresh,userId,invalidate]);
- useEffect(()=>{let previous=manager.getSnapshot();return manager.subscribe(()=>{const current=manager.getSnapshot();if(current===previous)return;previous=current;invalidate();setVerifiedSession(null);if(current.phase==='ready'&&current.session?.user_id===userId)void refresh();else if(current.phase!=='checking'){setState({groups:[],inbox:[],detail:null});selected.current=null;}});},[manager,userId,refresh,invalidate]);
+ useEffect(()=>{let previous=manager.getSnapshot();return manager.subscribe(()=>{const current=manager.getSnapshot();if(current===previous)return;previous=current;invalidate();setVerifiedSession(null);if(current.phase==='ready'&&current.session?.user_id===userId)void refresh();else if(current.phase!=='checking'){setState({groups:[],inbox:[],detail:null});setPhotos({});selected.current=null;}});},[manager,userId,refresh,invalidate]);
  const mutate=async<T,>(action:string,body:Record<string,unknown>)=>{
   const fingerprint=JSON.stringify([action,body]);let key=keys.current.get(fingerprint);if(!key){key=crypto.randomUUID();keys.current.set(fingerprint,key);}
   const result=await manager.call<T>(action,{...body,request_id:key});keys.current.delete(fingerprint);window.dispatchEvent(new Event('slm-groups-changed'));return result;
