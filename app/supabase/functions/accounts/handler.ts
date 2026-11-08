@@ -324,6 +324,20 @@ export function createHandler(env: Environment) {
         await privacyRpc('deletion_begin',{p_user:ctx.id,p_session:ctx.sid,p_operation:ticket.operation,p_proof:ticket.proof});
         return respond(await finishDeletion(ticket.operation,ticket.proof,deletion));
       }
+      if (action === 'profile_photo_public_list') {
+        await rate('photo-public:'+ctx.id,30);
+        const ids=body.user_ids;
+        if(!Array.isArray(ids)||ids.length>100||ids.some(id=>typeof id!=='string'||!/^[a-f0-9-]{36}$/.test(id)))throw new ApiError(400,'invalid_input','Nieprawidłowa lista użytkowników.');
+        const unique=[...new Set(ids)] as string[];
+        if(!unique.length)return respond({photos:{}});
+        const rows=await db('slm_profile_photos?user_id=in.('+unique.join(',')+')&select=user_id,object_path,revision') as {user_id:string;object_path:string|null;revision:string}[];
+        const photos:Record<string,string>={};
+        for(const row of rows){
+          if(row.object_path?.startsWith(row.user_id+'/')&&/^[a-f0-9-]{36}\\.webp$/.test(row.object_path.slice(row.user_id.length+1)))
+            photos[row.user_id]=env.url+'/storage/v1/object/public/slm-profile-photos/'+row.object_path+'?v='+row.revision;
+        }
+        return respond({photos});
+      }
       if (['profile_photo_get','profile_photo_upload','profile_photo_delete'].includes(action)) {
         if(!uploadRequest)await rate('photo:'+ctx.id,action==='profile_photo_get'?60:10);
         return respond(await profilePhoto(env,ctx,action,body));
