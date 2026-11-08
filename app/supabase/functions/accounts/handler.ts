@@ -333,7 +333,7 @@ export function createHandler(env: Environment) {
         const rows=await db('slm_profile_photos?user_id=in.('+unique.join(',')+')&select=user_id,object_path,revision') as {user_id:string;object_path:string|null;revision:string}[];
         const photos:Record<string,string>={};
         for(const row of rows){
-          if(row.object_path?.startsWith(row.user_id+'/')&&/^[a-f0-9-]{36}\\.webp$/.test(row.object_path.slice(row.user_id.length+1)))
+          if(row.object_path?.startsWith(row.user_id+'/')&&/^[a-f0-9-]{36}\.webp$/.test(row.object_path.slice(row.user_id.length+1)))
             photos[row.user_id]=env.url+'/storage/v1/object/public/slm-profile-photos/'+row.object_path+'?v='+row.revision;
         }
         return respond({photos});
