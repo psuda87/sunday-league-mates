@@ -40,9 +40,15 @@ export function useGroups(manager:SessionManager,userId:string){
    const groups=a.groups.map(summary),inbox=[...requests(b.requests),...requests(b.outgoing??[])];
    let detail:GroupDetail|null=null;
    if(selected.current&&groups.some(g=>g.id===selected.current))detail=details(await manager.call('groups_detail',{group_id:selected.current}),selected.current,userId);
-   const photoIds=detail?.members.map(m=>m.user_id)??[];
-   const publicPhotos=photoIds.length?await manager.call<{photos:Record<string,string>}>('profile_photo_public_list',{user_ids:photoIds}):{photos:{}};
-   if(alive.current&&ticket===generation.current)setPhotos(publicPhotos.photos??{});
+   // Photo failures must never prevent the group itself from loading.
+   let groupPhotos:Record<string,string>={};
+   if(detail?.members.length){
+     try {
+       const response=await manager.call<{photos:Record<string,string>}>('profile_photo_group_list',{group_id:detail.group.id});
+       groupPhotos=response.photos??{};
+     }catch { /* Use initials when photos are temporarily unavailable. */ }
+   }
+   if(alive.current&&ticket===generation.current)setPhotos(groupPhotos);
    if(alive.current&&ticket===generation.current&&manager.getSnapshot().session===session){setState({groups,inbox,detail});setVerifiedSession(session);}
   } catch(e){if(ticket===generation.current){setState({groups:[],inbox:[],detail:null});setPhotos({});fail(e);}}
   finally {if(alive.current&&ticket===generation.current)setLoading(false);}
