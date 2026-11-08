@@ -14,8 +14,8 @@ it('uses server counts and UUIDs without importing any demo world or inventing m
  expect(world).not.toHaveProperty('games');expect(world.groupState.groups.map(g=>g.id)).toEqual(['group-real']);
  expect(world.groupState.members).toHaveLength(1);expect(world.players).toEqual([]);
 });
-it('renders public photos only for users returned by the live group detail',()=>{
- const photos={'owner':'https://example.supabase.co/storage/v1/object/public/slm-profile-photos/owner/one.webp?v=1','outsider':'https://example.invalid/outsider.webp'};
+it('renders group-scoped photos only for members returned by the live group detail',()=>{
+ const photos={'owner':'https://example.supabase.co/storage/v1/object/sign/slm-profile-photos/owner/one.webp?token=short-lived','outsider':'https://example.invalid/outsider.webp'};
  const world=groupWorld('owner',[group],[],detail,photos);
  expect(world.players).toHaveLength(1);
  expect(world.players[0].portrait?.src).toBe(photos.owner);
