@@ -74,7 +74,7 @@ function PremiumEventsScreen({data,userId,onGroups,manager,onOwnProfile}:{manage
       <div className="slm-events-controls"><label>Aktywna grupa<select aria-label="Aktywna grupa" value={data.activeGroup} onChange={ev=>data.selectGroup(ev.target.value)}><option value="">Wszystkie</option><option value="groups" disabled={!data.discoveryEnabled}>Moje grupy</option><option value="public" disabled={!data.discoveryEnabled}>Publiczne</option><option value="mine">Moje mecze</option>{data.groups.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></label>
       {data.activeGroup==='public'&&<label className="slm-player-search">Szukaj meczu lub grupy<input type="search" value={data.search??''} maxLength={100} onChange={ev=>data.changeSearch(ev.target.value)}/></label>}
       
-      {manager&&<IonButton fill="outline" onClick={()=>setFinance(true)}>Moje rozliczenia grupowe</IonButton>}</div>
+      </div>
       <MatchFilters value={filter} onChange={value=>{if(data.changeFilter)data.changeFilter(value);else{setLocalFilter(value);if(data.offset)void data.refresh();}}}/>
       <div className="slm-match-list">{!data.loading&&!data.error&&filtered.map(m=><div key={m.id} data-event={m.id}>
         <p className="slm-event-label"><span>{m.group_name}</span></p>
