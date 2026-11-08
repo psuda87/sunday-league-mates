@@ -341,7 +341,7 @@ export function createHandler(env: Environment) {
         const photos:Record<string,string>={};
         // Short-lived URLs keep the bucket private. Only actual group members are returned.
         await Promise.all(rows.map(async row=>{
-          if(!row.object_path?.startsWith(row.user_id+'/')||!/^[a-f0-9-]{36}\.(webp|jpg)$/.test(row.object_path.slice(row.user_id.length+1)))return;
+          if(!row.object_path?.startsWith(row.user_id+'/')||!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\.(webp|jpg)$/.test(row.object_path.slice(row.user_id.length+1)))return;
           const signed=await call('/storage/v1/object/sign/slm-profile-photos/'+row.object_path,'POST',{expiresIn:120},undefined,true);
           const token=signed.data?.signedURL;
           if(signed.ok&&typeof token==='string'&&token.startsWith('/object/sign/'))
