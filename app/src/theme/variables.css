@@ -4106,3 +4106,18 @@ button.slm-group-card {
 /* Match location remains clickable above the full-card navigation overlay. */
 .slm-location-map-link{position:relative;z-index:3;color:inherit;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;cursor:pointer}
 .slm-location-map-link:focus-visible{outline:2px solid var(--slm-gold-edge);outline-offset:3px;border-radius:2px}
+
+/* Compact mobile match discovery, scoped to the Matches screen only. */
+@media (max-width: 600px) {
+  .slm-matches-screen .slm-events-controls { display: grid; gap: 12px; margin-bottom: 12px; }
+  .slm-matches-screen .slm-events-controls > label { font-size: .82rem; line-height: 1.35; }
+  .slm-matches-screen .slm-events-controls select { min-height: 44px; height: 44px; padding: 8px 12px; font-size: .9rem; }
+  .slm-matches-screen .slm-group-empty { padding: 5px 0 2px; margin: 0; }
+  .slm-matches-screen .slm-group-empty h2 { font-size: 1.28rem; line-height: 1.25; margin: 0 0 7px; letter-spacing: -.02em; }
+  .slm-matches-screen .slm-group-empty p { font-size: .85rem; line-height: 1.45; margin: 0 0 12px; }
+  .slm-matches-screen .slm-group-empty .slm-groups-cta { min-height: 44px; padding: 9px 14px; font-size: .85rem; gap: 8px; }
+  .slm-matches-screen .slm-group-empty .slm-groups-cta ion-icon { font-size: 1.1rem; }
+  .slm-matches-screen .slm-events-controls > ion-button { margin: 0; min-height: 44px; font-size: .8rem; --padding-top: 8px; --padding-bottom: 8px; }
+  .slm-matches-screen .slm-match-filters { gap: 7px; margin-bottom: 12px; flex-wrap: wrap; }
+  .slm-matches-screen .slm-match-filters button { min-height: 40px; padding: 8px 12px; font-size: .76rem; }
+}
