@@ -324,18 +324,26 @@ export function createHandler(env: Environment) {
         await privacyRpc('deletion_begin',{p_user:ctx.id,p_session:ctx.sid,p_operation:ticket.operation,p_proof:ticket.proof});
         return respond(await finishDeletion(ticket.operation,ticket.proof,deletion));
       }
-      if (action === 'profile_photo_public_list') {
-        await rate('photo-public:'+ctx.id,30);
-        const ids=body.user_ids;
-        if(!Array.isArray(ids)||ids.length>100||ids.some(id=>typeof id!=='string'||!/^[a-f0-9-]{36}$/.test(id)))throw new ApiError(400,'invalid_input','Nieprawidłowa lista użytkowników.');
-        const unique=[...new Set(ids)] as string[];
-        if(!unique.length)return respond({photos:{}});
-        const rows=await db('slm_profile_photos?user_id=in.('+unique.join(',')+')&select=user_id,object_path,revision') as {user_id:string;object_path:string|null;revision:string}[];
+      if (action === 'profile_photo_group_list') {
+        await rate('photo-group:'+ctx.id,20);
+        const groupId=body.group_id;
+        if(typeof groupId!=='string'||!/^[a-f0-9-]{36}$/.test(groupId))throw new ApiError(400,'invalid_input','Nieprawidłowa grupa.');
+        // Membership is checked server-side, never trusted from the client.
+        const viewer=await db('slm_group_members?group_id=eq.'+groupId+'&user_id=eq.'+ctx.id+'&select=user_id') as {user_id:string}[];
+        if(!viewer.length)throw new ApiError(403,'forbidden','Brak dostępu do grupy.');
+        const members=await db('slm_group_members?group_id=eq.'+groupId+'&select=user_id&limit=100') as {user_id:string}[];
+        const ids=members.map(m=>m.user_id).filter(id=>/^[a-f0-9-]{36}$/.test(id));
+        if(!ids.length)return respond({photos:{}});
+        const rows=await db('slm_profile_photos?user_id=in.('+ids.join(',')+')&select=user_id,object_path') as {user_id:string;object_path:string|null}[];
         const photos:Record<string,string>={};
-        for(const row of rows){
-          if(row.object_path?.startsWith(row.user_id+'/')&&/^[a-f0-9-]{36}\.webp$/.test(row.object_path.slice(row.user_id.length+1)))
-            photos[row.user_id]=env.url+'/storage/v1/object/public/slm-profile-photos/'+row.object_path+'?v='+row.revision;
-        }
+        // Short-lived URLs keep the bucket private. Only actual group members are returned.
+        await Promise.all(rows.map(async row=>{
+          if(!row.object_path?.startsWith(row.user_id+'/')||!/^[a-f0-9-]{36}\.(webp|jpg)$/.test(row.object_path.slice(row.user_id.length+1)))return;
+          const signed=await call('/storage/v1/object/sign/slm-profile-photos/'+row.object_path,'POST',{expiresIn:120},undefined,true);
+          const token=signed.data?.signedURL;
+          if(signed.ok&&typeof token==='string'&&token.startsWith('/object/sign/'))
+            photos[row.user_id]=env.url+'/storage/v1'+token;
+        }));
         return respond({photos});
       }
       if (['profile_photo_get','profile_photo_upload','profile_photo_delete'].includes(action)) {
