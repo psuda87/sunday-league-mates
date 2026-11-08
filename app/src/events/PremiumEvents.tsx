@@ -7,7 +7,7 @@ import PremiumGroupFinance from '../finance/PremiumGroupFinance';
 import type { SessionManager } from '../auth/sessionManager';
 import { useEffect,useRef,useState } from 'react';
 import { IonButton,IonIcon } from '@ionic/react';
-import { peopleOutline,refreshOutline } from 'ionicons/icons';
+import { refreshOutline } from 'ionicons/icons';
 import MatchHero from '../ui/MatchHero';
 import MatchFilters from '../ui/MatchFilters';
 import type { MatchFilter } from '../ui/MatchFilters';
