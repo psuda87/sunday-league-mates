@@ -1,3 +1,4 @@
+import { AccountError } from './api';
 import {AccountError} from './api';
 import { useOwnPhoto } from './useOwnPhoto';
 import { createElement,useEffect, useMemo, useRef, useState } from 'react';
@@ -52,7 +53,20 @@ export function useOwnProfile(manager:SessionManager,userId:string|null,selectio
   if(flight.current||!adapter||current.phase!=='ready'||auth.phase!=='ready'||auth.session?.user_id!==userId)return false;
   const ticket=generation.current;flight.current=true;setSaving(true);
   try{const profile=await adapter.changePhone(phone,currentPassword,share);if(ticket!==generation.current)return false;setState({owner:userId,phase:'ready',profile,notice:'Potwierdzono telefon i ustawienie widoczności.'});return true;}
-  catch{if(ticket===generation.current)setState(previous=>({...previous,notice:'Nie potwierdzono zmiany telefonu. Sprawdź obecne hasło i unikalność numeru; przy przerwanym połączeniu ponów odczyt profilu.'}));return false;}
+  catch(error){
+   if(ticket===generation.current){
+    const code=error instanceof AccountError?error.code:'';
+    const notice=code==='invalid_credentials'?'Nieprawidłowe hasło.':
+     code==='phone_taken'||code==='identifier_taken'?'Ten numer telefonu jest już używany.':
+     code==='invalid_phone'||code==='invalid_input'?'Sprawdź poprawność numeru telefonu.':
+     code==='session_invalid'||code==='unauthorized'?'Sesja wygasła. Zaloguj się ponownie.':
+     code==='network_error'?'Brak połączenia. Sprawdź internet i spróbuj ponownie.':
+     code==='phone_save_unavailable'||code==='service_unavailable'||code==='deletion_pending'||code==='server_error'?'Usługa zapisu telefonu jest chwilowo niedostępna. Spróbuj później.':
+     'Nie potwierdzono zmiany telefonu. Sprawdź profil przed ponowną próbą.';
+    setState(previous=>({...previous,notice}));
+   }
+   return false;
+  }
   finally{if(ticket===generation.current){flight.current=false;setSaving(false);}}
  }
  return {...current,photo,payments:userId?createElement(PersonalPayments,{key:userId,manager,userId}):undefined,saveIdentity,saveNumber,changeAlias,changePhone,deleteAccount:adapter?.deleteAccount,saving:current.phase==='ready'&&saving,reload:()=>setRevision(v=>v+1),
