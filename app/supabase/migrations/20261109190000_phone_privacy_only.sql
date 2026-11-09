@@ -31,7 +31,10 @@ begin
  if p_share is null or p_phone is null or (p_phone<>'' and p_phone !~ '^\+[1-9][0-9]{7,14}$') then raise exception 'invalid_input';end if;
  -- Edge normalizes new numbers to Poland; historical foreign numbers may be kept.
  if p_phone<>'' and p_phone !~ '^\+48[0-9]{9}$' and p_phone is distinct from slm_private.phone_for(p_user,p_user) then raise exception 'invalid_phone';end if;
- update public.slm_aliases set phone=nullif(p_phone,'') where user_id=p_user;
+ -- Keep the alias identifier unchanged for email accounts; it is a login credential for legacy accounts.
+ if exists(select 1 from public.slm_aliases where user_id=p_user) then
+   update public.slm_aliases set phone=nullif(p_phone,'') where user_id=p_user;
+ end if;
  update public.slm_player_profiles set contact_phone=nullif(p_phone,'') where user_id=p_user;
  update public.slm_profiles set share_phone=p_share and p_phone<>'' where user_id=p_user;
 end $$;
