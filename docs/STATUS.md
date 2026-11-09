@@ -1,3 +1,5 @@
+2026-11-09 UTC — feat/tito-atomic-lineups: przygotowano migrację i testy Tito, bez wdrożenia i bez uruchomienia SQL/RLS/współbieżności. PASS TypeScript, lint, build, 26 Vitest, parsowanie składni SQL i PL/pgSQL; FAIL istniejący strażnik UI na bazowym account-ui/model.ts. Runner SQL blokuje bieżącą gałąź, zatwierdzonego izolowanego stosu brak. NIE GOTOWE do wdrożenia; szczegóły i plan w docs/TITO_ATOMIC_LINEUPS.md.
+
 2026-11-09 UTC — Tito, feat/tito-atomic-lineups: praca częściowa. Dodano obsługę jawnego autora automatycznego w odczycie składu i test; automatyczne przydziały, migracja, backfill i testy SQL nie są gotowe. Produkcja bez zmian. PASS: test 26 przypadków, TypeScript, ESLint zmienionych plików, build. Strażnik UI FAIL na account-ui/model.ts identycznym z bazowym main; nie zmieniano przypięć. Szczegóły w docs/ODPOWIEDZI_CODEX.txt.
 
 # Grupy — odbiór właściciela, 2026-11-07
