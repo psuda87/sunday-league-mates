@@ -1,5 +1,4 @@
 import { AccountError } from './api';
-import {AccountError} from './api';
 import { useOwnPhoto } from './useOwnPhoto';
 import { createElement,useEffect, useMemo, useRef, useState } from 'react';
 import PersonalPayments from '../finance/PersonalPayments';
