@@ -1,3 +1,5 @@
+2026-11-09 UTC — Tito, feat/tito-atomic-lineups: praca częściowa. Dodano obsługę jawnego autora automatycznego w odczycie składu i test; automatyczne przydziały, migracja, backfill i testy SQL nie są gotowe. Produkcja bez zmian. PASS: test 26 przypadków, TypeScript, ESLint zmienionych plików, build. Strażnik UI FAIL na account-ui/model.ts identycznym z bazowym main; nie zmieniano przypięć. Szczegóły w docs/ODPOWIEDZI_CODEX.txt.
+
 # Grupy — odbiór właściciela, 2026-11-07
 
 Właściciel zaakceptował 7 poprawek i wyraził zgodę na scalenie `feat/groups-ux-acceptance` do `main` przez [PR #39](https://github.com/psuda87/sunday-league-mates/pull/39). Przed scaleniem ponownie przeszły oba strażniki. Wersja testowa na Vercel pozostaje na `3235037`; etap odbioru nie uruchamia kolejnego wdrożenia ani migracji. Następny moduł rozpoczynamy od zaktualizowanego `main` po potwierdzeniu scalenia.

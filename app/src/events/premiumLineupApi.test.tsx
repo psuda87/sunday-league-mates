@@ -5,6 +5,15 @@ import PremiumTeams from './PremiumTeams';
 import {lineupFixture, uid} from './lineupFixture.test-support';
 import {lineupPair, lineupSnapshot} from './lineupContracts';
 
+it('accepts Tito as an explicitly automatic author without inventing an Auth user', () => {
+  const f = lineupFixture(11, true), s = f.read();
+  const changed_at = '2026-11-09T12:00:00Z';
+  expect(lineupSnapshot({...s, last_change: {actor_type: 'automatic', user_id: null, display_name: 'Tito', changed_at}}, f.eventId).last_change)
+    .toEqual({user_id: null, display_name: 'Tito', changed_at});
+  expect(() => lineupSnapshot({...s, last_change: {user_id: null, display_name: 'Tito', changed_at}}, f.eventId)).toThrow();
+  expect(() => lineupSnapshot({...s, last_change: {actor_type: 'automatic', user_id: uid(1), display_name: 'Tito', changed_at}}, f.eventId)).toThrow();
+});
+
 afterEach(cleanup);
 const click = (name: string) => fireEvent.click(screen.getByRole('button', {name}));
 const dirty = () => document.querySelector('[data-lineup-dirty]')?.getAttribute('data-lineup-dirty');
