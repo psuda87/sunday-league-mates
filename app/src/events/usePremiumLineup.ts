@@ -7,6 +7,7 @@ import type {LineupAction, LineupEditor} from './lineupEditor';
 import {lineupMessage, lineupPair, lineupSnapshot} from './lineupContracts';
 import type {LineupSnapshot, LineupWrite} from './lineupContracts';
 import type {MatchDetail} from './premiumContracts';
+import {useVisibleRefresh} from './useVisibleRefresh';
 
 interface State {
   editor: LineupEditor; snapshot: LineupSnapshot | null; detail: MatchDetail | null;
@@ -88,10 +89,10 @@ export function usePremiumLineup(eventId: string, context: LineupProfileContext 
     put({...empty(eventId), detail, snapshot, lastChange: snapshot.last_change, receivedAt: Date.now(), verifiedFor: sessionStamp,
       editor: editLineup(emptyLineup(eventId), {type: 'load', eventId, baseline, proposal})});
   }, [eventId, put, sessionStamp]);
-  const load = useCallback(async (preserve = false) => {
-    if (!authorized() || flight.current !== null) return;
+  const load = useCallback(async (preserve = false, silent = false) => {
+    if (!authorized() || flight.current !== null || document.visibilityState !== 'visible' || navigator.onLine === false) return;
     const ticket = ++epoch.current; flight.current = ticket;
-    put({...stateRef.current, pending: 'load', error: ''});
+    if (!silent) put({...stateRef.current, pending: 'load', error: ''});
     try { const value = await pair(); if (authorized() && epoch.current === ticket) acceptPair(value, preserve); }
     catch (e) {
       const code = codeOf(e);
@@ -112,17 +113,31 @@ export function usePremiumLineup(eventId: string, context: LineupProfileContext 
   }, [manager, key, eventId]);
   const ready = !!manager && allowed && auth.phase === 'ready' && auth.session?.user_id === userId;
   useEffect(() => {
+    // A changed session invalidates even a pending read for the same account.
+    epoch.current++; flight.current = null;
+    if (auth.phase === 'signed_out' && (stateRef.current.snapshot || stateRef.current.intent)) put({...empty(eventId), error: 'session_invalid'});
+    else if (stateRef.current.pending) put({...stateRef.current, pending: null});
+  }, [sessionStamp, auth.phase, put, eventId]);
+  useEffect(() => {
     if (ready && active) void load(true);
     // load changes only with actor/session, not with draft edits.
   }, [ready, active, load]);
+  useVisibleRefresh(ready && active, () => {
+    if (!stateRef.current.intent) void load(true, true);
+  });
   const priorRoster = useRef(incomingRoster);
   useEffect(() => {
     if (priorRoster.current === incomingRoster) return;
     priorRoster.current = incomingRoster;
-    if (stateRef.current.snapshot && authorized()) put({...stateRef.current,
+    if (stateRef.current.snapshot && authorized() && active) put({...stateRef.current,
       editor: editLineup(stateRef.current.editor, {type: 'roster', eventId, ids: incomingRoster ? incomingRoster.split('|') : []}),
       blocked: true, error: 'lineup_roster_conflict'});
-  }, [incomingRoster, authorized, put, eventId]);
+    if (authorized() && active && !stateRef.current.intent) {
+      // A parent-confirmed roster supersedes any older pending pair read.
+      epoch.current++; flight.current = null;
+      void load(true, true);
+    }
+  }, [incomingRoster, authorized, put, eventId, active, load]);
   useEffect(() => {
     if (!state.detail) return;
     const left = Date.parse(state.detail.event.starts_at) + state.detail.event.duration_minutes! * 60000 - Date.parse(state.detail.server_now) - (Date.now() - state.receivedAt);

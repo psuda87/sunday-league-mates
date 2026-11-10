@@ -11,6 +11,12 @@ export interface EventSummary {
 }
 export interface MatchEntry extends Omit<Participant,'status'|'contact_phone'> {
   status:'registered'|'reserve'|'withdrawn'; contact_phone:string|null; joined_at:string;
+  jersey_number?:number|null;
+}
+// Current roster presentation only. History/finance keep every participation ID.
+export function currentWithdrawals(participants:MatchEntry[]):MatchEntry[] {
+  const active=new Set(participants.filter(p=>p.member_id&&p.status!=='withdrawn').map(p=>p.member_id));
+  return participants.filter(p=>p.status==='withdrawn'&&(!p.member_id||!active.has(p.member_id)));
 }
 export interface MatchDetail {event:EventSummary;participants:MatchEntry[];server_now:string;can_register_paid:boolean}
 const row=(v:unknown):Record<string,unknown>=>{if(!v||typeof v!=='object'||Array.isArray(v))throw Error('Invalid match contract');return v as Record<string,unknown>;};
@@ -48,6 +54,7 @@ export function matchDetail(value:unknown,id:string):MatchDetail {
   const participants=r.participants.map(v=>{
     const p=row(v);
     if(!text(p.id)||!(p.member_id===null||text(p.member_id))||!text(p.responsible_user_id)||!text(p.display_name)||!text(p.responsible_name)||!['registered','reserve','withdrawn'].includes(String(p.status))||typeof p.absent!=='boolean'||!(p.contact_phone===null||typeof p.contact_phone==='string')||!text(p.joined_at)||!Number.isFinite(Date.parse(String(p.joined_at))))throw Error('Invalid roster');
+    if(p.jersey_number!==undefined&&p.jersey_number!==null&&(!integer(p.jersey_number)||Number(p.jersey_number)>99))throw Error('Invalid jersey number');
     return p as unknown as MatchEntry;
   });
   if(new Set(participants.map(p=>p.id)).size!==participants.length)throw Error('Duplicate roster identifiers');

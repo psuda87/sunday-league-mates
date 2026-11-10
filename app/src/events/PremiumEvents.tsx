@@ -19,7 +19,7 @@ import './premiumEvents.css';
 import ParticipantGroup,{ RosterSummary } from '../ui/ParticipantGroup';
 import EventForm from '../demo/EventForm';
 import { useFrozenBack } from '../native/frozenDemoAndroid';
-import { heroMatch } from './premiumContracts';
+import { currentWithdrawals,heroMatch } from './premiumContracts';
 import type { MatchEntry,EventSummary } from './premiumContracts';
 import { premiumDefaults,premiumEventInput } from './premiumForm';
 import type { PremiumEventsController } from './usePremiumEvents';
@@ -39,6 +39,11 @@ function PremiumEventsScreen({data,userId,onGroups,manager,onOwnProfile}:{manage
   const area=useRef<HTMLElement>(null);
   useFrozenBack(()=>{if(selectedParticipant){setSelectedParticipant(null);return true;}if(confirmJoin){setConfirmJoin(false);return true;}if(editing){setEditing(false);return true;}if(finance){setFinance(false);return true;}if(!data.detail&&!data.creating)return false;data.back();return true;},()=>area.current,25);
   const d=data.detail,e=d?.event,full=e?.access==='full',own=d?.participants.find(p=>p.member_id===userId&&p.status!=='withdrawn');
+  const setDetailVisible=data.setDetailVisible;
+  useEffect(()=>{
+    setDetailVisible?.(!!e?.id&&!editing&&!finance&&!selectedParticipant&&!data.revalidating);
+    return ()=>setDetailVisible?.(false);
+  },[setDetailVisible,data.revalidating,e?.id,editing,finance,selectedParticipant]);
   useEffect(()=>{setReason('');setEditing(false);setConfirmJoin(false);setSelectedParticipant(null);},[e?.id]);
   const hasPlace=!!e&&full&&e.registered_count!<e.capacity!,closed=!e?.registration_open||e.status==='cancelled';
   const blocked=!!d&&!d.can_register_paid,writeDisabled=data.busy||data.loading;
@@ -68,7 +73,7 @@ function PremiumEventsScreen({data,userId,onGroups,manager,onOwnProfile}:{manage
         {full&&own?.status==='registered'&&!closed&&<details className="slm-panel"><summary>Dodaj gościa</summary><GuestForm key={e.id} disabled={writeDisabled||blocked} hasPlace={hasPlace} onSave={body=>data.act('guest',body)}/></details>}
         <ParticipantGroup title={full?'Uczestnicy':'Twoje wpisy'} emptyText="Brak zapisanych osób." previewLimit={5}>{d.participants.filter(p=>p.status==='registered').map(participant)}</ParticipantGroup>
         <ParticipantGroup title="Rezerwa" emptyText="Rezerwa jest pusta." description="Kolejność zgłoszeń. Zajęcie wolnego miejsca wymaga potwierdzenia.">{d.participants.filter(p=>p.status==='reserve').map(participant)}</ParticipantGroup>
-        {d.participants.some(p=>p.status==='withdrawn')&&<ParticipantGroup title="Wycofane wpisy" emptyText="Brak wpisów.">{d.participants.filter(p=>p.status==='withdrawn').map(participant)}</ParticipantGroup>}
+        {currentWithdrawals(d.participants).length>0&&<ParticipantGroup title="Wycofane wpisy" emptyText="Brak wpisów.">{currentWithdrawals(d.participants).map(participant)}</ParticipantGroup>}
       </>,full?<PremiumTeams key={e.id} eventId={e.id} participants={d.participants} cancelled={e.status==='cancelled'} canEdit={data.groups.some(g=>g.id===e.group_id)} profileContext={manager?{manager,userId,groupId:e.group_id}:undefined}/>:<p>Składy niedostępne bez pełnego dostępu do meczu.</p>,manager?<PremiumFinance key={`${userId}:${e.group_id}:${e.id}`} manager={manager} userId={userId} groupId={e.group_id} eventId={e.id} manage={!!e.can_manage||data.groups.some(g=>g.id===e.group_id&&g.admin_id===userId)} onChanged={()=>{void data.recheckFinancial?.();}}/>:<p>Rozliczenia wymagają aktywnej sesji.</p>]}/>}</>
     :<section className="slm-matches-screen">
       <div className="slm-events-controls"><label>Aktywna grupa<select aria-label="Aktywna grupa" value={data.activeGroup} onChange={ev=>data.selectGroup(ev.target.value)}><option value="">Wszystkie</option><option value="groups" disabled={!data.discoveryEnabled}>Moje grupy</option><option value="public" disabled={!data.discoveryEnabled}>Publiczne</option><option value="mine">Moje mecze</option>{data.groups.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></label>

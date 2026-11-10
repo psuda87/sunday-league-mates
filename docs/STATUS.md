@@ -1,3 +1,45 @@
+# Tito — implementacja do przeglądu, odbiór backendu zablokowany, 2026-11-10
+
+`codex/tito-lineups-completion`, osobny worktree `I:/slm/tito-lineups-completion`,
+baza świeżego `origin/main`: `51211af24479da9ee9dfef23df2fb400d72a9738`.
+Ponownie oceniono Tito `771ee3f` i auto-refresh `0db4050`; bez merge historycznych
+gałęzi, zmian migracji main, strażników, przypięć, CI i Vercel.
+
+Przygotowano nową migrację `20261110205229_tito_lineups_completion.sql`:
+atomowy przydział pojedynczego udziału, rezerwa/pamięć strony/wypisanie/powrót,
+jawny typ autora, numer w istniejącym DTO i operatorowy backfill wybranych
+przyszłych meczów bez automatycznego uruchomienia. Pełny powrót członka zachowuje
+nowy ID i preferuje stronę z ostatniego udziału tylko przy różnicy po przydziale
+≤1; goście wyłącznie po ID udziału. UI ukrywa zastąpione wycofane wpisy członka,
+pokazuje 0–99/—/G i odświeża widoczny skład online z ochroną szkicu/epok sesji.
+
+- **PASS:** build LIVE i Premium, lint, TypeScript/Edge; końcowe testy modułu
+  meczów 92/92; Chrome 320/390 Light/Dark, numery, wycofane i dwie syntetyczne
+  sesje z konfliktem. Chrome używa kontrolowanego transportu, nie SQL/Edge.
+- **FAIL:** ostatni pełny Vitest 541 PASS/1 FAIL (542; niezmieniony test logowania
+  B1App.test.tsx:48); konsolidacja odrzuca nową migrację; strażnik UI/policy
+  zatrzymuje się na niezmienionym `account-ui/model.ts`; testy strażników CI
+  34 PASS/1 ERROR (Windows symlink WinError 1314). Natywny Cypress 16.1.1 na
+  lokalnym serwerze kończy start kodem 3221225501, bez wykonanych scenariuszy.
+- **FAIL zgodności legacy:** stary dekoder main akceptuje zwykły Tito z UUID
+  rzeczywistego inicjatora, ale odrzuca NULL po erasure/backfillu bez konta.
+  Nowy dekoder rozróżnia autora ręcznego i automatycznego także po erasure.
+- **NOT RUN:** migracje od zera i upgrade48→49, SQL/RLS/finanse/FIFO/powiadomienia,
+  rzeczywista współbieżność i E2E dwóch sesji, dry-run/apply×2, czas blokady.
+  Docker pipe nie odpowiada, port55321 bez listenera, a istniejący preflight
+  odrzuca tę gałąź. Nie obchodzono blokady ani nie użyto innego stosu.
+
+Migracje i Edge wdrożone w tym zadaniu: **żadne**. Produkcja/Cloud/backfill/PR/
+merge bez zmian. Przygotowano SQL regresje przez dispatchery, syntetyczny upgrade
+oraz runner obu wymuszonych kolejności wyścigu. Publikacja kodu: zwykły push
+nowej gałęzi po sprawdzeniu `deploymentEnabled=false` w obu konfiguracjach i
+braku triggera push/hooka wdrożenia; nie stanowi zgody na publikację aplikacji.
+Następny krok: przegląd właściciela blokad/zgodności i dopiero pełny lokalny odbiór.
+Szczegóły, polecenia i bezpieczny plan wycofania bez utraty późniejszych zapisów:
+[TITO_LINEUPS_COMPLETION.md](TITO_LINEUPS_COMPLETION.md).
+
+---
+
 # Grupy — odbiór właściciela, 2026-11-07
 
 Właściciel zaakceptował 7 poprawek i wyraził zgodę na scalenie `feat/groups-ux-acceptance` do `main` przez [PR #39](https://github.com/psuda87/sunday-league-mates/pull/39). Przed scaleniem ponownie przeszły oba strażniki. Wersja testowa na Vercel pozostaje na `3235037`; etap odbioru nie uruchamia kolejnego wdrożenia ani migracji. Następny moduł rozpoczynamy od zaktualizowanego `main` po potwierdzeniu scalenia.

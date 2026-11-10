@@ -14,19 +14,20 @@ export default function PremiumTeams({eventId, participants, cancelled, canEdit 
   useEffect(() => {alive.current = true; return () => {alive.current = false;};}, []);
   const saveLimit = useId();
   const current = useRef({eventId, canEdit, cancelled, profileContext}); current.current = {eventId, canEdit, cancelled, profileContext};
-  const [active, setActive] = useState(true), [confirmRefresh, setConfirmRefresh] = useState(false);
+  const [active, setActive] = useState(false), [confirmRefresh, setConfirmRefresh] = useState(false);
   const [notice, setNotice] = useState('');
   const [profileId, setProfileId] = useState<string | null>(null);
   const area = useRef<HTMLDivElement>(null), lastTrigger = useRef<HTMLButtonElement | null>(null), scrollTop = useRef(0);
   const section = useRef<HTMLElement>(null);
   useEffect(() => {
-    const panel = section.current?.closest('[role="tabpanel"]');
-    if (!panel) return;
-    const update = () => setActive(!panel.hasAttribute('hidden')); update();
-    const observer = new MutationObserver(update); observer.observe(panel, {attributes: true, attributeFilter: ['hidden']});
+    const ancestors: HTMLElement[] = [];
+    for (let node = section.current; node; node = node.parentElement) ancestors.push(node);
+    const update = () => setActive(!ancestors.some(node => node.hidden || node.getAttribute('aria-hidden') === 'true')); update();
+    const observer = new MutationObserver(update);
+    for (const node of ancestors) observer.observe(node, {attributes: true, attributeFilter: ['hidden', 'aria-hidden']});
     return () => observer.disconnect();
   }, []);
-  const remote = usePremiumLineup(eventId, profileContext, canEdit, active, participants.filter(p => p.status === 'registered').map(p => p.id).sort().join('|'));
+  const remote = usePremiumLineup(eventId, profileContext, canEdit, active && !profileId, participants.filter(p => p.status === 'registered').map(p => p.id).sort().join('|'));
   const {editor: state, snapshot} = remote.state;
   const eligible = remote.verified ? remote.state.detail?.participants.filter(p => p.status === 'registered') ?? [] : [];
   useEffect(() => {setProfileId(null); setNotice('');}, [eventId]);
@@ -94,7 +95,7 @@ export default function PremiumTeams({eventId, participants, cancelled, canEdit 
         {unassigned.length > 0 && <div className="slm-team-unassigned"><h3>Poza podziałem: {unassigned.length}</h3><ul>{unassigned.map(p => <li key={p.id}>{p.display_name}{!p.member_id ? ' · gość' : ''}{(['a', 'b'] as const).map(side => <button type="button" disabled={!writable} key={side} aria-label={'Dodaj ' + p.display_name + ' do drużyny ' + side.toUpperCase()} onClick={() => change({type: 'assign', id: p.id, side})}>{side.toUpperCase()}</button>)}</li>)}</ul></div>}
         <PremiumPitch a={teams.a} b={teams.b} renderPlayer={p => {
           const interactive = state.mode ? writable : !!p.member_id && canEdit && !!profileContext;
-          const content = <><span className="slm-pitch-token" aria-hidden="true">{p.member_id ? '—' : 'G'}</span><span className="slm-pitch-name">{p.display_name}</span></>;
+          const content = <><span className="slm-pitch-token" aria-hidden="true">{p.member_id ? p.jersey_number ?? '—' : 'G'}</span><span className="slm-pitch-name">{p.display_name}</span></>;
           return <li key={p.id} data-entry={p.id}>{interactive ? <button type="button" className="slm-pitch-player" aria-label={(state.mode === 'swap' ? 'Wybierz do zamiany: ' : state.mode === 'transfer' ? 'Wybierz do przeniesienia: ' : 'Otwórz profil: ') + p.display_name} aria-pressed={state.mode ? state.selected === p.id : undefined} onClick={e => choose(p, e.currentTarget)}>{content}</button> : <span className="slm-pitch-player slm-pitch-guest" title={p.member_id ? 'Profil grupowy niedostępny w tym kontekście' : 'Gość bez profilu'}>{content}</span>}</li>;
         }}/>
         <p className="slm-teams-hint">{remote.state.lastChange ? `Ostatnia zmiana: ${remote.state.lastChange.display_name}` : 'Brak zapisanych zmian'}</p>
