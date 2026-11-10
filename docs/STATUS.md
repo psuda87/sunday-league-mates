@@ -30,7 +30,9 @@ pokazuje 0–99/—/G i odświeża widoczny skład online z ochroną szkicu/epok
   odrzuca tę gałąź. Nie obchodzono blokady ani nie użyto innego stosu.
 
 Migracje i Edge wdrożone w tym zadaniu: **żadne**. Produkcja/Cloud/backfill/PR/
-merge bez zmian. Przygotowano SQL regresje przez dispatchery, syntetyczny upgrade
+merge bez zmian. Implementacja: commit `7c00085f72d031a0a53478b753e35f333f312335`;
+zwykły push `origin/codex/tito-lineups-completion`: **PASS**. Przygotowano SQL
+regresje przez dispatchery, syntetyczny upgrade
 oraz runner obu wymuszonych kolejności wyścigu. Publikacja kodu: zwykły push
 nowej gałęzi po sprawdzeniu `deploymentEnabled=false` w obu konfiguracjach i
 braku triggera push/hooka wdrożenia; nie stanowi zgody na publikację aplikacji.
