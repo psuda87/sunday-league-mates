@@ -14,6 +14,30 @@ it('uses server counts and UUIDs without importing any demo world or inventing m
  expect(world).not.toHaveProperty('games');expect(world.groupState.groups.map(g=>g.id)).toEqual(['group-real']);
  expect(world.groupState.members).toHaveLength(1);expect(world.players).toEqual([]);
 });
+it('renders group-scoped photos only for members returned by the live group detail',()=>{
+ const photos={'owner':'https://example.supabase.co/storage/v1/object/sign/slm-profile-photos/owner/one.webp?token=short-lived','outsider':'https://example.invalid/outsider.webp'};
+ const world=groupWorld('owner',[group],[],detail,photos);
+ expect(world.players).toHaveLength(1);
+ expect(world.players[0].portrait?.src).toBe(photos.owner);
+ expect(world.players[0].portraitEdited).toBe(true);
+ expect(world.players.some(p=>p.id==='outsider')).toBe(false);
+});
+it('keeps group data visible if private photo lookup fails',async()=>{
+ const manager=mock(async action=>{
+  if(action==='groups_list')return {groups:[group]};
+  if(action==='groups_inbox')return {requests:[]};
+  if(action==='groups_detail')return detail;
+  if(action==='profile_photo_group_list')throw Error('Storage unavailable');
+  return {};
+ });
+ const {result}=renderHook(()=>useGroups(manager,'owner'));
+ await waitFor(()=>expect(result.current.binding.loading).toBe(false));
+ await act(()=>result.current.binding.open(group.id));
+ expect(result.current.world.groupState.groups[0].id).toBe(group.id);
+ expect(result.current.world.players[0].portrait).toBeUndefined();
+ expect(result.current.binding.error).toBe('');
+ expect(manager.call).toHaveBeenCalledWith('profile_photo_group_list',{group_id:group.id});
+});
 it('does not render an invented member profile while a real detail request is loading',()=>{
  window.history.replaceState(null,'','/#group/group-real');
  const binding:GroupBinding={loading:true,busy:false,error:'',searching:false,finding:false,counts:{'group-real':2},pending:{},found:[],candidates:[],requestPhones:{},shareFullName:false,refresh:async()=>{},open:async()=>{},search:()=>{},findPlayers:()=>{},create:async()=>null,act:()=>{},consent:()=>{}};

@@ -7,13 +7,13 @@ import { summary,details,requests,member } from './contracts';
 import { normalizePolishPhone } from '../../supabase/functions/_shared/phone';
 
 // Only real DTOs enter this legacy presentation shape. No initialWorld/reducer or fixtures.
-const player=(id:string,name:string):GroupPerson=>({id,name,nick:name});
-export function groupWorld(userId:string,groups:GroupSummary[],inbox:GroupRequest[],detail:GroupDetail|null):GroupWorld {
+const player=(id:string,name:string,photo?:string):GroupPerson=>({id,name,nick:name,...(photo?{portrait:{src:photo},portraitEdited:true}:{})});
+export function groupWorld(userId:string,groups:GroupSummary[],inbox:GroupRequest[],detail:GroupDetail|null,photos:Record<string,string>={}):GroupWorld {
  const groupRows=new Map<string,GroupIdentity>(groups.map(g=>[g.id,g]));
  for(const request of inbox)if(!groupRows.has(request.group_id))groupRows.set(request.group_id,{id:request.group_id,name:request.group_name??'',description:'',admin_id:''});
  const players=new Map<string,GroupPerson>();
  const members=groups.filter(g=>g.id!==detail?.group.id).map(g=>({groupId:g.id,playerId:userId,organizer:g.organizer,joinedAt:''}));
- if(detail){groupRows.set(detail.group.id,detail.group);for(const m of detail.members){players.set(m.user_id,player(m.user_id,m.display_name??m.nickname));members.push({groupId:detail.group.id,playerId:m.user_id,organizer:m.organizer,joinedAt:m.joined_at});}}
+ if(detail){groupRows.set(detail.group.id,detail.group);for(const m of detail.members){players.set(m.user_id,player(m.user_id,m.display_name??m.nickname,photos[m.user_id]));members.push({groupId:detail.group.id,playerId:m.user_id,organizer:m.organizer,joinedAt:m.joined_at});}}
  const requests=new Map([...inbox,...(detail?.requests??[])].map(r=>[r.id,r]));
  for(const r of requests.values()){
   if(r.actor_id&&r.actor_name&&!players.has(r.actor_id))players.set(r.actor_id,player(r.actor_id,r.actor_name));
@@ -27,9 +27,10 @@ export function useGroups(manager:SessionManager,userId:string){
  const auth=useSyncExternalStore(manager.subscribe,manager.getSnapshot);
  const [verifiedSession,setVerifiedSession]=useState(auth.session);
  const [state,setState]=useState<{groups:GroupSummary[];inbox:GroupRequest[];detail:GroupDetail|null}>({groups:[],inbox:[],detail:null});
+ const [photos,setPhotos]=useState<Record<string,string>>({});
  const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState(''),[found,setFound]=useState<GroupBinding['found']>([]),[candidates,setCandidates]=useState<GroupBinding['candidates']>([]);
  const [searching,setSearching]=useState(false),[finding,setFinding]=useState(false);
- const alive=useRef(true),generation=useRef(0),searchEpoch=useRef(0),candidateEpoch=useRef(0),flight=useRef(false),selected=useRef<string|null>(window.location.hash.startsWith('#group/')?window.location.hash.slice(7):null),keys=useRef(new Map<string,string>());
+ const photoFetchedAt=useRef(0),photoEpoch=useRef(0),alive=useRef(true),generation=useRef(0),searchEpoch=useRef(0),candidateEpoch=useRef(0),flight=useRef(false),selected=useRef<string|null>(window.location.hash.startsWith('#group/')?window.location.hash.slice(7):null),keys=useRef(new Map<string,string>());
  const fail=useCallback((e:unknown)=>{if(alive.current)setError(e instanceof AccountError&&e.code==='forbidden'?'Nie masz dostępu do tej grupy.':'Nie udało się potwierdzić danych grup. Odśwież i spróbuj ponownie.');},[]);
  const refresh=useCallback(async()=>{
   if(!alive.current)return;const ticket=++generation.current,session=manager.getSnapshot().session;setLoading(true);setError('');
@@ -39,8 +40,17 @@ export function useGroups(manager:SessionManager,userId:string){
    const groups=a.groups.map(summary),inbox=[...requests(b.requests),...requests(b.outgoing??[])];
    let detail:GroupDetail|null=null;
    if(selected.current&&groups.some(g=>g.id===selected.current))detail=details(await manager.call('groups_detail',{group_id:selected.current}),selected.current,userId);
+   // Photo failures must never prevent the group itself from loading.
+   let groupPhotos:Record<string,string>={};
+   if(detail?.members.length){
+     try {
+       const response=await manager.call<{photos:Record<string,string>}>('profile_photo_group_list',{group_id:detail.group.id});
+       groupPhotos=response.photos??{};
+     }catch { /* Use initials when photos are temporarily unavailable. */ }
+   }
+   if(alive.current&&ticket===generation.current){setPhotos(groupPhotos);photoFetchedAt.current=Object.keys(groupPhotos).length?Date.now():0;}
    if(alive.current&&ticket===generation.current&&manager.getSnapshot().session===session){setState({groups,inbox,detail});setVerifiedSession(session);}
-  } catch(e){if(ticket===generation.current){setState({groups:[],inbox:[],detail:null});fail(e);}}
+  } catch(e){if(ticket===generation.current){setState({groups:[],inbox:[],detail:null});setPhotos({});fail(e);}}
   finally {if(alive.current&&ticket===generation.current)setLoading(false);}
  },[manager,userId,fail]);
  // Coalesce manual refreshes synchronously, before React disables the button.
@@ -50,9 +60,36 @@ export function useGroups(manager:SessionManager,userId:string){
   const pending=refresh();manualFlight.current=pending;
   void pending.finally(()=>{if(manualFlight.current===pending)manualFlight.current=null;});return pending;
  },[refresh]);
- const invalidate=useCallback(()=>{generation.current++;searchEpoch.current++;candidateEpoch.current++;},[]);
+ const invalidate=useCallback(()=>{generation.current++;photoEpoch.current++;photoFetchedAt.current=0;searchEpoch.current++;candidateEpoch.current++;},[]);
+ // Signed photo URLs expire after 120s. Refresh only photos, not group data.
+ const renewPhotos=useCallback(async()=>{
+  const detail=state.detail,session=manager.getSnapshot().session;
+  if(!detail?.members.length||!session||session.user_id!==userId||document.visibilityState!=='visible')return;
+  const ticket=++photoEpoch.current,groupId=detail.group.id;
+  for(let attempt=0;attempt<2;attempt++){
+   try{
+    const response=await manager.call<{photos:Record<string,string>}>('profile_photo_group_list',{group_id:groupId});
+    if(alive.current&&ticket===photoEpoch.current&&manager.getSnapshot().session===session&&selected.current===groupId){
+     setPhotos(response.photos??{});photoFetchedAt.current=Date.now();
+    }
+    return;
+   }catch{
+    if(attempt===0)await new Promise<void>(resolve=>setTimeout(resolve,700));
+   }
+  }
+  // Keep existing images on a transient failure; retry on next visibility/expiry check.
+  photoFetchedAt.current=0;
+ },[manager,state.detail,userId]);
+ useEffect(()=>{
+  if(!state.detail)return;
+  const check=()=>{if(document.visibilityState==='visible'&&(!photoFetchedAt.current||Date.now()-photoFetchedAt.current>=90000))void renewPhotos();};
+  const timer=window.setInterval(check,30000);
+  document.addEventListener('visibilitychange',check);
+  window.addEventListener('focus',check);
+  return()=>{window.clearInterval(timer);document.removeEventListener('visibilitychange',check);window.removeEventListener('focus',check);};
+ },[state.detail,renewPhotos]);
  useEffect(()=>{alive.current=true;void refresh();return()=>{alive.current=false;invalidate();};},[refresh,userId,invalidate]);
- useEffect(()=>{let previous=manager.getSnapshot();return manager.subscribe(()=>{const current=manager.getSnapshot();if(current===previous)return;previous=current;invalidate();setVerifiedSession(null);if(current.phase==='ready'&&current.session?.user_id===userId)void refresh();else if(current.phase!=='checking'){setState({groups:[],inbox:[],detail:null});selected.current=null;}});},[manager,userId,refresh,invalidate]);
+ useEffect(()=>{let previous=manager.getSnapshot();return manager.subscribe(()=>{const current=manager.getSnapshot();if(current===previous)return;previous=current;invalidate();setVerifiedSession(null);if(current.phase==='ready'&&current.session?.user_id===userId)void refresh();else if(current.phase!=='checking'){setState({groups:[],inbox:[],detail:null});setPhotos({});selected.current=null;}});},[manager,userId,refresh,invalidate]);
  const mutate=async<T,>(action:string,body:Record<string,unknown>)=>{
   const fingerprint=JSON.stringify([action,body]);let key=keys.current.get(fingerprint);if(!key){key=crypto.randomUUID();keys.current.set(fingerprint,key);}
   const result=await manager.call<T>(action,{...body,request_id:key});keys.current.delete(fingerprint);window.dispatchEvent(new Event('slm-groups-changed'));return result;
@@ -92,5 +129,5 @@ export function useGroups(manager:SessionManager,userId:string){
   });},
  };
  const readMember=useCallback(async(id:string,groupId:string)=>{const m=member(await manager.call('groups_profile',{group_id:groupId,user_id:id}));if(m.user_id!==id)throw Error('Nieprawidłowy profil.');return m;},[manager]);
- return {verified:auth.phase==='ready'&&verifiedSession===auth.session,verifiedSession,world:groupWorld(userId,state.groups,state.inbox,state.detail),binding,readMember};
+ return {verified:auth.phase==='ready'&&verifiedSession===auth.session,verifiedSession,world:groupWorld(userId,state.groups,state.inbox,state.detail,photos),binding,readMember};
 }
