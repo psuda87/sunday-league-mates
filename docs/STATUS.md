@@ -1,3 +1,12 @@
+# UI Demo — wdrożony main, 2026-11-11
+
+Po akceptacji właściciela opublikowano `main` `793ef478144ed3d58c76c4748b4ceff92c44ea5e` na [UI Demo](https://slm-ui-demo.vercel.app). Vercel READY `dpl_C4qqLnE4wTo36pwo3u4PZcLWdAuN`. Poprzedni alias wskazywał na wdrożenie `dpl_PoRdeofKKAD6KSzC8XcvzrMXjuqM` z `0132a5c`. Osobny adres `slm-soccer.vercel.app` zachował dotychczasowe przypisanie.
+
+- Publiczny adres zwrócił HTTP 200 dla strony, JS, CSS i zasobu WebAssembly. Zweryfikowano pliki nowego builda, CSP, CORS 204 z dokładnym originem UI Demo i oczekiwaną odmowę 401 przy braku sesji. Test Cypress pod publicznym adresem zaliczył wyświetlenie logowania, przejście przez zakładkę Grupy i żądanie zdjęć członków grupy z kontrolowanym API.
+- Supabase pozostał na `accounts` v26, bez zmiany pakietu funkcji i bez migracji. Wydanie obejmuje frontend. Właściciel zaakceptował publikację pomimo opisanych poniżej rozbieżności strażników i wcześniejszych testów. Następny krok to ręczne sprawdzenie dzwonka grup, logowania i zdjęć na istniejącym koncie.
+
+---
+
 # PR #50 — telefon scalony do main, 2026-11-11
 
 [PR #50](https://github.com/psuda87/sunday-league-mates/pull/50) z `fix/profile-phone-sharing` scalono do `main` w `793ef478144ed3d58c76c4748b4ceff92c44ea5e`. Porównanie potwierdziło identyczną zawartość ze sprawdzoną gałęzią `2c6130b`. `main` zawiera poprawki komunikatów zapisu telefonu oraz odnawianie adresów zdjęć z PR #48.
