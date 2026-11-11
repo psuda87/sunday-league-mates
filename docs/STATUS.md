@@ -1,3 +1,11 @@
+# PR #48 — scalony do main, 2026-11-11
+
+Po doprecyzowaniu właściciela zakres obejmował wyłącznie scalenie [PR #48](https://github.com/psuda87/sunday-league-mates/pull/48). GitHub potwierdził merge `511ae63cac04994262ddf6d31acb21a46b6c20fe`. Zawartość `origin/main` jest identyczna ze sprawdzonym próbnym scaleniem `0104aa0`. Wyniki kontroli opisano poniżej.
+
+Praca trwa na `slm-ui-demo.vercel.app`. W tym kroku nie uruchomiono wdrożenia Vercel, nie zmieniono Supabase ani strażników. Przed przyszłą publikacją należy ponownie sprawdzić kontrakt Premium i działanie logowania na docelowej domenie.
+
+---
+
 # PR #48 — kontrola przed wydaniem, 2026-11-11
 
 Gałąź raportu `codex/pr-48-release-check`. [PR #48](https://github.com/psuda87/sunday-league-mates/pull/48) jest otwarty i bez konfliktów. Sprawdzono `fix/public-profile-photos` (`d888013`) po próbnym scaleniu `0104aa0` z `main` (`51211af`). Scalanie i publikacja są wstrzymane.
