@@ -1,3 +1,13 @@
+# Porządki na GitHubie, 2026-11-11
+
+Włączono i ponownie odczytano w GitHubie automatyczne usuwanie gałęzi źródłowych po scaleniu. PR #40 z klawiaturą ma teraz bazę `main`. PR #49 z bezpieczeństwem pozostaje otwarty. Gałąź wcześniejszych zmian dzwonka była już usunięta. Nie zmieniano zawartości `main` ani nie uruchamiano wdrożenia, migracji i testów aplikacji.
+
+- Zamknięto bez scalenia PR #26 (historyczny odbiór Androida), #36 (starsza organizacja statusu) i #41 (odłożone odświeżanie składów). Ich końcowe commity zachowano pod odpowiednimi tagami `archive/2026-11-11/pr-*`. Starszą wersję odstępów widoku meczu zachowano pod tagiem `archive/2026-11-11/premium-match-detail-spacing`.
+- Usunięto osiem gałęzi z GitHuba. Były to `feat/google-maps-match-location`, `feat/profile-photo-crop-chatgpt`, `fix/premium-match-detail-spacing`, `chore/android-main-acceptance`, `chore/branch-local-status`, `feat/lineup-auto-refresh-20261107`, `chore/main-stabilization` i `feat/premium-legal-pages`. Przed usunięciem sprawdzono zawartość `main`, tagi archiwalne i zależności otwartych PR-ów. Po zamknięciu raportu gałąź `codex/pr-48-release-check` przeznaczono do zachowania pod tagiem `archive/2026-11-11/ui-demo-release-and-cleanup`.
+- Usunięto 43 nieaktualne lokalne odwołania `origin/*`. Wśród 23 wskazujących na historię spoza `main` zachowano 22 końcówki, 14 jako lokalne `refs/archive/2026-11-11/*` i 8 przez inne zweryfikowane odwołania. Pominięto w archiwum jednorazowy marker testowy `test/scheduled-cloud-run`. Lokalnie usunięto też scalone `feat/premium-legal-pages` i `feat/groups-ux-acceptance`.
+
+---
+
 # Audyt małych zmian i gałęzi GitHub, 2026-11-11
 
 Stan na moment odczytu. `main` `793ef47` jest READY na UI Demo. Na GitHubie jest 19 gałęzi i 8 otwartych PR-ów. Nie wykonano kolejnego wdrożenia, migracji, testów aplikacji ani usuwania gałęzi w tym audycie.
