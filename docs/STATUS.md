@@ -1,3 +1,16 @@
+# PR #48 — kontrola przed wydaniem, 2026-11-11
+
+Gałąź raportu `codex/pr-48-release-check`. [PR #48](https://github.com/psuda87/sunday-league-mates/pull/48) jest otwarty i bez konfliktów. Sprawdzono `fix/public-profile-photos` (`d888013`) po próbnym scaleniu `0104aa0` z `main` (`51211af`). Scalanie i publikacja są wstrzymane.
+
+- Przeszły buildy LIVE i Premium web, lint, kontrola typów Edge oraz `git diff --check`. Vitest 526/527, w tym testy zdjęć grupowych. Test treści błędu logowania nie przechodzi również na `main`. Mobilny Cypress z kontrolowanym API zaliczył 2/4 testów na obu rewizjach. Te same dwa błędy dotyczą otwarcia grupy przez dzwonek i przycisku przejścia do grup.
+- GitHub pominął obie kontrole CI. Kontrola konsolidacji przechodzi na `main`, a w PR odrzuca zmianę chronionego handlera `accounts`. Kontrola zamrożonego UI odrzuca już `app/src/account-ui/model.ts` na `main`. Testy `premium-policy` na wyniku próbnego scalenia również nie przeszły. PR nie zmienia arkuszy stylów ani routingu.
+- [Główny adres](https://slm-soccer.vercel.app) zwraca HTTP 200 i wskazuje na istniejące wdrożenie Vercel READY `1baf893`. Supabase odrzuca z tej domeny sprawdzenie CORS i anonimowy odczyt sesji kodem 403. Z `slm-ui-demo.vercel.app` zwraca odpowiednio 204 i oczekiwane 401.
+- W Supabase aktywna jest `accounts` v26. Jej kod obsługuje `profile_photo_group_list` po sprawdzeniu członkostwa i podpisuje adresy na 120 s. Wersja na GitHubie różni się m.in. akcjami usuwania konta. Nie wykonano zmian w Supabase, migracji ani wdrożenia Vercel. Nie testowano zalogowanej sesji i zdjęć na głównej domenie ani lokalnej integracji SQL.
+
+Przed wydaniem wymagane są przegląd chronionych źródeł i aktualizacja listy dozwolonych domen Supabase o dokładny adres `https://slm-soccer.vercel.app`, a następnie ponowna kontrola i test zalogowanej sesji.
+
+---
+
 # Grupy — odbiór właściciela, 2026-11-07
 
 Właściciel zaakceptował 7 poprawek i wyraził zgodę na scalenie `feat/groups-ux-acceptance` do `main` przez [PR #39](https://github.com/psuda87/sunday-league-mates/pull/39). Przed scaleniem ponownie przeszły oba strażniki. Wersja testowa na Vercel pozostaje na `3235037`; etap odbioru nie uruchamia kolejnego wdrożenia ani migracji. Następny moduł rozpoczynamy od zaktualizowanego `main` po potwierdzeniu scalenia.
