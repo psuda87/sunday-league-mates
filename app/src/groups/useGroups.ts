@@ -30,7 +30,7 @@ export function useGroups(manager:SessionManager,userId:string){
  const [photos,setPhotos]=useState<Record<string,string>>({});
  const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState(''),[found,setFound]=useState<GroupBinding['found']>([]),[candidates,setCandidates]=useState<GroupBinding['candidates']>([]);
  const [searching,setSearching]=useState(false),[finding,setFinding]=useState(false);
- const alive=useRef(true),generation=useRef(0),searchEpoch=useRef(0),candidateEpoch=useRef(0),flight=useRef(false),selected=useRef<string|null>(window.location.hash.startsWith('#group/')?window.location.hash.slice(7):null),keys=useRef(new Map<string,string>());
+ const photoFetchedAt=useRef(0),photoEpoch=useRef(0),alive=useRef(true),generation=useRef(0),searchEpoch=useRef(0),candidateEpoch=useRef(0),flight=useRef(false),selected=useRef<string|null>(window.location.hash.startsWith('#group/')?window.location.hash.slice(7):null),keys=useRef(new Map<string,string>());
  const fail=useCallback((e:unknown)=>{if(alive.current)setError(e instanceof AccountError&&e.code==='forbidden'?'Nie masz dostępu do tej grupy.':'Nie udało się potwierdzić danych grup. Odśwież i spróbuj ponownie.');},[]);
  const refresh=useCallback(async()=>{
   if(!alive.current)return;const ticket=++generation.current,session=manager.getSnapshot().session;setLoading(true);setError('');
@@ -48,7 +48,7 @@ export function useGroups(manager:SessionManager,userId:string){
        groupPhotos=response.photos??{};
      }catch { /* Use initials when photos are temporarily unavailable. */ }
    }
-   if(alive.current&&ticket===generation.current)setPhotos(groupPhotos);
+   if(alive.current&&ticket===generation.current){setPhotos(groupPhotos);photoFetchedAt.current=Object.keys(groupPhotos).length?Date.now():0;}
    if(alive.current&&ticket===generation.current&&manager.getSnapshot().session===session){setState({groups,inbox,detail});setVerifiedSession(session);}
   } catch(e){if(ticket===generation.current){setState({groups:[],inbox:[],detail:null});setPhotos({});fail(e);}}
   finally {if(alive.current&&ticket===generation.current)setLoading(false);}
@@ -60,7 +60,34 @@ export function useGroups(manager:SessionManager,userId:string){
   const pending=refresh();manualFlight.current=pending;
   void pending.finally(()=>{if(manualFlight.current===pending)manualFlight.current=null;});return pending;
  },[refresh]);
- const invalidate=useCallback(()=>{generation.current++;searchEpoch.current++;candidateEpoch.current++;},[]);
+ const invalidate=useCallback(()=>{generation.current++;photoEpoch.current++;photoFetchedAt.current=0;searchEpoch.current++;candidateEpoch.current++;},[]);
+ // Signed photo URLs expire after 120s. Refresh only photos, not group data.
+ const renewPhotos=useCallback(async()=>{
+  const detail=state.detail,session=manager.getSnapshot().session;
+  if(!detail?.members.length||!session||session.user_id!==userId||document.visibilityState!=='visible')return;
+  const ticket=++photoEpoch.current,groupId=detail.group.id;
+  for(let attempt=0;attempt<2;attempt++){
+   try{
+    const response=await manager.call<{photos:Record<string,string>}>('profile_photo_group_list',{group_id:groupId});
+    if(alive.current&&ticket===photoEpoch.current&&manager.getSnapshot().session===session&&selected.current===groupId){
+     setPhotos(response.photos??{});photoFetchedAt.current=Date.now();
+    }
+    return;
+   }catch{
+    if(attempt===0)await new Promise<void>(resolve=>setTimeout(resolve,700));
+   }
+  }
+  // Keep existing images on a transient failure; retry on next visibility/expiry check.
+  photoFetchedAt.current=0;
+ },[manager,state.detail,userId]);
+ useEffect(()=>{
+  if(!state.detail)return;
+  const check=()=>{if(document.visibilityState==='visible'&&(!photoFetchedAt.current||Date.now()-photoFetchedAt.current>=90000))void renewPhotos();};
+  const timer=window.setInterval(check,30000);
+  document.addEventListener('visibilitychange',check);
+  window.addEventListener('focus',check);
+  return()=>{window.clearInterval(timer);document.removeEventListener('visibilitychange',check);window.removeEventListener('focus',check);};
+ },[state.detail,renewPhotos]);
  useEffect(()=>{alive.current=true;void refresh();return()=>{alive.current=false;invalidate();};},[refresh,userId,invalidate]);
  useEffect(()=>{let previous=manager.getSnapshot();return manager.subscribe(()=>{const current=manager.getSnapshot();if(current===previous)return;previous=current;invalidate();setVerifiedSession(null);if(current.phase==='ready'&&current.session?.user_id===userId)void refresh();else if(current.phase!=='checking'){setState({groups:[],inbox:[],detail:null});setPhotos({});selected.current=null;}});},[manager,userId,refresh,invalidate]);
  const mutate=async<T,>(action:string,body:Record<string,unknown>)=>{
