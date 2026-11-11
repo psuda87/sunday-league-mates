@@ -74,4 +74,48 @@ for(const manualFirst of [true,false]){
  if(manualFirst){assert.equal(result[1].code,0);for(const id of ids)assert(state[save.team_a.includes(id)?'team_a':'team_b'].includes(id));}
  else{assert.notEqual(result[1].code,0);assert.match(result[1].err,/lineup_(version|roster)_conflict/);}
 }
+// Selected backfill: compare the whole synthetic state, including accounting.
+// Server timestamps straddle COMMIT in the SAME psql process, so the measured
+// interval excludes Docker/process startup (unlike LOCK_ELAPSED_MS above).
+const future=event(),started=event(),cancelled=event(),unselected=event();
+const selected=[future,started,cancelled],observed=[...selected,unselected],manualId=randomUUID();
+sql(`update public.slm_matches set starts_at=clock_timestamp()-interval '1 hour' where id=${q(started)};
+ update public.slm_matches set status='cancelled' where id=${q(cancelled)};
+ insert into public.slm_match_entries(id,event_id,responsible_user_id,guest_name,status) values(${q(manualId)},${q(future)},${q(u[0])},'Manual fixture','registered');
+ ${observed.map(e=>`insert into public.slm_match_entries(event_id,responsible_user_id,guest_name,status) values(${q(e)},${q(u[0])},'Missing one','registered'),(${q(e)},${q(u[0])},'Missing two','registered');`).join('\n')}
+ insert into public.slm_match_lineups(event_id,version,team_a,team_b,roster_version,updated_by)
+ values(${q(future)},1,array[${q(manualId)}::uuid],'{}',slm_private.lineup_state(${q(future)})->>'roster_version',${q(u[0])});`);
+const idsSql='array['+observed.map(q).join(',')+']::uuid[]',selectedSql='array['+selected.map(q).join(',')+']::uuid[]';
+const aggregate=(table,order,filter='event_id')=>`(select coalesce(jsonb_agg(to_jsonb(t) order by ${order}),'[]') from public.${table} t where ${filter}=any(${idsSql}))`;
+const snapshot=()=>JSON.parse(sql(`select jsonb_build_object('events',${aggregate('slm_matches','id','id')},'entries',${aggregate('slm_match_entries','id')},'lineups',${aggregate('slm_match_lineups','event_id')},'history',${aggregate('slm_match_history','sequence')},'ledger',${aggregate('slm_group_ledger','id')},'payments',${aggregate('slm_group_payments','id')})`));
+const before=snapshot();
+const dry=JSON.parse(sql(`select jsonb_agg(to_jsonb(r)) from slm_private.tito_backfill(${selectedSql},false) r`));
+assert.equal(dry.reduce((n,r)=>n+r.missing_count,0),2);assert(dry.every(r=>r.applied_count===0));assert.deepEqual(snapshot(),before);
+function applyBackfill(label){
+ const lines=sql(`begin;set local lock_timeout='2s';set local statement_timeout='10s';
+ select set_config('slm.tito_backfill_started_at',clock_timestamp()::text,false);
+ select jsonb_build_object('rows',jsonb_agg(to_jsonb(r))) from slm_private.tito_backfill(${selectedSql},true) r;
+ commit;select jsonb_build_object('phase','committed','transaction_ms',extract(epoch from (clock_timestamp()-current_setting('slm.tito_backfill_started_at')::timestamptz))*1000);`).split(/\r?\n/).filter(line=>line.startsWith('{')).map(line=>JSON.parse(line));
+ const elapsed=lines.find(r=>r.phase==='committed').transaction_ms;assert(elapsed>=0);
+ console.log(`BACKFILL_TRANSACTION_MS ${label} ${elapsed} (server clock, after SET LOCAL through COMMIT; excludes Docker startup)`);
+ return lines.find(r=>r.rows).rows;
+}
+assert.equal(applyBackfill('first').reduce((n,r)=>n+r.applied_count,0),2);
+const applied=snapshot(),saved=applied.lineups.find(r=>r.event_id===future);assert(saved.team_a.includes(manualId));
+for(const key of ['events','entries','history','ledger','payments'])assert.deepEqual(applied[key],before[key]);
+assert(!applied.lineups.some(r=>[started,cancelled,unselected].includes(r.event_id)));
+assert(applyBackfill('second').every(r=>r.applied_count===0&&r.missing_count===0));assert.deepEqual(snapshot(),applied);
+// Hold only OUR transaction until the busy assertion completes; no time-based
+// race or container stop/restart. The existing stack guard ran before all of this.
+const holder=spawn('docker',['exec','-i','supabase_db_'+project,'psql','-X','-qAt','-U','postgres','-d','postgres','-v','ON_ERROR_STOP=1'],{windowsHide:true});
+let holderReady,holderReject,holderOutput='';
+const gate=new Promise((resolve,reject)=>{holderReady=resolve;holderReject=reject;});
+const completed=new Promise((resolve,reject)=>{holder.on('error',error=>{holderReject(error);reject(error);});holder.on('close',code=>{holderReject(Error('Holder ended before gate'));resolve(code);});});
+holder.stdout.on('data',part=>{holderOutput+=part;if(holderOutput.includes('TITO_BACKFILL_GATE'))holderReady();});
+holder.stderr.on('data',()=>{});
+holder.stdin.write("begin;set local statement_timeout='10s';select pg_advisory_xact_lock(20261014,1);select 'TITO_BACKFILL_GATE';\n");
+try{await gate;assert.throws(()=>sql(`select count(*) from slm_private.tito_backfill(${selectedSql},true)`),error=>String(error.stderr).includes('tito_backfill_busy'));}
+finally{holder.stdin.end('commit;\n');assert.equal(await completed,0);}
+assert.deepEqual(snapshot(),applied);
+console.log('PASS selected backfill: exact dry-run state, preserved manual/history/ledger, apply twice, skips, occupied gate and server-clock transaction measurements.');
 console.log('PASS last place, same request retry, both forced manual/automatic orders. Synthetic fixtures retained; no reset/cleanup of existing data.');

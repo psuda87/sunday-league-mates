@@ -1,4 +1,196 @@
-# Tito — implementacja i granice odbioru, 2026-11-10
+# Tito — ponowny odbiór lokalny, 2026-11-10–11
+
+Stan po implementacji `7c00085` i raporcie `2e32b8d`, w osobnym checkoutcie
+`I:/slm/tito-lineups-completion`, gałąź `codex/tito-lineups-completion`.
+**Pełny odbiór NIE jest zaliczony.** Docker działa, lecz wymagany projekt i porty
+zajmuje zachowany stos z 28 października; aktywny strażnik odrzuca gałąź Tito.
+Nie wykonano żadnego odczytu/zapisu danych tej bazy, migracji, backfillu ani
+operacji Supabase Cloud. Poniższy stan zastępuje historyczne wyniki środowiska
+i testów z końca tego dokumentu.
+
+## Środowisko i blokada izolacji
+
+- Windows 11 Enterprise `10.0.26200`, AMD Ryzen 7 5800X; Node `24.14.0`, npm
+  `11.9.0`, Python `3.14.3`, Supabase CLI przypięty do `2.121.0`.
+- Docker Desktop `4.95.0 (242831)`, silnik Linux/amd64 `29.8.2`, API `1.56`,
+  kontekst `desktop-linux`, WSL kernel `6.18.58.1-microsoft-standard-WSL2`.
+  Silnik odpowiadał już przy sprawdzaniu; nie uruchamiano ani nie restartowano
+  Desktopu/kontenerów. Obraz zachowanej bazy: PostgreSQL `17.11.0.004`.
+- `supabase_db_slm-main-stabilization`, ID `65c8f4a2ce37…`, utworzony
+  `2026-10-28T21:30:19Z`, zajmuje `55322`; Kong `03382f5f1d64…`, utworzony
+  `2026-10-28T21:30:30Z`, zajmuje `55321`. Obydwa uruchomione ponownie
+  `2026-11-10T22:00:03Z`, przed badaniem. Uruchomienie starego kontenera nie
+  oznacza nowej bazy.
+- Etykieta `com.supabase.cli.project=slm-main-stabilization` jest poprawna,
+  ale `com.supabase.cli.workdir` wskazuje
+  `I:/slm/sunday-league-mates/.worktrees/main-stabilization/.cache/stabilization-stack`,
+  a nie checkout Tito. Listenery hosta: `com.docker.backend`/`wslrelay`.
+  W nowym checkoutcie nie ma przygotowanego `config.toml` stosu.
+- **FAIL preflight:** `prepare-stabilization-local.mjs` i `test-tito-local.mjs`
+  zatrzymują się na wymaganiu gałęzi `chore/main-stabilization`. Nawet po osobnym
+  zatwierdzeniu wyjątku dla Tito zachowany stos nie spełni warunku świeżości.
+  Nie pobierano kluczy ani konfiguracji Cloud używanego stosu; jego braku
+  połączenia z Cloud nie uznano za potwierdzony. Warunki pierwszego zapisu
+  **nie zostały spełnione**.
+
+Do osobnego przeglądu przygotowano
+[propozycję strażnika lokalnego](review/tito-local-stack-guard-proposed.patch).
+Patch **nie jest zastosowany**. Dopuszcza dokładnie lokalną gałąź Tito,
+zabrania jej trybu CI, odrzuca istniejące kontenery i wolumeny projektu,
+zajęte porty, link Cloud, obcy workdir i kontener starszy niż przygotowanie.
+Nie zawiera resetu, zatrzymania ani usuwania starego stosu.
+[Test propozycji](review/test-tito-guard-proposal.mjs): **18/18 PASS**, wyłącznie
+mockowane metadane, bez Docker/SQL. `git apply --check`: PASS.
+
+Właściciel musi osobno przejrzeć patch oraz uzgodnić udostępnienie wymaganych
+portów i cykl dwóch nowych środowisk syntetycznych z właścicielem starego
+stosu. Nie wystarczy nazwać starej bazy fixture. Zmiana nazwy brancha, portów,
+zmiennych CI lub ręczne ominięcie `assertIsolated()` nie są rozwiązaniem.
+
+## Naprawa ujawniona przez Cypress
+
+Początkowy start Cypress kończył się `3221225501` (`0xC000001D`). Proces
+dziedziczył `ELECTRON_RUN_AS_NODE`; kod launchera zainstalowanego Cypress
+wybiera wtedy tryb Node. Bez tej zmiennej w **samym procesie potomnym** natywny
+smoke test kończy się kodem 0, a Cypress uruchamia scenariusze. Nie zmieniano
+globalnego środowiska ani ustawień Windows. Binarka Cypress `16.1.1`
+(`16.1.1.4005393`) ma poprawny podpis; SHA256
+`cb0a3a1d187ce001f968e8729bc24a775c7d9f9f8ed8d639f4e51827359dde19`.
+Nie potwierdzono hipotezy o braku instrukcji CPU.
+
+Rzeczywiste kliknięcie Cypress ujawniło regresję: odczyt po focus potrafił
+wyzerować tryb zamiany i pierwszy wybrany wpis; trwający odczyt w tle blokował
+także edycję/zapis. `usePremiumLineup` zachowuje teraz interakcję przy
+niezmienionej wersji/rosterze/uprawnieniach. Jawny zapis/odświeżenie może
+zastąpić odczyt w tle, którego spóźniony wynik odrzuca epoka operacji.
+CAS, autoryzacja i ochrona niezapisanego szkicu pozostają obowiązujące.
+Trzy nowe regresje jednostkowe obejmują oba przypadki oraz odzyskanie możliwości
+edycji po chwilowym błędzie odczytu i udanym odświeżeniu bez zmiany wersji.
+Ten ostatni test najpierw odtworzył błąd poprawki; warunek zachowania edytora
+nie przechwytuje już ścieżki powrotu ze stanu błędu.
+
+## Bieżące wyniki wykonanych kontroli
+
+| Kontrola | Wynik | Dowód / granica |
+| --- | --- | --- |
+| LIVE `npm run build`, Premium `npm run build:premium-local` po poprawce | PASS | Oba buildy ukończone; ostrzeżenie rozmiaru bundle |
+| `npm run lint`, TypeScript `--noEmit`, `npm run typecheck:edge` po poprawce | PASS | Każde polecenie exit 0 |
+| Pełny `npm run test.unit -- --run --maxWorkers=2` po poprawce | FAIL | **545 PASS / 1 FAIL, 546 testów, 78 plików**; jedyny błąd logowania jak na czystym main |
+| Ukierunkowane `lineupRefresh` + `premiumLineupApi` | PASS | 32/32, w tym trzy nowe regresje |
+| Cypress `node scripts/test-tito-browser.mjs` | PASS | **2/2**, Chrome 157, lokalny Vite; transport syntetyczny, nie Auth/Edge/SQL |
+| Mobilny Chrome CDP `node scripts/test-tito-chrome.mjs` | PASS | 320/390 px, Light/Dark, 0/99/—/G, wycofane wpisy, dwie syntetyczne sesje, konflikt i zachowanie szkicu; transport syntetyczny |
+| Parser pglast `7.22`, SQL i PL/pgSQL | PASS | 52 pliki: 49 migracji i 3 pliki Tito; to kontrola składni, nie zastosowanie migracji ani rozwiązanie referencji PostgreSQL |
+| `node --check app/scripts/test-tito-local.mjs` | PASS | Składnia rozszerzonego runnera; jego scenariusze bazy NOT RUN |
+| `npm run verify:consolidation` | FAIL | Niezaakceptowana 49. migracja; aktywna allowlista bez zmian |
+| `node scripts/verify-frozen-ui.mjs` | FAIL | Rozbieżność przypięcia `account-ui/model.ts`, odtworzona na czystym main |
+| `npm run test:premium-policy` | FAIL | 23 PASS / 84 FAIL z 107; bazowa kontrola grafu/przypięcia blokuje dalsze przypadki, nie oznacza to 84 dowiedzionych regresji bezpieczeństwa Tito |
+| Istniejący `test_lineups_ci_context.py` | FAIL | 34 PASS / 1 ERROR z 35: WinError 1314 przy tworzeniu symlinka |
+| Dekoder i komponent starszej PWA z czystego main | FAIL zgodności | Test opisujący zachowanie: 4/4 PASS; dwa warianty autora NULL odrzucane, szczegóły niżej |
+
+Logi lokalne: `app/.cache/tito-acceptance/`, m.in. `vitest-final.log`,
+`build-live-after-fix.log`, `build-premium-final.log`, `final-exits.json`,
+`cypress-after-fix.log`, `chrome-after-fix.log`, `sql-parser.json`,
+`ci-proposal.log`. Ostatni Vitest zakończył się exit 1 wyłącznie przez test bazowy;
+32/32 kontrole ukierunkowane są w `focused-after-fix.log`.
+Screenshoty: `app/.cache/tito-browser/evidence/`. Są ignorowane przez Git;
+nie zawierają wyników odczytu rzeczywistej bazy ani poświadczeń.
+
+## Kontrola na czystym main i osobny przegląd CI
+
+Utworzono czysty detached worktree `I:/slm/tito-main-control-20261110` na
+`51211af24479da9ee9dfef23df2fb400d72a9738`; świeże `npm ci --ignore-scripts`
+z tym samym lockfile i to samo środowisko. Nie zmieniono śledzonych plików.
+
+- **FAIL bazowy odtworzony:** `B1App.test.tsx`, 6 PASS/1 FAIL. Linia 48 oczekuje
+  „Nie udało się zalogować”, UI zwraca „Nieprawidłowy login, numer telefonu lub
+  hasło.” Tito nie zmienia tych plików.
+- **FAIL bazowy odtworzony:** hash `app/src/account-ui/model.ts`
+  `0238b068348d2c287fcd5237ea1ae102756df7a3309ada5988fe4c0147063b76`, przypięcie
+  `799f93912ea392642372d3dd9b8c496f32ed118f550f94dd320784418f86643f`.
+  Konsolidacja main przechodzi część migracji i dochodzi do tego błędu UI.
+  Tito dodatkowo wymaga przeglądu nowej migracji i zmienionych źródeł.
+- WinError 1314 odtworzono również minimalną próbą symlinka w katalogu
+  tymczasowym: token procesu nie ma uprawnienia do utworzenia dowiązania.
+  Nie zmieniano Developer Mode ani uprawnień Windows.
+  [Osobna propozycja testu CI](review/tito-ci-symlink-test-proposed.patch)
+  oznacza tylko ten brak uprawnienia jako SKIP i wydziela kontrolę modyfikacji
+  workflow do niezależnego testu. Patch nie jest zastosowany; aktywne CI,
+  strażniki i przypięcia pozostają niezmienione.
+  Kandydat uruchomiony wyłącznie z kodu złożonego w pamięci: **35 PASS / 1 SKIP
+  z 36**, bez modyfikacji aktywnego pliku; `git apply --check` PASS.
+
+Logi bazowe: `I:/slm/tito-main-control-20261110/app/.cache/tito-control/`.
+
+## PostgreSQL i prawdziwe sesje — NOT RUN
+
+| Wymagany przebieg | Wynik / następny krok po usunięciu obu blokad izolacji |
+| --- | --- |
+| Świeża instalacja wszystkich 49 migracji | NOT RUN; wykonać w nowym zatwierdzonym stosie, odczytać końcowe funkcje, ACL i RLS |
+| Osobna świeża baza main48 → before → Tito49 → after | NOT RUN; porównać przydziały, historię i rozliczenia oraz brak backfillu w migracji |
+| Runner i SQL regresje | NOT RUN; `match_lineups`, `lineup_admin`, `premium_match_visibility`, `public_match_discovery`, `account_privacy`, `notifications`, `settlements`, `premium_admin_finance`, `payment_workflow`, `tito_lineups` |
+| Dispatchery: ostatnie miejsce, oba wymuszone porządki manual/auto, request_id retry, rollback | NOT RUN; przygotowane wymuszanie blokad i SQL nie są dowodem wykonania |
+| Rezerwa/powrót, wypisanie/nowy zapis, goście, erasure autora, członek/admin/obcy, FIFO/opłaty/powiadomienia | NOT RUN na PostgreSQL |
+| Backfill wybranych meczów: dry-run, apply, apply ponownie, pomijanie rozpoczętych/odwołanych, ręczne przydziały, zajęta blokada | NOT RUN; rozszerzony runner porównuje dokładny stan i wymaga zera zmian przy drugim zastosowaniu |
+| Czas transakcji backfillu | NOT RUN; brak wartości pomiaru, nie podawać czasu procesu jako czasu SQL |
+| Dwie niezależne rzeczywiste sesje lokalny Auth → Edge → PostgreSQL, mobilny Chrome i Cypress | NOT RUN; zaliczone scenariusze z transportem syntetycznym nie zastępują tej ścieżki |
+
+Runner backfillu przygotowuje jawne ID przyszłego, rozpoczętego, odwołanego
+i niewybranego meczu. Porównuje całe rekordy meczów, wpisów, składów, historii,
+ledger i płatności; zachowuje ręczny przydział. Oddzielny proces utrzymuje
+transakcję z globalną blokadą aż do asercji `tito_backfill_busy`.
+`BACKFILL_TRANSACTION_MS` używa zegara PostgreSQL w jednym procesie psql od
+znacznika po `SET LOCAL` do odczytu po `COMMIT`, z pominięciem startu Docker/psql.
+Obejmuje mały narzut kolejnego polecenia w tej samej sesji; nie jest samym
+czasem funkcji ani dokładnym czasem posiadania blokady. Kod przygotowany,
+**żaden pomiar ani wyścig bazy nie został uruchomiony**.
+
+## Starsza PWA — blokada publikacji i backfillu
+
+[Test kontrolny](review/test-tito-legacy-main.mjs) uruchamia rzeczywisty
+`PremiumTeams` i dekoder niezmienionego main, ze sterowaną odpowiedzią DTO
+odpowiadającą autorowi ręcznemu/automatycznemu po usunięciu konta lub
+backfillowi bez inicjatora. Wynik 4/4 PASS oznacza odtworzenie zachowania:
+
+- Zwykłe Tito z prawdziwym UUID inicjatora: boisko i „Ostatnia zmiana: Tito”.
+- Zimny odczyt `user_id=NULL`, manual/automatic: „Nie potwierdzono operacji”,
+  brak boiska.
+- Odświeżenie otwartego widoku po NULL autora: błąd, poprzednie boisko i stara
+  nazwa autora pozostają w RAM, Zapisz wyłączone. Nie wolno przedstawiać tego
+  jako potwierdzonego aktualnego składu.
+
+To dowód działania prawdziwego klienta na syntetycznym transporcie. Zestawienie
+go z odpowiedzią rzeczywistego PostgreSQL po erasure/backfillu nadal NOT RUN.
+Nie przypisano Tito fikcyjnego UUID. **Publikacja aplikacji/serwera i backfill
+pozostają zablokowane**, nawet po usunięciu lokalnej blokady Docker.
+
+Konkretny plan odbioru zgodności: najpierw na świeżym lokalnym stosie zapisać
+odpowiedzi erasure i backfillu, podać je obu rzeczywistym dekoderom oraz otwartej
+i nowo uruchomionej starej PWA. Oddzielnie odebrać klienta tolerującego oba
+kontrakty i pokazywanie autorów NULL. Ewentualna publikacja wymaga kolejności:
+zgodny klient → potwierdzone odświeżenie/wycofanie starych PWA → migracja serwera
+→ powtórzenie odbioru → dopiero osobno zatwierdzony backfill. Samo opublikowanie
+nowego JS nie dowodzi aktualizacji już otwartych/zainstalowanych PWA. Jeśli nie
+można zapewnić wycofania starego klienta, potrzebny jest osobny wersjonowany
+kontrakt odpowiedzi; obecne rozwiązanie pozostaje niezgodne. Nie zastosowano
+żadnego z tych kroków publikacji.
+
+## Zakres zapisu tej kontynuacji
+
+Własne zmiany: naprawa focus/odczytu w tle, trzy regresje, środowisko potomne
+Cypress, rozszerzenie przyszłego pomiaru backfillu, propozycje do przeglądu
+i raport. Migracja Tito, wszystkie migracje main, Edge, aktywne strażniki,
+przypięcia, CI, lockfile i konfiguracja Vercel bez zmian w tej kontynuacji.
+Oryginalny checkout i źródłowe gałęzie Tito/odświeżania zachowane.
+Zwykły commit/push na gałąź zgodnie z AGENTS.md; bez PR, merge, workflow,
+wdrożenia ani operacji produkcyjnych. Wynik push i SHA w raporcie końcowym.
+
+---
+
+# Historia: implementacja i pierwsze kontrole, stan raportu 2e32b8d
+
+Poniżej zachowano wcześniejsze wyniki. Informacje o niedostępnym Dockerze,
+nieuruchomionym Cypress i starszych licznikach testów dotyczą tamtego przebiegu;
+aktualny odbiór opisano powyżej.
 
 Gałąź `codex/tito-lineups-completion`, osobny worktree `I:/slm/tito-lineups-completion`.
 Baza: świeżo pobrany `origin/main` `51211af24479da9ee9dfef23df2fb400d72a9738`.

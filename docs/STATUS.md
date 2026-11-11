@@ -1,4 +1,60 @@
-# Tito — implementacja do przeglądu, odbiór backendu zablokowany, 2026-11-10
+# Tito — ponowny odbiór, poprawka Cypress/focus, 2026-11-11
+
+`codex/tito-lineups-completion`, osobny checkout `I:/slm/tito-lineups-completion`;
+kontynuacja implementacji `7c00085` i raportu `2e32b8d`. **Pełny odbiór nadal
+zablokowany.** Windows 11 `10.0.26200`, Node `24.14.0`, Supabase CLI `2.121.0`,
+Docker Desktop `4.95.0`, Linux Engine `29.8.2`, Cypress `16.1.1`, Chrome `157`.
+
+Naprawiono kasowanie trybu zamiany/wybranego zawodnika przez odświeżenie focus
+oraz blokowanie edycji i zapisu przez odczyt w tle. Trzy nowe regresje chronią
+wybór, odrzucenie spóźnionej odpowiedzi i powrót po błędzie odczytu.
+Start Cypress naprawiono przez usunięcie
+odziedziczonego `ELECTRON_RUN_AS_NODE` wyłącznie w procesie potomnym.
+
+- **PASS:** LIVE/Premium build, lint, TypeScript, Edge; ukierunkowane testy 32/32;
+  Cypress 2/2 i Chrome CDP 320/390 Light/Dark, 0/99/—/G, wycofane wpisy, dwie
+  sesje i konflikt. Obie ścieżki przeglądarkowe mają **syntetyczny transport**,
+  nie rzeczywisty lokalny Auth/Edge/PostgreSQL. Parser SQL/PLpgSQL: 52 pliki PASS,
+  bez zastosowania migracji.
+- **FAIL:** pełny Vitest **545 PASS/1 FAIL z 546**. Błąd komunikatu logowania
+  odtworzono na czystym main `51211af` (6 PASS/1 FAIL), tak samo rozbieżność
+  przypięcia `account-ui/model.ts`. Konsolidacja Tito odrzuca nową migrację;
+  premium-policy 23 PASS/84 FAIL przez bazową blokadę grafu/przypięcia.
+  Aktywne testy CI: 34 PASS/1 ERROR (WinError 1314, brak uprawnienia symlink).
+- **FAIL zgodności / blokada publikacji i backfillu:** prawdziwy klient main
+  odrzuca autora NULL. Cztery kontrolne testy komponentu/dekodera odtwarzają
+  brak boiska przy zimnym odczycie i stary widok z zablokowanym zapisem po
+  odświeżeniu. To syntetyczne DTO; rzeczywista odpowiedź po erasure/backfillu
+  pozostaje NOT RUN. Bez fikcyjnego UUID Tito.
+- **NOT RUN:** świeże 49 migracji, osobny upgrade 48→49, końcowe funkcje/ACL/RLS,
+  dispatchery/wyścigi/retry/rollback, finanse/FIFO/powiadomienia, backfill i jego
+  czas transakcji oraz dwie rzeczywiste sesje Auth → Edge → PostgreSQL.
+
+Docker odpowiada, lecz `55321/55322` zajmuje stos `slm-main-stabilization`
+utworzony **2026-10-28**, z etykietą workdir starego checkoutu. Nie jest świeżym
+środowiskiem Tito. Strażnik dodatkowo odrzuca bieżącą gałąź. Nie odczytano danych
+ani nie zapisano niczego w tej bazie; nie restartowano/nie usuwano kontenerów,
+nie zmieniano Windows. Migracje i Edge wdrożone: **żadne**.
+
+Do osobnego przeglądu, **nie zastosowano**:
+[wyjątek lokalnego strażnika z kontrolą świeżości](review/tito-local-stack-guard-proposed.patch)
+(18/18 testów mockowanych) oraz
+[obsługa braku uprawnienia symlinka w teście CI](review/tito-ci-symlink-test-proposed.patch).
+Aktywne strażniki, CI i przypięcia pozostały bez zmian. Rozszerzono runner
+backfillu o porównania stanów i zegar serwera, ale nie uruchomiono go poza preflightem.
+Następny krok: osobny przegląd propozycji oraz uzgodnienie świeżych stosów i
+zwolnienia portów ze stroną używającą starej bazy, następnie rzeczywisty odbiór
+i potwierdzenie aktualizacji/wycofania starej PWA przed publikacją/backfillem.
+Pełne dowody, wersje, ograniczenia i plan kolejności:
+[TITO_LINEUPS_COMPLETION.md](TITO_LINEUPS_COMPLETION.md).
+Bez PR, merge, wdrożenia, zmian Cloud/Vercel; zwykły commit/push własnych zmian
+na bieżącą gałąź według AGENTS.md. Źródłowe gałęzie zachowane.
+
+---
+
+# Historia Tito — stan raportu 2e32b8d, 2026-11-10
+
+Poniższe wyniki są historyczne; aktualny stan Docker/Cypress/testów jest powyżej.
 
 `codex/tito-lineups-completion`, osobny worktree `I:/slm/tito-lineups-completion`,
 baza świeżego `origin/main`: `51211af24479da9ee9dfef23df2fb400d72a9738`.
