@@ -1,3 +1,13 @@
+# PR #50 — telefon scalony do main, 2026-11-11
+
+[PR #50](https://github.com/psuda87/sunday-league-mates/pull/50) z `fix/profile-phone-sharing` scalono do `main` w `793ef478144ed3d58c76c4748b4ceff92c44ea5e`. Porównanie potwierdziło identyczną zawartość ze sprawdzoną gałęzią `2c6130b`. `main` zawiera poprawki komunikatów zapisu telefonu oraz odnawianie adresów zdjęć z PR #48.
+
+- Usunięto z gałęzi `20261109190000_phone_privacy_only.sql`, która ponownie tworzyła funkcje i wyzwalacze ze starszej migracji `20261104183413_account_privacy_lifecycle.sql`. Lista migracji `main` pozostała identyczna. Produkcyjna migracja telefonu `20261109223650` i Edge Function `accounts` v26 zostały zweryfikowane odczytem. Nie zastosowano migracji ani nie wdrożono funkcji.
+- Przeszły buildy LIVE i Premium, lint, kontrola typów Edge i `git diff --check`. Vitest 530/531, w tym cztery nowe przypadki obsługi błędów zapisu telefonu. Niezaliczony test dotyczy tekstu odmowy logowania i występował wcześniej. Cypress z kontrolowanym API zaliczył 2/2 testy prywatności konta i telefonu oraz 2/4 testy grup. W grupach odnotowano przekroczenie limitu czasu zrzutu ekranu i brak przycisku przejścia do grup. GitHub pominął obie kontrole CI.
+- Kontrole chronionych źródeł nadal zgłaszają rozbieżności w handlerze `accounts` i modelu UI konta. Publikację wstrzymano. [UI Demo](https://slm-ui-demo.vercel.app) nadal wskazuje na wdrożenie `0132a5c`. Następny krok to przegląd chronionych zmian oraz ponowienie niezaliczonych kontroli przed publikacją.
+
+---
+
 # PR #48 — scalony do main, 2026-11-11
 
 Po doprecyzowaniu właściciela zakres obejmował wyłącznie scalenie [PR #48](https://github.com/psuda87/sunday-league-mates/pull/48). GitHub potwierdził merge `511ae63cac04994262ddf6d31acb21a46b6c20fe`. Zawartość `origin/main` jest identyczna ze sprawdzonym próbnym scaleniem `0104aa0`. Wyniki kontroli opisano poniżej.
