@@ -4,6 +4,7 @@ Po akceptacji właściciela opublikowano `main` `793ef478144ed3d58c76c4748b4ceff
 
 - Publiczny adres zwrócił HTTP 200 dla strony, JS, CSS i zasobu WebAssembly. Zweryfikowano pliki nowego builda, CSP, CORS 204 z dokładnym originem UI Demo i oczekiwaną odmowę 401 przy braku sesji. Test Cypress pod publicznym adresem zaliczył wyświetlenie logowania, przejście przez zakładkę Grupy i żądanie zdjęć członków grupy z kontrolowanym API.
 - Supabase pozostał na `accounts` v26, bez zmiany pakietu funkcji i bez migracji. Wydanie obejmuje frontend. Właściciel zaakceptował publikację pomimo opisanych poniżej rozbieżności strażników i wcześniejszych testów. Następny krok to ręczne sprawdzenie dzwonka grup, logowania i zdjęć na istniejącym koncie.
+- Po potwierdzeniu obecności obu końcowych commitów na `main` usunięto z GitHuba `fix/public-profile-photos` i `fix/profile-phone-sharing`, a lokalnie także gałąź telefonu. PR #48 i #50 są zamknięte przez scalenie. Gałąź `codex/pr-48-release-check` przechowuje raport wdrożenia.
 
 ---
 
