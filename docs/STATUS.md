@@ -1,3 +1,14 @@
+# Audyt małych zmian i gałęzi GitHub, 2026-11-11
+
+Stan na moment odczytu. `main` `793ef47` jest READY na UI Demo. Na GitHubie jest 19 gałęzi i 8 otwartych PR-ów. Nie wykonano kolejnego wdrożenia, migracji, testów aplikacji ani usuwania gałęzi w tym audycie.
+
+- `feat/google-maps-match-location` i `feat/profile-photo-crop-chatgpt` są kandydatami do usunięcia. Porównanie patchy potwierdziło identyczny zakres scalonych PR #46 i #45. Oba commity scalające są na `main`.
+- `feat/premium-legal-pages` jest już w historii `main` i stanowi bazę PR #36, #40, #41. `chore/main-stabilization` także jest w historii `main` i pozostaje bazą PR #26. Najpierw należy rozstrzygnąć te PR-y. Stara lista lokalnych odwołań ma 43 pozycje, których już nie ma na GitHubie. 23 wskazują na commity spoza historii `main`. Warto zweryfikować ich kopie przed pełnym czyszczeniem lokalnej listy.
+- Najmniejszy kandydat do wydania to poprawka klawiatury mobilnej PR #40. Sprawdzenie połączenia z `main` nie wykazało konfliktu tekstowego. Potrzebny test formularzy w Chrome na Androidzie. Równolegle do sprawdzenia dzwonek grup oraz aktualizacja testów komunikatu logowania i przejścia przez dolną zakładkę Grupy. PR #41 odświeża otwarte mecze i składy, dotyka tych samych plików co Tito. PR #49 zmienia uprawnienia bazy i wymaga oddzielnego odbioru oraz zgody na zdalną migrację.
+- Po sprzątaniu warto zweryfikować ustawienie GitHub **Automatically delete head branches**. Publiczny odczyt repozytorium nie ujawnia jego aktualnej wartości. Gałęzie z unikalnymi, odłożonymi zmianami można zastąpić tagami archiwalnymi po decyzji właściciela.
+
+---
+
 # UI Demo — wdrożony main, 2026-11-11
 
 Po akceptacji właściciela opublikowano `main` `793ef478144ed3d58c76c4748b4ceff92c44ea5e` na [UI Demo](https://slm-ui-demo.vercel.app). Vercel READY `dpl_C4qqLnE4wTo36pwo3u4PZcLWdAuN`. Poprzedni alias wskazywał na wdrożenie `dpl_PoRdeofKKAD6KSzC8XcvzrMXjuqM` z `0132a5c`. Osobny adres `slm-soccer.vercel.app` zachował dotychczasowe przypisanie.
