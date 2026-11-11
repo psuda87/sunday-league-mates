@@ -75,6 +75,12 @@ export function createHandler(env: Environment) {
       if(code==='group_transfer_required')throw new ApiError(409,code,'Najpierw przekaż zarządzanie grupami innemu aktywnemu członkowi w ustawieniach grupy. Grupa z innymi członkami nie może pozostać bez administratora.');
       if(code==='deletion_invalid')throw new ApiError(403,code,'Nieprawidłowe potwierdzenie operacji usuwania.');
       if(code==='deletion_busy')throw new ApiError(409,code,'Usuwanie trwa. Ponów sprawdzenie za chwilę.');
+      if(name==='phone_save'){
+        if(code==='session_invalid')throw new ApiError(403,'session_invalid','Sesja wygasła. Zaloguj się ponownie.');
+        if(code==='invalid_input'||code==='invalid_phone')throw new ApiError(400,'invalid_phone','Sprawdź poprawność numeru telefonu.');
+        if(r.data?.code==='23505')throw new ApiError(409,'phone_taken','Ten numer telefonu jest już używany.');
+        throw new ApiError(503,'phone_save_unavailable','Nie można teraz zapisać numeru. Spróbuj ponownie później.');
+      }
       throw new ApiError(503,'deletion_pending','Nie potwierdzono zakończenia operacji. Ponów sprawdzenie z tym samym identyfikatorem.');
     }return r.data;
   }

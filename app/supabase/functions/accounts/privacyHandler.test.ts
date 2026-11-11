@@ -6,7 +6,7 @@ import {createHandler} from './handler';
 afterEach(()=>{vi.unstubAllGlobals();transport.send.mockClear();});
 const id='00000000-0000-4000-8000-000000000001',sid='10000000-0000-4000-8000-000000000001',operation='20000000-0000-4000-8000-000000000001';
 const token='fixture.'+btoa(JSON.stringify({sub:id,session_id:sid}))+'.unsigned';
-function fixture(options:{invalidPassword?:boolean;authFailure?:boolean;noticeFailure?:boolean;completed?:boolean;photos?:boolean;storageFailure?:boolean}={}){
+function fixture(options:{invalidPassword?:boolean;authFailure?:boolean;noticeFailure?:boolean;completed?:boolean;photos?:boolean;storageFailure?:boolean;phoneSaveError?:{status:number;message?:string;code?:string}}={}){
  let phase=options.completed?'complete':'prepared',hasPhotos=options.photos===true;const calls:{path:string;body:Record<string,unknown>}[]=[];
  vi.stubGlobal('crypto',webcrypto);
  if(options.noticeFailure)transport.send.mockRejectedValueOnce(Error('smtp unavailable'));
@@ -19,6 +19,10 @@ function fixture(options:{invalidPassword?:boolean;authFailure?:boolean;noticeFa
   if(path==='/rest/v1/slm_aliases')return reply([{user_id:id,technical_email:'fixture@fixture.invalid',login:'fixture',phone:null}]);
   if(path==='/auth/v1/token')return options.invalidPassword?reply({},400):reply({access_token:token,user:{id}});
   if(path==='/auth/v1/logout')return reply({});
+  if(path.endsWith('slm_phone_save')&&options.phoneSaveError){
+   const {status,...error}=options.phoneSaveError;
+   return reply(error,status);
+  }
   if(path.endsWith('slm_deletion_begin'))return reply(null);
   if(path.endsWith('slm_deletion_work'))return reply([{operation_id:operation}]);
   if(path.endsWith('slm_deletion_step')){
@@ -37,6 +41,17 @@ function fixture(options:{invalidPassword?:boolean;authFailure?:boolean;noticeFa
  return {request,calls};
 }
 const deletion={action:'account_delete',operation_id:operation,proof:'a'.repeat(64),confirmation:'USUŃ KONTO',current_password:'fixture-password',user_id:'spoofed'};
+it.each([
+ {error:{status:400,message:'session_invalid'},status:403,code:'session_invalid'},
+ {error:{status:400,message:'invalid_phone'},status:400,code:'invalid_phone'},
+ {error:{status:409,code:'23505'},status:409,code:'phone_taken'},
+ {error:{status:503},status:503,code:'phone_save_unavailable'},
+])('reports phone save failure as $code',async({error,status,code})=>{
+ const f=fixture({phoneSaveError:error});
+ const response=await f.request({action:'save_contact_phone',phone:'123456789',share_phone:true,current_password:'fixture-password'});
+ expect(response.status).toBe(status);
+ expect(await response.json()).toMatchObject({code});
+});
 it('reauthenticates the current user before creating a job, without accepting supplied identity',async()=>{
  const f=fixture();const r=await f.request(deletion);expect(r.status).toBe(200);expect(await r.json()).toEqual({deleted:true,operation_id:operation});
  expect(f.calls.find(c=>c.path.endsWith('slm_deletion_begin'))?.body.p_user).toBe(id);
