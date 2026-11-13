@@ -1,0 +1,208 @@
+SUNDAY LEAGUE MATES (SLM) — PRACE
+ZBIORCZY RAPORT PROJEKTU / HISTORIA / BACKLOG / UWAGI
+Stan wiedzy: 13.11.2026
+Repozytorium: https://github.com/psuda87/sunday-league-mates
+
+WAŻNE: To rekonstrukcja z dostępnych rozmów, zapisanych ustaleń, fragmentów dokumentacji i wybranych plików GitHub, NIE pełny audyt wszystkich commitów, PR, migracji i środowisk. Oznaczenia:
+[OK] potwierdzone przez użytkownika lub testy we wskazanym kontekście;
+[W TOKU] rozpoczęte, nie ma potwierdzenia ukończenia;
+[BUG] zgłoszona usterka, stan naprawy wymaga sprawdzenia;
+[TODO] ustalone do zrobienia;
+[POMYSŁ] bez decyzji o wdrożeniu;
+[SPRAWDZIĆ] dane historyczne lub niezweryfikowane na obecnym main.
+Nie traktować dawnych PASS z gałęzi testowej jako dowodu aktualnego stanu produkcji.
+
+===========================================================
+1. CEL, TECHNOLOGIA, ZASADY PROWADZENIA
+===========================================================
+Aplikacja do amatorskiej piłki: konta, prywatne grupy, wyszukiwanie grup, mecze, zapisy, składy, profile, zdjęcia, statystyki, rozliczenia i docelowo ranking.
+Stos: Ionic React / TypeScript / Capacitor, Supabase (Auth, DB/RLS, Storage), Vercel (PWA/demo), Android (APK), Brevo (e-mail). Firebase/FCM rozważany dla powiadomień. Android + PWA na iOS i komputerze; natywne iOS odłożone.
+Repo: psuda87/sunday-league-mates. Adres testowy: slm-ui-demo.vercel.app; adres slm-soccer.vercel.app był problematyczny. Konto deweloperskie Google Play utworzone.
+Priorytet: małe koszty, darmowe poziomy usług, ograniczanie niepotrzebnego pollingu i zużycia limitów bez kompromisów w bezpieczeństwie.
+ZATWIERDZONY WYGLĄD: Premium 3.18 / Ultimate Player Card, nie przepisywać od zera; integrację dopasowywać do zatwierdzonego UI.
+PROCES: AUDYT -> NAPRAWA -> TESTY -> ODBIÓR NA TELEFONIE/VERCELU -> MERGE. Merge dopiero po wyraźnym potwierdzeniu użytkownika. Małe izolowane PR, regresje i rejestr odbiorów. Main ma pozostać stabilny.
+Rozdzielać demo/fixture od rzeczywistych danych Supabase i sprawdzać, z którym backendem łączy się każde środowisko.
+
+===========================================================
+2. OŚ CZASU / KAMIENIE MILOWE
+===========================================================
+2026-10-13 [OK TESTY / SPRAWDZIĆ MERGE] Moduł wydarzeń na feat/events: mecze, zapisy, goście, rezerwa, odwołania, obecność i historia. Zgłoszone testy: build/typy/lint, 29 Vitest, 7 Cypress, 6 bootstrap, 7 grup testów zdalnych (w tym wyścig o ostatnie miejsce). Migracje do wskazanego Supabase. Rozliczenia/FIFO/push jeszcze niegotowe.
+2026-10-14 [W TOKU] feat/integration: łączenie rozliczeń i push, rozwiązywanie konfliktów; SQL/RLS/concurrency i lokalny Docker bywały niewykonane. W innej iteracji zgłaszano 66 Vitest, 6 bootstrap, 10 Cypress mock; bez commita/pusha. Nie utożsamiać tych raportów z finalnym wdrożeniem.
+2026-10-17 [OK DEMO] UI Beta 2.1 na feat/ui-beta, Vercel READY, dolna nawigacja Mecze/Zawodnicy/Profil, składy w szczegółach meczu; demo było izolowane od realnego Auth.
+2026-10-18–25 [OK UI] Rozwój Premium 3.18; zaakceptowano wygląd, działanie przycisku wstecz i systemowego Android back. Starszych układów nie przywracać. Prace nad parity browser/Android i kopiowaniem sprawdzonych komponentów zamiast generowania nowych.
+2026-10-23 [TESTY] PR #7 chore(android): przygotowanie testów telefonu; build/APK/fixture OK, fizyczny telefon i transport początkowo niezweryfikowane. Później instalacja i uruchomienie na POCO M2007J20CG zakończone sukcesem.
+2026-10-25–28 [W TOKU] Realne grupy/mecze/zapisy w PR #20 (historyczny draft); zgłaszano 319 Vitest, 27 HTTP, 144 SQL i Chrome. Sprawdzić obecny merge, backend i zakres. Finansów Premium i edycji meczu nie uznawać za ukończone.
+2026-11-04 [OK UŻYTKOWNIK] Na Vercel z realnym Supabase i Brevo przetestowano rejestrację, logowanie, potwierdzenie e-mail, odzyskiwanie hasła. Problem z domeną slm-soccer.vercel.app nie był wówczas rozwiązany. Planowany test Android Studio.
+2026-11-07 [OK / W TOKU] PR #44 dotyczący profili wg relacji scalony do main (7e5ac42); usunięcie fikcyjnych portretów, upload zdjęć WebP, prywatny bucket slm-profile-photos, limit ok. 150 KB. Kadrowanie/pan/zoom/pinch nadal do odbioru. Prace na feat/profile-photos-v1.
+2026-11-07–12 [BUG] Dzwonek powiadomień wysuwał panel poza ekran, przyciski wyglądały źle; zgłoszono poprawę i potrzebę testów Vercel. Polling co 15 sekund odrzucony z uwagi na limity. Brak potwierdzonego finalnego odbioru w zebranych danych.
+2026-11-09 [BUG] Przy zmianie składów ręczne przeniesienie zawodnika i dołączenie kolejnego powoduje ręczny wybór drużyny zamiast automatycznego przydziału.
+2026-11-09 [BUG] Zmiana/udostępnienie telefonu po wpisaniu poprawnego hasła nie działała; zlecono analizę kodu i bazy.
+2026-11-10 [BUG] Logowanie numerem telefonu nie działa; zdecydowano, że e-mail lub login są obowiązkowe, telefon opcjonalny, a komunikat o logowaniu telefonem ma zniknąć, jeśli funkcji nie naprawimy. Status wdrożenia do weryfikacji.
+2026-11-10 [PYTANIE] Konta: liczba zarejestrowanych użytkowników, porównanie członków grupy z wszystkimi kontami, wypisanie loginów przy rozbieżności. Brak w tej rekonstrukcji potwierdzonych wyników liczbowych.
+2026-11-11 [BUG] Usuwanie zawodnika z meczu: brak potwierdzenia „czy na pewno?” i brak możliwości przywrócenia.
+2026-11-12 [BUG] Błąd po kliknięciu „Zatwierdź mecz”; prośba o naprawę na nowej gałęzi i wdrożenie slm-ui-demo. Nie ma tutaj potwierdzonego wyniku naprawy.
+2026-11-13 [OK SPECYFIKACJA] Uzgodniono SLM Rating 1.0 i MVP Gold, w tym zaakceptowano koncepcję wizualną czterech ekranów. Specyfikacja na gałęzi docs/slm-rating-mvp-gold-spec w docs/rating/SLM_RATING_1_0_MVP_GOLD.md (commit 0d544be). Obrazy przygotowane jako ZIP, ale NIE POTWIERDZONO ich dodania do GitHub.
+
+===========================================================
+3. MODUŁY — CO JEST, CO JESZCZE TRZEBA ZROBIĆ
+===========================================================
+01. LOGOWANIE I REJESTRACJA
+[OK] Publiczna samodzielna rejestracja zamiast kont tworzonych przez admina.
+[OK] Na testowanym Vercel: rejestracja, logowanie, wylogowanie w zakresie testów, e-mail confirmation, reset hasła, Brevo/Supabase.
+[OK] Etap B1: „Login lub numer telefonu” jako minimalna wcześniejsza zmiana etykiety, testy TS/lint/190 Vitest/19 Cypress na tamtym etapie; PÓŹNIEJSZE wymaganie zmieniło kierunek na login/e-mail obowiązkowy, telefon opcjonalny.
+[BUG] Logowanie telefonem i niespójna etykieta loginu; zweryfikować aktualne wymaganie, UI, backend i migracje.
+[BUG] Możliwe niejasne komunikaty o złym loginie/haśle; sprawdzić rozróżnienie błędnych danych, blokad i problemów sieci.
+[SPRAWDZIĆ] Utrzymanie sesji po restarcie, logowanie równocześnie na urządzeniach, Android Studio/POCO.
+[TODO] Ochrona antybotowa/CAPTCHA odłożona; przed publicznym uruchomieniem zweryfikować rate limits i abuse.
+
+02. EKRAN GŁÓWNY / NAWIGACJA / POWIADOMIENIA
+[OK] Premium 3.18, dolna nawigacja, back i system back w zatwierdzonym zakresie.
+[BUG] Dzwonek: panel poza ekranem, słabe przyciski; ustalić czy fix trafił na main i czy przeszedł odbiór.
+[TODO] Dopracowanie powiadomień i skrótów; unikać 15-sekundowego pollingu; preferować oszczędne zdarzenia/push.
+[SPRAWDZIĆ] FCM, powiadomienia Android, zgody, lifecycle, SMTP/callbacki iOS/PWA.
+
+03. GRUPY
+[W TOKU/TESTY] Tworzenie, wyszukiwanie, filtrowanie, lista członków, zaproszenia/kod, role admina, realny backend — różne elementy istniały w demo i na gałęziach.
+[USTALONE] Konto nie daje automatycznie dostępu do cudzych grup. Wyszukiwarka grup jest dopuszczalna, ale członkostwo i prywatne dane wymagają uprawnień.
+[USTALONE] Publicznie co najwyżej nick, a gdy go brak — imię; telefon dopiero po dołączeniu, wcześniej ewentualnie adminowi do akceptacji.
+[BUG] Udostępnienie/zmiana numeru po haśle; sprawdzić błędy bazy/RLS i UX.
+[TODO] Testy izolacji grup, uprawnień admina, wyszukiwania, zaproszeń, liczby członków vs liczby kont.
+
+04. MECZE I ZAPISY
+[W TOKU/TESTY] Tworzenie meczu, zapisy/wypisywanie, goście, rezerwa, anulowanie, obecność, historia. Potwierdzone testy na historycznych gałęziach, aktualny stan produkcji do sprawdzenia.
+[BUG] Zatwierdzenie meczu wywołuje błąd (12.11).
+[BUG] Usuwanie zawodnika bez potwierdzenia i bez przywrócenia (11.11).
+[TODO] Sprawdzić edycję meczu, role, zamknięcie zapisów, współbieżność, limit miejsc, odwołania, odzyskiwanie stanu.
+[USTALONE] Dane meczu wprowadzane ręcznie, nie importowane zewnętrznie.
+
+05. SKŁADY / BOISKO
+[OK DEMO] Losowanie, zamiana zawodników pomiędzy drużynami, ekran boiska i układ Premium; ręczne przenoszenie przy nierównych liczbach było postulowane.
+[BUG] Po ręcznym przesunięciu i dopisaniu nowej osoby system nie przydziela jej automatycznie.
+[TODO] Testy: 2 graczy rozdzielonych, ręczne przeniesienie obu do A, dołączenie trzeciego, automatyczny wybór drużyny; liczby 5 vs 6; swap, move, undo, zapis/odczyt i ponowne otwarcie.
+[TODO] Audyt logiki algorytmu, możliwe „monitory”/testy niezmienników dla funkcji; nie dodawać kosztownego monitoringu serwerowego bez potrzeby.
+[TODO] MVP Gold widoczny na boisku — zatwierdzony efekt wizualny.
+
+06. PROFILE I ZDJĘCIA
+[OK] Ultimate Player Card i Premium 3.18, portret, numer koszulki, pseudonim/nazwisko, złota tarcza, motywy.
+[W TOKU] Zdjęcie własne: prywatny Storage, WebP, redukcja rozmiaru, kadrowanie kołowe z twarzą w centrum, zoom/pan/pinch, dopasowanie tła, zapis wybranego kadru, zgodność z demo.
+[TODO] Dokładna weryfikacja widoku własnego i cudzego profilu, uprawnień, wczytywania zdjęcia i błędów.
+[USTALONE] Ograniczać rozmiar obrazów i koszty Storage.
+[TODO] Rating i gwiazdki, MVP Gold na karcie.
+
+07. ROZLICZENIA
+[W TOKU] Projektowano ledger, wpłaty, zaległości, rozliczenia, FIFO; historyczne migracje i integracje.
+[SPRAWDZIĆ] Co faktycznie jest w main i Supabase, czy migracje były zastosowane, czy rozliczenia Premium są kompletne.
+[TODO] Testy RLS, sald, współbieżności, korekt i historii; nie uznawać rozliczeń za odebrane bez testów użytkownika.
+
+08. USTAWIENIA / KONTO
+[W TOKU] Edycja danych, numer koszulki, zdjęcie, telefon i jego widoczność, hasło, wylogowanie, usunięcie konta, ustawienia wyglądu.
+[BUG] Aktualizacja/udostępnianie telefonu z hasłem.
+[TODO] Weryfikacja polityk widoczności danych i ustawień powiadomień.
+
+===========================================================
+4. RATING 1.0 / MVP GOLD — PEŁNY SKRÓT
+===========================================================
+[OK KONCEPCJA, NIE KOD]
+- Każdy zaczyna z 7/10, czyli 3,5 z 5 gwiazdek; rating może spaść do 1/10.
+- Pierwsza zmiana po minimum 5 ocenionych meczach.
+- Oceny 1–10 od innych uczestników tego samego meczu, nie od siebie; anonimowe, 48 h; brak oceny nie liczy się do średniej.
+- Bez punktów za wygraną/remis/przegraną.
+- Wstępne wagi: 80% oceny kolegów, 12% MVP, 5% gole i asysty, 3% frekwencja. Dokładna matematyka NIE jest jeszcze zatwierdzona.
+- Ochrona przed skrajnymi złośliwymi jedynkami i wzajemnym nabijaniem ocen; nie usuwać automatycznie każdej skrajnej oceny.
+- Gole i asysty wpisuje sam zawodnik, na zasadzie zaufania; mały wpływ; podsumowanie miesięczne i historia.
+- Frekwencja tylko na plus, bez kar za nieobecności.
+- MVP: jeden głos na innego uczestnika, kworum minimum połowa uczestników (5/10, 6/12).
+- MVP Gold za jednoznaczne pierwsze miejsce; remis na pierwszym miejscu daje po 0,25 jednostki MVP akumulacyjnego; 4 remisy = jedno MVP akumulacyjne.
+- Gold trwa 7 dni od meczu, chyba że po kolejnym rozegranym meczu zawodnik nie obroni Gold w ważnym głosowaniu; brak kworum nie odbiera Gold przed upływem 7 dni.
+- Historia zdobytych wyróżnień zostaje.
+- Globalny rating zawodnika w całej aplikacji jest preferowany; zbadać wpływ różnych grup.
+- Oceny kolegów po zamknięciu 48 h; MVP ustalone po głosowaniu; gole/asysty/frekwencja miesięcznie.
+[OK PROJEKT UI]
+- Karta Gold: metaliczny ciemnozłoty gradient, korona/emblemat, efekt WOW, złoty refleks.
+- Większe gwiazdki POD pseudonimem/nazwiskiem, w odwróconym łuku (środkowa najniżej), bez podpisu, dokładne połówki.
+- Listy grup i meczu: wyraźny złoty znacznik/korona, podświetlenie; boisko: MVP na zawodniku.
+- Refleks cykliczny co ok. 4–5 s wszędzie; po wejściu na własny lub cudzy profil Gold dodatkowa animacja ~1,5 s; ograniczenie ruchu dla accessibility.
+- Wizualizację czterech ekranów użytkownik zaakceptował bez zmian.
+Dokładny dokument: docs/rating/SLM_RATING_1_0_MVP_GOLD.md na docs/slm-rating-mvp-gold-spec.
+[TODO] Assety: 4 zrzuty bieżącej aplikacji i zatwierdzony kompozyt MVP Gold były przygotowane w ZIP, ale ich obecności w repo NIE potwierdzono. Dołączyć do docs/rating/assets.
+[TODO] Wdrożenie, testy RLS/głosowania i akceptacja na Vercel/telefonie; bez merge przed odbiorem.
+
+===========================================================
+5. WYGLĄD, BRANDING, PLATFORMA
+===========================================================
+[OK] Premium 3.18 zamrożone jako punkt odniesienia; karta Ultimate; poprawne back w zaakceptowanym zakresie.
+[OK] Motywy jasny/ciemny, automatyczne dopasowanie i ręczny wybór w UI Beta; zweryfikować w main.
+[SPRAWDZIĆ] Wcześniej zgłaszano: za małe odstępy etykiet profilu, niedziałający back, przesunięty plus „dodaj mecz”, rozbieżności listy drużyn z Vercel, stary ekran losowania; nie zakładać, że wszystkie są nadal otwarte.
+[TODO] Zgodność wyglądu Android vs Vercel, w szczególności zdjęć.
+[BRANDING] Rozważane logo: A Street Premium odrzucone; finaliści B Urban Club (herb, złoto/miedź), C Starball (niebiesko-zielona piłka), D Motion (fioletowo-zielony zawodnik). Nie mylić koncepcji z zatwierdzonym assetem.
+[PLATFORMA] Android przez Capacitor/APK, PWA dla iPhone i desktopu; natywne iOS / budowanie w VM rozważane, ale nie jest priorytetem.
+[TODO] Test instalacji PWA, odświeżania, offline/cache, aktualizacji, sesji i powiadomień; checklisty telefonu.
+[TODO] Google Play: opis, zrzuty ekranu, publikacja — odłożone do etapu gotowości.
+
+===========================================================
+6. BEZPIECZEŃSTWO / SUPABASE / INFRASTRUKTURA
+===========================================================
+[TODO OBOWIĄZKOWE PRZED PUBLIKACJĄ] Audyt bezpieczeństwa: RLS i izolacja danych grup, admin/role, rozliczenia i zapisy, Auth/sesje/hasła, klucze API, Storage, migracje/zależności, testy bezpośredniego API, Supabase Security Advisor.
+[TODO] Weryfikacja wszystkich migracji lokalnie i zdalnie, bez przypadkowych zmian produkcji.
+[HISTORYCZNE] Lokalna poprawka WHERE e.id = p_event w slm_private.match_summary była zaakceptowana tylko lokalnie; nie przenosić automatycznie na remote.
+[TODO] Kontrola Brevo, SMTP, linków powrotnych, redirectów Supabase dla stabilnej domeny Vercel.
+[TODO] Monitorować zużycie Supabase/Vercel/Storage; nie odpytywać co 15 s bez uzasadnienia.
+[SPRAWDZIĆ] Czy slm-soccer.vercel.app i slm-ui-demo.vercel.app wskazują właściwe wdrożenia i tę samą bazę, czy demo jest odizolowane.
+[TODO] Dopracowanie FCM/push i uprawnień powiadomień; bez wymuszania płatnych usług.
+
+===========================================================
+7. MONETYZACJA I POMYSŁY NA PRZYSZŁOŚĆ
+===========================================================
+[ODŁOŻONE] Reklamy — temat poruszony, brak decyzji o wdrożeniu.
+[PREFERENCJA] Jeśli płatna aplikacja, najpierw niewielka opłata jednorazowa; symboliczny abonament ewentualnie przy dużej skali.
+[POMYSŁ DŁUGOTERMINOWY] Mecze międzygrupowe, wyzwania, pojedynki, rankingi między grupami — „wersja 6.0”.
+[ODŁOŻONE] Integracja z WhatsApp / inne kanały komunikacji.
+[TODO] Przygotowanie opisu i grafik Google Play, dopiero gdy produkt będzie gotowy.
+
+===========================================================
+8. ZNANE GAŁĘZIE / PR / KONTEKST GIT
+===========================================================
+Historycznie: feat/ui-beta, feat/premium318-live, feat/premium319-android, feat/premium320-visual-parity, feat/integration, chore/android-phone-readiness, chore/local-phone-fixtures, feat/auth, feat/events, feat/slm-v1-live, feat/profile-photos-v1, main.
+PR #7 — przygotowanie testów fizycznego Androida.
+PR #20 — historyczny draft integracji realnych grup/meczów (sprawdzić stan).
+PR #44 — profil (według rozmowy scalony do main).
+docs/slm-rating-mvp-gold-spec — dokumentacja ratingu i MVP Gold, commit 0d544be.
+Nie wykonywać automatycznego merge wszystkich gałęzi: część to eksperymenty, snapshoty lub historyczne rozwiązania. Najpierw audyt main, PR i środowisk.
+
+===========================================================
+9. REJESTR ODBIORÓW — ZASADA NA PRZYSZŁOŚĆ
+===========================================================
+01 Logowanie/rejestracja: część web + Supabase/Brevo odebrana, Android i późniejsze zmiany telefonu do sprawdzenia.
+02 Ekran główny: wygląd bazowy zaakceptowany; dzwonek i powiadomienia do sprawdzenia.
+03 Grupy: wymagany odbiór end-to-end.
+04 Mecze/zapisy: wymagany odbiór end-to-end; błędy zatwierdzania i usuwania.
+05 Składy: wymagany odbiór algorytmu i ręcznych operacji.
+06 Profile/zdjęcia: karta zaakceptowana; kadrowanie i upload do końcowego odbioru.
+07 Rozliczenia: brak potwierdzonego końcowego odbioru.
+08 Ustawienia: częściowo działają; telefon do naprawy.
+09 Rating/MVP Gold: koncepcja zatwierdzona, implementacja nierozpoczęta w potwierdzonym zakresie.
+Każdy odbiór dokumentować: ekran, scenariusz, commit, środowisko, testy automatyczne, wynik telefonu, data, decyzja użytkownika.
+
+===========================================================
+10. KOLEJNOŚĆ NAJBLIŻSZYCH PRAC — PROPOZYCJA
+===========================================================
+P0: Ustalić stan main i otwartych PR; naprawić „Zatwierdź mecz”; zabezpieczyć usuwanie/przywracanie zawodnika; naprawić automatyczny przydział w składach.
+P0: Uporządkować logowanie login/e-mail i błąd telefonu; sprawdzić edycję/udostępnianie numeru, domeny i środowiska.
+P1: Dokończyć upload/kadrowanie zdjęć, dzwonek i przegląd grup/meczów na telefonie.
+P1: Audyt Supabase/RLS, rozliczeń, migracji, regresji; rejestr odbiorów.
+P2: Wdrożyć Rating 1.0 + MVP Gold według zatwierdzonej specyfikacji, po ustaleniu formuły i audycie kodu; dodać materiały wizualne do Git.
+P3: Google Play, powiadomienia, dodatkowe funkcje, monetyzacja i pomysły przyszłych wersji.
+Priorytety to propozycja organizacyjna, nie deklaracja wykonania.
+
+===========================================================
+11. BRAKI W PEWNOŚCI / CO SPRAWDZIĆ PRZY NASTĘPNYM AUDYCIE
+===========================================================
+- Pełna lista otwartych/merged PR, branch head i deployment Vercel.
+- Aktualny schemat Supabase, migracje i Security Advisor.
+- Status błędów zgłoszonych 9–12 listopada.
+- Faktyczna liczba kont i członkostw; bez zgadywania loginów i danych osobowych.
+- Stan produkcyjny rozliczeń, push, fotografii, sesji i PWA.
+- Czy zaakceptowane assety MVP Gold znalazły się w repo.
+- Czy istnieją dodatkowe ustalenia w czatach niedostępnych w tej rekonstrukcji.
+
+KONIEC RAPORTU. Ten plik jest żywym rejestrem: aktualizować po każdym audycie, naprawie, teście, odbiorze i merge.
