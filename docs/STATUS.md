@@ -1,5 +1,11 @@
 # Aktualny stan Sunday League Mates
 
+2026-10-25 17:41 Europe/Warsaw — poprawka BottomNav z main a46f5e4 / PR #12 została zbudowana i zainstalowana jako aktualizacja Premium na POCO (install -r), bez czyszczenia danych. Aplikacja uruchomiona, backend/reverse działają, bez sprawdzanych markerów crasha. Odbiór: dotknąć Grupy i porównać aktywny stan wszystkich3 zakładek; potwierdzenie ręczne oczekuje. Bez zmian zdalnych.
+
+---
+
+# Aktualny stan Sunday League Mates
+
 2026-10-25 17:35 Europe/Warsaw — fix/bottom-nav-highlight z main2c3e3f2. Naprawiono wyłącznie aktywny stan i obszar przycisków BottomNav, zachowując + oraz wygląd Premium/kartę Ultimate. TS/lint, 8 jednostkowych testów nawigacji, 8 konfiguracji Cypress (4 szerokości ×2 motywy ×3 warianty paska), build main/Premium, cap sync i source guards PASS. Android assembleDebug PASS. Backend/Auth/SQL/dane bez zmian. Poprawka zakończona; [PR #12](https://github.com/psuda87/sunday-league-mates/pull/12) zawiera wynik scalania i commit main (źródło aktualnego statusu). Użytkownik autoryzował squash merge po zielonych kontrolach, bez wdrożenia. Szczegóły: docs/ODPOWIEDZI_CODEX.txt; zrzuty: docs/ui/bottom-nav.
 
 ---
