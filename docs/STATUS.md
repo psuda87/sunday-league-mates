@@ -1,3 +1,12 @@
+# Ultimate — numer bez ikony edycji
+
+2026-10-26 19:04 Europe/Warsaw — Ultimate: usunięcie ołówka przy numerze
+Bieżąca gałąź faktycznego katalogu roboczego: feat/ui-beta (baza2d5984c). Usunięto onEditNumber z interfejsu wspólnego app/src/ui/UltimatePlayerCard.tsx, przycisk i znak ołówka; numer zawsze korzysta z istniejącego span.slm-ultimate-number. Usunięto przekazanie callbacku z demo/Profile.tsx. Bez zmian CSS, rozmiaru karty, portretu, motywów, danych i backendu. Wariant demo re-eksportuje wspólny komponent; podgląd karty i AccountScreens korzystają z tego samego komponentu. Edycja numeru pozostaje w Edytuj profil; obsługa formularza zachowana.
+Dostosowano demo/UltimatePlayerCard.test.tsx i demo/Profile.test.tsx: brak akcji/ołówka na karcie, numery0/99, portret pojedynczy/arkusz/inicjały, edycja przez formularz/walidacja0–99 i ochrona właściciela. PASS4 testy/2 pliki, TypeScript, ESLint, npm run build i build:demo z kontrolą izolacji. Ostrzeżenia build: duże chunki, demo Vite początkowo nie rozwiązuje dwóch stadionowych assetów, ale pliki są emitowane i kontrola izolacji przechodzi. Nie deklarujemy nowej weryfikacji wizualnej ani testu fizycznego POCO. Krótki przegląd React według vercel:react-best-practices: bez nowych hooków, zależności ani efektów, numer pozostaje etykietowany dostępnie.
+Zmiany lokalne, bez commita/push/merge/deploy i bez instalacji APK. Inne worktree, w tym audyt PR17, nietknięte. Raport docs/ODPOWIEDZI_CODEX.txt. Następny krok: odbiór podglądu karty; aktualizacja Androida wymaga osobnego zlecenia.
+
+---
+
 # Publikacja lokalnej pracy — 2026-10-25 15:39:45 Europe/Warsaw
 
 2026-10-25 15:39:45 Europe/Warsaw — zabezpieczenie i publikacja całej lokalnej pracy
