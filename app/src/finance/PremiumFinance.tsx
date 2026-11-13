@@ -32,22 +32,24 @@ export default function PremiumFinance({manager,userId,groupId,eventId,manage=fa
       const remaining=person.account.dues.filter(d=>!id||d.event_id===id).reduce((sum,d)=>sum+d.outstanding_cents,0);
       const previous=accepted.find(r=>r.event_id===id);
       const generalPending=!p&&pending.some(r=>r.event_id===null);
+      const covered=remaining<=0;
       return <article className="slm-payment-card" key={`${person.user_id}:${d?.event_id??p!.id}`} aria-label={`Płatności: ${person.name}`}>
        <h3>{person.name}{person.user_id===userId?' · Ty':''}</h3>
        <p><strong>{id?title(id):'Wpłata ogólna'}</strong>{d&&<><br/>{matchDate(d.starts_at)}</>}<br/>Do zapłaty: {formatCents(remaining)}</p>
        <p className="slm-payment-report">{p?`Zgłoszono wpłatę: ${formatCents(p.corrected_amount_cents)}`:generalPending?'Zgłoszono wpłatę ogólną — rozpatrz jej kafelek.':'Brak zgłoszenia wpłaty'}</p>
        <div className="slm-payment-actions" role="group" aria-label="Decyzje dotyczące wpłaty">
-        <button className={`slm-payment-accept ${p?'is-reported':'is-unreported'}`} aria-label={p?'Akceptuj zgłoszoną wpłatę':'Akceptuj wpłatę bez zgłoszenia'} disabled={f.busy||remaining<=0||generalPending||!!d?.legacy||!!p&&p.event_id!==null&&p.corrected_amount_cents>remaining} onClick={()=>{void(p?f.mutate('accept_payment',{payment_id:p.id,expected_amount_cents:p.corrected_amount_cents,...(p.event_id?{event_id:p.event_id}:{})}):f.mutate('record_payment',{event_id:d!.event_id,user_id:person.user_id,amount_cents:d!.outstanding_cents}));}}>Akceptuj</button>
+        <button className={`slm-payment-accept ${p?'is-reported':'is-unreported'}`} aria-label={p?'Akceptuj zgłoszoną wpłatę':'Akceptuj wpłatę bez zgłoszenia'} disabled={f.busy||covered||generalPending||!!d?.legacy||!!p&&p.event_id!==null&&p.corrected_amount_cents>remaining} onClick={()=>{void(p?f.mutate('accept_payment',{payment_id:p.id,expected_amount_cents:p.corrected_amount_cents,...(p.event_id?{event_id:p.event_id}:{})}):f.mutate('record_payment',{event_id:d!.event_id,user_id:person.user_id,amount_cents:d!.outstanding_cents}));}}>{p?'Potwierdź zgłoszenie':'Oznacz jako opłacone'}</button>
         <button disabled={f.busy||!p} onClick={()=>{if(p)void f.mutate('reject_payment',{payment_id:p.id,...(p.event_id?{event_id:p.event_id}:{})});}}>Odrzuć</button>
         <button disabled={f.busy||!previous} title={previous?'Cofnij zatwierdzoną wpłatę':'Nie ma zatwierdzonej wpłaty do anulowania'} onClick={()=>{if(previous)void f.mutate('cancel_payment',{payment_id:previous.id,expected_amount_cents:previous.corrected_amount_cents,...(previous.event_id?{event_id:previous.event_id}:{})});}}>Anuluj</button>
        </div>
-       {p&&remaining===0&&<small>Należność została już pokryta. Odrzuć nieaktualne zgłoszenie.</small>}
+       {p&&covered&&<small>Wpłata została już zaksięgowana. To zgłoszenie jest nieaktualne — odrzuć tylko zgłoszenie; nie anuluj zaksięgowanej wpłaty.</small>}
+       {!p&&previous&&covered&&<small>Opłacono — wpłata jest zaksięgowana.</small>}
       </article>;
      });
     })}
    </div>:<div role="tabpanel" aria-label="Historia wpłat">
     <h3>Historia wpłat</h3>{!history.length&&<p>Brak wpłat.</p>}
-    {history.filter(({receipt:p})=>!eventId||p.event_id===null||p.event_id===eventId).map(({receipt:p,name})=><article className="slm-payment-card" key={p.id}><h3>{name}</h3><p>{p.event_id?title(p.event_id):'Wpłata ogólna'}<br/>{formatCents(p.corrected_amount_cents)} · {receiptStatus(p)}</p>{admin&&<div className="slm-payment-actions" role="group" aria-label="Decyzje dotyczące wpłaty"><button disabled>Akceptuj</button><button disabled>Odrzuć</button><button disabled={f.busy||p.status!=='accepted'||p.corrected_amount_cents<=0} onClick={()=>{void f.mutate('cancel_payment',{payment_id:p.id,expected_amount_cents:p.corrected_amount_cents,...(p.event_id?{event_id:p.event_id}:{})});}}>Anuluj</button></div>}</article>)}
+    {history.filter(({receipt:p})=>!eventId||p.event_id===null||p.event_id===eventId).map(({receipt:p,name})=><article className="slm-payment-card" key={p.id}><h3>{name}</h3><p>{p.event_id?title(p.event_id):'Wpłata ogólna'}<br/>{formatCents(p.corrected_amount_cents)} · {receiptStatus(p)}</p>{admin&&<div className="slm-payment-actions" role="group" aria-label="Decyzje dotyczące wpłaty">{p.status==='pending'?<><span>Zgłoszenie oczekuje na decyzję — nie zostało zaksięgowane.</span><button disabled={f.busy} onClick={()=>{void f.mutate('reject_payment',{payment_id:p.id,...(p.event_id?{event_id:p.event_id}:{})});}}>Odrzuć zgłoszenie</button></>:p.status==='accepted'&&p.corrected_amount_cents>0?<button disabled={f.busy} onClick={()=>{void f.mutate('cancel_payment',{payment_id:p.id,expected_amount_cents:p.corrected_amount_cents,...(p.event_id?{event_id:p.event_id}:{})});}}>Cofnij zaksięgowaną wpłatę</button>:<span>Brak aktywnej wpłaty do cofnięcia.</span>}</div>}</article>)}
     <h3>Twoje operacje księgowe</h3>{f.own.history.filter(h=>!eventId||h.event_id===eventId).map(h=><p key={h.id}>{matchDate(h.created_at)} · {ledgerKind[h.kind as keyof typeof ledgerKind]??'Operacja'} · {formatCents(h.amount_cents)}</p>)}
    </div>}
   </>}
