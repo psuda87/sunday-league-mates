@@ -1,0 +1,190 @@
+{
+  "date": "2026-11-01 Europe/Warsaw",
+  "rc": "1575bef77f0b24a8c74373018895b7b872ebc06a",
+  "main": "134c52b1aee0d0804cc0cf71f151f95040e7a38f",
+  "branches": [
+    {
+      "branch": "fix/bottom-nav-highlight",
+      "sha": "25404f45ca415ea6f5eaa04780707a820cb415ca",
+      "decision": "DELETE",
+      "main": {
+        "is_ancestor": false,
+        "exclusive_commits": 2,
+        "different_app_paths": 55
+      },
+      "rc": {
+        "is_ancestor": false,
+        "exclusive_commits": 2,
+        "different_app_paths": 140
+      }
+    },
+    {
+      "branch": "fix/premium-profile-display-name",
+      "sha": "a3576210e978b0c608eb706b7554430aaa269ab8",
+      "decision": "REVIEW",
+      "main": {
+        "is_ancestor": false,
+        "exclusive_commits": 2,
+        "different_app_paths": 37
+      },
+      "rc": {
+        "is_ancestor": false,
+        "exclusive_commits": 2,
+        "different_app_paths": 127
+      }
+    },
+    {
+      "branch": "fix/premium-real-ui-regression",
+      "sha": "a82397b130ca2296511247e848139edb79308a87",
+      "decision": "KEEP",
+      "main": {
+        "is_ancestor": false,
+        "exclusive_commits": 19,
+        "different_app_paths": 150
+      },
+      "rc": {
+        "is_ancestor": false,
+        "exclusive_commits": 19,
+        "different_app_paths": 158
+      }
+    },
+    {
+      "branch": "feat/slm-v1-polish-stats",
+      "sha": "1b3aed659749f1084cab8cd4f47f99a54a50c8b9",
+      "decision": "KEEP",
+      "main": {
+        "is_ancestor": false,
+        "exclusive_commits": 53,
+        "different_app_paths": 104
+      },
+      "rc": {
+        "is_ancestor": false,
+        "exclusive_commits": 9,
+        "different_app_paths": 15
+      }
+    },
+    {
+      "branch": "feat/ui-beta",
+      "sha": "2d5984cbb82dda3c0fe2f713499cbf3edd588057",
+      "decision": "KEEP",
+      "main": {
+        "is_ancestor": false,
+        "exclusive_commits": 63,
+        "different_app_paths": 165
+      },
+      "rc": {
+        "is_ancestor": false,
+        "exclusive_commits": 63,
+        "different_app_paths": 243
+      }
+    },
+    {
+      "branch": "feat/premium318-live",
+      "sha": "4b14e0ce5c225900aca8d7c36442f8aa23fc3c56",
+      "decision": "DELETE",
+      "main": {
+        "is_ancestor": false,
+        "exclusive_commits": 3,
+        "different_app_paths": 124
+      },
+      "rc": {
+        "is_ancestor": false,
+        "exclusive_commits": 3,
+        "different_app_paths": 202
+      }
+    },
+    {
+      "branch": "feat/premium319-android",
+      "sha": "ac4954c41b876ae47055174176116a4877c952a5",
+      "decision": "DELETE",
+      "main": {
+        "is_ancestor": false,
+        "exclusive_commits": 5,
+        "different_app_paths": 125
+      },
+      "rc": {
+        "is_ancestor": false,
+        "exclusive_commits": 5,
+        "different_app_paths": 203
+      }
+    },
+    {
+      "branch": "feat/premium320-visual-parity",
+      "sha": "c6c2ff624eb42d9bc39725f10a58c8df07f81cee",
+      "decision": "REVIEW",
+      "main": {
+        "is_ancestor": false,
+        "exclusive_commits": 6,
+        "different_app_paths": 146
+      },
+      "rc": {
+        "is_ancestor": false,
+        "exclusive_commits": 6,
+        "different_app_paths": 223
+      }
+    },
+    {
+      "branch": "feat/slm-v1-live",
+      "sha": "5c3f13fe0cbe3d0f8e14b7c980189b25cf7bb94f",
+      "decision": "REVIEW",
+      "main": {
+        "is_ancestor": false,
+        "exclusive_commits": 72,
+        "different_app_paths": 159
+      },
+      "rc": {
+        "is_ancestor": false,
+        "exclusive_commits": 72,
+        "different_app_paths": 239
+      }
+    },
+    {
+      "branch": "feat/premium-lineup-editor-stage1",
+      "sha": "b30908e15cedff6ffa1a4ca76f0fb514e04302a7",
+      "decision": "DELETE",
+      "main": {
+        "is_ancestor": false,
+        "exclusive_commits": 5,
+        "different_app_paths": 72
+      },
+      "rc": {
+        "is_ancestor": true,
+        "exclusive_commits": 0,
+        "different_app_paths": 37
+      }
+    },
+    {
+      "branch": "fix/premium-lineup-stage1-contract",
+      "sha": "7ad5c75414cf669d4471f3122e93073dab9aa8d7",
+      "decision": "DELETE",
+      "main": {
+        "is_ancestor": false,
+        "exclusive_commits": 7,
+        "different_app_paths": 72
+      },
+      "rc": {
+        "is_ancestor": true,
+        "exclusive_commits": 0,
+        "different_app_paths": 37
+      }
+    }
+  ],
+  "safe_ref_deletion_candidates": [
+    "fix/bottom-nav-highlight",
+    "feat/premium318-live",
+    "feat/premium319-android",
+    "feat/premium-lineup-editor-stage1",
+    "fix/premium-lineup-stage1-contract"
+  ],
+  "deleted": [],
+  "checks": {
+    "verify_consolidation": "PASS42/55/10",
+    "historical_full_suites": "NOT RUN",
+    "docker_mount_inventory": "NOT RUN: Docker unavailable; not started"
+  },
+  "open_relevant_prs": {
+    "fix/premium-profile-display-name": 15,
+    "fix/premium-real-ui-regression": 23,
+    "feat/slm-v1-polish-stats": 31
+  }
+}

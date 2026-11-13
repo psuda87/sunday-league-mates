@@ -1,3 +1,11 @@
+# Redukcja starych gałęzi — Etap 1
+
+2026-11-01 Europe/Warsaw — na osobne polecenie właściciela faktycznie usunięto z origin dokładnie5 gałęzi:fix/bottom-nav-highlight,feat/premium318-live,feat/premium319-android,feat/premium-lineup-editor-stage1,fix/premium-lineup-stage1-contract. Przed każdą operacją ponownie sprawdzono GitHub:protected=false,brak otwartego PR jako head/base i brak rulesetów; potwierdzono bieżący SHA oraz zachowanie potrzebnego kodu w niezmienionym main/RC. Git push --delete bez force. Ponowne git ls-remote i GitHub branches potwierdziły45→40 gałęzi, pominiętych0; pozostałe40 SHA bez zmian. Lokalne gałęzie, tagi i worktree identyczne przed/po. Brak zmian kodu, nowych gałęzi, merge/rebase/deploy lub Supabase. Zapisano wyłącznie lokalne notatki; wcześniejsze zmiany właściciela zachowane. Chronologia:docs/ODPOWIEDZI_CODEX.txt.
+
+2026-11-01 Europe/Warsaw — lokalny audyt na istniejącym `feat/slm-v1-release-candidate`1575bef, porównanie z origin/main134c52b i11 gałęziami po fetch/GitHub. Wynik:5 DELETE (referencje),3 KEEP,3 REVIEW. Lista:fix/bottom-nav-highlight,feat/premium318-live,feat/premium319-android,feat/premium-lineup-editor-stage1,fix/premium-lineup-stage1-contract. Niczego nie usunięto; brak nowych gałęzi/commitów/push i zmian kodu. PR31 nadal poza RC; a82397b musi pozostać osiągalny dla policy. Główne ui-beta z6 zmianami właściciela nietknięte. PASS RC consolidation42/55/10; bez pełnych testów historycznych gałęzi. Docker/mounty prywatnych cache NOT RUN (silnik niedostępny, nie uruchamiano); odpowiednie worktree zachowano. Brak zmian Supabase/migracji/Edge/Androida. Raport lokalny:docs/FRONTEND_BRANCH_REDUCTION_STAGE1.md; chronologia:docs/ODPOWIEDZI_CODEX.txt. Następny krok: osobna decyzja o usunięciu wyłącznie5 referencji po ponownej kontroli stanu.
+
+---
+
 # Najnowszy RC uruchomiony w emulatorze
 
 2026-10-30 21:16 Europe/Warsaw — Android Studio otwarte z `.worktrees/slm-v1-release-candidate/app/android`; istniejący AVD Medium_Phone_API_36.1 uruchomiony z widocznym oknem, bez wipe danych. APK RC SHA256 ca6de17a63b6de01f461b49bde95c8b2403edc6c809115b3a369cf585f70e1fc zainstalowany przez install -r wyłącznie na emulator-5554 (ro.kernel.qemu=1), MainActivity uruchomiona i na pierwszym planie. Potwierdzono wizualnie ekran Mecze z fikcyjnymi lokalnymi danymi i odtworzoną sesją.
