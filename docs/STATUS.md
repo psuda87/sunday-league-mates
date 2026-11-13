@@ -1,3 +1,9 @@
+# Instalacja bieżącej poprawki B3
+
+2026-10-25 21:37 Europe/Warsaw — feat/premium-b3-groups, źródła c22d65b. Nowy APK Premium z poprawkami przełącznika i odświeżania zbudowany, zsynchronizowany i zainstalowany aktualizacją na POCO c7a559b5 bez usuwania danych. Build/source guards/APK verification PASS, uruchomienie Status ok; w sprawdzonym logu procesu brak FATAL EXCEPTION i wskazanych błędów WebView. Ręczny odbiór dwóch kontrolek nadal oczekuje właściciela. PR #13 bez merge; Cloud bez zmian. Szczegóły docs/ODPOWIEDZI_CODEX.txt.
+
+---
+
 # Aktualizacja UI B3 po POCO
 
 2026-10-25 21:34 Europe/Warsaw — feat/premium-b3-groups, istniejący PR #13. Poprawiono wyłącznie kompaktowy przełącznik zgody per grupa i przycisk odświeżania (44px, ikona, stan ładowania, deduplikacja). Załadowane dane nie znikają podczas refresh, błąd zapisu zachowuje stan i kontrolkę. Backend/RLS/Auth/Ultimate/BottomNav bez zmian; brak operacji Cloud.
@@ -113,3 +119,6 @@ Pozosta?y moderate zale?no?ci oraz ostrze?enia bundle/Browserslist/Gradle. Brak 
 Nast?pny etap: r?czny odbi?r obecnej integracji na telefonie, przegl?d rollout danych i osobne uzgodnienie poczty oraz FCM. Merge kodu nie oznacza wdro?enia ani gotowo?ci do wydania.
 
 Raport: [REPOSITORY_AUDIT.md](REPOSITORY_AUDIT.md). Szczeg??owa historia: [ODPOWIEDZI_CODEX.txt](ODPOWIEDZI_CODEX.txt).
+
+
+2026-10-25 22:43 Europe/Warsaw — kontrola synchronizacji: ostatnie commity kodu/PR #14/#15 potwierdzone na GitHub; lokalne notatki instalacji w docs/STATUS.md i docs/ODPOWIEDZI_CODEX.txt w worktree B3/main jeszcze bez commitu/push. Nie wykonywano push ani merge w tej kontroli.
