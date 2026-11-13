@@ -97,3 +97,15 @@ Odpowiedź: `A grupy/mecz/zapis/goście/rezerwa: PASS/FAIL; B należność/wpła
 ## BLOCKED / następny krok
 
 Osobna zgoda na aktualizację i reverse64321, następnie fizyczny odbiór. P1 administracji meczem i ograniczenia DTO finansów pozostają z PR20/21. Cloud/SMTP/aktywacja nowego Auth poza zakresem i nadal zablokowane wcześniejszymi kryteriami. Bez merge, migracji, deploy, resetów i publikacji.
+
+
+## Aktualizacja instalacji — 2026-10-28 17:53:58 Europe/Warsaw
+
+Użytkownik zatwierdził reverse64321, aktualizację i bezpieczną diagnostykę. APK o oczekiwanym SHA256 b3f2f27b35a89beb72e3155e5bc63de2bf5f36bb20c0d0182276e5b19991ae6d zainstalowano przez adb install -r: Success. Kopia poprzedniego APK istnieje. POCO c7a559b5/M2007J20CG/Android12 potwierdzony; USB reverse tcp:64321 tcp:64321 PASS. Rzeczywisty curl uruchomiony na telefonie uzyskał HTTP200 z lokalnego accounts; wszystkie cztery capabilities nowego Auth false. Start MainActivity COLD Status:ok, aplikacja na pierwszym planie. Ograniczony logcat bieżącego procesu:0 dopasowań fatal/crash, błędów sieciowego ładowania WebView i nieobsłużonych wyjątków JS; nie jest to pełny test wszystkich ekranów. Surowych logów/sekretów nie zapisano.
+
+APK INSTALLED; reverse PASS; start PASS; połączenie telefonu z lokalnym Supabase PASS (transport + publiczne capabilities, chronione dane jeszcze niepotwierdzone). Logowanie OCZEKUJE NA UŻYTKOWNIKA. Poproszono o ręczne logowanie istniejącym kontem Stage2/64321 oraz potwierdzenie rzeczywistej grupy/listy meczów, bez udostępniania hasła. Nie wykonywano nowych operacji danych, uninstall/clear, zmian Auth/SQL/RLS/Edge/Cloud ani przebudowy APK. Historyczne statusy NIE WYKONANO wyżej opisują poprzedni etap przed zgodą.
+
+Po potwierdzeniu logowania: grupa i ten sam mecz na drugim koncie; zapis/goście/rezerwa; odczyt należności/wpłata/akceptacja/saldo na istniejącym fixture; restart, oba Wstecz, tło, klawiatura kwoty, scroll i Light/Dark. Wszystkie te ręczne scenariusze nadal OCZEKUJĄ.
+
+
+[2026-10-28 17:57:02 Europe/Warsaw] Stage3: po wyraźnej zgodzie właściciela uproszczono identyfikatory logowania i ustawiono nowe zgodne z walidacją hasła wyłącznie dwóm istniejącym fikcyjnym kontom izolacji slm-premium-real-finance/64321. Użyto lokalnego Auth Admin API, bez zmian kodu, polityk, aktywacji nowego Auth lub Cloud. Logowanie obu kont i odczyt istniejącej wspólnej grupy przez accounts PASS. Porównanie UUID/grup/członkostw/profili zawodników/meczów przed i po PASS; bez zmian tych danych. Dane logowania wyłącznie w lokalnym pliku Temp/SLM-STAGE3-POCO.txt poza Git, bez wartości w raporcie. Fizyczne logowanie nadal OCZEKUJE; użytkownik ma zacząć od konta Zawodnik. docs/ODPOWIEDZI_CODEX.txt.
