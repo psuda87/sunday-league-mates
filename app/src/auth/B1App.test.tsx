@@ -45,7 +45,7 @@ describe('B1 existing Auth into frozen account UI',()=>{
   const request=vi.fn().mockRejectedValue(new AccountError('Denied','invalid_credentials'));
   const {manager}=setup(request);render(<B1App manager={manager}/>);
   await login('+48 123 456 789');
-  await waitFor(()=>expect(screen.getByRole('alert')).toHaveTextContent('Nie udało się zalogować'));
+  await waitFor(()=>expect(screen.getByRole('alert')).toHaveTextContent('Nieprawidłowy login, numer telefonu lub hasło.'));
   expect(request).toHaveBeenCalledWith('login',{identifier:'+48 123 456 789',password:'Test-only-secret'},undefined);
   expect(screen.queryByText('Chroniony świat demo')).toBeNull();
   expect(screen.getByLabelText('Hasło')).toHaveValue('');
