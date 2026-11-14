@@ -1,3 +1,18 @@
+# Supabase Cloud — migracje zastosowane 2026-11-14 (zgoda właściciela)
+
+Na projekcie `hjtcyybkxebvdropchac` zastosowano przez MCP, z kontrolą sumy md5 treści pliku z repo i po próbie na sucho (wycofana transakcja):
+- `20261110205229_tito_lineups_completion` (Tito + `jersey_number` w uczestnikach meczu) — md5 treści `7e53e891afeab975321ce49ad298e28d`,
+- `20261112230000_guard_pending_manual_payment` — md5 treści `5f00114f1cc3ee59e068f4a0c68aefa6`.
+Stan w chwili wdrożenia: 0 nadchodzących meczów, 0 oczekujących wpłat. Uprawnienia nowych funkcji: tylko `service_role` (`tito_backfill`: tylko właściciel bazy).
+Potwierdzone w przeglądarce: numery zawodników na boisku (27, 14, 77…; 0 gdy brak numeru; G dla gościa).
+
+**Rozjazd baza ↔ repo (nierozwiązany):** na bazie NIE ma `20261104183413_account_privacy_lifecycle` (brak `slm_deletion_*`, `privacy_redaction_ok`,
+`account_deletions`, `photo_upload_leases`); jest za to `phone_privacy_only_20261109` (tylko część telefoniczna), której nie ma w `main`.
+Skutki: `20261114100000_fix_account_deletion_request_receipts` celowo NIE została zastosowana (poprawia funkcję, której na bazie nie ma);
+`slm_match_lineups.updated_by` jest na bazie NOT NULL, więc `slm_private.tito_backfill` (operatorski, wywołuje przejście z `p_initiator=null`) na tej bazie
+zakończy się błędem — nie uruchamiać przed wdrożeniem cyklu prywatności. Usuwanie konta nie jest wdrożone na produkcji.
+Samoczynny przydział Tito nie był testowany na produkcji (wymaga utworzenia meczu i zapisu — dane prawdziwe).
+
 # MVP Gold — warstwa wizualna, 2026-11-14
 
 Gałąź `feat/mvp-gold-visuals` (decyzje właściciela z 14.11.2026): karta zawodnika ma prawdziwe gwiazdki ratingu w łuku (start 7,0 = 3,5 gwiazdki;
