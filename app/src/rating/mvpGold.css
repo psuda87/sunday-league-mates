@@ -11,6 +11,10 @@
 .slm-ultimate-card[data-mvp-gold="true"] .slm-ultimate-inner { background: radial-gradient(ellipse at 50% 28%, #b8861f, #5c3b0a 78%); }
 .slm-ultimate-card[data-mvp-gold="true"] .slm-ultimate-nameplate h2 { color: #fff3bd; }
 
+/* Stadion w tle dostaje złoty ton; portret zostaje w naturalnych kolorach. */
+.slm-ultimate-card[data-mvp-gold="true"] .slm-ultimate-stadium { filter: sepia(1) saturate(2.4) hue-rotate(-14deg) brightness(1.15); }
+.slm-ultimate-card[data-mvp-gold="true"] { filter: drop-shadow(0 0 14px rgba(232, 193, 90, .55)); }
+
 /* Odznaka MVP na karcie jest nad refleksem. */
 .slm-ultimate-card[data-mvp-gold="true"]::before { content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none;
   background: linear-gradient(105deg, transparent 20%, rgba(255, 244, 200, .5) 50%, transparent 80%); background-size: 260% 100%; animation: slm-gold-sweep 4.5s ease-in-out infinite; mix-blend-mode: screen; }
@@ -41,5 +45,5 @@ li[data-mvp-gold="true"] .slm-pitch-token::after { content: ''; position: absolu
 /* Gwiazdki pod nazwiskiem w łuku + chmurka z dokładnym wynikiem. */
 .slm-ultimate-stars-button { position: absolute; z-index: 6; left: 50%; bottom: 14px; transform: translateX(-50%); min-width: 44px; min-height: 44px; padding: 0; border: 0; background: none; cursor: pointer; }
 .slm-ultimate-stars-button .slm-rating-stars { margin: 0 auto; }
-.slm-rating-bubble { position: absolute; z-index: 7; left: 50%; bottom: 62px; transform: translateX(-50%); width: max-content; max-width: 86%; padding: 8px 12px; border-radius: 12px; font-size: .78rem; line-height: 1.35; text-align: center; color: #fff; background: rgba(15, 11, 16, .94); border: 1px solid var(--slm-mvp-gold-2); }
+.slm-rating-bubble { position: absolute; z-index: 7; left: 50%; bottom: 128px; transform: translateX(-50%); width: max-content; max-width: 86%; padding: 8px 12px; border-radius: 12px; font-size: .78rem; line-height: 1.35; text-align: center; color: #fff; background: rgba(15, 11, 16, .94); border: 1px solid var(--slm-mvp-gold-2); }
 .slm-rating-bubble strong { display: block; font-size: 1rem; color: var(--slm-mvp-gold-1); }
