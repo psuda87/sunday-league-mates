@@ -28,6 +28,7 @@ export function premiumWebConfig(base,env=process.env){
   if(value){const u=new URL(value);if(u.protocol!=='https:'||u.username||u.password||['localhost','127.0.0.1','[::1]'].includes(u.hostname))throw new Error('Legal documents require public HTTPS URLs');}
   define['import.meta.env.'+name]=JSON.stringify(value);
  }
+ define['import.meta.env.VITE_MVP_GOLD_PREVIEW']=JSON.stringify('1'); // PREVIEW BRANCH ONLY — never merge
  return {...base,configFile:false,envDir:false,envPrefix:[],define,
   plugins:[...base.plugins,mediaPipeAssets,{name:'premium-web-document',transformIndexHtml(html){
    const old="connect-src 'self' http://127.0.0.1:54321";
