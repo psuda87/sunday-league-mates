@@ -16,13 +16,18 @@ export default function RatingStars({ rating, size = 28 }: { rating: number; siz
   const height = size + ARC_OFFSETS[2] * (size / 24);
   return (
     <svg className="slm-rating-stars" role="img" aria-label={`Ocena ${formatRating(rating)} na 10`} width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+      <defs>
+        <linearGradient id={`${uid}-gold`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#fff6c9" /><stop offset=".45" stopColor="#f2c94c" /><stop offset="1" stopColor="#b47a16" />
+        </linearGradient>
+      </defs>
       {fills.map((fill, i) => {
         const x = i * step, y = ARC_OFFSETS[i] * (size / 24), scale = size / 24, clip = `${uid}-s${i}`;
         return (
           <g key={i} data-fill={fill} transform={`translate(${x} ${y}) rotate(${ROTATION[i]} ${size / 2} ${size / 2}) scale(${scale})`}>
             <clipPath id={clip}><rect x="0" y="0" width={24 * fill} height="24" /></clipPath>
             <path className="slm-rating-star-bg" d={STAR} />
-            <path className="slm-rating-star-fill" d={STAR} clipPath={`url(#${clip})`} />
+            <path className="slm-rating-star-fill" d={STAR} clipPath={`url(#${clip})`} fill={`url(#${uid}-gold)`} />
           </g>
         );
       })}
