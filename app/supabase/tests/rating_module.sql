@@ -3,7 +3,7 @@ begin;
 set local lock_timeout='2s';
 set local statement_timeout='60s';
 create temp table rid(k text primary key,id uuid not null default gen_random_uuid());
-insert into rid(k) select unnest(array['u1','u2','u3','u4','u5','u6','s1','s2','s3','s4','s5','s6','group','other','future','m1','m2','m3','old']);
+insert into rid(k) select unnest(array['u1','u2','u3','u4','u5','u6','s1','s2','s3','s4','s5','s6','group','other','future','m1','m2','m3','m4','old']);
 create function pg_temp.tid(key text) returns uuid language sql as $$select id from rid where k=key$$;
 create function pg_temp.verify(ok boolean,label text) returns void language plpgsql as $$begin
  if ok is distinct from true then raise exception 'FAIL %',label;end if;
@@ -70,14 +70,21 @@ begin
  perform pg_temp.verify(pg_temp.fails(1,'stats',pg_temp.ev('m1',jsonb_build_object('goals',51,'assists',0)),'invalid_input'),'absurd goals rejected');
  perform pg_temp.verify(pg_temp.fails(1,'overview',jsonb_build_object('x',1),'invalid_input'),'unknown overview field rejected');
 
- -- Ballots: everyone gives u1 a nine; u1 gives the others a five. Editable until the window closes.
- perform pg_temp.call(2,'rate',pg_temp.ev('m1',jsonb_build_object('ratings',jsonb_build_object(u1,3),'mvp_user',u3,'action_team','b')));
+ -- Ballots: everyone gives u1 a nine; u1 gives the others a five. A ballot is final once sent.
  perform pg_temp.call(2,'rate',pg_temp.ev('m1',jsonb_build_object('ratings',jsonb_build_object(u1,9,u3,6,u4,6),'mvp_user',u1,'action_team','a')));
+ perform pg_temp.verify(pg_temp.fails(2,'rate',pg_temp.ev('m1',jsonb_build_object('ratings',jsonb_build_object(u1,1),'mvp_user',u3)),'ballot_final'),'a sent ballot cannot be changed');
+ perform pg_temp.verify(pg_temp.call(3,'overview')->'gold'='[]'::jsonb,'one vote of four is not decisive');
  perform pg_temp.call(3,'rate',pg_temp.ev('m1',jsonb_build_object('ratings',jsonb_build_object(u1,9,u2,6,u4,6),'mvp_user',u1,'action_team','a')));
- perform pg_temp.call(4,'rate',pg_temp.ev('m1',jsonb_build_object('ratings',jsonb_build_object(u1,9),'mvp_user',u1,'action_team','a')));
+ perform pg_temp.verify(pg_temp.call(3,'overview')->'gold'='[]'::jsonb,'two of four: the others could still tie');
+ s:=pg_temp.call(4,'rate',pg_temp.ev('m1',jsonb_build_object('ratings',jsonb_build_object(u1,9),'mvp_user',u1,'action_team','a')));
+ -- Three of four votes cannot be caught: Gold at once, valid 7 days from the final whistle.
+ perform pg_temp.verify(s->>'gold_user'=u1::text and (s->'my'->>'submitted')::boolean and s->>'phase'='open','unbeatable lead gives Gold while the window is still open');
+ perform pg_temp.verify((select valid_until=e.starts_at+interval '90 minutes'+interval '7 days' from public.slm_mvp_gold g join public.slm_matches e on e.id=g.event_id where g.event_id=pg_temp.tid('m1')),'Gold expires 7 days after the final whistle');
+ perform pg_temp.verify(pg_temp.call(3,'overview')->'gold'=jsonb_build_array(u1),'u1 is the visible Gold holder');
+ perform pg_temp.verify(pg_temp.call(6,'overview')->'gold'='[]'::jsonb,'Gold is not exposed outside shared groups');
+ perform pg_temp.verify((pg_temp.call(2,'player',jsonb_build_object('user_id',u1))->>'gold')::boolean,'group mate sees the Gold flag');
  s:=pg_temp.call(1,'rate',pg_temp.ev('m1',jsonb_build_object('ratings',jsonb_build_object(u2,5,u3,5,u4,5),'mvp_user',u2,'action_team','b')));
  perform pg_temp.verify((s->'my'->'ratings'->>u2::text)::int=5 and s->'my'->>'mvp_user'=u2::text,'own ballot is returned');
- perform pg_temp.verify((pg_temp.call(2,'get',pg_temp.ev('m1'))->'my'->'ratings'->>u1::text)::int=9,'ballot was replaced, not appended');
  perform pg_temp.verify(not(pg_temp.call(2,'get',pg_temp.ev('m1'))::text like '%'||u3::text||'":5%'),'other ballots stay private');
  -- Goals, assists and the final score.
  perform pg_temp.call(1,'stats',pg_temp.ev('m1',jsonb_build_object('goals',2,'assists',1)));
@@ -89,6 +96,8 @@ begin
  -- Close the window (move the match into the previous month) and let the next call settle it.
  reset role;
  update public.slm_matches set starts_at=pg_temp.base() where id=pg_temp.tid('m1');
+ -- The fixture moves a played match back in time; keep its Gold expiry consistent with the new final whistle.
+ update public.slm_mvp_gold set valid_until=pg_temp.base()+interval '90 minutes'+interval '7 days' where event_id=pg_temp.tid('m1');
  set local role service_role;
  r:=pg_temp.call(1,'overview');
  perform pg_temp.verify(pg_temp.fails(2,'rate',pg_temp.ev('m1',jsonb_build_object('ratings','{}'::jsonb)),'rating_closed'),'closed window rejects ballots');
@@ -104,23 +113,23 @@ begin
  perform pg_temp.verify((select value from public.slm_player_ratings where user_id=u1)=7.200+v,'bonus is added on top and stays');
  perform pg_temp.verify((select bonus from public.slm_rating_months where user_id=u3)=0,'no bonus without MVP, goals or a winning action');
  perform pg_temp.verify((r->'me'->>'rating')::numeric=7.00 and not (r->'me'->>'final')::boolean,'still 7.00 before five rated matches');
- perform pg_temp.verify((pg_temp.call(3,'overview')->'gold')@>to_jsonb(u1),'u1 is the visible Gold holder');
- perform pg_temp.verify(pg_temp.call(6,'overview')->'gold'='[]'::jsonb,'Gold is not exposed outside shared groups');
+ perform pg_temp.verify(pg_temp.call(3,'overview')->'gold'='[]'::jsonb,'Gold from last month has expired');
+ perform pg_temp.verify((r->'me'->'stats'->>'played')::int=1 and (r->'me'->'stats'->>'goals')::int=2 and (r->'me'->'stats'->>'assists')::int=1 and (r->'me'->'stats'->>'mvp')::int=1,'profile totals: 1 match, 2 goals, 1 assist, 1 MVP');
  perform pg_temp.verify(pg_temp.fails(6,'player',jsonb_build_object('user_id',u1),'not_found'),'rating of a stranger is hidden');
- perform pg_temp.verify((pg_temp.call(2,'player',jsonb_build_object('user_id',u1))->>'gold')::boolean,'group mate sees the Gold flag');
- -- Settlement is idempotent.
+-- Settlement is idempotent.
  perform pg_temp.call(1,'overview');
  perform pg_temp.verify((select count(*) from public.slm_rating_history where user_id=u1)=2 and (select count(*) from public.slm_mvp_gold)=1,'second settle changes nothing');
 
- -- A later match the holder played crowns u2: u1 loses Gold at once.
+ -- Two of four votes are not decisive early (the rest could tie) but win when the window closes.
  perform pg_temp.mk('m2',clock_timestamp()-interval '3 hours',array['u1','u2'],array['u3','u4']);
  perform pg_temp.call(1,'rate',pg_temp.ev('m2',jsonb_build_object('ratings','{}'::jsonb,'mvp_user',u2)));
- perform pg_temp.call(3,'rate',pg_temp.ev('m2',jsonb_build_object('ratings','{}'::jsonb,'mvp_user',u2)));
+ s:=pg_temp.call(3,'rate',pg_temp.ev('m2',jsonb_build_object('ratings','{}'::jsonb,'mvp_user',u2)));
+ perform pg_temp.verify(s->'gold_user'='null'::jsonb,'no early Gold while the result can still change');
  reset role;
  update public.slm_matches set starts_at=clock_timestamp()-interval '3 days' where id=pg_temp.tid('m2');
  set local role service_role;
  r:=pg_temp.call(3,'overview');
- perform pg_temp.verify(r->'gold'=jsonb_build_array(u2),'new Gold replaces the previous holder');
+ perform pg_temp.verify(r->'gold'=jsonb_build_array(u2),'Gold awarded at closing, still valid (7 days from the final whistle)');
  perform pg_temp.verify((select count(*) from public.slm_rating_history where event_id=pg_temp.tid('m2'))=0,'no rating change without at least two ballots');
 
  -- Tie: 0.25 MVP each and no Gold; no quorum when fewer than half voted.
@@ -135,6 +144,12 @@ begin
  perform pg_temp.verify(s->'result'->>'mvp_outcome'='tie' and s->'result'->'mvp_user'='null'::jsonb,'tie has no Gold');
  perform pg_temp.verify((select sum(mvp_units) from public.slm_rating_months where user_id in (u3,u4) and settled_at is null)=0.50,'tie gives 0.25 MVP to each');
  perform pg_temp.verify(pg_temp.call(3,'overview')->'gold'=jsonb_build_array(u2),'tie does not take Gold away');
+ -- A later match the holder played crowns someone else: the previous holder loses Gold at once.
+ perform pg_temp.mk('m4',clock_timestamp()-interval '2 hours',array['u1','u2'],array['u3','u4']);
+ perform pg_temp.call(2,'rate',pg_temp.ev('m4',jsonb_build_object('ratings','{}'::jsonb,'mvp_user',u1)));
+ perform pg_temp.call(3,'rate',pg_temp.ev('m4',jsonb_build_object('ratings','{}'::jsonb,'mvp_user',u1)));
+ perform pg_temp.call(4,'rate',pg_temp.ev('m4',jsonb_build_object('ratings','{}'::jsonb,'mvp_user',u1)));
+ perform pg_temp.verify(pg_temp.call(3,'overview')->'gold'=jsonb_build_array(u1),'new Gold replaces the previous holder');
  -- The public value appears after five rated matches.
  reset role;
  update public.slm_player_ratings set rated_matches=5 where user_id=u1;

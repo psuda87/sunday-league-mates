@@ -385,6 +385,7 @@ export function createHandler(env: Environment) {
             forbidden:[403,'Oceniać mogą tylko zawodnicy, którzy zagrali w tym meczu.'],
             not_found:[404,'Mecz lub zawodnik nie istnieje albo nie masz do niego dostępu.'],
             rating_closed:[409,'Ocenianie tego meczu jest zamknięte.'],
+            ballot_final:[409,'Twoje oceny zostały już zapisane i nie można ich zmienić.'],
             invalid_input:[400,'Nieprawidłowe dane oceny.'],
             invalid_action:[400,'Nieznana akcja ocen.'],
           };

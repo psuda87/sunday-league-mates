@@ -160,7 +160,12 @@ begin
  select count(*) into voters from public.slm_match_votes v where v.event_id=p_event and v.mvp_user is not null
   and exists(select 1 from slm_private.rating_participants(p_event) x where x.user_id=v.voter_id)
   and exists(select 1 from slm_private.rating_participants(p_event) x where x.user_id=v.mvp_user);
- if voters=0 then outcome:='no_votes';
+ -- A Gold awarded early (unbeatable lead) stands.
+ select g.user_id into champion from public.slm_mvp_gold g where g.event_id=p_event;
+ if champion is not null then
+  outcome:='gold';
+  update public.slm_rating_months set mvp_units=mvp_units+1 where user_id=champion and month=m;
+ elsif voters=0 then outcome:='no_votes';
  elsif voters*2<n then outcome:='no_quorum';
  else
   with tally as (select v.mvp_user u,count(*) c from public.slm_match_votes v where v.event_id=p_event and v.mvp_user is not null
@@ -169,7 +174,8 @@ begin
   select array_agg(u order by u) into winners from tally where c=(select max(c) from tally);
   if cardinality(winners)=1 then
    outcome:='gold';champion:=winners[1];
-   insert into public.slm_mvp_gold(event_id,user_id,valid_until) values(p_event,champion,clock_timestamp()+interval '7 days');
+   insert into public.slm_mvp_gold(event_id,user_id,valid_until)
+    values(p_event,champion,e.starts_at+make_interval(mins=>e.duration_minutes)+interval '7 days') on conflict(event_id) do nothing;
    update public.slm_rating_months set mvp_units=mvp_units+1 where user_id=champion and month=m;
   else
    outcome:='tie';
@@ -187,6 +193,28 @@ begin
    and user_id in (select x.user_id from slm_private.rating_participants(p_event) x where x.team=act);
  end if;
  update public.slm_match_rating_state set finalized_at=clock_timestamp(),mvp_outcome=outcome,mvp_user=champion,action_team=act where event_id=p_event;
+end $$;
+
+-- Ballots are final, so Gold can be awarded before the window closes once nobody can catch the leader
+-- and the quorum is already met. It always expires 7 days after the final whistle.
+create function slm_private.rating_try_early_gold(p_event uuid) returns void
+language plpgsql security invoker set search_path='' as $$
+declare e public.slm_matches; n integer; ballots integer; voters integer; leader uuid; top integer; second integer;
+begin
+ if exists(select 1 from public.slm_mvp_gold where event_id=p_event) then return;end if;
+ select * into e from public.slm_matches where id=p_event;
+ select count(*) into n from slm_private.rating_participants(p_event);
+ select count(*),count(v.mvp_user) into ballots,voters from public.slm_match_votes v where v.event_id=p_event
+  and exists(select 1 from slm_private.rating_participants(p_event) x where x.user_id=v.voter_id);
+ with tally as (select v.mvp_user u,count(*)::integer c from public.slm_match_votes v where v.event_id=p_event and v.mvp_user is not null
+   and exists(select 1 from slm_private.rating_participants(p_event) x where x.user_id=v.voter_id)
+   and exists(select 1 from slm_private.rating_participants(p_event) x where x.user_id=v.mvp_user) group by v.mvp_user),
+  ranked as (select u,c,row_number() over(order by c desc,u) r from tally)
+ select (select u from ranked where r=1),coalesce((select c from ranked where r=1),0),coalesce((select c from ranked where r=2),0) into leader,top,second;
+ if leader is not null and voters*2>=n and top>second+(n-ballots) then
+  insert into public.slm_mvp_gold(event_id,user_id,valid_until)
+   values(p_event,leader,e.starts_at+make_interval(mins=>e.duration_minutes)+interval '7 days') on conflict(event_id) do nothing;
+ end if;
 end $$;
 
 -- Lazy settlement, called by the dispatcher under the global gate: close finished rating windows, then finished months.
@@ -238,7 +266,9 @@ language sql stable security invoker set search_path='' as $$
   'participants',(select coalesce(jsonb_agg(jsonb_build_object('user_id',x.user_id,'team',x.team,
      'display_name',coalesce(slm_private.profile_display_name(p_viewer,x.user_id,e.group_id),slm_private.public_player_name(x.user_id),'Zawodnik'))
      order by x.team nulls last,x.user_id),'[]'::jsonb) from slm_private.rating_participants(p_event) x),
+  'gold_user',(select g.user_id from public.slm_mvp_gold g where g.event_id=p_event),
   'my',jsonb_build_object(
+   'submitted',exists(select 1 from public.slm_match_votes v where v.event_id=p_event and v.voter_id=p_viewer),
    'ratings',(select coalesce(jsonb_object_agg(s.target_id,s.score),'{}'::jsonb) from public.slm_match_ratings s where s.event_id=p_event and s.rater_id=p_viewer),
    'mvp_user',(select v.mvp_user from public.slm_match_votes v where v.event_id=p_event and v.voter_id=p_viewer),
    'action_team',(select v.action_team from public.slm_match_votes v where v.event_id=p_event and v.voter_id=p_viewer),
@@ -270,7 +300,9 @@ begin
 
  if p_action='overview' then
   if p_body<>'{}'::jsonb then raise exception 'invalid_input';end if;
-  return jsonb_build_object('me',slm_private.rating_public(p_user),
+  return jsonb_build_object('me',slm_private.rating_public(p_user)||jsonb_build_object('stats',(select jsonb_build_object(
+     'played',coalesce(sum(t.played),0),'goals',coalesce(sum(t.goals),0),'assists',coalesce(sum(t.assists),0),
+     'mvp',(select count(*) from public.slm_mvp_gold g where g.user_id=p_user)) from public.slm_rating_months t where t.user_id=p_user)),
    'gold',(select coalesce(jsonb_agg(h order by h),'[]'::jsonb) from slm_private.rating_gold_holders() h
     where h=p_user or exists(select 1 from public.slm_group_members mine join public.slm_group_members theirs on theirs.group_id=mine.group_id
      join public.slm_groups g on g.id=mine.group_id and not g.archived where mine.user_id=p_user and theirs.user_id=h)));
@@ -300,7 +332,8 @@ begin
 
  if p_action='rate' then
   if jsonb_typeof(p_body->'ratings') is distinct from 'object' then raise exception 'invalid_input';end if;
-  delete from public.slm_match_ratings where event_id=e.id and rater_id=p_user;
+  -- One ballot per player, final once sent.
+  if exists(select 1 from public.slm_match_votes where event_id=e.id and voter_id=p_user) then raise exception 'ballot_final';end if;
   for k,v in select * from jsonb_each(p_body->'ratings') loop
    if jsonb_typeof(v) is distinct from 'number' or v::text!~'^([1-9]|10)$' then raise exception 'invalid_input';end if;
    target:=k::uuid;
@@ -312,8 +345,8 @@ begin
   mvp:=nullif(p_body->>'mvp_user','')::uuid;team:=p_body->>'action_team';
   if team is not null and team not in ('a','b') then raise exception 'invalid_input';end if;
   if mvp is not null and (mvp=p_user or not exists(select 1 from slm_private.rating_participants(e.id) x where x.user_id=mvp)) then raise exception 'invalid_input';end if;
-  insert into public.slm_match_votes(event_id,voter_id,mvp_user,action_team) values(e.id,p_user,mvp,team)
-   on conflict(event_id,voter_id) do update set mvp_user=excluded.mvp_user,action_team=excluded.action_team,updated_at=clock_timestamp();
+  insert into public.slm_match_votes(event_id,voter_id,mvp_user,action_team) values(e.id,p_user,mvp,team);
+  perform slm_private.rating_try_early_gold(e.id);
  elsif p_action='stats' then
   if jsonb_typeof(p_body->'goals') is distinct from 'number' or jsonb_typeof(p_body->'assists') is distinct from 'number'
    or (p_body->>'goals')!~'^[0-9]{1,2}$' or (p_body->>'assists')!~'^[0-9]{1,2}$' then raise exception 'invalid_input';end if;
@@ -331,9 +364,9 @@ begin
 end $$;
 
 revoke all on function slm_private.rating_participants(uuid),slm_private.rating_gold_holders(),slm_private.rating_public(uuid),
- slm_private.rating_finalize(uuid),slm_private.rating_settle(),slm_private.rating_match_state(uuid,uuid),
+ slm_private.rating_finalize(uuid),slm_private.rating_try_early_gold(uuid),slm_private.rating_settle(),slm_private.rating_match_state(uuid,uuid),
  public.slm_ratings_dispatch(uuid,uuid,text,jsonb) from public,anon,authenticated;
 grant execute on function slm_private.rating_participants(uuid),slm_private.rating_gold_holders(),slm_private.rating_public(uuid),
- slm_private.rating_finalize(uuid),slm_private.rating_settle(),slm_private.rating_match_state(uuid,uuid),
+ slm_private.rating_finalize(uuid),slm_private.rating_try_early_gold(uuid),slm_private.rating_settle(),slm_private.rating_match_state(uuid,uuid),
  public.slm_ratings_dispatch(uuid,uuid,text,jsonb) to service_role;
 commit;

@@ -23,3 +23,6 @@
 .slm-rating-panel .slm-rating-link { min-height: 44px; padding: 0; margin-top: 8px; border: 0; background: none; text-decoration: underline; color: var(--slm-text-secondary, #b9b3b8); }
 .slm-rating-panel .slm-rating-submit { font-weight: 800; color: #fff; background: linear-gradient(180deg, #d6263c, #8f0f20); border-color: #e8c15a; }
 .slm-rating-result p { margin: 0 0 4px; }
+
+.slm-rating-confirm { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px 12px; border: 1px solid #e8c15a; border-radius: 12px; }
+.slm-rating-confirm p { grid-column: 1 / -1; margin: 0 0 4px; }

@@ -11,11 +11,15 @@ Zastępuje „propozycję 0.1”. Źródłem prawdy dla obliczeń jest serwer: `
 - Nowy sezon nie zeruje oceny — zawodnik zaczyna z oceną końcową poprzedniego sezonu.
 
 ## Ocenianie meczu
-- Okno: od końca meczu przez 48 godzin. Oceny można zmieniać do zamknięcia okna. Oceny są anonimowe.
+- Okno: od końca meczu przez 48 godzin, nie dłużej. Oceny są anonimowe.
+- **Karta ocen jest ostateczna:** oceny, głos na MVP i akcję meczu wysyła się raz (z potwierdzeniem) i nie można ich zmienić.
+  Własne gole i asysty oraz wynik meczu można poprawiać do końca okna.
 - Oceniają i są oceniani tylko członkowie, którzy zagrali (zapisani, nieoznaczeni jako nieobecni). Goście bez konta nie biorą udziału.
 - Nikt nie ocenia siebie i nie głosuje na siebie.
 - **MVP:** kworum to co najmniej połowa uczestników. Samodzielny zwycięzca = MVP Gold; remis = po 0,25 MVP dla remisujących, bez złota.
-- **MVP Gold** trwa najwyżej 7 dni i przepada wcześniej, gdy w późniejszym meczu z udziałem posiadacza MVP Gold zdobędzie ktoś inny.
+- **MVP Gold od razu:** skoro głosów nie da się zmienić, złoto jest nadawane natychmiast, gdy lidera nie da się już dogonić
+  (przewaga większa niż liczba osób, które jeszcze nie głosowały) i jest kworum — np. 7 głosów z 12. W pozostałych przypadkach po zamknięciu okna.
+- **MVP Gold** trwa 7 dni **od końca meczu** (rozstrzygnięcie w ostatniej chwili daje więc 5 dni) i przepada wcześniej, gdy w późniejszym meczu z udziałem posiadacza MVP Gold zdobędzie ktoś inny.
 - **Akcja meczu:** każdy wskazuje drużynę A albo B; drużyna z większością głosów dostaje premię dla wszystkich swoich zawodników. Remis — nikt.
 - **Gole i asysty** wpisuje sam zawodnik. **Wynik meczu** może wpisać i poprawić każdy uczestnik (widać, kto zmienił ostatni).
   Rozbieżność (więcej goli lub asyst niż wynik drużyny; asyst tyle samo co goli) jest tylko informacją — gole nadal się liczą.
@@ -34,7 +38,7 @@ Liczona po zakończeniu miesiąca (czas Europe/Warsaw), gdy wszystkie mecze mies
 - Zapis na rezerwę liczy się do frekwencji jak obecność (nieopisywane zawodnikom w zasadach).
 
 ## Poza tym etapem
-- Sezony (ustawiane ręcznie przez administratora aplikacji; statystyki i rankingi sezonu, sezon letni) — niezaimplementowane.
-- Kafelki statystyk w profilu (Mecze, Bramki, Asysty, MVP) — nadal bez danych.
+- Sezony — odłożone decyzją właściciela (14.11.2026); działa tylko cykl miesięczny.
+- Kafelki w profilu (Mecze, Bramki, Asysty, MVP) pokazują sumy z rozliczonych meczów i liczbę zdobytych MVP Gold.
 - Zgłaszanie nadużyć, powiadomienia o otwarciu okna ocen — niezaimplementowane.
 - Uruchomienie: nic sprzed `slm_rating_config.enabled_from` (czas migracji) nie jest oceniane.

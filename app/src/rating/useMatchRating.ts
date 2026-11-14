@@ -37,7 +37,7 @@ export function useMatchRating(manager: SessionManager | undefined, eventId: str
   return {
     state, pending, error, notice,
     reload: () => run('ratings_get', {}),
-    rate: (ballot: Ballot) => run('ratings_rate', { ...ballot }, 'Oceny zapisane. Możesz je zmieniać do końca okna oceniania.'),
+    rate: (ballot: Ballot) => run('ratings_rate', { ...ballot }, 'Oceny zapisane. Dziękujemy!'),
     saveStats: (goals: number, assists: number) => run('ratings_stats', { goals, assists }, 'Gole i asysty zapisane.'),
     saveScore: (a: number, b: number) => run('ratings_score', { score_a: a, score_b: b }, 'Wynik zapisany.'),
   };

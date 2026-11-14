@@ -31,12 +31,13 @@ export default function MatchRatingPanel({ manager, userId, eventId, active = tr
   const [action, setAction] = useState<Team | null>(null);
   const [goals, setGoals] = useState('0'), [assists, setAssists] = useState('0');
   const [scoreA, setScoreA] = useState(''), [scoreB, setScoreB] = useState('');
+  const [confirm, setConfirm] = useState(false);
   const stamp = s ? JSON.stringify([s.event_id, s.my, s.score]) : '';
   useEffect(() => {
     if (!s) return;
     setRatings(s.my.ratings); setMvp(s.my.mvp_user); setAction(s.my.action_team);
     setGoals(String(s.my.goals)); setAssists(String(s.my.assists));
-    setScoreA(s.score ? String(s.score.a) : ''); setScoreB(s.score ? String(s.score.b) : '');
+    setScoreA(s.score ? String(s.score.a) : ''); setScoreB(s.score ? String(s.score.b) : ''); setConfirm(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reset drafts only when the server copy changes
   }, [stamp]);
   useEffect(() => { if (s?.result) refreshRatings(); }, [s?.result, refreshRatings]);
@@ -45,11 +46,14 @@ export default function MatchRatingPanel({ manager, userId, eventId, active = tr
   const others = s.participants.filter(p => p.user_id !== userId);
   const warnings = scoreWarnings(s);
   const hasTeams = s.participants.some(p => p.team);
+  const earlyMvp = s.phase === 'open' && s.gold_user ? s.participants.find(p => p.user_id === s.gold_user)?.display_name ?? 'Zawodnik' : null;
+  const canBallot = s.phase === 'open' && s.can_rate && !s.my.submitted;
   return <section className="slm-panel slm-rating-panel" aria-busy={api.pending}>
     <h2>Oceny</h2>
     {s.phase === 'disabled' && <p className="slm-rating-note">Ten mecz nie podlega ocenianiu.</p>}
     {s.phase === 'before' && <p className="slm-rating-note">Ocenianie otworzy się po zakończeniu meczu i potrwa 48 godzin.</p>}
     {s.phase === 'open' && <p className="slm-rating-note">Ocenianie otwarte do: <strong>{when(s.closes_at)}</strong>. Oceny są anonimowe.</p>}
+    {earlyMvp && <p className="slm-rating-result"><strong>MVP meczu:</strong> {earlyMvp} — wynik głosowania jest już przesądzony.</p>}
     {s.phase === 'closed' && <Result state={s} />}
     {api.error && <p role="alert" className="slm-rating-error">{api.error}</p>}
     {api.notice && <p role="status" className="slm-rating-ok">{api.notice}</p>}
@@ -76,6 +80,9 @@ export default function MatchRatingPanel({ manager, userId, eventId, active = tr
           <button type="button" onClick={() => void api.saveStats(count(goals), count(assists))}>Zapisz</button>
         </div>
       </fieldset>
+    </>}
+    {s.phase === 'open' && s.can_rate && s.my.submitted && <p className="slm-rating-ok">Twoje oceny i głosy są zapisane. Nie można ich już zmienić.</p>}
+    {canBallot && <>
       <fieldset className="slm-rating-block" disabled={api.pending}>
         <legend>Oceń zawodników (1–10)</legend>
         {others.length === 0 && <p className="slm-rating-note">Brak innych zawodników do oceny.</p>}
@@ -90,7 +97,12 @@ export default function MatchRatingPanel({ manager, userId, eventId, active = tr
         <legend>Akcja meczu — która drużyna?</legend>
         <div className="slm-rating-teams" role="radiogroup" aria-label="Akcja meczu">{(['a', 'b'] as const).map(t => <button key={t} type="button" role="radio" aria-checked={action === t} onClick={() => setAction(action === t ? null : t)}>{teamName(t)}</button>)}</div>
       </fieldset>}
-      <button type="button" className="slm-rating-submit" disabled={api.pending} onClick={() => void api.rate({ ratings, mvp_user: mvp, action_team: action })}>Zapisz oceny</button>
+      {!confirm ? <button type="button" className="slm-rating-submit" disabled={api.pending} onClick={() => setConfirm(true)}>Zapisz oceny</button>
+        : <div role="alertdialog" aria-label="Potwierdzenie ocen" className="slm-rating-confirm">
+          <p>Po zapisaniu nie zmienisz już ocen ani głosów w tym meczu. Zapisać?</p>
+          <button type="button" onClick={() => setConfirm(false)}>Wróć</button>
+          <button type="button" className="slm-rating-submit" disabled={api.pending} onClick={() => void api.rate({ ratings, mvp_user: mvp, action_team: action })}>Tak, zapisz</button>
+        </div>}
     </>}
   </section>;
 }
