@@ -15,10 +15,10 @@ it('validates login, normalizes email, toggles password, serializes submits and 
 it('shows a clear, neutral message for incorrect login or password',async()=>{
  const adapter=port();adapter.signIn=vi.fn().mockRejectedValue(new AccountUiFailure('credentials'));
  render(<AccountScreens view="login" port={adapter} onNavigate={vi.fn()} loginOrPhone/>);
- fireEvent.change(screen.getByLabelText('Login lub numer telefonu'),{target:{value:'nieznany'}});
+ fireEvent.change(screen.getByLabelText('E-mail lub login'),{target:{value:'nieznany'}});
  fireEvent.change(screen.getByLabelText('Hasło'),{target:{value:'bledne-haslo'}});
  fireEvent.submit(screen.getByRole('form'));
- await waitFor(()=>expect(screen.getByRole('alert')).toHaveTextContent('Nieprawidłowy login, numer telefonu lub hasło.'));
+ await waitFor(()=>expect(screen.getByRole('alert')).toHaveTextContent('Nieprawidłowy e-mail, login lub hasło.'));
  expect(screen.getByRole('alert')).not.toHaveTextContent('AccountUiFailure');
 });
 it('registers only after consent and matching policy, with optional phone/number and no group',async()=>{

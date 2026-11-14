@@ -109,6 +109,40 @@ it('withdrawal stays enabled despite debt and real guest writes have no invented
  await waitFor(()=>expect(screen.getByLabelText('Imię lub pseudonim gościa')).toHaveValue(''));
 });
 
+it('asks for confirmation before withdrawing and offers to restore the own entry',async()=>{
+ const p={id:'entry',member_id:'owner',responsible_user_id:'owner',status:'registered',absent:false,display_name:'Actual player',guest_name:null,guest_phone:null,responsible_name:'Actual player',contact_phone:null,joined_at:now};
+ const actWrite=vi.fn().mockResolvedValue(true);
+ const data={...detail,detail:{...detail,event:{...event,registered_count:1},participants:[p],can_register_paid:true},events:[],groups:[group],organizers:[group],activeGroup:'',offset:0,loading:false,busy:false,error:'',notice:'',creating:false,serverNow:now,act:actWrite,back:vi.fn(),refresh:vi.fn(),open:vi.fn(),beginCreate:vi.fn(),selectGroup:vi.fn()} as unknown as PremiumEventsController;
+ const {rerender}=render(<PremiumEvents data={data} userId="owner" onGroups={vi.fn()}/>);
+ fireEvent.click(screen.getByText('WYCOFAJ ZAPIS'));
+ expect(screen.getByRole('alertdialog')).toHaveTextContent('Na pewno wycofać?');expect(actWrite).not.toHaveBeenCalled();
+ fireEvent.click(screen.getByRole('button',{name:'Anuluj'}));expect(screen.queryByRole('alertdialog')).toBeNull();expect(actWrite).not.toHaveBeenCalled();
+ fireEvent.click(screen.getByText('WYCOFAJ ZAPIS'));fireEvent.click(screen.getByRole('button',{name:'Tak, wycofaj'}));
+ await waitFor(()=>expect(actWrite).toHaveBeenCalledWith('withdraw',{participant_id:'entry'}));
+ rerender(<PremiumEvents data={{...data,detail:{...data.detail!,participants:[{...p,status:'withdrawn'}]}} as unknown as PremiumEventsController} userId="owner" onGroups={vi.fn()}/>);
+ const undo=await screen.findByRole('button',{name:/Przywróć zapis|Wróć na rezerwę/});
+ fireEvent.click(undo);await waitFor(()=>expect(actWrite).toHaveBeenLastCalledWith(expect.stringMatching(/^(join|reserve)$/),{}));
+});
+
+it('lets a manager restore withdrawn members and guests through the existing join/guest actions',async()=>{
+ const base={responsible_user_id:'owner',absent:false,responsible_name:'Owner',contact_phone:null,joined_at:now,status:'withdrawn',guest_name:null,guest_phone:null};
+ const member={...base,id:'w1',member_id:'player',display_name:'Withdrawn Player'};
+ const guest={...base,id:'w2',member_id:null,display_name:'Withdrawn Guest',guest_name:'Withdrawn Guest'};
+ const actWrite=vi.fn().mockResolvedValue(true);
+ const data={...detail,detail:{...detail,event:{...event,registered_count:0,can_manage:true},participants:[member,guest],can_register_paid:true},events:[],groups:[group],organizers:[group],activeGroup:'',offset:0,loading:false,busy:false,error:'',notice:'',creating:false,serverNow:now,act:actWrite,back:vi.fn(),refresh:vi.fn(),open:vi.fn(),beginCreate:vi.fn(),selectGroup:vi.fn()} as unknown as PremiumEventsController;
+ render(<PremiumEvents data={data} userId="owner" onGroups={vi.fn()}/>);
+ const restore=screen.getAllByText(/Przywróć (wpis|na rezerwę)/);
+ expect(restore).toHaveLength(2);
+ fireEvent.click(restore[0]);expect(actWrite).toHaveBeenLastCalledWith(expect.stringMatching(/^(join|reserve)$/),{user_id:'player'});
+ fireEvent.click(restore[1]);expect(actWrite).toHaveBeenLastCalledWith('guest',expect.objectContaining({guest_name:'Withdrawn Guest',guest_phone:'',user_id:'owner'}));
+});
+it('does not offer restoring withdrawn entries to non-managers',()=>{
+ const member={id:'w1',member_id:'player',responsible_user_id:'player',status:'withdrawn',absent:false,display_name:'Withdrawn Player',guest_name:null,guest_phone:null,responsible_name:'P',contact_phone:null,joined_at:now};
+ const data={...detail,detail:{...detail,event:{...event,registered_count:0,can_manage:false},participants:[member],can_register_paid:true},events:[],groups:[group],organizers:[group],activeGroup:'',offset:0,loading:false,busy:false,error:'',notice:'',creating:false,serverNow:now,act:vi.fn(),back:vi.fn(),refresh:vi.fn(),open:vi.fn(),beginCreate:vi.fn(),selectGroup:vi.fn()} as unknown as PremiumEventsController;
+ render(<PremiumEvents data={data} userId="owner" onGroups={vi.fn()}/>);
+ expect(screen.queryByText(/Przywróć/)).toBeNull();
+});
+
 it('enables creation for members only when the server confirms the new contract and sends filters before paging',async()=>{
  const m=manager(),normal=vi.mocked(m.call).getMockImplementation()!;
  vi.mocked(m.call).mockImplementation(async<T,>(action:string,body?:Record<string,unknown>)=>action==='matches_list'?{events:[event],server_now:now,member_creation_enabled:true} as T:action==='groups_list'?{groups:[{...group,admin_id:'someone-else',organizer:false}]} as T:normal(action,body));

@@ -2,8 +2,8 @@ describe('Minimalny moduł kont — UI z kontrolowanym API', () => {
   const input = (label: string, value: string) => cy.get('ion-input').filter((_, el) => (el as unknown as {label: string}).label === label).find('input').clear({ log: false }).type(value, { log: false });
   const submit = (text: string) => cy.contains('ion-button', text).click();
   it('pokazuje odmowę logowania i nie oferuje rejestracji', () => {
-    cy.intercept('POST', '**/functions/v1/accounts', {statusCode:401,body:{code:'invalid_credentials',error:'Nieprawidłowy login, numer telefonu lub hasło.'}}).as('denied');
-    cy.visit('/'); input('E-mail, login lub numer telefonu', 'Fikcyjny'); input('Hasło', crypto.randomUUID()); submit('Zaloguj się');
+    cy.intercept('POST', '**/functions/v1/accounts', {statusCode:401,body:{code:'invalid_credentials',error:'Nieprawidłowy e-mail, login lub hasło.'}}).as('denied');
+    cy.visit('/'); input('E-mail lub login', 'Fikcyjny'); input('Hasło', crypto.randomUUID()); submit('Zaloguj się');
     cy.wait('@denied'); cy.get('[role="alert"]').should('contain', 'Nieprawidłowy login');
     cy.contains('Zarejestruj się').should('not.exist'); cy.contains('Zarządzaj kontami').should('not.exist');
     cy.get('input[type="password"]').should('have.value', '');
@@ -22,7 +22,7 @@ describe('Minimalny moduł kont — UI z kontrolowanym API', () => {
       else if (req.body.action === 'save_profile' && invalid) req.reply({statusCode:401,body:{code:'session_invalid',error:'Sesja wygasła. Zaloguj się ponownie.'}});
       else req.reply({ok:true});
     });
-    cy.visit('/'); input('E-mail, login lub numer telefonu','Fikcyjny'); const temporary = crypto.randomUUID();
+    cy.visit('/'); input('E-mail lub login','Fikcyjny'); const temporary = crypto.randomUUID();
     input('Hasło',temporary); submit('Zaloguj się'); cy.contains('h1','Zmień hasło tymczasowe').should('be.visible');
     cy.contains('Mój profil').should('not.exist'); cy.contains('Zarządzaj kontami').should('not.exist');
     input('Hasło tymczasowe',temporary); const next = crypto.randomUUID(); input('Nowe hasło',next); input('Powtórz nowe hasło',next); submit('Zmień hasło');
@@ -43,7 +43,7 @@ describe('Minimalny moduł kont — UI z kontrolowanym API', () => {
       else if(req.body.action==='profile') req.reply({...player,user_id:session.user_id});
       else req.reply({ok:true});
     });
-    cy.visit('/'); input('E-mail, login lub numer telefonu','Fikcyjny'); input('Hasło',crypto.randomUUID()); submit('Zaloguj się');
+    cy.visit('/'); input('E-mail lub login','Fikcyjny'); input('Hasło',crypto.randomUUID()); submit('Zaloguj się');
     submit('Zarządzaj kontami'); cy.contains('h1','Utwórz konto zawodnika').should('be.visible'); cy.contains('Resetuj hasło').should('be.visible');
   });
   it('po ponownym otwarciu sprawdza zapisany refresh; offline ukrywa dane, logout usuwa zapis', () => {
@@ -63,7 +63,7 @@ describe('Minimalny moduł kont — UI z kontrolowanym API', () => {
       else if(req.body.action==='profile') req.reply({user_id:result.user_id,login:'Fikcyjny',phone:'+12025550112',full_name:'',display_as:'nickname',display_name:'Fikcyjny'});
       else req.reply({ok:true});
     });
-    cy.visit('/'); input('E-mail, login lub numer telefonu','Fikcyjny'); input('Hasło',crypto.randomUUID()); submit('Zaloguj się');
+    cy.visit('/'); input('E-mail lub login','Fikcyjny'); input('Hasło',crypto.randomUUID()); submit('Zaloguj się');
     cy.contains('ion-button', 'Mój profil').click(); cy.contains('h1','Fikcyjny').should('be.visible');
     cy.then(()=>{allowRefresh=()=>undefined;});cy.reload();
     cy.contains('Sprawdzanie sesji').should('be.visible');cy.contains('h1','Fikcyjny').should('not.exist');

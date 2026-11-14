@@ -36,7 +36,7 @@ function setup(request:(action:string,values?:Record<string,unknown>,session?:Se
 }
 async function login(identifier='Fikcyjny'){
  await screen.findByRole('heading',{name:'Zaloguj się'});
- fireEvent.change(screen.getByLabelText('Login lub numer telefonu'),{target:{value:identifier}});
+ fireEvent.change(screen.getByLabelText('E-mail lub login'),{target:{value:identifier}});
  fireEvent.change(screen.getByLabelText('Hasło'),{target:{value:'Test-only-secret'}});
  fireEvent.submit(screen.getByRole('form'));
 }
@@ -45,7 +45,7 @@ describe('B1 existing Auth into frozen account UI',()=>{
   const request=vi.fn().mockRejectedValue(new AccountError('Denied','invalid_credentials'));
   const {manager}=setup(request);render(<B1App manager={manager}/>);
   await login('+48 123 456 789');
-  await waitFor(()=>expect(screen.getByRole('alert')).toHaveTextContent('Nieprawidłowy login, numer telefonu lub hasło.'));
+  await waitFor(()=>expect(screen.getByRole('alert')).toHaveTextContent('Nieprawidłowy e-mail, login lub hasło.'));
   expect(request).toHaveBeenCalledWith('login',{identifier:'+48 123 456 789',password:'Test-only-secret'},undefined);
   expect(screen.queryByText('Chroniony świat demo')).toBeNull();
   expect(screen.getByLabelText('Hasło')).toHaveValue('');
