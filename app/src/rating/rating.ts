@@ -35,6 +35,8 @@ export function starFills(rating: number): number[] {
 
 /** Polski zapis z jednym miejscem po przecinku: 7 → „7,0". */
 export const formatRating = (rating: number): string => clampRating(rating).toFixed(1).replace('.', ',');
+/** Dokładny wynik pokazywany w chmurce po dotknięciu gwiazdek, np. 7,43. */
+export const formatRatingPrecise = (rating: number): string => clampRating(rating).toFixed(2).replace('.', ',');
 
 export const ratingChangeUnlocked = (ratedMatches: number): boolean => ratedMatches >= MIN_RATED_MATCHES_FOR_CHANGE;
 

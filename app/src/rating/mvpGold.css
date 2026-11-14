@@ -1,0 +1,45 @@
+/* MVP Gold — własne style; nie zmieniają zatwierdzonego pliku theme/variables.css (wygląd Premium 3.18). */
+:root { --slm-mvp-gold-1: #fff3bd; --slm-mvp-gold-2: #e8c15a; --slm-mvp-gold-3: #a8741f; --slm-mvp-gold-deep: #3b2606; }
+
+/* Refleks działa ciągle wszędzie, gdzie jest MVP Gold (wspólna animacja .slm-gold-shine z rating.css). */
+.slm-gold-tag { display: inline-block; margin-left: 8px; padding: 1px 7px; border-radius: 999px; font-size: .62rem; font-weight: 800; letter-spacing: .08em; line-height: 1.5; vertical-align: middle;
+  color: var(--slm-mvp-gold-deep); background: linear-gradient(135deg, var(--slm-mvp-gold-1), var(--slm-mvp-gold-2) 55%, var(--slm-mvp-gold-3)); }
+.slm-gold-badge { position: absolute; z-index: 5; top: 5%; left: 50%; width: 34%; min-width: 96px; transform: translateX(-50%); pointer-events: none; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .55)); }
+
+/* Karta: złote tło zamiast burgundowego, ta sama sylwetka. */
+.slm-ultimate-card[data-mvp-gold="true"] { background: linear-gradient(135deg, #8a5a14, #fff3bd 22%, #e8c15a 38%, #a8741f 55%, #fff3bd 78%, #8a5a14); box-shadow: 0 0 22px rgba(232, 193, 90, .45); }
+.slm-ultimate-card[data-mvp-gold="true"] .slm-ultimate-inner { background: radial-gradient(ellipse at 50% 28%, #b8861f, #5c3b0a 78%); }
+.slm-ultimate-card[data-mvp-gold="true"] .slm-ultimate-nameplate h2 { color: #fff3bd; }
+
+/* Odznaka MVP na karcie jest nad refleksem. */
+.slm-ultimate-card[data-mvp-gold="true"]::before { content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  background: linear-gradient(105deg, transparent 20%, rgba(255, 244, 200, .5) 50%, transparent 80%); background-size: 260% 100%; animation: slm-gold-sweep 4.5s ease-in-out infinite; mix-blend-mode: screen; }
+
+/* Wiersze list (grupa, uczestnicy meczu): złota obwódka i refleks, bez korony. */
+li[data-mvp-gold="true"] > .slm-group-person, li.slm-live-entry[data-mvp-gold="true"] { position: relative; overflow: hidden; border-radius: 14px; padding-inline: 10px;
+  box-shadow: inset 0 0 0 1.5px var(--slm-mvp-gold-2), 0 0 12px rgba(232, 193, 90, .35); background: linear-gradient(90deg, rgba(232, 193, 90, .18), rgba(232, 193, 90, .04)); }
+li[data-mvp-gold="true"] > .slm-group-person::after, li.slm-live-entry[data-mvp-gold="true"]::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(105deg, transparent 25%, rgba(255, 244, 200, .38) 50%, transparent 75%); background-size: 260% 100%; animation: slm-gold-sweep 4.5s ease-in-out infinite; }
+
+/* Boisko: złoty pierścień wokół znacznika; kolor drużyny (wypełnienie) zostaje. */
+li[data-mvp-gold="true"] .slm-pitch-token { position: relative; overflow: hidden; box-shadow: 0 0 0 3px var(--slm-mvp-gold-2), 0 0 14px rgba(232, 193, 90, .75); }
+li[data-mvp-gold="true"] .slm-pitch-token::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(105deg, transparent 25%, rgba(255, 244, 200, .6) 50%, transparent 75%); background-size: 260% 100%; animation: slm-gold-sweep 4.5s ease-in-out infinite; }
+
+@keyframes slm-gold-sweep { 0%, 55% { background-position: 160% 0; } 100% { background-position: -60% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .slm-ultimate-card[data-mvp-gold="true"]::before, li[data-mvp-gold="true"] > .slm-group-person::after, li.slm-live-entry[data-mvp-gold="true"]::after, li[data-mvp-gold="true"] .slm-pitch-token::after { animation: none; opacity: 0; }
+}
+
+/* Telefon: ikona w przycisku o polu dotyku ≥ 44 px, kontrast jak na ciemnym i złotym tle. */
+.slm-call { display: inline-flex; width: fit-content; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 1.5px solid var(--slm-mvp-gold-2); border-radius: 999px; color: #fff !important; background: rgba(0, 0, 0, .35); text-decoration: none; font-weight: 600; }
+.slm-roster-group .slm-call { display: inline-flex; padding: 0 16px; margin: 6px 0 4px; font-size: .8rem; }
+.slm-call::before { content: ''; width: 18px; height: 18px; flex: none; background: var(--slm-mvp-gold-2);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 013 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 013 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z'/%3E%3C/svg%3E") center / contain no-repeat; }
+
+/* Gwiazdki pod nazwiskiem w łuku + chmurka z dokładnym wynikiem. */
+.slm-ultimate-stars-button { position: absolute; z-index: 6; left: 50%; bottom: 14px; transform: translateX(-50%); min-width: 44px; min-height: 44px; padding: 0; border: 0; background: none; cursor: pointer; }
+.slm-ultimate-stars-button .slm-rating-stars { margin: 0 auto; }
+.slm-rating-bubble { position: absolute; z-index: 7; left: 50%; bottom: 62px; transform: translateX(-50%); width: max-content; max-width: 86%; padding: 8px 12px; border-radius: 12px; font-size: .78rem; line-height: 1.35; text-align: center; color: #fff; background: rgba(15, 11, 16, .94); border: 1px solid var(--slm-mvp-gold-2); }
+.slm-rating-bubble strong { display: block; font-size: 1rem; color: var(--slm-mvp-gold-1); }

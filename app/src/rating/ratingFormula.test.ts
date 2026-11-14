@@ -37,13 +37,13 @@ describe('provisional rating formula', () => {
     expect(at(10) - at(0)).toBeGreaterThan(at(20) - at(10));
     expect(at(20) - at(10)).toBeGreaterThan(at(40) - at(30));
   });
-  it('never penalizes attendance and keeps ratings within 1–10 with one decimal', () => {
+  it('never penalizes attendance and keeps ratings within 1–10 with two decimals', () => {
     expect(computeRating(mature({ attendance: 0 })).rating).toBe(7);
     expect(computeRating(mature({ attendance: -3 })).rating).toBe(7);
     expect(computeRating(mature({ peerScores: Array(30).fill(1) })).rating).toBeGreaterThanOrEqual(1);
     expect(computeRating(mature({ peerScores: Array(30).fill(10), mvpUnits: 99, goals: 999, attendance: 1 })).rating).toBeLessThanOrEqual(10);
     const r = computeRating(mature({ peerScores: [8, 9, 7, 8, 8, 9, 6] })).rating;
-    expect(r).toBe(Math.round(r * 10) / 10);
+    expect(r).toBe(Math.round(r * 100) / 100);
   });
   it('ignores non-finite peer scores', () => {
     expect(computeRating(mature({ peerScores: [Number.NaN, 7, 7] })).rating).toBe(7);

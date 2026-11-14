@@ -2,8 +2,8 @@ import { MIN_RATED_MATCHES_FOR_CHANGE, PROVISIONAL_WEIGHTS, RATING_MAX, RATING_M
 
 /**
  * WERSJA PRÓBNA — propozycja do zatwierdzenia przez właściciela, NIEPODŁĄCZONA do aplikacji ani do bazy.
- * Realizuje zapisane założenia (docs/rating/SLM_RATING_1_0_MVP_GOLD.md): wagi 80/12/5/3, rating 1–10 z jednym
- * miejscem po przecinku, start 7,0, zmiany dopiero po 5 ocenionych meczach, malejąca korzyść z goli/asyst,
+ * Realizuje zapisane założenia (docs/rating/SLM_RATING_1_0_MVP_GOLD.md): wagi 80/12/5/3, rating 1–10 z dwoma
+ * miejscami po przecinku (np. 7,43), start 7,0, zmiany dopiero po 5 ocenionych meczach, malejąca korzyść z goli/asyst,
  * frekwencja wyłącznie na plus, premie z limitem (MVP nie dominuje nad ocenami kolegów).
  * Wygładzanie, skale premii i normalizacja między grupami wymagają odrębnej akceptacji.
  */
@@ -38,7 +38,7 @@ export interface RatingBreakdown {
   components: { peer: number; mvp: number; goalsAssists: number; attendance: number };
 }
 
-const round1 = (value: number) => Math.round(value * 10) / 10;
+const round2 = (value: number) => Math.round(value * 100) / 100;
 const unit = (value: number) => (Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0);
 
 export function computeRating(input: RatingInput): RatingBreakdown {
@@ -54,5 +54,5 @@ export function computeRating(input: RatingInput): RatingBreakdown {
   if (input.ratedMatches < MIN_RATED_MATCHES_FOR_CHANGE) return { rating: RATING_START, provisional: true, components };
   const w = PROVISIONAL_WEIGHTS;
   const composite = w.peers * peer + w.mvp * mvp + w.goalsAssists * goalsAssists + w.attendance * attendance;
-  return { rating: round1(Math.min(RATING_MAX, Math.max(RATING_MIN, composite))), provisional: false, components };
+  return { rating: round2(Math.min(RATING_MAX, Math.max(RATING_MIN, composite))), provisional: false, components };
 }
