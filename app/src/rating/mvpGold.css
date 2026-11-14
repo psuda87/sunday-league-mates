@@ -15,6 +15,9 @@
 .slm-ultimate-card[data-mvp-gold="true"] .slm-ultimate-stadium { filter: sepia(1) saturate(2.4) hue-rotate(-14deg) brightness(1.15); }
 .slm-ultimate-card[data-mvp-gold="true"] { filter: drop-shadow(0 0 14px rgba(232, 193, 90, .55)); }
 
+/* Pasmo refleksu wyjeżdża poza kartę; bez przycięcia powiększało obszar przewijania strony (skaczący pasek przewijania). */
+.slm-ultimate-card[data-mvp-gold="true"] { overflow: hidden; overflow: clip; }
+
 /* Odznaka MVP na karcie jest nad refleksem. */
 .slm-ultimate-card[data-mvp-gold="true"]::before { content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none;
   background: linear-gradient(var(--slm-gold-angle, 135deg), transparent 30%, rgba(255, 244, 200, .5) 50%, transparent 70%); transform: translate(var(--slm-gold-x0, -130%), var(--slm-gold-y0, -130%)); animation: slm-gold-sweep 4.5s linear infinite; will-change: transform; mix-blend-mode: screen; }
