@@ -53,9 +53,11 @@ select pg_temp.pay(2,'submit_payment','{"amount_cents":1000,"request_id":"400000
 select pg_temp.pay(1,'reject_payment','{"payment_id":"40000000-0000-4000-8000-000000000011","request_id":"40000000-0000-4000-8000-000000000012"}');
 select pg_temp.verify((select outstanding_cents=2300 from slm_private.group_dues('00000000-0000-4000-8000-000000000002')),'rejection never pays');
 select pg_temp.pay(2,'submit_payment','{"amount_cents":2300,"request_id":"40000000-0000-4000-8000-000000000013"}');
-select pg_temp.pay(1,'record_payment','{"user_id":"00000000-0000-4000-8000-000000000002","amount_cents":2300,"request_id":"40000000-0000-4000-8000-000000000014"}');
-select pg_temp.denied(1,'accept_payment','{"payment_id":"40000000-0000-4000-8000-000000000013","request_id":"40000000-0000-4000-8000-000000000015"}','already_paid');
+-- A manual payment must not be recorded while the same player's submission is still pending (guard_pending_manual_payment).
+select pg_temp.denied(1,'record_payment','{"user_id":"00000000-0000-4000-8000-000000000002","amount_cents":2300,"request_id":"40000000-0000-4000-8000-000000000014"}','pending_payment_exists');
 select pg_temp.pay(1,'reject_payment','{"payment_id":"40000000-0000-4000-8000-000000000013","request_id":"40000000-0000-4000-8000-000000000016"}');
+select pg_temp.pay(1,'record_payment','{"user_id":"00000000-0000-4000-8000-000000000002","amount_cents":2300,"request_id":"40000000-0000-4000-8000-000000000014"}');
+select pg_temp.verify((select outstanding_cents=0 from slm_private.group_dues('00000000-0000-4000-8000-000000000002')),'manual payment recorded after the pending submission was rejected');
 select pg_temp.verify(not has_function_privilege('authenticated','public.slm_group_finance_dispatch(uuid,uuid,text,jsonb)','EXECUTE') and not has_function_privilege('anon','slm_private.payment_workflow_base(uuid,uuid,text,jsonb)','EXECUTE'),'RPC ACL preserved');
 set local role authenticated;
 do $$begin begin perform public.slm_group_finance_dispatch(null,null,'wallet','{}');raise exception 'client RPC exposed';exception when insufficient_privilege then null;end;end $$;
