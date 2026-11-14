@@ -40,3 +40,11 @@ it('shows the exact rating in a bubble on tap and the gold look only for the cur
  expect(screen.getByRole('img',{name:'MVP Gold'})).toBeInTheDocument();
  expect(screen.getByRole('img',{name:'MVP Gold'})).toHaveTextContent('MVP');
 });
+
+it('drops the first-recalculation note once the rating is real',()=>{
+ const {rerender}=render(<UltimatePlayerCard name="Alex Nowak" rating={7}/>);
+ fireEvent.click(screen.getByRole('button',{name:/Ocena 7,00 na 10/}));
+ expect(screen.getByRole('status')).toHaveTextContent('Pierwsze przeliczenie po 5 ocenionych meczach.');
+ rerender(<UltimatePlayerCard name="Alex Nowak" rating={7.43} ratingFinal/>);
+ expect(screen.getByRole('status')).toHaveTextContent(/^7,43 \/ 10$/);
+});
