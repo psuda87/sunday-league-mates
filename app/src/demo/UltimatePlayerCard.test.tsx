@@ -38,5 +38,5 @@ it('shows the exact rating in a bubble on tap and the gold look only for the cur
  rerender(<UltimatePlayerCard name="Alex Nowak" rating={7.43} gold/>);
  expect(document.querySelector('.slm-ultimate-card')).toHaveAttribute('data-mvp-gold','true');
  expect(screen.getByRole('img',{name:'MVP Gold'})).toBeInTheDocument();
- expect(screen.getByRole('img',{name:'MVP Gold'})).not.toHaveTextContent('MVP');
+ expect(screen.getByRole('img',{name:'MVP Gold'})).toHaveTextContent('MVP');
 });
