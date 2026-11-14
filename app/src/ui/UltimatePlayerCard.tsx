@@ -4,7 +4,7 @@ import RatingStars from '../rating/RatingStars';
 import { GoldBadge, GoldSparkles, useMvpGold } from '../rating/mvpGold';
 import { RATING_START, formatRatingPrecise } from '../rating/rating';
 export interface CardPortrait { src: string; column?: 0 | 1; row?: 0 | 1 }
-export default function UltimatePlayerCard({ name, portrait, jerseyNumber, headingRef, onEditNumber, portraitDescription, portraitFit, rating = RATING_START, playerId, gold }: { name: string; portrait?: CardPortrait; jerseyNumber?: number; headingRef?: Ref<HTMLHeadingElement>; onEditNumber?:()=>void; portraitDescription?:string; portraitFit?:'cover'; rating?: number; playerId?: string | null; gold?: boolean }) {
+export default function UltimatePlayerCard({ name, portrait, jerseyNumber, headingRef, onEditNumber, portraitDescription, portraitFit, rating = RATING_START, ratingFinal = false, playerId, gold }: { name: string; portrait?: CardPortrait; jerseyNumber?: number; headingRef?: Ref<HTMLHeadingElement>; onEditNumber?:()=>void; portraitDescription?:string; portraitFit?:'cover'; rating?: number; ratingFinal?: boolean; playerId?: string | null; gold?: boolean }) {
   const title=useId();
   const shield=useId();
   const silhouette="M .5 .008 C .46 .045 .43 .035 .4 .024 C .32 .025 .22 .105 .035 .145 L .035 .79 Q .035 .875 .13 .9 L .5 .99 L .87 .9 Q .965 .875 .965 .79 L .965 .145 C .78 .105 .68 .025 .6 .024 C .57 .035 .54 .045 .5 .008 Z";
@@ -26,7 +26,7 @@ export default function UltimatePlayerCard({ name, portrait, jerseyNumber, headi
       <div className="slm-ultimate-nameplate"><h2 ref={headingRef} tabIndex={-1} id={title}>{parts.length>1&&<span>{parts[0]} </span>}<strong>{surname}</strong></h2></div>
       {isGold&&<><GoldBadge/><GoldSparkles/></>}
       <button type="button" className="slm-ultimate-stars-button" aria-expanded={bubble} aria-label={`Ocena ${formatRatingPrecise(rating)} na 10. Pokaż szczegóły`} onClick={()=>setBubble(open=>!open)} onBlur={()=>setBubble(false)}><RatingStars rating={rating} size={30}/></button>
-      {bubble&&<div className="slm-rating-bubble" role="status"><strong>{formatRatingPrecise(rating)} / 10</strong>Pierwsze przeliczenie po 5 ocenionych meczach.</div>}
+      {bubble&&<div className="slm-rating-bubble" role="status"><strong>{formatRatingPrecise(rating)} / 10</strong>{!ratingFinal&&'Pierwsze przeliczenie po 5 ocenionych meczach.'}</div>}
       <svg className="slm-ultimate-rim" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d={silhouette} transform="translate(.018 .012) scale(.964 .976)"/></svg>
     </div>
   </article></div>;
