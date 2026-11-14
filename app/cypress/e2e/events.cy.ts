@@ -13,7 +13,7 @@ describe('Wydarzenia — interfejs z kontrolowanym API', () => {
       else if (req.body.action === 'events_list') req.reply({ events: [], server_now: '2026-10-14T22:30:00Z' });
       else req.reply({ ok: true });
     });
-    cy.visit('/'); input('E-mail, login lub numer telefonu', 'Fixture'); input('Hasło', crypto.randomUUID()); cy.contains('ion-button', 'Zaloguj się').click();
+    cy.visit('/'); input('E-mail lub login', 'Fixture'); input('Hasło', crypto.randomUUID()); cy.contains('ion-button', 'Zaloguj się').click();
     cy.contains('ion-button', 'Mecze').click(); cy.contains('ion-button', 'Wydarzenia i rozliczenia historyczne').click();
     cy.contains('ion-button','Utwórz mecz').should('not.exist');
     cy.contains('ion-button','Lista meczów').should('be.visible');
@@ -36,7 +36,7 @@ describe('Wydarzenia — interfejs z kontrolowanym API', () => {
       else if (req.body.action === 'settlements_account') req.reply({ blocked: false, unpaid_matches: 0 });
       else req.reply({ ok: true });
     });
-    cy.visit('/'); input('E-mail, login lub numer telefonu', 'Fixture'); input('Hasło', crypto.randomUUID()); cy.contains('ion-button', 'Zaloguj się').click();
+    cy.visit('/'); input('E-mail lub login', 'Fixture'); input('Hasło', crypto.randomUUID()); cy.contains('ion-button', 'Zaloguj się').click();
     cy.contains('ion-button', 'Mecze').click(); cy.contains('ion-button', 'Wydarzenia i rozliczenia historyczne').click(); cy.get('button[aria-label^="Otwórz szczegóły meczu"]').first().click();
     cy.contains('[role=tab]', 'Informacje').click();
     cy.contains('Podział należności uwzględnia decyzje o opłacie i zastępstwa.').should('be.visible'); cy.contains('[role=tab]', 'Uczestnicy').click(); cy.contains('Bez automatycznego awansu').should('be.visible');

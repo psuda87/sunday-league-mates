@@ -4,7 +4,7 @@ describe('Rzeczywista przeglądarka i lokalny Supabase',()=>{
   cy.intercept('**/functions/v1/accounts',req=>{if(!req.url.startsWith('http://127.0.0.1:54321/'))throw new Error('Remote API forbidden in local integration test');if(req.body?.action==='login')req.alias='liveLogin';req.continue();});
   cy.visit('/');
   cy.env(['slm_email','slm_password'],{log:false}).then(values=>{
-   cy.get('ion-input').filter((_,el)=>(el as unknown as {label:string}).label==='E-mail, login lub numer telefonu').find('input').type(String(values.slm_email),{log:false});
+   cy.get('ion-input').filter((_,el)=>(el as unknown as {label:string}).label==='E-mail lub login').find('input').type(String(values.slm_email),{log:false});
    cy.get('input[type="password"]').type(String(values.slm_password),{log:false});
   });
   cy.contains('ion-button','Zaloguj się').click();

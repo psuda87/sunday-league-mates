@@ -4,7 +4,7 @@ describe('Rozliczenia — przygotowany interfejs z kontrolowanym API', () => {
   const session = (role: 'member' | 'admin') => ({ user_id: crypto.randomUUID(), access_token: crypto.randomUUID(),
     refresh_token: crypto.randomUUID(), role, must_change_password: false, expires_in: 3600 });
   const profile = (user_id: string) => ({ user_id, login: 'Fixture', phone: '+12025550150', full_name: '', display_as: 'nickname', display_name: 'Fixture' });
-  const login = () => { cy.visit('/'); input('E-mail, login lub numer telefonu', 'Fixture'); input('Hasło', crypto.randomUUID()); cy.contains('ion-button', 'Zaloguj się').click(); };
+  const login = () => { cy.visit('/'); input('E-mail lub login', 'Fixture'); input('Hasło', crypto.randomUUID()); cy.contains('ion-button', 'Zaloguj się').click(); };
 
   it('pokazuje własny dług/gościa i blokadę; zgłoszenie wpłaty nie zmienia salda', () => {
     const s = session('member'), event = crypto.randomUUID();

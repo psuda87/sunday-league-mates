@@ -21,7 +21,7 @@ export default function AccountScreens({view,port,onNavigate,profile=emptyProfil
  const profileValue=()=>({...draft,nickname:draft.nickname.trim(),fullName:draft.fullName.trim(),jerseyNumber:number===''?undefined:Number(number)});
  function submit(event:FormEvent){event.preventDefault();if(flight.current)return;
   const problems:string[]=[];
-  if(view==='login'&&loginOrPhone&&!email.trim())problems.push('Podaj login lub numer telefonu.');
+  if(view==='login'&&loginOrPhone&&!email.trim())problems.push('Podaj e-mail lub login.');
   if((view==='login'&&!loginOrPhone)||['register','forgot'].includes(view))problems.push(...[emailProblem(email)].filter(Boolean));
   if(view==='login'&&!password)problems.push('Podaj hasło.');
   if(['register','reset','password'].includes(view)){const problem=passwordProblem(password);if(problem)problems.push(problem);if(password!==confirmation)problems.push('Hasła muszą być takie same.');}
