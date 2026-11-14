@@ -1,7 +1,8 @@
 /* SLM Rating / MVP Gold — samodzielne style; nie modyfikują zatwierdzonej karty Premium 3.18. */
 .slm-rating-stars { display: block; margin: 4px auto 0; overflow: visible; }
 .slm-rating-star-bg { fill: rgba(255, 255, 255, .14); stroke: rgba(255, 255, 255, .28); stroke-width: .6; }
-.slm-rating-star-fill { fill: var(--slm-gold, #e8c15a); }
+.slm-rating-star-fill { stroke: #7a4f0c; stroke-width: .7; stroke-linejoin: round; }
+.slm-rating-stars { filter: drop-shadow(0 0 4px rgba(242, 201, 76, .65)) drop-shadow(0 1px 1px rgba(0, 0, 0, .6)); }
 
 /* Wspólny refleks MVP Gold: ukośny, metaliczny, cykliczny co ok. 4–5 s (bez pollingu i kosztów serwera). */
 .slm-gold-shine { position: relative; overflow: hidden; isolation: isolate; }

@@ -20,8 +20,8 @@ describe('MVP Gold context', () => {
     render(<MvpGoldProvider previewUserId="a"><Probe id="a" /></MvpGoldProvider>);
     expect(screen.getByTestId('a')).toHaveTextContent('plain');
   });
-  it('tag shows just the word GOLD', () => {
+  it('tag shows just the word MVP', () => {
     render(<GoldTag />);
-    expect(screen.getByRole('img', { name: 'MVP Gold' })).toHaveTextContent(/^GOLD$/);
+    expect(screen.getByRole('img', { name: 'MVP Gold' })).toHaveTextContent(/^MVP$/);
   });
 });

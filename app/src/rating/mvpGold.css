@@ -4,7 +4,7 @@
 /* Refleks działa ciągle wszędzie, gdzie jest MVP Gold (wspólna animacja .slm-gold-shine z rating.css). */
 .slm-gold-tag { display: inline-block; margin-left: 8px; padding: 1px 7px; border-radius: 999px; font-size: .62rem; font-weight: 800; letter-spacing: .08em; line-height: 1.5; vertical-align: middle;
   color: var(--slm-mvp-gold-deep); background: linear-gradient(135deg, var(--slm-mvp-gold-1), var(--slm-mvp-gold-2) 55%, var(--slm-mvp-gold-3)); }
-.slm-gold-badge { position: absolute; z-index: 5; top: 5%; left: 50%; width: 34%; min-width: 96px; transform: translateX(-50%); pointer-events: none; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .55)); }
+.slm-gold-badge { position: absolute; z-index: 5; top: 4%; left: 50%; width: 30%; min-width: 84px; transform: translateX(-50%); pointer-events: none; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .55)); }
 
 /* Karta: złote tło zamiast burgundowego, ta sama sylwetka. */
 .slm-ultimate-card[data-mvp-gold="true"] { background: linear-gradient(135deg, #8a5a14, #fff3bd 22%, #e8c15a 38%, #a8741f 55%, #fff3bd 78%, #8a5a14); box-shadow: 0 0 22px rgba(232, 193, 90, .45); }
@@ -43,7 +43,23 @@ li[data-mvp-gold="true"] .slm-pitch-token::after { content: ''; position: absolu
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.6 10.8a15 15 0 006.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 013 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z'/%3E%3C/svg%3E") center / contain no-repeat; }
 
 /* Gwiazdki pod nazwiskiem w łuku + chmurka z dokładnym wynikiem. */
-.slm-ultimate-stars-button { position: absolute; z-index: 6; left: 50%; bottom: 14px; transform: translateX(-50%); min-width: 44px; min-height: 44px; padding: 0; border: 0; background: none; cursor: pointer; }
+.slm-ultimate-stars-button { position: absolute; z-index: 6; left: 50%; bottom: 20px; transform: translateX(-50%); min-width: 44px; min-height: 44px; padding: 0; border: 0; background: none; cursor: pointer; }
 .slm-ultimate-stars-button .slm-rating-stars { margin: 0 auto; }
 .slm-rating-bubble { position: absolute; z-index: 7; left: 50%; bottom: 128px; transform: translateX(-50%); width: max-content; max-width: 86%; padding: 8px 12px; border-radius: 12px; font-size: .78rem; line-height: 1.35; text-align: center; color: #fff; background: rgba(15, 11, 16, .94); border: 1px solid var(--slm-mvp-gold-2); }
 .slm-rating-bubble strong { display: block; font-size: 1rem; color: var(--slm-mvp-gold-1); }
+
+/* Iskrzące krawędzie złotej karty. */
+.slm-gold-sparkles { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
+.slm-gold-sparkles i { position: absolute; transform: translate(-50%, -50%) scale(0); opacity: 0; animation: slm-gold-twinkle 3.6s ease-in-out infinite;
+  background: radial-gradient(circle, #fff 0 18%, rgba(255, 244, 200, .9) 30%, transparent 62%); filter: drop-shadow(0 0 5px #ffe58a);
+  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%); }
+@keyframes slm-gold-twinkle { 0%, 55%, 100% { transform: translate(-50%, -50%) scale(0) rotate(0); opacity: 0; } 70% { transform: translate(-50%, -50%) scale(1.5) rotate(45deg); opacity: 1; } 85% { transform: translate(-50%, -50%) scale(.6) rotate(90deg); opacity: .7; } }
+/* Pulsująca złota poświata wokół karty. */
+.slm-ultimate-card[data-mvp-gold="true"] { animation: slm-gold-glow 3.6s ease-in-out infinite; }
+@keyframes slm-gold-glow { 0%, 100% { filter: drop-shadow(0 0 10px rgba(232, 193, 90, .45)); } 50% { filter: drop-shadow(0 0 22px rgba(255, 226, 130, .85)); } }
+@media (prefers-reduced-motion: reduce) { .slm-gold-sparkles i, .slm-ultimate-card[data-mvp-gold="true"] { animation: none; } }
+
+/* Uczestnicy meczu: przycisk telefonu po prawej stronie wiersza, wiersz nie rośnie. */
+.slm-premium-events .slm-live-entry { position: relative; }
+.slm-premium-events .slm-live-entry .slm-call { position: absolute; top: 10px; right: 10px; margin: 0; min-height: 44px; padding: 0 14px; font-size: .8rem; }
+.slm-premium-events .slm-live-entry .slm-demo-person-meta > strong { display: block; padding-right: 128px; }
