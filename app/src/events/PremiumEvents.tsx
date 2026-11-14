@@ -25,6 +25,8 @@ import { premiumDefaults,premiumEventInput } from './premiumForm';
 import type { PremiumEventsController } from './usePremiumEvents';
 import { matchDate,money } from './model';
 import { GoldTag, useMvpGoldHolders } from '../rating/mvpGold';
+import MatchRatingPanel from '../rating/MatchRatingPanel';
+import { useRatingsAvailable } from '../rating/RatingProvider';
 
 export default function PremiumEvents(props:Parameters<typeof PremiumEventsScreen>[0]){
   return <>{props.data.revalidating&&<section role="status"><p>{props.data.error||'Potwierdzanie dostępu do bieżącego widoku…'}</p><button type="button" onClick={()=>{void props.data.revalidate();}}>Ponów odczyt widoku</button></section>}<div hidden={props.data.revalidating}><PremiumEventsScreen {...props}/></div></>;
@@ -54,6 +56,7 @@ function PremiumEventsScreen({data,userId,onGroups,manager,onOwnProfile}:{manage
   const refresh=<IonButton fill="clear" aria-label="Odśwież mecze" aria-busy={data.loading} disabled={writeDisabled} onClick={()=>{void (e?data.open(e.id):data.refresh(data.offset));}}><IonIcon icon={refreshOutline} aria-hidden="true"/></IonButton>;
   const messages=<>{data.error&&<p className="slm-error" role="alert">{data.error}<button type="button" disabled={writeDisabled} onClick={()=>{void(e?data.open(e.id):data.refresh(data.offset));}}>Spróbuj ponownie</button></p>}{data.notice&&<p role="status" className="slm-notice">{data.notice}</p>}{data.loading&&<p role="status">Wczytywanie meczów…</p>}</>;
   const goldHolders=useMvpGoldHolders();
+  const ratingsAvailable=useRatingsAvailable();
   function participant(p:MatchEntry){
     const gold=!!p.member_id&&goldHolders.has(p.member_id);
     const manages=p.responsible_user_id===userId||e?.can_manage;
@@ -84,7 +87,7 @@ function PremiumEventsScreen({data,userId,onGroups,manager,onOwnProfile}:{manage
         <ParticipantGroup title={full?'Uczestnicy':'Twoje wpisy'} emptyText="Brak zapisanych osób." previewLimit={5}>{d.participants.filter(p=>p.status==='registered').map(participant)}</ParticipantGroup>
         <ParticipantGroup title="Rezerwa" emptyText="Rezerwa jest pusta." description="Kolejność zgłoszeń. Zajęcie wolnego miejsca wymaga potwierdzenia.">{d.participants.filter(p=>p.status==='reserve').map(participant)}</ParticipantGroup>
         {currentWithdrawals(d.participants).length>0&&<ParticipantGroup title="Wycofane wpisy" emptyText="Brak wpisów.">{currentWithdrawals(d.participants).map(participant)}</ParticipantGroup>}
-      </>,full?<PremiumTeams key={e.id} eventId={e.id} participants={d.participants} cancelled={e.status==='cancelled'} canEdit={data.groups.some(g=>g.id===e.group_id)} profileContext={manager?{manager,userId,groupId:e.group_id}:undefined}/>:<p>Składy niedostępne bez pełnego dostępu do meczu.</p>,manager?<PremiumFinance key={`${userId}:${e.group_id}:${e.id}`} manager={manager} userId={userId} groupId={e.group_id} eventId={e.id} manage={!!e.can_manage||data.groups.some(g=>g.id===e.group_id&&g.admin_id===userId)} onChanged={()=>{void data.recheckFinancial?.();}}/>:<p>Rozliczenia wymagają aktywnej sesji.</p>]}/>}</>
+      </>,full?<PremiumTeams key={e.id} eventId={e.id} participants={d.participants} cancelled={e.status==='cancelled'} canEdit={data.groups.some(g=>g.id===e.group_id)} profileContext={manager?{manager,userId,groupId:e.group_id}:undefined}/>:<p>Składy niedostępne bez pełnego dostępu do meczu.</p>,manager?<PremiumFinance key={`${userId}:${e.group_id}:${e.id}`} manager={manager} userId={userId} groupId={e.group_id} eventId={e.id} manage={!!e.can_manage||data.groups.some(g=>g.id===e.group_id&&g.admin_id===userId)} onChanged={()=>{void data.recheckFinancial?.();}}/>:<p>Rozliczenia wymagają aktywnej sesji.</p>,...(manager&&full&&ratingsAvailable?[<MatchRatingPanel key={`rating:${e.id}`} manager={manager} userId={userId} eventId={e.id}/>]:[])]}/>}</>
     :<section className="slm-matches-screen">
       <div className="slm-events-controls"><label>Aktywna grupa<select aria-label="Aktywna grupa" value={data.activeGroup} onChange={ev=>data.selectGroup(ev.target.value)}><option value="">Wszystkie</option><option value="groups" disabled={!data.discoveryEnabled}>Moje grupy</option><option value="public" disabled={!data.discoveryEnabled}>Publiczne</option><option value="mine">Moje mecze</option>{data.groups.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></label>
       {data.activeGroup==='public'&&<label className="slm-player-search">Szukaj meczu lub grupy<input type="search" value={data.search??''} maxLength={100} onChange={ev=>data.changeSearch(ev.target.value)}/></label>}

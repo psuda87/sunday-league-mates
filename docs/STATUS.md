@@ -1,3 +1,16 @@
+# Moduł ocen (Rating 0.2) — 2026-11-14, gałąź `feat/rating-module`
+
+Zasady: `docs/rating/SLM_RATING_0_2.md` (zatwierdzone przez właściciela). Zbudowane i przetestowane **lokalnie**; **nic nie wdrożono** (ani migracji, ani funkcji Edge, ani klienta).
+- Baza: `20261114190000_rating_module.sql` — tabele ocen/głosów/statystyk/miesięcy/historii/MVP Gold (RLS włączone, dostęp tylko `service_role`),
+  `public.slm_ratings_dispatch` (akcje `overview`, `player`, `get`, `rate`, `stats`, `score`) i leniwe rozliczanie okien 48 h oraz miesięcy.
+- Edge `accounts/handler.ts`: akcje `ratings_*` (bez testu Deno — brak Deno w środowisku).
+- Klient: `RatingProvider` (ocena na karcie, posiadacze MVP Gold), zakładka „Oceny” w szczegółach meczu (`MatchRatingPanel`).
+  Zakładka i złoto pojawiają się dopiero, gdy serwer odpowie na `ratings_overview` — klient wdrożony przed backendem nic nie pokazuje.
+- Formuła `proposal-0.1` zastąpiona przez `0.2` w `src/rating/ratingFormula.ts`.
+Weryfikacja: tsc 0, eslint 0 błędów, Vitest 597/597, `npm run build` OK, `tests/rating_module.sql` PASS na lokalnym Postgresie (51+1 migracji).
+**Do wdrożenia (kolejność):** migracja → funkcja Edge → klient. Przed wdrożeniem funkcji Edge trzeba porównać wersję produkcyjną z repo
+(na produkcji nie ma cyklu prywatności, a repo zawiera jego akcje).
+
 # Supabase Cloud — migracje zastosowane 2026-11-14 (zgoda właściciela)
 
 Na projekcie `hjtcyybkxebvdropchac` zastosowano przez MCP, z kontrolą sumy md5 treści pliku z repo i po próbie na sucho (wycofana transakcja):
