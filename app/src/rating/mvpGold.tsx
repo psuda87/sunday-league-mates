@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext, useEffect, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import './mvpGold.css';
 
@@ -11,7 +11,40 @@ const HoldersContext = createContext<ReadonlySet<string>>(new Set());
 
 export const mvpGoldPreviewEnabled = (): boolean => import.meta.env?.VITE_MVP_GOLD_PREVIEW === '1';
 
+/** Cztery ukośne kierunki refleksu: [x0, y0, x1, y1, kąt pasma]. */
+export const REFLEX_DIRECTIONS = [
+  ['-130%', '-130%', '130%', '130%', '135deg'], // z lewej góry w prawy dół
+  ['130%', '-130%', '-130%', '130%', '45deg'], // z prawej góry w lewy dół
+  ['-130%', '130%', '130%', '-130%', '45deg'], // z lewego dołu w prawą górę
+  ['130%', '130%', '-130%', '-130%', '135deg'], // z prawego dołu w lewą górę
+] as const;
+
+/** Losuje następny kierunek, inny niż poprzedni, i zapisuje go w zmiennych CSS elementu. */
+export function applyRandomReflex(element: HTMLElement, random: () => number = Math.random): number {
+  const previous = Number(element.dataset.slmReflex ?? -1);
+  let next = Math.floor(random() * REFLEX_DIRECTIONS.length) % REFLEX_DIRECTIONS.length;
+  if (next === previous) next = (next + 1) % REFLEX_DIRECTIONS.length;
+  const [x0, y0, x1, y1, angle] = REFLEX_DIRECTIONS[next];
+  element.dataset.slmReflex = String(next);
+  element.style.setProperty('--slm-gold-x0', x0); element.style.setProperty('--slm-gold-y0', y0);
+  element.style.setProperty('--slm-gold-x1', x1); element.style.setProperty('--slm-gold-y1', y1);
+  element.style.setProperty('--slm-gold-angle', angle);
+  return next;
+}
+
+/** Po każdym obiegu pętli refleksu (pasmo jest wtedy poza elementem) wybiera nowy losowy kierunek. */
+function useRandomReflexDirections() {
+  useEffect(() => {
+    const onIteration = (event: AnimationEvent) => {
+      if (event.animationName === 'slm-gold-sweep' && event.target instanceof HTMLElement) applyRandomReflex(event.target);
+    };
+    document.addEventListener('animationiteration', onIteration);
+    return () => document.removeEventListener('animationiteration', onIteration);
+  }, []);
+}
+
 export function MvpGoldProvider({ holders, previewUserId, children }: { holders?: Iterable<string>; previewUserId?: string; children: ReactNode }) {
+  useRandomReflexDirections();
   const value = useMemo(() => {
     const set = new Set<string>(holders ?? []);
     if (previewUserId && mvpGoldPreviewEnabled()) set.add(previewUserId);
