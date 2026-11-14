@@ -109,6 +109,21 @@ it('withdrawal stays enabled despite debt and real guest writes have no invented
  await waitFor(()=>expect(screen.getByLabelText('Imię lub pseudonim gościa')).toHaveValue(''));
 });
 
+it('asks for confirmation before withdrawing and offers to restore the own entry',async()=>{
+ const p={id:'entry',member_id:'owner',responsible_user_id:'owner',status:'registered',absent:false,display_name:'Actual player',guest_name:null,guest_phone:null,responsible_name:'Actual player',contact_phone:null,joined_at:now};
+ const actWrite=vi.fn().mockResolvedValue(true);
+ const data={...detail,detail:{...detail,event:{...event,registered_count:1},participants:[p],can_register_paid:true},events:[],groups:[group],organizers:[group],activeGroup:'',offset:0,loading:false,busy:false,error:'',notice:'',creating:false,serverNow:now,act:actWrite,back:vi.fn(),refresh:vi.fn(),open:vi.fn(),beginCreate:vi.fn(),selectGroup:vi.fn()} as unknown as PremiumEventsController;
+ const {rerender}=render(<PremiumEvents data={data} userId="owner" onGroups={vi.fn()}/>);
+ fireEvent.click(screen.getByText('WYCOFAJ ZAPIS'));
+ expect(screen.getByRole('alertdialog')).toHaveTextContent('Na pewno wycofać?');expect(actWrite).not.toHaveBeenCalled();
+ fireEvent.click(screen.getByRole('button',{name:'Anuluj'}));expect(screen.queryByRole('alertdialog')).toBeNull();expect(actWrite).not.toHaveBeenCalled();
+ fireEvent.click(screen.getByText('WYCOFAJ ZAPIS'));fireEvent.click(screen.getByRole('button',{name:'Tak, wycofaj'}));
+ await waitFor(()=>expect(actWrite).toHaveBeenCalledWith('withdraw',{participant_id:'entry'}));
+ rerender(<PremiumEvents data={{...data,detail:{...data.detail!,participants:[{...p,status:'withdrawn'}]}} as unknown as PremiumEventsController} userId="owner" onGroups={vi.fn()}/>);
+ const undo=await screen.findByRole('button',{name:/Przywróć zapis|Wróć na rezerwę/});
+ fireEvent.click(undo);await waitFor(()=>expect(actWrite).toHaveBeenLastCalledWith(expect.stringMatching(/^(join|reserve)$/),{}));
+});
+
 it('enables creation for members only when the server confirms the new contract and sends filters before paging',async()=>{
  const m=manager(),normal=vi.mocked(m.call).getMockImplementation()!;
  vi.mocked(m.call).mockImplementation(async<T,>(action:string,body?:Record<string,unknown>)=>action==='matches_list'?{events:[event],server_now:now,member_creation_enabled:true} as T:action==='groups_list'?{groups:[{...group,admin_id:'someone-else',organizer:false}]} as T:normal(action,body));

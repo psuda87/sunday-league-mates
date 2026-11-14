@@ -1,0 +1,20 @@
+/* SLM Rating / MVP Gold — samodzielne style; nie modyfikują zatwierdzonej karty Premium 3.18. */
+.slm-rating-stars { display: block; margin: 4px auto 0; overflow: visible; }
+.slm-rating-star-bg { fill: rgba(255, 255, 255, .14); stroke: rgba(255, 255, 255, .28); stroke-width: .6; }
+.slm-rating-star-fill { fill: var(--slm-gold, #e8c15a); }
+
+/* Wspólny refleks MVP Gold: ukośny, metaliczny, cykliczny co ok. 4–5 s (bez pollingu i kosztów serwera). */
+.slm-gold-shine { position: relative; overflow: hidden; isolation: isolate; }
+.slm-gold-shine::after {
+  content: ''; position: absolute; inset: -20% auto -20% -60%; width: 40%; pointer-events: none; z-index: 1;
+  background: linear-gradient(105deg, transparent 0%, rgba(255, 244, 200, .0) 20%, rgba(255, 244, 200, .55) 50%, rgba(255, 244, 200, 0) 80%, transparent 100%);
+  transform: translateX(0) skewX(-18deg);
+  animation: slm-gold-shine 4.5s ease-in-out infinite;
+}
+/* Jednorazowa, mocniejsza animacja przy wejściu na profil z aktywnym Gold (~1,5 s). */
+.slm-gold-shine--enter::after { animation: slm-gold-shine-enter 1.5s ease-out 1, slm-gold-shine 4.5s ease-in-out 1.5s infinite; width: 55%; }
+@keyframes slm-gold-shine { 0%, 70% { transform: translateX(0) skewX(-18deg); } 100% { transform: translateX(520%) skewX(-18deg); } }
+@keyframes slm-gold-shine-enter { 0% { transform: translateX(0) skewX(-18deg); opacity: 1; } 100% { transform: translateX(420%) skewX(-18deg); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .slm-gold-shine::after, .slm-gold-shine--enter::after { animation: none; opacity: 0; }
+}
