@@ -4,7 +4,7 @@
 /* Refleks działa ciągle wszędzie, gdzie jest MVP Gold (wspólna animacja .slm-gold-shine z rating.css). */
 .slm-gold-tag { display: inline-block; margin-left: 8px; padding: 1px 7px; border-radius: 999px; font-size: .62rem; font-weight: 800; letter-spacing: .08em; line-height: 1.5; vertical-align: middle;
   color: var(--slm-mvp-gold-deep); background: linear-gradient(135deg, var(--slm-mvp-gold-1), var(--slm-mvp-gold-2) 55%, var(--slm-mvp-gold-3)); }
-.slm-gold-badge { position: absolute; z-index: 5; top: 4%; left: 50%; width: 30%; min-width: 84px; transform: translateX(-50%); pointer-events: none; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .55)); }
+.slm-gold-badge { position: absolute; z-index: 5; top: 7%; left: 50%; width: 30%; min-width: 84px; transform: translateX(-50%); pointer-events: none; filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .55)); }
 
 /* Karta: złote tło zamiast burgundowego, ta sama sylwetka. */
 .slm-ultimate-card[data-mvp-gold="true"] { background: linear-gradient(135deg, #8a5a14, #fff3bd 22%, #e8c15a 38%, #a8741f 55%, #fff3bd 78%, #8a5a14); box-shadow: 0 0 22px rgba(232, 193, 90, .45); }
@@ -48,18 +48,18 @@ li[data-mvp-gold="true"] .slm-pitch-token::after { content: ''; position: absolu
 .slm-rating-bubble { position: absolute; z-index: 7; left: 50%; bottom: 128px; transform: translateX(-50%); width: max-content; max-width: 86%; padding: 8px 12px; border-radius: 12px; font-size: .78rem; line-height: 1.35; text-align: center; color: #fff; background: rgba(15, 11, 16, .94); border: 1px solid var(--slm-mvp-gold-2); }
 .slm-rating-bubble strong { display: block; font-size: 1rem; color: var(--slm-mvp-gold-1); }
 
-/* Iskrzące krawędzie złotej karty. */
+/* Błyski na krawędzi złotej karty: miękki punkt światła z poziomą smugą (jak odbicie w metalu), bez kształtu gwiazdki. */
 .slm-gold-sparkles { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
-.slm-gold-sparkles i { position: absolute; transform: translate(-50%, -50%) scale(0); opacity: 0; animation: slm-gold-twinkle 3.6s ease-in-out infinite;
-  background: radial-gradient(circle, #fff 0 30%, #fff3bd 55%, #ffe58a 100%); filter: drop-shadow(0 0 6px #fff3bd) drop-shadow(0 0 12px #f2c94c);
-  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%); }
-@keyframes slm-gold-twinkle { 0%, 55%, 100% { transform: translate(-50%, -50%) scale(0) rotate(0); opacity: 0; } 70% { transform: translate(-50%, -50%) scale(1.25) rotate(45deg); opacity: 1; } 85% { transform: translate(-50%, -50%) scale(.6) rotate(90deg); opacity: .7; } }
+.slm-gold-sparkles i { position: absolute; transform: translate(-50%, -50%) scale(0); opacity: 0; mix-blend-mode: screen; animation: slm-gold-twinkle 5s ease-in-out infinite;
+  background: radial-gradient(ellipse 50% 6% at center, rgba(255, 250, 225, .95), transparent 100%), radial-gradient(circle, rgba(255, 252, 235, 1) 0 8%, rgba(255, 226, 130, .55) 22%, transparent 55%); }
+@keyframes slm-gold-twinkle { 0%, 60%, 100% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 78% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; } 90% { transform: translate(-50%, -50%) scale(.7); opacity: .5; } }
 /* Pulsująca złota poświata wokół karty. */
 .slm-ultimate-card[data-mvp-gold="true"] { animation: slm-gold-glow 3.6s ease-in-out infinite; }
 @keyframes slm-gold-glow { 0%, 100% { filter: drop-shadow(0 0 10px rgba(232, 193, 90, .45)); } 50% { filter: drop-shadow(0 0 22px rgba(255, 226, 130, .85)); } }
 @media (prefers-reduced-motion: reduce) { .slm-gold-sparkles i, .slm-ultimate-card[data-mvp-gold="true"] { animation: none; } }
 
-/* Uczestnicy meczu: przycisk telefonu po prawej stronie wiersza, wiersz nie rośnie. */
-.slm-premium-events .slm-live-entry { position: relative; }
-.slm-premium-events .slm-live-entry .slm-call { position: absolute; top: 10px; right: 10px; margin: 0; min-height: 44px; padding: 0 14px; font-size: .8rem; }
-.slm-premium-events .slm-live-entry .slm-demo-person-meta > strong { display: block; padding-right: 128px; }
+/* Uczestnicy meczu: zwarty wiersz, nazwa wyśrodkowana względem awatara, telefon po prawej. */
+.slm-premium-events .slm-live-entry { position: relative; align-items: center; padding-block: 8px; }
+li.slm-live-entry[data-mvp-gold="true"] { padding-block: 8px; }
+.slm-premium-events .slm-live-entry .slm-call { position: absolute; top: 50%; right: 10px; transform: translateY(-50%); margin: 0; min-height: 34px; padding: 0 12px; font-size: .78rem; }
+.slm-premium-events .slm-live-entry .slm-demo-person-meta > strong { display: block; padding-right: 118px; }
