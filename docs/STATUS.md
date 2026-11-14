@@ -1,3 +1,23 @@
+# Audyt kodu i gałąź pod prace.txt — 2026-11-14
+
+Pełny audyt `main` (793ef47) na życzenie właściciela, pełna zgoda na ingerencję w repo.
+Scalone do main: PR #51 (audyt: usunięty martwy szablon Ionic `ExploreContainer` i pusty `Home.css`, naprawiony
+przestarzały test logowania, bezpieczny `npm audit fix` — zniknęła podatność high), PR #52 (poprawki finansów:
+komunikaty przy zatwierdzaniu meczu i wyścigu wpłat + migracja `20261112230000`, **niezastosowana zdalnie**),
+PR #53 (sama dokumentacja: prace.txt i specyfikacja Rating/MVP Gold).
+Po scaleniu: tsc 0, eslint 0, Vitest 531/531 (automatyczne). Pełny `build:premium-web` nie zbudował się w środowisku audytu,
+bo pobiera zasoby MediaPipe z CDN (brak dostępu do sieci) — to ograniczenie środowiska, nie kodu.
+**Otwarte:** `npm run verify:consolidation` i `npm run test:premium-policy` padają już na main — piny hashy dla
+`account-ui/model.ts` (0f84e33) i `accounts/handler.ts` (zapis telefonu) są nieaktualne. Nie zmieniano strażników
+ani hashy bez przeglądu właściciela. 17 umiarkowanych podatności zależności wymaga zmian łamiących (react-router 8, Ionic 8.8).
+Niescalone gałęzie wymagają odbioru (SQL/telefon/wygląd): codex/tito-lineups-completion i feat/tito-atomic-lineups
+(auto-przydział, migracje), fix/security-p1-p3-20261110 (migracja RLS), fix/android-keyboard-scroll-20261107,
+patch-code-review, codex/demo-match-6v6, stare feat/account-model-foundation, chore/online-readiness, feat/premium-account-identifiers.
+Gałąź `feat/prace-p0-rating-foundation`: potwierdzenie przed wycofaniem uczestnika + „Przywróć zapis" dla własnego wpisu;
+`src/rating` (skala 1–10, gwiazdki z połówkami, okno 48 h, uprawnienia ocen, kworum MVP, remisy 0,25, ważność MVP Gold 7 dni)
+z 16 testami; komponent `RatingStars` (odwrócony łuk) i wspólny refleks CSS — jeszcze niepodłączone do zatwierdzonej karty.
+Brak backendu ratingów (formuła niezatwierdzona). Następny krok: odbiór i decyzje z listy pytań w raporcie.
+
 # Tito — ponowny odbiór, poprawka Cypress/focus, 2026-11-11
 
 `codex/tito-lineups-completion`, osobny checkout `I:/slm/tito-lineups-completion`;
