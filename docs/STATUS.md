@@ -7,16 +7,22 @@ komunikaty przy zatwierdzaniu meczu i wyścigu wpłat + migracja `20261112230000
 PR #53 (sama dokumentacja: prace.txt i specyfikacja Rating/MVP Gold).
 Po scaleniu: tsc 0, eslint 0, Vitest 531/531 (automatyczne). Pełny `build:premium-web` nie zbudował się w środowisku audytu,
 bo pobiera zasoby MediaPipe z CDN (brak dostępu do sieci) — to ograniczenie środowiska, nie kodu.
-**Otwarte:** `npm run verify:consolidation` i `npm run test:premium-policy` padają już na main — piny hashy dla
-`account-ui/model.ts` (0f84e33) i `accounts/handler.ts` (zapis telefonu) są nieaktualne. Nie zmieniano strażników
-ani hashy bez przeglądu właściciela. 17 umiarkowanych podatności zależności wymaga zmian łamiących (react-router 8, Ionic 8.8).
-Niescalone gałęzie wymagają odbioru (SQL/telefon/wygląd): codex/tito-lineups-completion i feat/tito-atomic-lineups
-(auto-przydział, migracje), fix/security-p1-p3-20261110 (migracja RLS), fix/android-keyboard-scroll-20261107,
+**Strażnicy (zaktualizowane na polecenie właściciela, 14.11.2026):** `verify:consolidation` i `test:premium-policy` padały już na main
+(nieaktualne piny po zaakceptowanych PR #45–#57). Dodano `OWNER_SOURCE` (niezmienny commit) i `OWNER_FILES`/`OWNER_MIGRATIONS` w
+`scripts/premium-route-policy.mjs` oraz listę migracji w `verify-consolidation.mjs`; kontrola samego pliku z pinami nadal wymaga
+przeglądu właściciela. Wynik: `verify:consolidation` PASS, `test:premium-policy` 107/107. Pliki wyglądu 3.18 nie były zmieniane
+wizualnie w tej gałęzi (zmiany `Identity.tsx`, `variables.css`, `MatchHero.tsx` pochodzą ze scalonych PR #45–#47).
+17 umiarkowanych podatności zależności wymaga zmian łamiących (react-router 8, Ionic 8.8).
+Tito (auto-przydział) scalony w PR #57. Niescalone gałęzie wymagają odbioru: fix/security-p1-p3-20261110 (migracja RLS), fix/android-keyboard-scroll-20261107,
 patch-code-review, codex/demo-match-6v6, stare feat/account-model-foundation, chore/online-readiness, feat/premium-account-identifiers.
-Gałąź `feat/prace-p0-rating-foundation`: potwierdzenie przed wycofaniem uczestnika + „Przywróć zapis" dla własnego wpisu;
-`src/rating` (skala 1–10, gwiazdki z połówkami, okno 48 h, uprawnienia ocen, kworum MVP, remisy 0,25, ważność MVP Gold 7 dni)
-z 16 testami; komponent `RatingStars` (odwrócony łuk) i wspólny refleks CSS — jeszcze niepodłączone do zatwierdzonej karty.
-Brak backendu ratingów (formuła niezatwierdzona). Następny krok: odbiór i decyzje z listy pytań w raporcie.
+Gałąź `feat/prace-p0-rating-foundation`: potwierdzenie przed wycofaniem uczestnika, „Przywróć zapis” (własny wpis) i
+„Przywróć wpis/Przywróć na rezerwę” dla organizatora (istniejące akcje `join`/`guest`, test SQL `restore_withdrawn.sql`);
+logowanie: e-mail lub login (telefon opcjonalny, bez SMS); `src/rating` (skala 1–10, gwiazdki, okno 48 h, kworum MVP, remisy,
+MVP Gold 7 dni) + `ratingFormula.ts` `proposal-0.1` (wagi 80/12/5/3, wygładzanie, limity premii) — **niezatwierdzona, niepodłączona**;
+`RatingStars` niepodłączone do zatwierdzonej karty. Brak backendu ratingów.
+Weryfikacja: tsc 0, eslint 0, Vitest 579/579, `npm run build` OK, 15 testów SQL na lokalnym Postgresie PASS.
+**Kolejność wdrożenia:** najpierw migracje `20261110205229`, `20261112230000`, `20261114100000` (ręcznie, za zgodą), potem klient.
+Brak: paczki zdjęć MVP Gold (właściciel musi ją wgrać do docs/rating/assets).
 
 # Tito — ponowny odbiór, poprawka Cypress/focus, 2026-11-11
 
