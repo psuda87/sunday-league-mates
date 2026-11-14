@@ -58,7 +58,8 @@ export function GoldBadge() {
 }
 
 const SPARKS: ReadonlyArray<readonly [number, number, number, number]> = [
-  [8, 22, 0, 10], [50, 3, .9, 12], [92, 22, 1.7, 10], [4, 52, 2.4, 8], [96, 55, .4, 9], [10, 80, 1.3, 9], [90, 81, 2.9, 10], [30, 93, 2, 8], [70, 93, .7, 8], [50, 98, 3.3, 11],
+  [9, 21, 0, 22], [50, 2, .9, 26], [91, 21, 1.7, 22], [3, 50, 2.4, 18], [97, 52, .4, 20], [5, 74, 1.3, 18], [95, 75, 2.9, 20], [27, 91, 2, 18], [73, 91, .7, 18], [50, 98, 3.3, 24],
+  [28, 9, 1.1, 16], [72, 9, 2.6, 16],
 ];
 /** Iskrzące punkty na krawędziach złotej karty (czysty CSS, bez kosztów serwera). */
 export function GoldSparkles() {
