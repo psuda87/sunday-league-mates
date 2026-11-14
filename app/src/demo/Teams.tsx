@@ -5,7 +5,9 @@ import { useState } from 'react';
 import type { Dispatch } from 'react';
 import type { Action, Entry, Game, World } from './data';
 import { personName, registered, teamEntries } from './data';
+import { useMvpGoldHolders } from '../rating/mvpGold';
 export default function DemoTeams({world,game,dispatch,onPlayer}:{world:World;game:Game;dispatch:Dispatch<Action>;onPlayer:(id:string)=>void}) {
+  const goldHolders=useMvpGoldHolders();
   const [swap,setSwap]=useState(false),[selected,setSelected]=useState<string|null>(null),[notice,setNotice]=useState('');
   const teams=teamEntries(game),selectedSide=teams.a.some(e=>e.id===selected)?'a':teams.b.some(e=>e.id===selected)?'b':null;
   const activeSelected=selectedSide?selected:null;
@@ -20,7 +22,7 @@ export default function DemoTeams({world,game,dispatch,onPlayer}:{world:World;ga
   function marker(entry:Entry,side:'a'|'b') {
     const player=world.players.find(p=>p.id===entry.playerId),name=personName(world,entry),short=player?player.name.split(' ').at(-1):entry.guestName?.replace(' · demo','')??'Gość';
     const content=<><span className="slm-pitch-token" aria-hidden="true">{player?.portraitEdited?<><DemoAvatar player={player}/><span className="slm-pitch-custom-number">{player.jerseyNumber}</span></>:player?(player.jerseyNumber??'—'):'G'}</span><span className="slm-pitch-name" aria-hidden="true">{short}</span><span className="slm-sr-only">{name}{!player?' · gość bez profilu':''}</span></>;
-    return <li key={entry.id} data-entry={entry.id} data-player={entry.playerId??''}>{swap||player?<button type="button" className={`slm-pitch-player${!swap?' slm-demo-person':''}`} aria-label={`${swap?'Wybierz do zamiany':'Otwórz kartę'}: ${name}`} aria-pressed={swap?activeSelected===entry.id:undefined} onClick={()=>choose(entry,side)}>{content}</button>:<span className="slm-pitch-player slm-pitch-guest" title="Gość bez profilu">{content}</span>}</li>;
+    return <li key={entry.id} data-entry={entry.id} data-player={entry.playerId??''} data-mvp-gold={entry.playerId&&goldHolders.has(entry.playerId)?'true':undefined}>{swap||player?<button type="button" className={`slm-pitch-player${!swap?' slm-demo-person':''}`} aria-label={`${swap?'Wybierz do zamiany':'Otwórz kartę'}: ${name}`} aria-pressed={swap?activeSelected===entry.id:undefined} onClick={()=>choose(entry,side)}>{content}</button>:<span className="slm-pitch-player slm-pitch-guest" title="Gość bez profilu">{content}</span>}</li>;
   }
   if(eventAccess(world,game)!=='full')return <p role="status">Składy niedostępne w tym widoku.</p>;
   return <section className="slm-demo-teams" aria-label="Demonstracyjne składy na boisku">

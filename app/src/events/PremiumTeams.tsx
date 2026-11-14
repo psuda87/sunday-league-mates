@@ -5,11 +5,13 @@ import type {LineupAction} from './lineupEditor';
 import LineupPlayerProfile from './LineupPlayerProfile';
 import type {LineupProfileContext} from './LineupPlayerProfile';
 import {usePremiumLineup} from './usePremiumLineup';
+import {useMvpGoldHolders} from '../rating/mvpGold';
 
 // Stage 1 pitch/editor; Stage 2A snapshots and explicit, versioned server writes.
 export default function PremiumTeams({eventId, participants, cancelled, canEdit = false, profileContext}: {
   eventId: string; participants: MatchEntry[]; cancelled: boolean; canEdit?: boolean; profileContext?: LineupProfileContext;
 }) {
+  const goldHolders = useMvpGoldHolders();
   const alive = useRef(true), opening = useRef(0);
   useEffect(() => {alive.current = true; return () => {alive.current = false;};}, []);
   const saveLimit = useId();
@@ -96,7 +98,7 @@ export default function PremiumTeams({eventId, participants, cancelled, canEdit 
         <PremiumPitch a={teams.a} b={teams.b} renderPlayer={p => {
           const interactive = state.mode ? writable : !!p.member_id && canEdit && !!profileContext;
           const content = <><span className="slm-pitch-token" aria-hidden="true">{p.member_id ? p.jersey_number ?? '—' : 'G'}</span><span className="slm-pitch-name">{p.display_name}</span></>;
-          return <li key={p.id} data-entry={p.id}>{interactive ? <button type="button" className="slm-pitch-player" aria-label={(state.mode === 'swap' ? 'Wybierz do zamiany: ' : state.mode === 'transfer' ? 'Wybierz do przeniesienia: ' : 'Otwórz profil: ') + p.display_name} aria-pressed={state.mode ? state.selected === p.id : undefined} onClick={e => choose(p, e.currentTarget)}>{content}</button> : <span className="slm-pitch-player slm-pitch-guest" title={p.member_id ? 'Profil grupowy niedostępny w tym kontekście' : 'Gość bez profilu'}>{content}</span>}</li>;
+          return <li key={p.id} data-entry={p.id} data-mvp-gold={p.member_id&&goldHolders.has(p.member_id)?'true':undefined}>{interactive ? <button type="button" className="slm-pitch-player" aria-label={(state.mode === 'swap' ? 'Wybierz do zamiany: ' : state.mode === 'transfer' ? 'Wybierz do przeniesienia: ' : 'Otwórz profil: ') + p.display_name} aria-pressed={state.mode ? state.selected === p.id : undefined} onClick={e => choose(p, e.currentTarget)}>{content}</button> : <span className="slm-pitch-player slm-pitch-guest" title={p.member_id ? 'Profil grupowy niedostępny w tym kontekście' : 'Gość bez profilu'}>{content}</span>}</li>;
         }}/>
         <p className="slm-teams-hint">{remote.state.lastChange ? `Ostatnia zmiana: ${remote.state.lastChange.display_name}` : 'Brak zapisanych zmian'}</p>
         <p id={saveLimit} className="slm-teams-hint">Zmiany trafiają do wspólnego składu dopiero po potwierdzeniu zapisu przez serwer.</p>

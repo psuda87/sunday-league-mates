@@ -35,7 +35,7 @@ export default function LineupPlayerProfile({context, memberId, onBack, backLabe
       <button type="button" onClick={() => setRevision(n => n + 1)}>Spróbuj ponownie</button>
     </> : !p ? <p role="status">Wczytywanie profilu…</p> : <>
       <p className="slm-players-demo">Profil grupowy · tylko dane udostępnione przez serwer</p>
-      <UltimatePlayerCard headingRef={heading} name={typeof p.display_name === 'string' && p.display_name.trim() ? p.display_name : p.nickname} jerseyNumber={p.jersey_number ?? undefined}/>
+      <UltimatePlayerCard playerId={memberId} headingRef={heading} name={typeof p.display_name === 'string' && p.display_name.trim() ? p.display_name : p.nickname} jerseyNumber={p.jersey_number ?? undefined}/>
       <p className="slm-muted">Statystyki i zdjęcia innych zawodników nie są jeszcze dostępne.</p>
     </>}
   </section>;

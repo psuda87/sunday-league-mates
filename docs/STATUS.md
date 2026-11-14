@@ -1,3 +1,14 @@
+# MVP Gold — warstwa wizualna, 2026-11-14
+
+Gałąź `feat/mvp-gold-visuals` (decyzje właściciela z 14.11.2026): karta zawodnika ma prawdziwe gwiazdki ratingu w łuku (start 7,0 = 3,5 gwiazdki;
+dotknięcie otwiera chmurkę z dokładnym wynikiem, np. 7,43), a dla aktualnego MVP Gold złote tło i znaczek z samym słowem GOLD.
+Listy (grupa, uczestnicy meczu) i boisko: złota obwódka + ciągły refleks, bez korony, kolor drużyny zachowany; mała plakietka GOLD na listach.
+Przycisk „Zadzwoń” to teraz ikona telefonu z polem dotyku ≥ 44 px. Rating liczony z dwoma miejscami (`ratingFormula` nadal `proposal-0.1`, niezatwierdzona).
+**Złoto jest domyślnie wyłączone** — brak źródła w backendzie (kto jest MVP Gold). Podgląd: zbuduj z `VITE_MVP_GOLD_PREVIEW=1` (złoto dla zalogowanego).
+Reguła utraty złota (nowy MVP po ważnym głosowaniu w późniejszym meczu, maks. 7 dni) jest już w `mvpGoldActive`. Kafelki statystyk nadal „—” do czasu źródła danych.
+Zmieniono pliki chronione (`UltimatePlayerCard.tsx`, `Teams.tsx`, `PremiumEvents.tsx` i in.) — piny przepięte na commit tej gałęzi na polecenie właściciela.
+Weryfikacja: tsc 0, eslint 0 błędów, Vitest 584/584, `verify:consolidation` PASS, `test:premium-policy` 107/107, zrzuty ekranu fixture w Chrome.
+
 # Audyt kodu i gałąź pod prace.txt — 2026-11-14
 
 Pełny audyt `main` (793ef47) na życzenie właściciela, pełna zgoda na ingerencję w repo.
