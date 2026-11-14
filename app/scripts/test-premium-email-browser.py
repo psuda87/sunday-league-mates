@@ -121,7 +121,7 @@ async def run():
                 await page.get_by_role('radio', name='España', exact=True).check()
                 await page.get_by_role('radio', name='Ciemny', exact=True).check()
                 await page.locator('.slm-account-appearance > summary').click()
-                await page.get_by_label('Login lub numer telefonu', exact=True).fill('fixture@example.invalid')
+                await page.get_by_label('E-mail lub login', exact=True).fill('fixture@example.invalid')
                 password = secrets.token_urlsafe(20)
                 await page.get_by_label('Hasło', exact=True).fill(password)
                 await page.get_by_role('button', name='Zaloguj', exact=True).click()
