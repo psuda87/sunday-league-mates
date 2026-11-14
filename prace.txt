@@ -205,4 +205,15 @@ Priorytety to propozycja organizacyjna, nie deklaracja wykonania.
 - Czy zaakceptowane assety MVP Gold znalazły się w repo.
 - Czy istnieją dodatkowe ustalenia w czatach niedostępnych w tej rekonstrukcji.
 
+===========================================================
+12. AUDYT 14.11.2026 (aktualizacja rejestru)
+===========================================================
+[OK] main po audycie: tsc 0, eslint 0, Vitest 531/531; scalono PR #51 (audyt), #52 (finanse: zatwierdzanie meczu i wyścig wpłat), #53 (dokumentacja). Migracja 20261112230000 NIE jest zastosowana zdalnie.
+[OK TESTY] „Zatwierdź mecz” (12.11): poprawione komunikaty błędów w #52; ostateczna przyczyna po stronie serwera do potwierdzenia na Vercel/telefonie.
+[W TOKU] Usuwanie zawodnika (11.11): potwierdzenie „Na pewno wycofać?” + „Przywróć zapis” dla własnego wpisu na feat/prace-p0-rating-foundation; przywrócenie cudzego wpisu wymaga nowej akcji backendu.
+[W TOKU] Auto-przydział do drużyn (9.11): gotowe rozwiązanie na codex/tito-lineups-completion i feat/tito-atomic-lineups (migracje + testy SQL) — niescalone, wymaga testów SQL/RLS i odbioru.
+[BUG] Strażniki verify:consolidation i test:premium-policy padają na main (nieaktualne piny hashy) — wymaga przeglądu właściciela.
+[W TOKU] Rating 1.0: logika domenowa w src/rating (z testami) i komponent RatingStars; brak backendu, brak podłączenia do karty; formuła nadal niezatwierdzona.
+[TODO] Dodać assety MVP Gold do docs/rating/assets (nadal brak plików w repo).
+
 KONIEC RAPORTU. Ten plik jest żywym rejestrem: aktualizować po każdym audycie, naprawie, teście, odbiorze i merge.
