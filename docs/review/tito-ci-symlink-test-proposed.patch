@@ -1,0 +1,24 @@
+--- a/app/scripts/test_lineups_ci_context.py
++++ b/app/scripts/test_lineups_ci_context.py
+@@ -295,12 +295,20 @@
+         path = self.root / 'app/src/view.tsx'
+         original=path.read_bytes()
+         path.unlink()
+-        path.symlink_to('missing.tsx')
++        try:
++            path.symlink_to('missing.tsx')
++        except OSError as error:
++            path.write_bytes(original)
++            if getattr(error, 'winerror', None) == 1314:
++                self.skipTest('Windows token cannot create symlinks; no system privilege change')
++            raise
+         with self.assertRaises(RuntimeError):
+             self.verify()
+         path.unlink()
+         path.write_bytes(original)
+         self.verify()
++
++    def test_rejects_workflow_drift_without_symlink_privilege(self):
+         self.write(self.root, ci.WORKFLOW, 'tampered workflow')
+         with self.assertRaises(RuntimeError):
+             self.verify()

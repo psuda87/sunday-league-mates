@@ -7,6 +7,7 @@ import type {LineupAction, LineupEditor} from './lineupEditor';
 import {lineupMessage, lineupPair, lineupSnapshot} from './lineupContracts';
 import type {LineupSnapshot, LineupWrite} from './lineupContracts';
 import type {MatchDetail} from './premiumContracts';
+import {useVisibleRefresh} from './useVisibleRefresh';
 
 interface State {
   editor: LineupEditor; snapshot: LineupSnapshot | null; detail: MatchDetail | null;
@@ -75,6 +76,13 @@ export function usePremiumLineup(eventId: string, context: LineupProfileContext 
   const acceptPair = useCallback((value: Awaited<ReturnType<typeof pair>>, preserve: boolean) => {
     const old = stateRef.current, {detail, snapshot, baseline} = value;
     const ids = detail.participants.filter(p => p.status === 'registered').map(p => p.id);
+    if (preserve && old.snapshot?.version === snapshot.version && old.snapshot.roster_version === snapshot.roster_version &&
+      old.snapshot.can_write === snapshot.can_write && !old.intent && !old.blocked && !old.error) {
+      // An unchanged poll may finish between choosing a mode and the first
+      // player. Preserve that interaction as well as any unsaved assignment.
+      put({...old, detail, snapshot, lastChange: snapshot.last_change, receivedAt: Date.now(), verifiedFor: sessionStamp, pending: null});
+      return;
+    }
     if (snapshot.can_write && preserve && old.snapshot?.can_write && (lineupChanged(old.editor.baseline, old.editor.draft) || old.intent)) {
       const rosterChanged = old.snapshot.roster_version !== snapshot.roster_version;
       const versionChanged = old.snapshot.version !== snapshot.version;
@@ -88,10 +96,10 @@ export function usePremiumLineup(eventId: string, context: LineupProfileContext 
     put({...empty(eventId), detail, snapshot, lastChange: snapshot.last_change, receivedAt: Date.now(), verifiedFor: sessionStamp,
       editor: editLineup(emptyLineup(eventId), {type: 'load', eventId, baseline, proposal})});
   }, [eventId, put, sessionStamp]);
-  const load = useCallback(async (preserve = false) => {
-    if (!authorized() || flight.current !== null) return;
+  const load = useCallback(async (preserve = false, silent = false) => {
+    if (!authorized() || (flight.current !== null && (silent || stateRef.current.pending !== null)) || document.visibilityState !== 'visible' || navigator.onLine === false) return;
     const ticket = ++epoch.current; flight.current = ticket;
-    put({...stateRef.current, pending: 'load', error: ''});
+    if (!silent) put({...stateRef.current, pending: 'load', error: ''});
     try { const value = await pair(); if (authorized() && epoch.current === ticket) acceptPair(value, preserve); }
     catch (e) {
       const code = codeOf(e);
@@ -112,17 +120,31 @@ export function usePremiumLineup(eventId: string, context: LineupProfileContext 
   }, [manager, key, eventId]);
   const ready = !!manager && allowed && auth.phase === 'ready' && auth.session?.user_id === userId;
   useEffect(() => {
+    // A changed session invalidates even a pending read for the same account.
+    epoch.current++; flight.current = null;
+    if (auth.phase === 'signed_out' && (stateRef.current.snapshot || stateRef.current.intent)) put({...empty(eventId), error: 'session_invalid'});
+    else if (stateRef.current.pending) put({...stateRef.current, pending: null});
+  }, [sessionStamp, auth.phase, put, eventId]);
+  useEffect(() => {
     if (ready && active) void load(true);
     // load changes only with actor/session, not with draft edits.
   }, [ready, active, load]);
+  useVisibleRefresh(ready && active, () => {
+    if (!stateRef.current.intent) void load(true, true);
+  });
   const priorRoster = useRef(incomingRoster);
   useEffect(() => {
     if (priorRoster.current === incomingRoster) return;
     priorRoster.current = incomingRoster;
-    if (stateRef.current.snapshot && authorized()) put({...stateRef.current,
+    if (stateRef.current.snapshot && authorized() && active) put({...stateRef.current,
       editor: editLineup(stateRef.current.editor, {type: 'roster', eventId, ids: incomingRoster ? incomingRoster.split('|') : []}),
       blocked: true, error: 'lineup_roster_conflict'});
-  }, [incomingRoster, authorized, put, eventId]);
+    if (authorized() && active && !stateRef.current.intent) {
+      // A parent-confirmed roster supersedes any older pending pair read.
+      epoch.current++; flight.current = null;
+      void load(true, true);
+    }
+  }, [incomingRoster, authorized, put, eventId, active, load]);
   useEffect(() => {
     if (!state.detail) return;
     const left = Date.parse(state.detail.event.starts_at) + state.detail.event.duration_minutes! * 60000 - Date.parse(state.detail.server_now) - (Date.now() - state.receivedAt);
@@ -133,12 +155,12 @@ export function usePremiumLineup(eventId: string, context: LineupProfileContext 
   const verified = ready && binding.current?.key === key && binding.current.manager === manager && state.verifiedFor === sessionStamp;
   const writable = verified && state.snapshot?.can_write === true && !state.pending && !state.blocked && !state.intent && !isClosed(state);
   function edit(action: LineupAction) {
-    if (!authorized() || flight.current !== null || !writable) return;
+    if (!authorized() || stateRef.current.pending !== null || !writable) return;
     put({...stateRef.current, editor: editLineup(stateRef.current.editor, action), notice: ''});
   }
   async function save() {
     const s = stateRef.current;
-    if (!authorized() || flight.current !== null || !s.snapshot?.can_write || s.verifiedFor !== sessionStamp || (!s.intent && (isClosed(s) || s.blocked || !lineupChanged(s.editor.baseline, s.editor.draft)))) return;
+    if (!authorized() || s.pending !== null || !s.snapshot?.can_write || s.verifiedFor !== sessionStamp || (!s.intent && (isClosed(s) || s.blocked || !lineupChanged(s.editor.baseline, s.editor.draft)))) return;
     const body: LineupWrite = s.intent?.body ?? {event_id: eventId, expected_version: s.snapshot.version, expected_roster_version: s.snapshot.roster_version,
       team_a: Object.keys(s.editor.draft).filter(id => s.editor.draft[id] === 'a').sort(), team_b: Object.keys(s.editor.draft).filter(id => s.editor.draft[id] === 'b').sort(), request_id: crypto.randomUUID()};
     const ticket = ++epoch.current; flight.current = ticket;

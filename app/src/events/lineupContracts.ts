@@ -8,7 +8,7 @@ export interface LineupSnapshot {
   event_id: string; version: number; event_version: number; roster_version: string;
   saved_roster_version: string | null; team_a: string[]; team_b: string[];
   unassigned: string[]; stale_entry_ids: string[];
-  last_change: {user_id: string; display_name: string; changed_at: string} | null;
+  last_change: {user_id: string | null; actor_type?: 'manual' | 'automatic'; display_name: string; changed_at: string} | null;
 }
 export interface LineupWrite {
   event_id: string; expected_version: number; expected_roster_version: string;
@@ -34,8 +34,13 @@ export function lineupSnapshot(value: unknown, eventId: string): LineupSnapshot 
   let last: LineupSnapshot['last_change'] = null;
   if (r.last_change !== null) {
     const c = object(r.last_change);
-    if (!uuid(c.user_id) || typeof c.display_name !== 'string' || !c.display_name.trim() || typeof c.changed_at !== 'string' || !Number.isFinite(Date.parse(c.changed_at))) throw Error('Invalid lineup author');
-    last = {user_id: c.user_id, display_name: c.display_name, changed_at: c.changed_at};
+    // user_id is the real initiating account when available; never a synthetic Tito ID.
+    const automatic = c.actor_type === 'automatic' && (c.user_id === null || uuid(c.user_id)) && c.display_name === 'Tito';
+    const manual = (c.actor_type === undefined && uuid(c.user_id)) ||
+      (c.actor_type === 'manual' && (uuid(c.user_id) || c.user_id === null));
+    if ((!automatic && !manual) || typeof c.display_name !== 'string' || !c.display_name.trim() || typeof c.changed_at !== 'string' || !Number.isFinite(Date.parse(c.changed_at))) throw Error('Invalid lineup author');
+    last = {user_id: c.user_id as string | null, display_name: c.display_name, changed_at: c.changed_at,
+      ...(c.actor_type ? {actor_type: c.actor_type as 'manual' | 'automatic'} : {})};
   }
   if (r.version === 0 ? last !== null || a.length + b.length > 0 || r.saved_roster_version !== null : !last || r.saved_roster_version === null) throw Error('Invalid saved lineup');
   return {can_write:r.can_write===true,event_id: r.event_id, version: r.version, event_version: r.event_version, roster_version: r.roster_version,

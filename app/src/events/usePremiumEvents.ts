@@ -5,6 +5,8 @@ import type { GroupSummary } from '../groups/model';
 import { matchDetail,matchList,matchError } from './premiumContracts';
 import type { EventSummary,MatchDetail } from './premiumContracts';
 import type { EventInput } from '../demo/eventDraft';
+import {AccountError} from '../auth/api';
+import {useVisibleRefresh} from './useVisibleRefresh';
 
 export function usePremiumEvents(manager:SessionManager,userId:string){
   const auth=useSyncExternalStore(manager.subscribe,manager.getSnapshot);
@@ -17,6 +19,7 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
   const debounce=useRef<ReturnType<typeof setTimeout>|null>(null);
   const [memberCreationEnabled,setMemberCreationEnabled]=useState(false);
   const [minimumEnabled,setMinimumEnabled]=useState(false);
+  const [detailVisible,setDetailVisible]=useState(false);
   const [activeGroup,setActiveGroup]=useState(''),[offset,setOffset]=useState(0),[creating,setCreating]=useState(false);
   const alive=useRef(true),epoch=useRef(0),detailEpoch=useRef(0),flight=useRef(false),refreshFlight=useRef<{key:string;promise:Promise<boolean>}|null>(null),keys=useRef(new Map<string,string>());
   const authorized=useCallback(()=>alive.current&&manager.getSnapshot().phase==='ready'&&manager.getSnapshot().session?.user_id===userId,[manager,userId]);
@@ -66,6 +69,23 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
     if(phase!=='ready'||current.session?.user_id!==userId){invalidate();setVerifiedSession(null);if(debounce.current)clearTimeout(debounce.current);query.current={scope:'all',period:'upcoming'};setSearch('');setActiveGroup('');setOffset(0);setListFilter('upcoming');setDiscoveryEnabled(false);setMinimumEnabled(false);setHasMore(false);setNextOffset(null);setEvents([]);setGroups([]);setDetail(null);setLoading(true);}
     else{refreshFlight.current=null;void revalidate();}
   });},[manager,userId,revalidate,invalidate]);
+  const backgroundFlight=useRef<symbol|null>(null);
+  useEffect(()=>{backgroundFlight.current=null;},[auth.session,auth.phase,detail?.event.id]);
+  useVisibleRefresh(detailVisible && !!detail && auth.phase==='ready' && verifiedSession===auth.session,()=>{
+    const id=route.current.eventId,session=manager.getSnapshot().session;
+    if(!id||!authorized()||flight.current||backgroundFlight.current)return;
+    const ticket=++detailEpoch.current,request=Symbol();backgroundFlight.current=request;
+    void (async()=>{
+      try{
+        const fresh=matchDetail(await manager.call('matches_detail',{event_id:id}),id);
+        if(authorized()&&manager.getSnapshot().session===session&&ticket===detailEpoch.current&&route.current.eventId===id){setDetail(fresh);setServerNow(fresh.server_now);}
+      }catch(e){
+        if(authorized()&&manager.getSnapshot().session===session&&ticket===detailEpoch.current&&e instanceof AccountError&&['not_found','forbidden','group_archived','session_invalid'].includes(e.code)){
+          setDetail(null);setError(matchError(e));
+        }
+      }finally{if(backgroundFlight.current===request)backgroundFlight.current=null;}
+    })();
+  });
   const open=useCallback(async(id:string)=>{
     const ticket=++detailEpoch.current;setDetail(null);setLoading(true);setError('');setCreating(false);
     try{const d=matchDetail(await manager.call('matches_detail',{event_id:id}),id);if(authorized()&&ticket===detailEpoch.current){setDetail(d);setServerNow(d.server_now);return true;}return false;}
@@ -84,7 +104,8 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
   }
   async function act(action:string,values:Record<string,unknown>={}){
     const id=detail?.event.id;if(!id)return false;
-    return work(async()=>{await mutate('matches_'+action,{event_id:id,...values});if(!authorized())return;if(!await open(id)||!await refresh(offset))throw Error('Readback failed');if(authorized())setNotice('Zmiana została zapisana.');});
+    const session=manager.getSnapshot().session,ticket=detailEpoch.current;
+    return work(async()=>{await mutate('matches_'+action,{event_id:id,...values});if(!authorized()||manager.getSnapshot().session!==session||ticket!==detailEpoch.current||route.current.eventId!==id)return;if(!await open(id)||!await refresh(offset))throw Error('Readback failed');if(authorized())setNotice('Zmiana została zapisana.');});
   }
   async function create(input:EventInput){
     await work(async()=>{
@@ -118,6 +139,6 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
   function selectGroup(id:string){back();resetPage();if(listFilter==='mine')setListFilter('upcoming');const next=['public','groups','mine'].includes(id)||groups.some(g=>g.id===id)?id:'';setActiveGroup(next);setSearch('');query.current={...query.current,scope:['public','groups','mine'].includes(next)?next:next?'group':'all',group_id:groups.some(g=>g.id===next)?next:''};delete query.current.query;void refresh();}
   function changeSearch(value:string){if(query.current.scope!=='public')return;resetPage();setSearch(value);query.current={...query.current,query:value};setLoading(true);setError('');if([...value].length>100){setLoading(false);setError('Wpisz najwyżej 100 znaków.');return;}debounce.current=setTimeout(()=>{debounce.current=null;if(authorized())void refresh();},300);}
   function changeFilter(value:'upcoming'|'history'|'mine'){resetPage();setListFilter(value);query.current={...query.current,period:value==='history'?'history':'upcoming'};if(value==='mine'){setActiveGroup('mine');setSearch('');delete query.current.query;query.current.scope='mine';}void refresh();}
-  return {revalidating:auth.phase!=='ready'||verifiedSession!==auth.session,revalidate,listFilter,changeFilter,search,changeSearch,discoveryEnabled,hasMore,nextOffset,recheckFinancial,events,groups,detail,loading,busy,error,notice,serverNow,activeGroup,offset,creating,organizers,refresh,open,back,act,create,edit,beginCreate,selectGroup};
+  return {setDetailVisible,revalidating:auth.phase!=='ready'||verifiedSession!==auth.session,revalidate,listFilter,changeFilter,search,changeSearch,discoveryEnabled,hasMore,nextOffset,recheckFinancial,events,groups,detail,loading,busy,error,notice,serverNow,activeGroup,offset,creating,organizers,refresh,open,back,act,create,edit,beginCreate,selectGroup};
 }
 export type PremiumEventsController=ReturnType<typeof usePremiumEvents>;
