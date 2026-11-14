@@ -365,6 +365,35 @@ export function createHandler(env: Environment) {
         if (!result.ok) throw new ApiError(503, 'service_unavailable', 'Nie udało się pobrać własnych grup finansowych.');
         return respond(result.data);
       }
+      if (action.startsWith('ratings_')) {
+        const allowed: Record<string,string[]> = {
+          ratings_overview: [], ratings_player: ['user_id'], ratings_get: ['event_id'],
+          ratings_rate: ['event_id','ratings','mvp_user','action_team'], ratings_stats: ['event_id','goals','assists'],
+          ratings_score: ['event_id','score_a','score_b'],
+        };
+        const fields = allowed[action];
+        if (!fields) throw new ApiError(400, 'invalid_action', 'Nieznana akcja ocen.');
+        await rate('ratings:' + ctx.id, 90);
+        if (Object.keys(body).some(key => key !== 'action' && !fields.includes(key)))
+          throw new ApiError(400, 'invalid_input', 'Żądanie ocen zawiera niedozwolone pola.');
+        const payload = Object.fromEntries(fields.filter(key => Object.hasOwn(body,key)).map(key => [key,body[key]]));
+        const r = await call('/rest/v1/rpc/slm_ratings_dispatch', 'POST', {p_user:ctx.id,p_session:ctx.sid,p_action:action.slice(8),p_body:payload}, undefined, true);
+        if (!r.ok) {
+          const code = typeof r.data?.message === 'string' ? r.data.message : '';
+          const errors: Record<string,[number,string]> = {
+            session_invalid:[401,'Sesja wygasła. Zaloguj się ponownie.'],
+            forbidden:[403,'Oceniać mogą tylko zawodnicy, którzy zagrali w tym meczu.'],
+            not_found:[404,'Mecz lub zawodnik nie istnieje albo nie masz do niego dostępu.'],
+            rating_closed:[409,'Ocenianie tego meczu jest zamknięte.'],
+            invalid_input:[400,'Nieprawidłowe dane oceny.'],
+            invalid_action:[400,'Nieznana akcja ocen.'],
+          };
+          const known = errors[code];
+          if (known) throw new ApiError(known[0], code, known[1]);
+          throw new ApiError(503, 'service_unavailable', 'Nie udało się zapisać lub pobrać ocen.');
+        }
+        return respond(r.data);
+      }
       if (action === 'lineups_get' || action === 'lineups_save') {
         await rate('lineups:' + ctx.id, 60);
         const fields = action === 'lineups_get' ? ['event_id'] : ['event_id','expected_version','expected_roster_version','team_a','team_b','request_id'];
