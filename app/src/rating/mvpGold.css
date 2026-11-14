@@ -17,20 +17,21 @@
 
 /* Odznaka MVP na karcie jest nad refleksem. */
 .slm-ultimate-card[data-mvp-gold="true"]::before { content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none;
-  background: linear-gradient(105deg, transparent 20%, rgba(255, 244, 200, .5) 50%, transparent 80%); background-size: 260% 100%; animation: slm-gold-sweep 4.5s ease-in-out infinite; mix-blend-mode: screen; }
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 244, 200, .5) 50%, transparent 70%); transform: translateX(-130%); animation: slm-gold-sweep 4.5s linear infinite; will-change: transform; mix-blend-mode: screen; }
 
 /* Wiersze list (grupa, uczestnicy meczu): złota obwódka i refleks, bez korony. */
 li[data-mvp-gold="true"] > .slm-group-person, li.slm-live-entry[data-mvp-gold="true"] { position: relative; overflow: hidden; border-radius: 14px; padding-inline: 10px;
   box-shadow: inset 0 0 0 1.5px var(--slm-mvp-gold-2), 0 0 12px rgba(232, 193, 90, .35); background: linear-gradient(90deg, rgba(232, 193, 90, .18), rgba(232, 193, 90, .04)); }
 li[data-mvp-gold="true"] > .slm-group-person::after, li.slm-live-entry[data-mvp-gold="true"]::after { content: ''; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(105deg, transparent 25%, rgba(255, 244, 200, .38) 50%, transparent 75%); background-size: 260% 100%; animation: slm-gold-sweep 4.5s ease-in-out infinite; }
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 244, 200, .38) 50%, transparent 70%); transform: translateX(-130%); animation: slm-gold-sweep 4.5s linear infinite; will-change: transform; }
 
 /* Boisko: złoty pierścień wokół znacznika; kolor drużyny (wypełnienie) zostaje. */
 li[data-mvp-gold="true"] .slm-pitch-token { position: relative; overflow: hidden; box-shadow: 0 0 0 3px var(--slm-mvp-gold-2), 0 0 14px rgba(232, 193, 90, .75); }
 li[data-mvp-gold="true"] .slm-pitch-token::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
-  background: linear-gradient(105deg, transparent 25%, rgba(255, 244, 200, .6) 50%, transparent 75%); background-size: 260% 100%; animation: slm-gold-sweep 4.5s ease-in-out infinite; }
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 244, 200, .6) 50%, transparent 70%); transform: translateX(-130%); animation: slm-gold-sweep 4.5s linear infinite; will-change: transform; }
 
-@keyframes slm-gold-sweep { 0%, 55% { background-position: 160% 0; } 100% { background-position: -60% 0; } }
+/* Pasmo światła zaczyna i kończy ruch całkowicie poza elementem, więc pętla nie ma widocznego skoku. */
+@keyframes slm-gold-sweep { 0% { transform: translateX(-130%); } 45%, 100% { transform: translateX(130%); } }
 @media (prefers-reduced-motion: reduce) {
   .slm-ultimate-card[data-mvp-gold="true"]::before, li[data-mvp-gold="true"] > .slm-group-person::after, li.slm-live-entry[data-mvp-gold="true"]::after, li[data-mvp-gold="true"] .slm-pitch-token::after { animation: none; opacity: 0; }
 }
@@ -59,7 +60,14 @@ li[data-mvp-gold="true"] .slm-pitch-token::after { content: ''; position: absolu
 @media (prefers-reduced-motion: reduce) { .slm-gold-sparkles i, .slm-ultimate-card[data-mvp-gold="true"] { animation: none; } }
 
 /* Uczestnicy meczu: zwarty wiersz, nazwa wyśrodkowana względem awatara, telefon po prawej. */
-.slm-premium-events .slm-live-entry { position: relative; align-items: center; padding-block: 8px; }
+.slm-premium-events li.slm-live-entry { position: relative; align-items: center; padding-block: 8px; }
+.slm-premium-events li.slm-live-entry > .slm-roster-avatar { align-self: center; margin-block: 0; }
 li.slm-live-entry[data-mvp-gold="true"] { padding-block: 8px; }
-.slm-premium-events .slm-live-entry .slm-call { position: absolute; top: 50%; right: 10px; transform: translateY(-50%); margin: 0; min-height: 34px; padding: 0 12px; font-size: .78rem; }
-.slm-premium-events .slm-live-entry .slm-demo-person-meta > strong { display: block; padding-right: 118px; }
+.slm-premium-events li.slm-live-entry .slm-call { position: absolute; top: 50%; right: 10px; transform: translateY(-50%); margin: 0; min-height: 34px; padding: 0 12px; font-size: .78rem; }
+.slm-premium-events li.slm-live-entry .slm-demo-person-meta > strong { display: block; padding-right: 118px; }
+
+/* Refleks także w kółku z inicjałami / zdjęciem w złotym wierszu (lista meczu i grupy). */
+li[data-mvp-gold="true"] .slm-roster-avatar, li[data-mvp-gold="true"] .slm-player-avatar { position: relative; overflow: hidden; border-radius: 50%; box-shadow: 0 0 0 1.5px var(--slm-mvp-gold-2), 0 0 8px rgba(232, 193, 90, .6); }
+li[data-mvp-gold="true"] .slm-roster-avatar::after, li[data-mvp-gold="true"] .slm-player-avatar::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 244, 200, .75) 50%, transparent 70%); transform: translateX(-130%); animation: slm-gold-sweep 4.5s linear infinite; }
+@media (prefers-reduced-motion: reduce) { li[data-mvp-gold="true"] .slm-roster-avatar::after, li[data-mvp-gold="true"] .slm-player-avatar::after { animation: none; opacity: 0; } }
