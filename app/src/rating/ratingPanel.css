@@ -1,0 +1,28 @@
+/* Zakładka „Oceny” — własne style, bez zmian w zatwierdzonym theme/variables.css. */
+.slm-rating-panel { display: grid; gap: 12px; }
+.slm-rating-note { margin: 0; color: var(--slm-text-secondary, #b9b3b8); font-size: .85rem; }
+.slm-rating-error { margin: 0; color: #ff9d9d; }
+.slm-rating-ok { margin: 0; color: #9fe3b4; }
+.slm-rating-warning { margin: 6px 0 0; padding: 8px 10px; border: 1px solid #e8c15a; border-radius: 10px; color: #fff3bd; font-size: .82rem; }
+.slm-rating-block { margin: 0; padding: 10px 12px 12px; border: 1px solid rgba(232, 193, 90, .35); border-radius: 12px; min-width: 0; }
+.slm-rating-block legend { padding: 0 6px; font-weight: 700; }
+.slm-rating-score { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; }
+.slm-rating-score label { display: grid; gap: 4px; font-size: .8rem; }
+.slm-rating-score input { width: 64px; min-height: 44px; padding: 0 8px; text-align: center; font-size: 1.1rem; color: inherit; background: rgba(0, 0, 0, .35); border: 1px solid rgba(232, 193, 90, .5); border-radius: 10px; }
+.slm-rating-score > span { padding-bottom: 10px; font-size: 1.3rem; }
+.slm-rating-panel button { min-height: 44px; padding: 0 14px; color: inherit; background: rgba(0, 0, 0, .35); border: 1px solid rgba(232, 193, 90, .5); border-radius: 10px; font: inherit; cursor: pointer; }
+.slm-rating-panel button:disabled { opacity: .5; cursor: default; }
+.slm-rating-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.slm-rating-who { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.slm-rating-who small { color: var(--slm-text-secondary, #b9b3b8); }
+.slm-rating-mvp { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-weight: 700; color: #e8c15a; }
+.slm-rating-scale { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 3px; }
+.slm-rating-scale button { min-height: 40px; padding: 0; font-weight: 700; }
+.slm-rating-scale button[aria-checked="true"], .slm-rating-teams button[aria-checked="true"] { color: #2a1b04; background: linear-gradient(135deg, #fff3bd, #e8c15a 55%, #a8741f); border-color: #fff3bd; }
+.slm-rating-teams { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.slm-rating-panel .slm-rating-link { min-height: 44px; padding: 0; margin-top: 8px; border: 0; background: none; text-decoration: underline; color: var(--slm-text-secondary, #b9b3b8); }
+.slm-rating-panel .slm-rating-submit { font-weight: 800; color: #fff; background: linear-gradient(180deg, #d6263c, #8f0f20); border-color: #e8c15a; }
+.slm-rating-result p { margin: 0 0 4px; }
+
+.slm-rating-confirm { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px 12px; border: 1px solid #e8c15a; border-radius: 12px; }
+.slm-rating-confirm p { grid-column: 1 / -1; margin: 0 0 4px; }

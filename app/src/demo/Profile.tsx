@@ -1,3 +1,4 @@
+import { usePlayerRating } from '../rating/RatingProvider';
 import { useEffect, useId, useRef, useState } from 'react';
 import type { Dispatch, FormEvent } from 'react';
 import { AvatarPicker, IdentityEditor } from './Identity';
@@ -43,13 +44,14 @@ export default function DemoProfile({world,id,onBack,dispatch,personal=false,onP
   },()=>heading.current,30);
   // FROZEN_ANDROID_END
   const stats=statistics(world,id);
+  const liveStats=usePlayerRating(live?profile?.user_id:undefined)?.stats;
   function save(event:FormEvent) {
     event.preventDefault();
     if(!own)return;
     if(!/^[0-9]{1,2}$/.test(number.trim())){setError('Wpisz pełny numer od 0 do 99.');return;}
     dispatch({type:'jersey',playerId:id,number:Number(number.trim())});setEditing(false);
   }
-  return <div className="slm-players-screen slm-ultimate-profile"><MatchHeader title={personal?"Mój profil":"Zawodnicy"} backLabel="Wróć do poprzedniego widoku" onBack={onBack}/><p className="slm-players-demo">{live?live.phase==='loading'?'Wczytywanie profilu…':live.phase==='ready'?'Profil Supabase · statystyki niedostępne':live.notice:'Dane przykładowe · fikcyjne portrety i statystyki'}</p>
+  return <div className="slm-players-screen slm-ultimate-profile"><MatchHeader title={personal?"Mój profil":"Zawodnicy"} backLabel="Wróć do poprzedniego widoku" onBack={onBack}/><p className="slm-players-demo">{live?live.phase==='loading'?'Wczytywanie profilu…':live.phase==='ready'?(liveStats?'Profil Supabase':'Profil Supabase · statystyki niedostępne'):live.notice:'Dane przykładowe · fikcyjne portrety i statystyki'}</p>
     <div ref={playerCardArea}><UltimatePlayerCard key={id} playerId={live?profile?.user_id:id} name={live?profile?.display_name??'—':player.name} portrait={live?(live.photo?.image?{src:live.photo.image}:undefined):player.portrait} jerseyNumber={live?profile?.jersey_number??undefined:player.jerseyNumber} headingRef={heading} portraitFit={live?'cover':undefined} portraitDescription={live?'Zdjęcie profilowe':undefined} onEditNumber={own&&(!live||live.phase==='ready'&&!!live.saveNumber)?editNumber:undefined}/></div>
     {editing&&own&&!live&&<form className="slm-number-form" onSubmit={save} noValidate aria-label={live?"Edycja własnego numeru koszulki":"Edycja numeru demonstracyjnego"}>
       <label htmlFor={field}>{live?'Twój numer koszulki (0–99)':'Twój numer koszulki · demo (0–99)'}</label>
@@ -57,7 +59,7 @@ export default function DemoProfile({world,id,onBack,dispatch,personal=false,onP
       {error&&<p id={errorId} role="alert">{error}</p>}
       <div><button type="submit">Zapisz numer</button><button type="button" onClick={()=>setEditing(false)}>Anuluj</button></div>
     </form>}
-    <section className="slm-player-stats slm-ultimate-summary" aria-label={live?"Statystyki zawodnika · niedostępne":"Cztery podstawowe statystyki demonstracyjne"}><dl className="slm-ultimate-stats">{[[stats.played,'Mecze'],[player.demoTotals.goals,'Bramki'],[player.demoTotals.assists,'Asysty'],[player.demoTotals.mvp,'MVP']].map(([value,label])=><div key={label}><dt>{label}</dt><dd>{live?'—':value}</dd></div>)}</dl></section>
+    <section className="slm-player-stats slm-ultimate-summary" aria-label={live?"Statystyki zawodnika · niedostępne":"Cztery podstawowe statystyki demonstracyjne"}><dl className="slm-ultimate-stats">{[[stats.played,'Mecze'],[player.demoTotals.goals,'Bramki'],[player.demoTotals.assists,'Asysty'],[player.demoTotals.mvp,'MVP']].map(([value,label],index)=><div key={label}><dt>{label}</dt><dd>{live?(liveStats?[liveStats.played,liveStats.goals,liveStats.assists,liveStats.mvp][index]:'—'):value}</dd></div>)}</dl></section>
     {personal&&own&&<div className="slm-my-identity">
       <div className="slm-identity-actions slm-my-actions"><button type="button" disabled={!!live&&(live.phase==='loading'||live.saving)} aria-expanded={editor==='identity'} onClick={()=>{if(live&&live.phase!=='ready'){live.reload();return;}setEditing(false);setEditor(editor==='identity'?null:'identity');}}>{live&&live.phase!=='ready'?'Ponów odczyt profilu':'Edytuj profil'}</button><button type="button" disabled={!!live&&(live.phase!=='ready'||live.photo?.saving||!live.photo)} aria-expanded={editor==='portrait'} onClick={()=>{setEditing(false);if(live?.photo?.phase==='error')live.photo.reload();setEditor(editor==='portrait'?null:'portrait');}}>Zmień zdjęcie</button><button type="button" onClick={()=>{if(settings.current){settings.current.open=!settings.current.open;if(settings.current.open)settings.current.scrollIntoView?.({block:'start',behavior:'smooth'});}}}>Ustawienia</button></div>
       {editor==='identity'&&(!live||live.phase==='ready')&&<IdentityEditor key={'identity:'+(profile?.user_id??id)} personalProfile={live} player={player} dispatch={dispatch} onClose={closeEditor} onNumber={editNumber}/>}

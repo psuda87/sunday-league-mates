@@ -3,14 +3,18 @@ import type { CSSProperties, Ref } from 'react';
 import RatingStars from '../rating/RatingStars';
 import { GoldBadge, GoldSparkles, useMvpGold } from '../rating/mvpGold';
 import { RATING_START, formatRatingPrecise } from '../rating/rating';
+import { usePlayerRating } from '../rating/RatingProvider';
 export interface CardPortrait { src: string; column?: 0 | 1; row?: 0 | 1 }
-export default function UltimatePlayerCard({ name, portrait, jerseyNumber, headingRef, onEditNumber, portraitDescription, portraitFit, rating = RATING_START, ratingFinal = false, playerId, gold }: { name: string; portrait?: CardPortrait; jerseyNumber?: number; headingRef?: Ref<HTMLHeadingElement>; onEditNumber?:()=>void; portraitDescription?:string; portraitFit?:'cover'; rating?: number; ratingFinal?: boolean; playerId?: string | null; gold?: boolean }) {
+export default function UltimatePlayerCard({ name, portrait, jerseyNumber, headingRef, onEditNumber, portraitDescription, portraitFit, rating: ratingProp, ratingFinal: finalProp, playerId, gold }: { name: string; portrait?: CardPortrait; jerseyNumber?: number; headingRef?: Ref<HTMLHeadingElement>; onEditNumber?:()=>void; portraitDescription?:string; portraitFit?:'cover'; rating?: number; ratingFinal?: boolean; playerId?: string | null; gold?: boolean }) {
   const title=useId();
   const shield=useId();
   const silhouette="M .5 .008 C .46 .045 .43 .035 .4 .024 C .32 .025 .22 .105 .035 .145 L .035 .79 Q .035 .875 .13 .9 L .5 .99 L .87 .9 Q .965 .875 .965 .79 L .965 .145 C .78 .105 .68 .025 .6 .024 C .57 .035 .54 .045 .5 .008 Z";
   const [failedSource,setFailedSource]=useState<string|null>(null);
   const [bubble,setBubble]=useState(false);
   const holder=useMvpGold(playerId);
+  const known=usePlayerRating(playerId);
+  const rating=ratingProp??known?.rating??RATING_START;
+  const ratingFinal=finalProp??known?.final??false;
   const isGold=gold??holder;
   const parts=name.trim().split(/\s+/u),surname=parts.length>1?parts.slice(1).join(' '):parts[0];
   const initials=parts.slice(0,2).map(part=>Array.from(part)[0]).join('');
