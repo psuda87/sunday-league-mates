@@ -47,6 +47,16 @@ export async function secretEquals(given: string, expected: string): Promise<boo
   for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
   return diff === 0;
 }
+// Do RPC trafiają wyłącznie pola znane danej grupie akcji. `action` zostaje, bo
+// rozliczenia porównują zapisane ciało żądania przy ponowieniu (idempotencja).
+export const RPC_FIELDS = {
+  settlements: ['action','absent','amount_cents','event_id','expected_amount_cents','expected_version','offset','participant_id','payable','payment_id','reason','replacement_id','request_id','user_id'],
+  notifications: ['action','binding_id','binding_version','category','device_id','device_secret','notification_id','offset','platform','push_enabled','token'],
+  events: ['action','absent','capacity','date','duration_minutes','event_id','guest_name','guest_phone','hourly_rate','list','location','offset','participant_id','reason','request_id','time','total_cost','user_id'],
+} as const;
+export function pickFields(body: Row, fields: readonly string[]): Row {
+  return Object.fromEntries(fields.filter(key => Object.hasOwn(body, key)).map(key => [key, body[key]]));
+}
 export function displayName(login: string, fullName: string, mode: string) {
   return mode === 'full_name' && fullName.trim() ? fullName.trim() : login;
 }
@@ -503,7 +513,7 @@ export function createHandler(env: Environment) {
       if (action.startsWith('settlements_')) {
         await rate('settlements:' + ctx.id, 60);
         const r = await call('/rest/v1/rpc/slm_settlements_dispatch', 'POST', {
-          p_user: ctx.id, p_session: ctx.sid, p_action: action.slice(12), p_body: body,
+          p_user: ctx.id, p_session: ctx.sid, p_action: action.slice(12), p_body: pickFields(body, RPC_FIELDS.settlements),
         }, undefined, true);
         if (!r.ok) {
           const messages: Record<string, [number, string]> = {
@@ -541,7 +551,7 @@ export function createHandler(env: Environment) {
       if (action.startsWith('notifications_')) {
         await rate('notifications:' + ctx.id, 90);
         const r = await call('/rest/v1/rpc/slm_notifications_dispatch', 'POST', {
-          p_user: ctx.id, p_session: ctx.sid, p_action: action.slice(14), p_body: body,
+          p_user: ctx.id, p_session: ctx.sid, p_action: action.slice(14), p_body: pickFields(body, RPC_FIELDS.notifications),
         }, undefined, true);
         if (!r.ok) {
           const messages: Record<string, [number, string]> = {
@@ -580,7 +590,7 @@ export function createHandler(env: Environment) {
         }
         await rate('events:' + ctx.id, 90);
         const r = await call('/rest/v1/rpc/slm_events_dispatch', 'POST', {
-          p_user: ctx.id, p_session: ctx.sid, p_action: action.slice(7), p_body: body,
+          p_user: ctx.id, p_session: ctx.sid, p_action: action.slice(7), p_body: pickFields(body, RPC_FIELDS.events),
         }, undefined, true);
         if (!r.ok) {
           const messages: Record<string, [number, string]> = {

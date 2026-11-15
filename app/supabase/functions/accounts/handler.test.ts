@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { webcrypto } from 'node:crypto';
-import { createHandler, displayName, normalizeLogin, normalizePhone, randomPassword, secretEquals } from './handler';
+import { createHandler, displayName, normalizeLogin, normalizePhone, randomPassword, secretEquals, pickFields, RPC_FIELDS } from './handler';
 
 afterEach(() => vi.unstubAllGlobals());
 describe('brama rozliczeń (kontrolowane RPC)', () => {
@@ -231,4 +231,29 @@ it('save_profile podlega limitowi prób przed zapisem profilu', async () => {
  const handler=createHandler({url:'https://example.invalid',anon:'',service:'',origins:[]});
  const r=await handler(new Request('https://example.invalid',{method:'POST',headers:{authorization:'Bearer '+token},body:JSON.stringify({action:'save_profile',full_name:'Jan',display_as:'nickname'})}));
  expect(r.status).toBe(429);expect(patched).toBe(false);expect(rateKeys).toHaveLength(2);
+});
+it.each([
+ ['settlements_detail','slm_settlements_dispatch',{event_id:'e1',offset:0}],
+ ['notifications_read','slm_notifications_dispatch',{notification_id:'n1'}],
+ ['events_detail','slm_events_dispatch',{event_id:'e1'}],
+])('%s przekazuje do RPC wyłącznie dozwolone pola',async(action,rpc,allowed)=>{
+ vi.stubGlobal('crypto',webcrypto);
+ const id=webcrypto.randomUUID(),sid=webcrypto.randomUUID();
+ const token=['synthetic',btoa(JSON.stringify({sub:id,session_id:sid})),'unsigned'].join('.');
+ let sent:Record<string,unknown>|undefined;
+ vi.stubGlobal('fetch',vi.fn(async(url:string,options:RequestInit)=>{
+  const reply=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status});
+  if(url.includes('slm_account_rate'))return reply(true);
+  if(url.endsWith('/auth/v1/user'))return reply({id});
+  if(url.includes('slm_account_context'))return reply({user_id:id,role:'member',must_change_password:false});
+  if(url.includes(rpc)){sent=JSON.parse(options.body as string).p_body;return reply({});}
+  if(url.includes('slm_phone_visibility'))return reply([]);
+  throw new Error('Nieoczekiwane żądanie testowe '+url);
+ }));
+ const handler=createHandler({url:'https://example.invalid',anon:'',service:'',origins:[]});
+ const r=await handler(new Request('https://example.invalid',{method:'POST',headers:{authorization:'Bearer '+token},body:JSON.stringify({action,...allowed,padding:'x'.repeat(5000),p_user:'spoofed',role:'admin'})}));
+ expect(r.status).toBe(200);expect(sent).toEqual({action,...allowed});
+});
+it('pickFields zachowuje tylko znane klucze',()=>{
+ expect(pickFields({action:'a',request_id:'r',junk:1},RPC_FIELDS.settlements)).toEqual({action:'a',request_id:'r'});
 });
