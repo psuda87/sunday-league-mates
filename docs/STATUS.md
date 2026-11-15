@@ -1,3 +1,13 @@
+# Dzwonek — przypomnienie o zaległych płatnościach — 2026-11-15 (zgoda właściciela)
+
+Main `9edc04d` (gałąź `feat/payment-reminder-bell`): dzwonek na ekranie „Mecze” liczy własne mecze z nieopłaconą należnością (bez meczów ze zgłoszoną wpłatą oczekującą na akceptację)
+plus — u administratora — prośby do grup. Okno: lista meczów z kwotami, ostrzeżenie przed blokadą/o blokadzie zapisów płatnych, „Zgłoś wpłatę” otwiera Profil z rozwiniętymi
+„Moimi płatnościami”. Dane z istniejącego `group_finance_wallet`; bez zmian bazy i Edge. Strażnicy: `OWNER_SOURCE` = `7f1de95`. Kontrole: tsc PASS, Vitest 610/610, eslint 0 błędów,
+oba strażniki PASS, build PASS. Vercel produkcja = `9edc04d` (`dpl_FK8kskiJgXvR8zJ6o3kEhsVBWmAi`), HTTP 200.
+Złota karta MVP: kod karty na `preview/mvp-gold` (`b724f0a`) i `main` identyczny; lokalny render z main (ciemny/jasny, España/Lime, inicjały/zdjęcie) pokazuje stadion przez złoto — zgłoszonego błędu nie odtworzono.
+
+---
+
 # Profile kolorystyczne — „Zadzwoń”, zakładka „Oceny”, domyślnie España ciemny — 2026-11-15 (zgoda właściciela)
 
 Main `3eaaffd` (gałąź `fix/palette-call-dark-default`): `.slm-call` i `ratingPanel.css` używają zmiennych aktywnego profilu (`--slm-gold`, `--ion-text-color`, `--slm-panel`,
