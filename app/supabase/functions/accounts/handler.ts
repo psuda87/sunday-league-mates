@@ -454,27 +454,27 @@ export function createHandler(env: Environment) {
         if (!r.ok) {
           const code = typeof r.data?.message === 'string' ? r.data.message : '';
           const errors: Record<string, [number, string]> = {
-            session_invalid: [401, 'Sesja wygas?a. Zaloguj si? ponownie.'],
-            forbidden: [403, 'Brak uprawnie? do tej operacji.'],
+            session_invalid: [401, 'Sesja wygasła. Zaloguj się ponownie.'],
+            forbidden: [403, 'Brak uprawnień do tej operacji.'],
             not_found: [404, 'Nie znaleziono wskazanych danych.'],
-            registration_blocked: [403, 'Zaleg?o?ci blokuj? nowe zapisy na p?atne mecze.'],
-            event_full: [409, 'Brak wolnych miejsc. Mo?esz wybra? rezerw?.'],
-            duplicate_signup: [409, 'Ten zapis ju? istnieje.'],
-            registration_closed: [409, 'Zapisy s? zamkni?te.'],
-            event_cancelled: [409, 'Mecz zosta? odwo?any.'],
-            stale_version: [409, 'Dane zmieni?y si?. Od?wie? je przed ponown? decyzj?.'],
+            registration_blocked: [403, 'Zaległości blokują nowe zapisy na płatne mecze.'],
+            event_full: [409, 'Brak wolnych miejsc. Możesz wybrać rezerwę.'],
+            duplicate_signup: [409, 'Ten zapis już istnieje.'],
+            registration_closed: [409, 'Zapisy są zamknięte.'],
+            event_cancelled: [409, 'Mecz został odwołany.'],
+            stale_version: [409, 'Dane zmieniły się. Odśwież je przed ponowną decyzją.'],
             idempotency_conflict: [409, 'Identyfikator dotyczy innej operacji.'],
             consent_required: [409, 'Potwierdź przejście na pseudonim, aby ukryć dane.'],
-            payment_processed: [409, 'Wp?ata zosta?a ju? rozpatrzona.'],
+            payment_processed: [409, 'Wpłata została już rozpatrzona.'],
             already_paid: [409, 'Należność jest już opłacona. Odśwież płatności.'],
             overpayment: [409, 'Kwota przewyższa pozostałą należność za mecz.'],
             pending_payment_exists: [409, 'Wpłata czeka już na decyzję administratora.'],
-            request_processed: [409, 'Pro?ba zosta?a ju? rozpatrzona.'],
-            already_member: [409, 'Zawodnik ju? nale?y do grupy.'],
+            request_processed: [409, 'Prośba została już rozpatrzona.'],
+            already_member: [409, 'Zawodnik już należy do grupy.'],
             group_archived: [409, 'Grupa jest zarchiwizowana.'],
-            match_not_finished: [409, 'Mecz jeszcze si? nie zako?czy?.'],
-            already_approved: [409, 'Rozliczenie jest ju? zatwierdzone.'],
-            reason_required: [400, 'Podaj pow?d decyzji (do 500 znak?w).'],
+            match_not_finished: [409, 'Mecz jeszcze się nie zakończył.'],
+            already_approved: [409, 'Rozliczenie jest już zatwierdzone.'],
+            reason_required: [400, 'Podaj powód decyzji (do 500 znaków).'],
           };
           if(prefix==='groups_'){
             const messages:Record<string,string>={session_invalid:'Sesja wygasła. Zaloguj się ponownie.',forbidden:'Brak uprawnień do tej operacji.',not_found:'Grupa lub profil nie istnieje albo nie masz dostępu.',request_processed:'Zgłoszenie zostało już rozpatrzone. Odśwież grupę.',already_member:'Ta osoba już należy do grupy.',idempotency_conflict:'Identyfikator dotyczy innej operacji. Odśwież dane.',group_archived:'Grupa jest zarchiwizowana.'};
@@ -484,8 +484,8 @@ export function createHandler(env: Environment) {
           if (code === 'invalid_group' || code === 'invalid_input' || code === 'request_required') throw new ApiError(400, code, 'Sprawdź nazwę, opis i wymagane pola.');
           if (errors[code]) throw new ApiError(errors[code][0], code, errors[code][1]);
           if (r.data?.code === '22P02' || r.data?.code === '23514' || r.data?.code === '23502')
-            throw new ApiError(400, 'invalid_input', 'Sprawd? wymagane pola i poprawno?? danych.');
-          throw new ApiError(503, 'service_unavailable', 'Nie uda?o si? potwierdzi? operacji. Pon?w z tym samym identyfikatorem.');
+            throw new ApiError(400, 'invalid_input', 'Sprawdź wymagane pola i poprawność danych.');
+          throw new ApiError(503, 'service_unavailable', 'Nie udało się potwierdzić operacji. Ponów z tym samym identyfikatorem.');
         }
         if (action === 'matches_list' && (Object.hasOwn(payload, 'query') || payload.scope === 'groups') && r.data?.public_discovery_version !== 1)
           throw new ApiError(503, 'discovery_unavailable', 'Wyszukiwanie wymaga aktualnego backendu. Spróbuj ponownie po aktualizacji.');
