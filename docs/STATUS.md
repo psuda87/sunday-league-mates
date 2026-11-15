@@ -1,3 +1,12 @@
+# Szczegóły meczu — przycisk „i” i mapy po adresie — 2026-11-15 (zgoda właściciela)
+
+Main `3415b12` (gałąź `feat/match-info-button`): zakładka „Informacje” zastąpiona przyciskiem „i” w kafelku szczegółów meczu (okno z tą samą treścią, edycją i zarządzaniem);
+zakładki: Uczestnicy, Składy, Rozliczenie, Oceny. Widok bez kafelka (`access='own'`) zachowuje zakładkę. Link lokalizacji pokazuje nazwę obiektu, a Google Maps szuka po polu adres
+(gdy go brak — po nazwie). Strażnicy przepięci (`OWNER_SOURCE` = `e8abb74`). Kontrole: tsc PASS, Vitest 602/602, eslint 0 błędów, oba strażniki PASS, build PASS.
+Vercel produkcja = `3415b12` (`dpl_6LPnB4oZaV55hrcBtrE3AGsqtePZ`), HTTP 200, bundle zawiera przycisk. Bez zmian bazy i Edge. Wyglądu na telefonie nie sprawdzano.
+
+---
+
 # Wydanie 2026-11-15 — main na produkcji (zgoda właściciela)
 
 Main `264a97e` = PR #67 (moduł ocen) + `fix/finance-match-approval-feedback` (konflikt w jednej linii: komunikaty main + `match_not_finished`, `already_approved`, `forbidden`, `event_cancelled`).
