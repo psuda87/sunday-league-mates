@@ -10,12 +10,14 @@ export function setPalette(palette:Palette) {
  document.documentElement.dataset.theme=palette;window.dispatchEvent(new CustomEvent('slm-palette',{detail:palette}));
 }
 export type Appearance = 'auto' | 'light' | 'dark';
-let memoryAppearance:Appearance='auto';
+// Owner decision 2026-11-15: España dark is the default until the user picks another mode.
+export const defaultAppearance:Appearance='dark';
+let memoryAppearance:Appearance=defaultAppearance;
 // Retain the subscribed MediaQueryList for the lifetime of the app.
 let activeMedia: MediaQueryList | null = null;
 export const appearanceKey = 'slm.appearance';
 export function readAppearance(): Appearance {
-  try { const value = localStorage.getItem(appearanceKey); return value === 'light' || value === 'dark' ? value : 'auto'; }
+  try { const value = localStorage.getItem(appearanceKey); return value === 'light' || value === 'dark' || value === 'auto' ? value : defaultAppearance; }
   catch { return memoryAppearance; }
 }
 export function resolveDark(mode: Appearance, systemDark: boolean) { return mode === 'dark' || (mode === 'auto' && systemDark); }
