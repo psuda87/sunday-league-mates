@@ -1,3 +1,26 @@
+# Wydanie 2026-11-15 — main na produkcji (zgoda właściciela)
+
+Main `264a97e` = PR #67 (moduł ocen) + `fix/finance-match-approval-feedback` (konflikt w jednej linii: komunikaty main + `match_not_finished`, `already_approved`, `forbidden`, `event_cancelled`).
+Kontrole przed pushem: tsc PASS, Vitest 598/598, eslint 0 błędów (7 ostrzeżeń), `verify:consolidation` PASS, `test:premium-policy` PASS, `build:premium-web` PASS.
+Nie scalono: `fix/android-keyboard-scroll-20261107` (własny test nie przechodzi na gałęzi), `fix/security-p1-p3-20261110` (migracja spoza kolejności, nie ma jej w bazie, strażnicy odrzucają),
+`feat/tito-atomic-lineups` (zastąpiona przez PR #57), `feat/account-model-foundation` i `feat/premium-account-identifiers` (szkice z października, 231 commitów za main).
+
+Supabase `hjtcyybkxebvdropchac`:
+- `20261115002408_rating_module` (wcześniej tego dnia).
+- `20261115120000_account_privacy_reconcile_20261115` — po próbie na sucho z wycofaniem: części `20261104183413_account_privacy_lifecycle` nieobjęte `phone_privacy_only_20261109`
+  (FK profilu zawodnika z kaskadą, cofnięcie SELECT tabel kontaktowych dla anon/authenticated, `photo_upload_leases` + `slm_photo_upload_lease`, `account_deletions`, `slm_deletion_*`,
+  `privacy_redaction_ok`, `erase_json`, kolumny `*_erased`, nullowalne odwołania historyczne), strażnik `group_payment_identity_guard` z `20261019171834` (bez starego dispatchera)
+  oraz `20261114100000_fix_account_deletion_request_receipts`. md5 treści `9ea28a424edfeb30d4e6f5da36dfc0c8`. Nowe RPC wyłącznie dla `service_role`.
+  Pliku tej migracji nie ma w repo (podobnie jak `phone_privacy_only_20261109`); historia migracji baza↔repo nadal różni się znacznikami czasu.
+- Edge `accounts` wdrożona z main `264a97e` (wcześniej tego dnia: wersja produkcyjna + blok ocen). Z listy CORS zniknął lokalny `127.0.0.1:5196`.
+  Kontrola bez kont: OPTIONS 204, login z błędnymi danymi 401 `invalid_credentials`, status/ratings bez sesji 401, `account_delete_resume` 400 `deletion_invalid`.
+
+Vercel `slm-ui-demo`: produkcja = main `264a97e` (`dpl_2V7bKEyknEXCBP2sfyoQGbE8onjj`), poprzednio `3235037`. Strona, regulamin i polityka HTTP 200. Push do main nie buduje się automatycznie
+(Git buduje tylko `preview/mvp-gold`). Logowanie działa wyłącznie z domen na liście CORS (slm-ui-demo, slm-soccer, slm-football, podgląd git-preview-mvp-gold), nie z adresów pojedynczych wdrożeń.
+Testów w przeglądarce na prawdziwych kontach nie wykonano; czekają na właściciela. Przełącznik testowy MVP Gold działa tylko na `preview/mvp-gold`.
+
+---
+
 # Moduł ocen (Rating 0.2) — 2026-11-14, gałąź `feat/rating-module`
 
 Zasady: `docs/rating/SLM_RATING_0_2.md` (zatwierdzone przez właściciela). Zbudowane i przetestowane **lokalnie**; **nic nie wdrożono** (ani migracji, ani funkcji Edge, ani klienta).
