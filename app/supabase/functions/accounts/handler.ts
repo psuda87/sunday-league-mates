@@ -38,6 +38,15 @@ function password(body: Row, key: string, newPassword = false): string {
 // 9 losowych bajtów = 72 bity entropii i dokładnie 12 znaków base64url.
 export const randomPassword = () => btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(9))))
   .replace(/\+/g, '-').replace(/\//g, '_');
+// Porównanie sekretów w stałym czasie: porównujemy skróty o stałej długości.
+export async function secretEquals(given: string, expected: string): Promise<boolean> {
+  if (!expected) return false;
+  const digest = async (value: string) => new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value)));
+  const [a, b] = await Promise.all([digest(given), digest(expected)]);
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
+  return diff === 0;
+}
 export function displayName(login: string, fullName: string, mode: string) {
   return mode === 'full_name' && fullName.trim() ? fullName.trim() : login;
 }
@@ -231,7 +240,7 @@ export function createHandler(env: Environment) {
       if(uploadRequest&&action!=='profile_photo_upload')throw new ApiError(400,'invalid_input','Nieprawidłowe żądanie.');
       await rate('global', 300);
       if(action==='account_privacy_worker'){
-        if(origin||request.headers.get('authorization')!==`Bearer ${env.service}`||!env.service)throw unauthorized();
+        if(origin||!env.service||!(await secretEquals(request.headers.get('authorization')??'',`Bearer ${env.service}`)))throw unauthorized();
         const jobs=await privacyRpc('deletion_work',{});
         let finished=0;
         for(const job of jobs){try{await finishDeletion(job.operation_id,null,deletion);finished++;}catch{/* Durable retry/backoff. */}}
@@ -631,6 +640,7 @@ export function createHandler(env: Environment) {
         return respond(await profile(ctx.id));
       }
       if (action === 'save_profile') {
+        await rate('scoped:' + ctx.id, 90);
         const name = field(body, 'full_name', 100).trim();
         const mode = field(body, 'display_as');
         if (!['nickname', 'first_name', 'full_name'].includes(mode)) throw new ApiError(400, 'invalid_input', 'Wybierz nazwę wyświetlaną.');

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { webcrypto } from 'node:crypto';
-import { createHandler, displayName, normalizeLogin, normalizePhone, randomPassword } from './handler';
+import { createHandler, displayName, normalizeLogin, normalizePhone, randomPassword, secretEquals } from './handler';
 
 afterEach(() => vi.unstubAllGlobals());
 describe('brama rozliczeń (kontrolowane RPC)', () => {
@@ -207,4 +207,28 @@ it('returns a consent conflict instead of an outage when revocation lacks confir
  const handler=createHandler({url:'https://example.invalid',anon:'',service:'',origins:[]});
  const r=await handler(new Request('https://example.invalid',{method:'POST',headers:{authorization:'Bearer '+token},body:JSON.stringify({action:'groups_consent',share_full_name:false,request_id:webcrypto.randomUUID()})}));
  expect(r.status).toBe(409);expect((await r.json()).code).toBe('consent_required');
+});
+it('porównuje sekrety w stałym czasie i odrzuca pusty oczekiwany sekret', async () => {
+ vi.stubGlobal('crypto',webcrypto);
+ expect(await secretEquals('Bearer fixture-service','Bearer fixture-service')).toBe(true);
+ expect(await secretEquals('Bearer fixture-servicE','Bearer fixture-service')).toBe(false);
+ expect(await secretEquals('Bearer fixture-service-longer','Bearer fixture-service')).toBe(false);
+ expect(await secretEquals('','')).toBe(false);
+});
+it('save_profile podlega limitowi prób przed zapisem profilu', async () => {
+ vi.stubGlobal('crypto',webcrypto);
+ const id=webcrypto.randomUUID(),sid=webcrypto.randomUUID();
+ const token=['synthetic',btoa(JSON.stringify({sub:id,session_id:sid})),'unsigned'].join('.');
+ const rateKeys:string[]=[];let patched=false;
+ vi.stubGlobal('fetch',vi.fn(async(url:string,options:RequestInit)=>{
+  const reply=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status});
+  if(url.includes('slm_account_rate')){const key=JSON.parse(options.body as string).p_key;rateKeys.push(key);return reply(rateKeys.length===1);}
+  if(url.endsWith('/auth/v1/user'))return reply({id});
+  if(url.includes('slm_account_context'))return reply({user_id:id,role:'member',must_change_password:false});
+  if(url.includes('slm_profiles')&&options.method==='PATCH'){patched=true;return reply([]);}
+  throw new Error('Nieoczekiwane żądanie testowe '+url);
+ }));
+ const handler=createHandler({url:'https://example.invalid',anon:'',service:'',origins:[]});
+ const r=await handler(new Request('https://example.invalid',{method:'POST',headers:{authorization:'Bearer '+token},body:JSON.stringify({action:'save_profile',full_name:'Jan',display_as:'nickname'})}));
+ expect(r.status).toBe(429);expect(patched).toBe(false);expect(rateKeys).toHaveLength(2);
 });
