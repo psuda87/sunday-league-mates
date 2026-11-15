@@ -1,3 +1,13 @@
+# Profile kolorystyczne — „Zadzwoń”, zakładka „Oceny”, domyślnie España ciemny — 2026-11-15 (zgoda właściciela)
+
+Main `3eaaffd` (gałąź `fix/palette-call-dark-default`): `.slm-call` i `ratingPanel.css` używają zmiennych aktywnego profilu (`--slm-gold`, `--ion-text-color`, `--slm-panel`,
+`--slm-button-*`) zamiast stałego złota/czerwieni España; w wierszu MVP Gold przycisk pozostaje złoty. Domyślny tryb bez zapisanego wyboru: ciemny (`defaultAppearance`), profil España;
+zapisany wybór (także „auto”) zostaje. `app/index.html` (domyślna aplikacja LIVE) nadal ma skrypt startowy „auto” — Premium (`b1/index.html`) go nie ma.
+Strażnicy: `OWNER_SOURCE` = `a0c9b20`, `app/src/ui/theme.ts` dopisany do `OWNER_FILES`. Kontrole: tsc PASS, Vitest 604/604, eslint 0 błędów, oba strażniki PASS, build PASS.
+Vercel produkcja = `3eaaffd` (`dpl_Hdy84hRK88QHv4VieZX5SemUuNUE`), HTTP 200. Wyglądu w przeglądarce nie sprawdzano; pozostałych ekranów pod kątem stałych kolorów nie audytowano.
+
+---
+
 # Szczegóły meczu — przycisk „i” i mapy po adresie — 2026-11-15 (zgoda właściciela)
 
 Main `3415b12` (gałąź `feat/match-info-button`): zakładka „Informacje” zastąpiona przyciskiem „i” w kafelku szczegółów meczu (okno z tą samą treścią, edycją i zarządzaniem);
