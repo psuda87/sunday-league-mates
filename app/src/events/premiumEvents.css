@@ -234,3 +234,13 @@
    margin:0 0 7px;font-size:.875rem;line-height:1.3;
  }
 }
+/* Match information behind the "i" button on the detail card (owner request 2026-11-15). */
+.slm-premium-events .slm-match-detail .slm-match-info-button {flex:none;display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;margin:-4px -6px -4px 0;padding:0;border:0;border-radius:50%;background:transparent;color:var(--slm-gold);font-size:24px;cursor:pointer;position:relative;z-index:2;}
+.slm-premium-events .slm-match-detail .slm-match-info-button:active {background:rgba(255,255,255,.08);}
+.slm-premium-events .slm-match-info-dialog {padding:14px 16px 16px;}
+.slm-premium-events .slm-match-info-dialog-head {display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 6px;}
+.slm-premium-events .slm-match-info-dialog-head h2 {margin:0;}
+.slm-premium-events .slm-match-info-close {flex:none;width:40px;height:40px;margin:-8px -10px -8px 0;border:0;border-radius:50%;background:transparent;color:var(--slm-text);font-size:1.6rem;line-height:1;cursor:pointer;}
+.slm-premium-events .slm-match-info-dialog .slm-match-info {margin:0;padding:0;border:0;background:transparent;box-shadow:none;}
+.slm-premium-events .slm-match-info-dialog .slm-match-info > h2 {display:none;}
+.slm-premium-events .slm-match-info-dialog .slm-match-info p {margin:0 0 10px;}

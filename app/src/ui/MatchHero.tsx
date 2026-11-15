@@ -1,13 +1,15 @@
 import type { ReactNode } from 'react';
 import { IonIcon } from '@ionic/react';
-import { locationOutline, timeOutline } from 'ionicons/icons';
+import { informationCircleOutline, locationOutline, timeOutline } from 'ionicons/icons';
 import type { Match } from '../events/model';
 import { capacityState } from './capacity';
 import MatchCapacityProgress from './MatchCapacityProgress';
-export type MatchHeroModel = Pick<Match,'starts_at'|'location'|'status'> & Partial<Pick<Match,'registered_count'|'capacity'|'duration_minutes'|'registration_open'|'decision_required'>>;
-export default function MatchHero({ match, children, badge, imageSrc = '/assets/branding/stadium-bg-card.jpg', title = 'Następny mecz', onOpen, openDisabled = false, compact = false, displayName, minimum = 10 }: { match: MatchHeroModel; children?: ReactNode; badge?:ReactNode; imageSrc?: string; title?: string; onOpen?: () => void; openDisabled?: boolean; compact?: boolean; displayName?: string; minimum?:number }) {
+export type MatchHeroModel = Pick<Match,'starts_at'|'location'|'status'> & Partial<Pick<Match,'registered_count'|'capacity'|'duration_minutes'|'registration_open'|'decision_required'>> & { address?: string };
+// The visible label is the venue name; Google Maps searches by the street address when one is known.
+const mapsSearchUrl =(match: Pick<MatchHeroModel,'location'|'address'>) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((match.address?.trim() || match.location).trim())}`;
+export default function MatchHero({ match, children, badge, imageSrc = '/assets/branding/stadium-bg-card.jpg', title = 'Następny mecz', onOpen, openDisabled = false, compact = false, displayName, minimum = 10, onInfo }: { match: MatchHeroModel; children?: ReactNode; badge?:ReactNode; imageSrc?: string; title?: string; onOpen?: () => void; openDisabled?: boolean; compact?: boolean; displayName?: string; minimum?:number; onInfo?: () => void }) {
   const date = new Date(match.starts_at);
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(match.location.trim())}`;
+  const mapsUrl = mapsSearchUrl(match);
   const isDetail = title === 'Szczegóły meczu';
   const capacity = typeof match.registered_count==='number' && typeof match.capacity==='number' ? capacityState(match.registered_count, match.capacity, minimum) : null;
   const format = (options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('pl-PL', { timeZone: 'Europe/Warsaw', hourCycle:'h23', ...options }).format(date);
@@ -21,8 +23,8 @@ export default function MatchHero({ match, children, badge, imageSrc = '/assets/
         <time className="slm-date-tile" dateTime={match.starts_at} aria-label={format({ weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}>
           <span>{format({ weekday: 'short' })}</span><strong>{format({ day: 'numeric' })}</strong><span>{format({ month: 'short' })}</span>
         </time>
-        <div className="slm-match-meta">{compact ? <h2 className="slm-card-name">{displayName ?? `Mecz · ${format({ weekday: 'long' })}`}</h2> : isDetail ? <><div className="slm-detail-title-row"><h2 className="slm-detail-name">{displayName ?? `Mecz · ${format({ weekday: 'long' })}`}</h2>{badge}</div><strong className="slm-kickoff">{format({ hour: '2-digit', minute: '2-digit' })}</strong></> : <><p className="slm-weekday">{format({ weekday: 'long' })}</p><strong className="slm-kickoff">{format({ hour: '2-digit', minute: '2-digit' })}</strong></>}
-          <p className="slm-location"><IonIcon icon={locationOutline} aria-hidden="true" /> <a className="slm-location-map-link" href={mapsUrl} target="_blank" rel="noopener noreferrer" aria-label={`Otwórz lokalizację w Google Maps: ${match.location}`} onClick={event=>event.stopPropagation()}>{match.location}</a></p>
+        <div className="slm-match-meta">{compact ? <h2 className="slm-card-name">{displayName ?? `Mecz · ${format({ weekday: 'long' })}`}</h2> : isDetail ? <><div className="slm-detail-title-row"><h2 className="slm-detail-name">{displayName ?? `Mecz · ${format({ weekday: 'long' })}`}</h2>{badge}{onInfo && <button type="button" className="slm-match-info-button" aria-label="Informacje o meczu" aria-haspopup="dialog" onClick={onInfo}><IonIcon icon={informationCircleOutline} aria-hidden="true" /></button>}</div><strong className="slm-kickoff">{format({ hour: '2-digit', minute: '2-digit' })}</strong></> : <><p className="slm-weekday">{format({ weekday: 'long' })}</p><strong className="slm-kickoff">{format({ hour: '2-digit', minute: '2-digit' })}</strong></>}
+          <p className="slm-location"><IonIcon icon={locationOutline} aria-hidden="true" /> <a className="slm-location-map-link" href={mapsUrl} target="_blank" rel="noopener noreferrer" aria-label={`Otwórz lokalizację w Google Maps: ${match.location}${match.address?.trim() ? `, ${match.address.trim()}` : ''}`} onClick={event=>event.stopPropagation()}>{match.location}</a></p>
           <p className="slm-match-date"><IonIcon icon={timeOutline} aria-hidden="true" /> {compact ? `${format({ hour: '2-digit', minute: '2-digit' })}${match.duration_minutes===undefined?'':` · ${match.duration_minutes} min`}` : `${match.duration_minutes} minut · ${format({ year: 'numeric' })}`}</p>
         </div>
       </div>
