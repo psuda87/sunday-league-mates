@@ -1,3 +1,13 @@
+# Wydajność frontendu — gałąź perf/lazy-cache-cleanup — 2026-11-15
+
+Zmiany: ekrany konta ładowane leniwie (`app/src/pages/lazyScreens.tsx`), usunięty `@vitejs/plugin-legacy` z domyślnego `vite.config.ts` (bez drugiego pakietu legacy),
+`SessionManager.call` współdzieli równoczesne identyczne `groups_list`/`groups_inbox` (bez cache po zakończeniu — dane zawsze z serwera). Wygląd, routing Premium, migracje i Edge bez zmian.
+Pomiar `npm run build` (domyślny LIVE): główny JS 1490 → 1363 KB (gzip 338 → 303 KB), CSS 139,6 → 125,1 KB, `dist` 5,1 → 3,4 MB; reszta to Ionic/React (kod aplikacji ok. 59 KB).
+Kontrole: tsc PASS, Vitest 615/615 + nowy test współdzielenia odczytów, eslint na zmienionych plikach 0 błędów. `verify:consolidation` nie uruchomiony: strażnik wymaga commita `a82397b`,
+którego nie ma na GitHubie (uruchomić lokalnie). W przeglądarce/na Androidzie nie testowano. Otwarte: 56 kluczy obcych bez indeksu i 2 polityki RLS bez `(select auth.uid())` (advisors, bez zmian w bazie).
+
+---
+
 # Bezpieczeństwo P1, zmiana nazwy grupy, kłódka widoczności — 2026-11-15 (zgoda właściciela)
 
 Main `0c9c352`. Supabase `hjtcyybkxebvdropchac` (po próbie na sucho z wycofaniem, zapisane w historii migracji):
