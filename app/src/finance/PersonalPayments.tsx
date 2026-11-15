@@ -7,6 +7,7 @@ import {isSettledReport,paymentChoices,receiptStatus} from './paymentModel';
 import {formatCents,parseCents} from '../settlements/model';
 import {matchDate} from '../events/model';
 import {eventSummary} from '../events/premiumContracts';
+import {financeChangedEvent,ownPaymentsRequestEvent,takeOwnPaymentsRequest} from './paymentsIntent';
 import './premiumFinance.css';
 
 function OwnPaymentForm({manager,userId,group,onChanged,refreshVersion}:{manager:SessionManager;userId:string;group:WalletGroup;onChanged:()=>void;refreshVersion:number}){
@@ -49,7 +50,12 @@ function OwnPaymentForm({manager,userId,group,onChanged,refreshVersion}:{manager
 
 export default function PersonalPayments({manager,userId}:{manager:SessionManager;userId:string}){
  const [open,setOpen]=useState(false),[groups,setGroups]=useState<WalletGroup[]|null>(null),[groupId,setGroupId]=useState(''),[error,setError]=useState(''),[revision,setRevision]=useState(0);
- const generation=useRef(0);
+ const generation=useRef(0),section=useRef<HTMLElement>(null);
+ // Opened from the notification bell ("Zgłoś wpłatę"): expand and bring the section into view.
+ useEffect(()=>{
+  const reveal=()=>{if(!takeOwnPaymentsRequest())return;setOpen(true);window.setTimeout(()=>section.current?.scrollIntoView?.({block:'start',behavior:'smooth'}),150);};
+  reveal();window.addEventListener(ownPaymentsRequestEvent,reveal);return()=>window.removeEventListener(ownPaymentsRequestEvent,reveal);
+ },[]);
  useEffect(()=>manager.subscribe(()=>{
   const auth=manager.getSnapshot();if(auth.phase!=='ready'||auth.session?.user_id!==userId){generation.current++;setGroups(null);}else setRevision(v=>v+1);
  }),[manager,userId]);
@@ -76,12 +82,12 @@ export default function PersonalPayments({manager,userId}:{manager:SessionManage
   return()=>{alive=false;};
  },[manager,userId,open,revision]);
  const group=groups?.find(g=>g.group_id===groupId);
- return <section className="slm-finance slm-premium-finance" aria-label="Płatności własnego profilu">
+ return <section ref={section} className="slm-finance slm-premium-finance" aria-label="Płatności własnego profilu">
   <button type="button" aria-expanded={open} onClick={()=>setOpen(v=>!v)}>Moje płatności</button>
   {open&&<><h2>Moje płatności</h2>{error&&<p role="alert">{error}</p>}{!groups&&!error&&<p role="status">Wczytywanie płatności…</p>}<button onClick={()=>setRevision(v=>v+1)}>Odśwież płatności</button>
    {groups?.length===0&&<p>Nie masz jeszcze rozliczeń w grupach.</p>}
    {groups&&groups.length>1?<label>Grupa<select value={groupId} onChange={e=>setGroupId(e.target.value)}>{groups.map(g=><option key={g.group_id} value={g.group_id}>{g.group_name}</option>)}</select></label>:group&&<p>{group.group_name}</p>}
-   {group&&<OwnPaymentForm key={`${userId}:${group.group_id}`} manager={manager} userId={userId} group={group} refreshVersion={revision} onChanged={()=>setRevision(v=>v+1)}/>}
+   {group&&<OwnPaymentForm key={`${userId}:${group.group_id}`} manager={manager} userId={userId} group={group} refreshVersion={revision} onChanged={()=>{setRevision(v=>v+1);window.dispatchEvent(new Event(financeChangedEvent));}}/>}
   </>}
  </section>;
 }

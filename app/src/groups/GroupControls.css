@@ -55,3 +55,11 @@
 .slm-group-notification-panel ul {list-style:none;margin:0;padding:0;}
 .slm-group-notification-panel li button {display:flex;flex-direction:column;gap:6px;width:100%;min-height:48px;padding:12px 4px;text-align:left;background:transparent;color:inherit;border:0;border-bottom:1px solid var(--slm-border);font:inherit;overflow-wrap:anywhere;}
 .slm-group-notification-panel button:focus-visible {outline:2px solid var(--slm-gold);outline-offset:2px;}
+/* Own outstanding payments in the shared notification bell (owner request 2026-11-15). */
+.slm-payment-reminder {margin:0 0 14px;padding:0 0 14px;border-bottom:1px solid var(--slm-border);}
+.slm-payment-reminder:last-child {margin:0;padding:0;border:0;}
+.slm-payment-reminder li {display:flex;flex-direction:column;gap:4px;padding:10px 4px;border-bottom:1px solid var(--slm-border);line-height:1.4;overflow-wrap:anywhere;}
+.slm-payment-reminder li span:last-child {color:var(--slm-text-secondary);font-size:.85rem;}
+.slm-payment-reminder-warning {margin:10px 0 0 !important;font-size:.85rem;color:var(--ion-text-color);}
+.slm-payment-reminder-cta {width:100%;min-height:44px;margin-top:12px;border:1px solid var(--slm-gold);border-radius:12px;background:linear-gradient(180deg,var(--slm-button-top),var(--slm-button-bottom));color:var(--ion-color-primary-contrast,#fff);font:inherit;font-weight:700;cursor:pointer;}
+.slm-payment-reminder-cta:focus-visible {outline:2px solid var(--slm-gold);outline-offset:2px;}
