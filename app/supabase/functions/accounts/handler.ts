@@ -57,6 +57,16 @@ export const RPC_FIELDS = {
 export function pickFields(body: Row, fields: readonly string[]): Row {
   return Object.fromEntries(fields.filter(key => Object.hasOwn(body, key)).map(key => [key, body[key]]));
 }
+// Adres klienta ustawiany przez Cloudflare/bramę Supabase. Brak lub nietypowa
+// wartość => null: wtedy działa wyłącznie limit globalny, nigdy wspólny kubełek "unknown".
+export function clientAddress(request: Request): string | null {
+  for (const name of ['cf-connecting-ip', 'x-real-ip', 'x-forwarded-for']) {
+    const value = request.headers.get(name)?.split(',')[0]?.trim() ?? '';
+    if (value && value.length <= 45 && /^[0-9A-Fa-f:.]+$/.test(value)) return value.toLowerCase();
+  }
+  return null;
+}
+const EMAIL_ACTIONS = new Set(['signup', 'resend_verification', 'recover_email', 'verify_email', 'recover_password']);
 export function displayName(login: string, fullName: string, mode: string) {
   return mode === 'full_name' && fullName.trim() ? fullName.trim() : login;
 }
@@ -248,7 +258,11 @@ export function createHandler(env: Environment) {
       const body = parsed as Row;
       const action = field(body, 'action', 40);
       if(uploadRequest&&action!=='profile_photo_upload')throw new ApiError(400,'invalid_input','Nieprawidłowe żądanie.');
-      await rate('global', 300);
+      // Najpierw limit per adres (jeden klient nie zablokuje innych), potem wysoki bezpiecznik globalny.
+      const client = clientAddress(request);
+      if (client) await rate('ip:' + client, 180);
+      await rate('global', 3000);
+      if (client && EMAIL_ACTIONS.has(action)) await rate('email-flow-ip:' + client, 4);
       if(action==='account_privacy_worker'){
         if(origin||!env.service||!(await secretEquals(request.headers.get('authorization')??'',`Bearer ${env.service}`)))throw unauthorized();
         const jobs=await privacyRpc('deletion_work',{});
@@ -257,6 +271,7 @@ export function createHandler(env: Environment) {
         return respond({processed:finished});
       }
       if(action==='account_delete_resume'){
+        if(client)await rate('deletion-resume-ip:'+client,6);
         await rate('deletion-resume',12);
         let ticket;try{ticket=deletionProof(body);}catch{throw new ApiError(400,'deletion_invalid','Nieprawidłowa operacja usuwania.');}
         return respond(await finishDeletion(ticket.operation,ticket.proof,deletion));
@@ -295,7 +310,8 @@ export function createHandler(env: Environment) {
         return respond(await accept(session, s!.security_version));
       }
       if (action === 'refresh') {
-        await rate('refresh-global', 120);
+        if (client) await rate('refresh-ip:' + client, 30);
+        await rate('refresh-global', 600);
         const r = await call('/auth/v1/token?grant_type=refresh_token', 'POST', { refresh_token: field(body, 'refresh_token', 4096) });
         if (r.status >= 500) throw new ApiError(503, 'service_unavailable', 'Serwer jest chwilowo niedostępny. Spróbuj ponownie.');
         if (r.status === 429) throw new ApiError(429, 'rate_limited', 'Zbyt wiele prób. Spróbuj ponownie za minutę.');

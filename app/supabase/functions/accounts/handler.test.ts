@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { webcrypto } from 'node:crypto';
-import { createHandler, displayName, normalizeLogin, normalizePhone, randomPassword, secretEquals, pickFields, RPC_FIELDS } from './handler';
+import { createHandler, displayName, normalizeLogin, normalizePhone, randomPassword, secretEquals, pickFields, RPC_FIELDS, clientAddress } from './handler';
 
 afterEach(() => vi.unstubAllGlobals());
 describe('brama rozliczeń (kontrolowane RPC)', () => {
@@ -256,4 +256,29 @@ it.each([
 });
 it('pickFields zachowuje tylko znane klucze',()=>{
  expect(pickFields({action:'a',request_id:'r',junk:1},RPC_FIELDS.settlements)).toEqual({action:'a',request_id:'r'});
+});
+describe('limity per adres klienta', () => {
+ const sha=async(v:string)=>Array.from(new Uint8Array(await webcrypto.subtle.digest('SHA-256',new TextEncoder().encode(v)))).map(x=>x.toString(16).padStart(2,'0')).join('');
+ async function keysFor(headers:Record<string,string>,body:Record<string,unknown>={action:'login'}){
+  vi.stubGlobal('crypto',webcrypto);
+  const keys:string[]=[];
+  vi.stubGlobal('fetch',vi.fn(async(_url:string,options:RequestInit)=>{keys.push(JSON.parse(options.body as string).p_key);return new Response('false',{status:200});}));
+  const handler=createHandler({url:'https://example.invalid',anon:'',service:'',origins:[]});
+  const r=await handler(new Request('https://example.invalid',{method:'POST',headers,body:JSON.stringify(body)}));
+  return {status:r.status,keys};
+ }
+ it('sprawdza limit adresu przed globalnym i odmawia bez dalszych zapytań', async () => {
+  const r=await keysFor({'cf-connecting-ip':'203.0.113.7'});
+  expect(r.status).toBe(429);expect(r.keys).toEqual([await sha('ip:203.0.113.7')]);
+ });
+ it('bez wiarygodnego adresu używa tylko limitu globalnego, bez wspólnego kubełka', async () => {
+  expect((await keysFor({})).keys).toEqual([await sha('global')]);
+  expect((await keysFor({'x-forwarded-for':'unknown, 1.2.3.4'})).keys).toEqual([await sha('global')]);
+ });
+ it('rozpoznaje adres z nagłówków bramy w ustalonej kolejności', () => {
+  const req=(h:Record<string,string>)=>new Request('https://example.invalid',{headers:h});
+  expect(clientAddress(req({'cf-connecting-ip':'2001:DB8::1','x-real-ip':'198.51.100.1'}))).toBe('2001:db8::1');
+  expect(clientAddress(req({'x-forwarded-for':'198.51.100.2, 10.0.0.1'}))).toBe('198.51.100.2');
+  expect(clientAddress(req({'x-real-ip':'<script>'}))).toBeNull();
+ });
 });
