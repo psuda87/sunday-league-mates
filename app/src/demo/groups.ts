@@ -20,8 +20,9 @@ export type GroupAction =
  |{type:'group_cancel';requestId:string}
  |{type:'group_permission';groupId:string;targetId:string;allow:boolean}
  |{type:'group_remove'|'group_transfer';groupId:string;targetId:string}
- |{type:'group_leave';groupId:string};
-const groupActions=new Set(['group_create','group_invite','group_phone','group_join','group_decide','group_cancel','group_permission','group_remove','group_transfer','group_leave']);
+ |{type:'group_leave';groupId:string}
+ |{type:'group_rename';groupId:string;name:string};
+const groupActions=new Set(['group_create','group_invite','group_phone','group_join','group_decide','group_cancel','group_permission','group_remove','group_transfer','group_leave','group_rename']);
 export const isGroupAction=(action:{type:string}):action is GroupAction=>groupActions.has(action.type);
 export const foldGroup=(value:string)=>value.toLocaleLowerCase('pl').normalize('NFD').replace(/\p{Diacritic}/gu,'').replace(/ł/g,'l').trim();
 export function validGroupText(name:string,description:string) {
@@ -134,6 +135,10 @@ export function reduceGroups(previous:World,action:GroupAction):World {
  if(action.type==='group_permission') {
   const target=member(group.id,action.targetId);if(!admin(group.id)||!target||action.targetId===group.adminId)return previous;
   target.organizer=action.allow;world.notice=action.allow?'Nadano uprawnienie organizatora w tej grupie.':'Odebrano uprawnienie organizatora w tej grupie.';return world;
+ }
+ if(action.type==='group_rename') {
+  const name=action.name.trim();if(!admin(group.id)||!validGroupText(name,''))return previous;
+  group.name=name;world.notice='Zmieniono nazwę grupy · demo.';return world;
  }
  if(action.type==='group_transfer') {
   if(!admin(group.id)||!member(group.id,action.targetId)||action.targetId===user)return previous;

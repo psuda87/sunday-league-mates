@@ -7,7 +7,7 @@ import PremiumGroupFinance from '../finance/PremiumGroupFinance';
 import type { SessionManager } from '../auth/sessionManager';
 import { useEffect,useRef,useState } from 'react';
 import { IonButton,IonIcon } from '@ionic/react';
-import { refreshOutline } from 'ionicons/icons';
+import { lockClosedOutline,lockOpenOutline,refreshOutline } from 'ionicons/icons';
 import MatchHero from '../ui/MatchHero';
 import MatchFilters from '../ui/MatchFilters';
 import type { MatchFilter } from '../ui/MatchFilters';
@@ -34,14 +34,14 @@ export default function PremiumEvents(props:Parameters<typeof PremiumEventsScree
 function PremiumEventsScreen({data,userId,onGroups,manager,onOwnProfile}:{manager?:SessionManager;data:PremiumEventsController;userId:string;onGroups:()=>void;onOwnProfile?:()=>void}){
   const [finance,setFinance]=useState(false);
   const [confirmJoin,setConfirmJoin]=useState(false);
-  const [confirmWithdraw,setConfirmWithdraw]=useState<{id:string;label:string;own:boolean}|null>(null),[undoWithdraw,setUndoWithdraw]=useState(false),[showInfo,setShowInfo]=useState(false);
+  const [confirmWithdraw,setConfirmWithdraw]=useState<{id:string;label:string;own:boolean}|null>(null),[undoWithdraw,setUndoWithdraw]=useState(false),[showInfo,setShowInfo]=useState(false),[confirmPrivate,setConfirmPrivate]=useState(false);
   const [selectedParticipant,setSelectedParticipant]=useState<MatchEntry|null>(null);
   const [editing,setEditing]=useState(false),[editConflict,setEditConflict]=useState('');
   const editVersion=useRef<number|undefined>(undefined);
   const [localFilter,setLocalFilter]=useState<MatchFilter>('upcoming'),[reason,setReason]=useState('');
   const filter=data.listFilter??localFilter;
   const area=useRef<HTMLElement>(null);
-  useFrozenBack(()=>{if(showInfo){setShowInfo(false);return true;}if(selectedParticipant){setSelectedParticipant(null);return true;}if(confirmJoin){setConfirmJoin(false);return true;}if(confirmWithdraw){setConfirmWithdraw(null);return true;}if(editing){setEditing(false);return true;}if(finance){setFinance(false);return true;}if(!data.detail&&!data.creating)return false;data.back();return true;},()=>area.current,25);
+  useFrozenBack(()=>{if(confirmPrivate){setConfirmPrivate(false);return true;}if(showInfo){setShowInfo(false);return true;}if(selectedParticipant){setSelectedParticipant(null);return true;}if(confirmJoin){setConfirmJoin(false);return true;}if(confirmWithdraw){setConfirmWithdraw(null);return true;}if(editing){setEditing(false);return true;}if(finance){setFinance(false);return true;}if(!data.detail&&!data.creating)return false;data.back();return true;},()=>area.current,25);
   const d=data.detail,e=d?.event,full=e?.access==='full',own=d?.participants.find(p=>p.member_id===userId&&p.status!=='withdrawn');
   const setDetailVisible=data.setDetailVisible;
   useEffect(()=>{
@@ -50,9 +50,14 @@ function PremiumEventsScreen({data,userId,onGroups,manager,onOwnProfile}:{manage
   },[setDetailVisible,data.revalidating,e?.id,editing,finance,selectedParticipant]);
   useEffect(()=>{setReason('');setEditing(false);setConfirmJoin(false);setSelectedParticipant(null);},[e?.id]);
   const hasPlace=!!e&&full&&e.registered_count!<e.capacity!,closed=!e?.registration_open||e.status==='cancelled';
-  useEffect(()=>{setUndoWithdraw(false);setConfirmWithdraw(null);setShowInfo(false);},[e?.id]);
+  useEffect(()=>{setUndoWithdraw(false);setConfirmWithdraw(null);setShowInfo(false);setConfirmPrivate(false);},[e?.id]);
   const blocked=!!d&&!d.can_register_paid,writeDisabled=data.busy||data.loading;
   const badge=(m:EventSummary)=><EventPrivacy game={{visibility:m.visibility}}/>;
+  // Lock toggle (MASTER TODO #4): only the match founder, through the normal edit so entries, guests and reserve stay.
+  const setVisibility=(visibility:'public'|'private')=>{if(e)void data.edit({...premiumEventInput(e),visibility});};
+  const lockToggle=(m:EventSummary)=>m.created_by===userId&&m.can_edit&&m.registration_open&&m.status!=='cancelled'
+   ?<button type="button" className="slm-event-privacy slm-event-privacy-toggle" disabled={data.busy||data.loading} aria-label={`Widoczność meczu: ${m.visibility==='public'?'publiczny':'prywatny'}. Zmień na ${m.visibility==='public'?'prywatny':'publiczny'}`} onClick={()=>m.visibility==='public'?setConfirmPrivate(true):setVisibility('public')}><IonIcon icon={m.visibility==='public'?lockOpenOutline:lockClosedOutline} aria-hidden="true"/>{m.visibility==='public'?'Publiczne':'Prywatne'}</button>
+   :badge(m);
   const refresh=<IonButton fill="clear" aria-label="Odśwież mecze" aria-busy={data.loading} disabled={writeDisabled} onClick={()=>{void (e?data.open(e.id):data.refresh(data.offset));}}><IonIcon icon={refreshOutline} aria-hidden="true"/></IonButton>;
   const messages=<>{data.error&&<p className="slm-error" role="alert">{data.error}<button type="button" disabled={writeDisabled} onClick={()=>{void(e?data.open(e.id):data.refresh(data.offset));}}>Spróbuj ponownie</button></p>}{data.notice&&<p role="status" className="slm-notice">{data.notice}</p>}{data.loading&&<p role="status">Wczytywanie meczów…</p>}</>;
   const goldHolders=useMvpGoldHolders();
@@ -80,8 +85,8 @@ function PremiumEventsScreen({data,userId,onGroups,manager,onOwnProfile}:{manage
     </div></div>}
     {(data.creating||editing&&e?.can_edit&&full)&&data.serverNow?<>{messages}{editConflict&&<p role="alert">{editConflict}</p>}<EventForm onBack={()=>editing?setEditing(false):data.back()} onSave={async input=>{if(editing){if(editVersion.current!==e?.version){setEditConflict('Mecz zmienił się podczas edycji. Szkic zachowano. Anuluj edycję i otwórz aktualny mecz przed nowym zapisem.');return;}if(await data.edit(input))setEditing(false);}else await data.create(input);}} live={{editing,canEdit:e?.can_edit,occupied:e?.registered_count??0,groups:editing&&e?data.groups.filter(g=>g.id===e.group_id):data.organizers,initial:editing&&e?premiumEventInput(e):premiumDefaults(data.serverNow,data.organizers.some(g=>g.id===data.activeGroup)?data.activeGroup:data.organizers[0]?.id),busy:data.busy}}/></>:<>
     <PremiumScrollHeader title={e?'Szczegóły meczu':'Mecze'} action={refresh} primaryAction={!e&&manager?<GroupNotifications manager={manager} userId={userId} onGroups={onGroups} onPayments={onOwnProfile} refreshKey={data.loading}/>:undefined} onBack={e?data.back:undefined}/>{messages}
-    {e&&d?<>{full&&showInfo&&<div className="slm-join-dialog-backdrop" onClick={ev=>{if(ev.target===ev.currentTarget)setShowInfo(false);}}><div role="dialog" aria-modal="true" aria-labelledby="slm-match-info-title" className="slm-join-dialog slm-match-info-dialog" onKeyDown={ev=>{if(ev.key==='Escape')setShowInfo(false);}}><div className="slm-match-info-dialog-head"><h2 id="slm-match-info-title">Informacje o meczu</h2><button type="button" autoFocus className="slm-match-info-close" aria-label="Zamknij informacje o meczu" onClick={()=>setShowInfo(false)}>×</button></div>{matchInfo}</div></div>}
-      {full?<><p className="slm-event-label"><span>{e.group_name}</span></p><MatchHero match={heroMatch(e)} minimum={e.minimum_players} displayName={e.name} badge={badge(e)} title="Szczegóły meczu" onInfo={()=>setShowInfo(true)}>{ownAction}</MatchHero></>:<section className="slm-panel"><h2>{e.name}</h2><p>{matchDate(e.starts_at)} · {e.location} · {e.group_name}</p><p>{e.access==='none'?'Szczegóły tego prywatnego meczu są dostępne dla członków grupy.':'Widoczny jest wyłącznie Twój udział po opuszczeniu grupy.'}</p>{e.access==='own'&&ownAction}</section>}
+    {e&&d?<>{full&&confirmPrivate&&<div className="slm-join-dialog-backdrop"><div role="alertdialog" aria-modal="true" aria-labelledby="slm-private-title" aria-describedby="slm-private-description" className="slm-join-dialog"><h2 id="slm-private-title">Zmienić mecz na prywatny?</h2><p id="slm-private-description">Mecz zobaczą tylko członkowie grupy. Obecne zapisy, goście i rezerwa zostają bez zmian.</p><div className="slm-join-dialog-actions"><button type="button" autoFocus onClick={()=>setConfirmPrivate(false)}>Anuluj</button><button type="button" disabled={writeDisabled} onClick={()=>{setConfirmPrivate(false);setVisibility('private');}}>Tak, prywatny</button></div></div></div>}{full&&showInfo&&<div className="slm-join-dialog-backdrop" onClick={ev=>{if(ev.target===ev.currentTarget)setShowInfo(false);}}><div role="dialog" aria-modal="true" aria-labelledby="slm-match-info-title" className="slm-join-dialog slm-match-info-dialog" onKeyDown={ev=>{if(ev.key==='Escape')setShowInfo(false);}}><div className="slm-match-info-dialog-head"><h2 id="slm-match-info-title">Informacje o meczu</h2><button type="button" autoFocus className="slm-match-info-close" aria-label="Zamknij informacje o meczu" onClick={()=>setShowInfo(false)}>×</button></div>{matchInfo}</div></div>}
+      {full?<><p className="slm-event-label"><span>{e.group_name}</span></p><MatchHero match={heroMatch(e)} minimum={e.minimum_players} displayName={e.name} badge={lockToggle(e)} title="Szczegóły meczu" onInfo={()=>setShowInfo(true)}>{ownAction}</MatchHero></>:<section className="slm-panel"><h2>{e.name}</h2><p>{matchDate(e.starts_at)} · {e.location} · {e.group_name}</p><p>{e.access==='none'?'Szczegóły tego prywatnego meczu są dostępne dla członków grupy.':'Widoczny jest wyłącznie Twój udział po opuszczeniu grupy.'}</p>{e.access==='own'&&ownAction}</section>}
       {e.access!=='none'&&<MatchTabs key={e.id} withInfo={!full} panels={[...(full?[]:[matchInfo]),<>
         {full&&<RosterSummary occupied={e.registered_count!} capacity={e.capacity!} reserve={e.reserve_count!}/>}
         {full&&own?.status==='registered'&&!closed&&<details className="slm-panel"><summary>Dodaj gościa</summary><GuestForm key={e.id} disabled={writeDisabled||blocked} hasPlace={hasPlace} onSave={body=>data.act('guest',body)}/></details>}

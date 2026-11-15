@@ -123,6 +123,7 @@ export function useGroups(manager:SessionManager,userId:string){
    else {body.group_id=action.groupId;operation=action.type.slice(6);
     if('targetId'in action)body.user_id=action.targetId;
     if(action.type==='group_permission')body.organizer=action.allow;
+    if(action.type==='group_rename')body.name=action.name.trim();
     if(action.type==='group_phone')body.phone=normalizePolishPhone(action.phone);
    }
    await mutate('groups_'+operation,body);if(action.type==='group_leave')selected.current=null;await refresh();

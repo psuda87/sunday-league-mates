@@ -63,3 +63,12 @@
 .slm-payment-reminder-warning {margin:10px 0 0 !important;font-size:.85rem;color:var(--ion-text-color);}
 .slm-payment-reminder-cta {width:100%;min-height:44px;margin-top:12px;border:1px solid var(--slm-gold);border-radius:12px;background:linear-gradient(180deg,var(--slm-button-top),var(--slm-button-bottom));color:var(--ion-color-primary-contrast,#fff);font:inherit;font-weight:700;cursor:pointer;}
 .slm-payment-reminder-cta:focus-visible {outline:2px solid var(--slm-gold);outline-offset:2px;}
+/* Group rename in the admin panel (owner request 2026-11-15). */
+.slm-groups .slm-group-rename {display:grid;gap:6px;margin:0 0 16px;}
+.slm-groups .slm-group-rename label {font-size:.85rem;color:var(--slm-text-secondary);}
+.slm-groups .slm-group-rename > div {display:flex;flex-wrap:wrap;gap:8px;}
+.slm-groups .slm-group-rename input {flex:1 1 180px;min-width:0;min-height:44px;padding:8px 12px;border:1px solid var(--slm-border);border-radius:12px;background:var(--slm-field-bg,var(--slm-panel));color:var(--ion-text-color);font:inherit;}
+.slm-groups .slm-group-rename input:focus-visible {outline:2px solid var(--slm-gold);outline-offset:2px;}
+.slm-groups .slm-group-rename button {flex:none;min-height:44px;}
+.slm-groups .slm-group-rename button:disabled {opacity:.5;}
+.slm-groups .slm-group-rename small {color:var(--ion-color-danger,#c5000f);}

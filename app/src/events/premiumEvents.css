@@ -244,3 +244,7 @@
 .slm-premium-events .slm-match-info-dialog .slm-match-info {margin:0;padding:0;border:0;background:transparent;box-shadow:none;}
 .slm-premium-events .slm-match-info-dialog .slm-match-info > h2 {display:none;}
 .slm-premium-events .slm-match-info-dialog .slm-match-info p {margin:0 0 10px;}
+/* Lock toggle for the match founder (MASTER TODO #4): same look as the badge, larger touch area. */
+.slm-premium-events .slm-match-detail button.slm-event-privacy-toggle {font:inherit;font-size:.6rem;line-height:1.2;cursor:pointer;position:relative;border-color:var(--slm-gold);}
+.slm-premium-events .slm-match-detail button.slm-event-privacy-toggle::after {content:"";position:absolute;inset:-10px -6px;}
+.slm-premium-events .slm-match-detail button.slm-event-privacy-toggle:disabled {opacity:.6;cursor:default;}

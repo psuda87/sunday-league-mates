@@ -40,3 +40,28 @@ it('falls back to the venue name when the match has no address',()=>{
  render(<PremiumEvents data={controller({...event,address:'  '})} userId="owner" onGroups={vi.fn()}/>);
  expect(screen.getByRole('link',{name:/Google Maps/})).toHaveAttribute('href',`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('Orlik Kępa')}`);
 });
+
+it('lets only the match founder switch visibility with the lock, confirming before going private',async()=>{
+ const own={...event,created_by:'owner',can_edit:true,visibility:'public'};
+ const data=controller(own);(data as unknown as {edit:ReturnType<typeof vi.fn>}).edit=vi.fn(async()=>true);
+ const {unmount}=render(<PremiumEvents data={data} userId="owner" onGroups={vi.fn()}/>);
+ fireEvent.click(screen.getByRole('button',{name:/Widoczność meczu: publiczny/}));
+ const dialog=screen.getByRole('alertdialog',{name:'Zmienić mecz na prywatny?'});
+ fireEvent.click(within(dialog).getByRole('button',{name:'Anuluj'}));
+ expect(data.edit).not.toHaveBeenCalled();
+ fireEvent.click(screen.getByRole('button',{name:/Widoczność meczu: publiczny/}));
+ fireEvent.click(screen.getByRole('button',{name:'Tak, prywatny'}));
+ expect(data.edit).toHaveBeenCalledWith(expect.objectContaining({visibility:'private',name:'Mecz',location:'Orlik Kępa'}));
+ unmount();
+ const priv=controller({...own,visibility:'private'});(priv as unknown as {edit:ReturnType<typeof vi.fn>}).edit=vi.fn(async()=>true);
+ render(<PremiumEvents data={priv} userId="owner" onGroups={vi.fn()}/>);
+ fireEvent.click(screen.getByRole('button',{name:/Widoczność meczu: prywatny/}));
+ expect(screen.queryByRole('alertdialog')).toBeNull();
+ expect(priv.edit).toHaveBeenCalledWith(expect.objectContaining({visibility:'public'}));
+});
+
+it('shows a plain badge to everyone else',()=>{
+ render(<PremiumEvents data={controller({...event,created_by:'someone',can_edit:true})} userId="owner" onGroups={vi.fn()}/>);
+ expect(screen.queryByRole('button',{name:/Widoczność meczu/})).toBeNull();
+ expect(screen.getByText('Prywatne')).toBeInTheDocument();
+});
