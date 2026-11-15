@@ -5,6 +5,7 @@ import type { Group } from './Groups';
 import MatchHeader from '../ui/MatchHeader';
 import { money } from '../events/model';
 import { useOperation } from './useOperation';
+import { useLoad } from './useLoad';
 interface Payment {id:string;event_id:string|null;user_id:string;amount_cents:number;corrected_amount_cents:number;status:string}
 interface Account {balance_cents:number;registration_allowed:boolean;dues:{event_id:string;starts_at:string;legacy?:boolean;due_cents:number;outstanding_cents:number}[];payments:Payment[];surplus:null|{event_id:string;assessed_cents:number;received_cents:number}[]}
 interface EventFinance {event:{version:number;approved_at:string|null;cost_cents:number};participants:{entry_id:string;user_id:string;name:string;payable:boolean;amount_cents:number}[];payments:Payment[];surplus:Account['surplus']}
@@ -14,7 +15,7 @@ export default function Finance({manager,eventId,groupId,onBack,manageEvent=true
  const {busy,error,run,mutate}=useOperation(manager);
  async function refresh(g=selected){if(!g)return;setAccount(await manager.call<Account>('group_finance_account',{group_id:g}));if(eventId&&manageEvent)setDetail(await manager.call<EventFinance>('group_finance_detail',{group_id:g,event_id:eventId}));setInitialError('');}
  useEffect(()=>{if(groupId)return;let live=true;setGroupsLoading(true);manager.call<{groups:Group[]}>('finance_groups').then(r=>{if(live){setGroups(r.groups);if(!groupId)setSelected(r.groups[0]?.id??'');setGroupsLoading(false);}}).catch(e=>{if(live){setInitialError(e instanceof Error?e.message:'Nie udało się pobrać grup.');setGroupsLoading(false);}});return()=>{live=false;};},[manager,groupId]);
- useEffect(()=>{if(!selected)return;let live=true;setAccount(null);setAccountLoading(true);Promise.all([manager.call<Account>('group_finance_account',{group_id:selected}),eventId&&manageEvent?manager.call<EventFinance>('group_finance_detail',{group_id:selected,event_id:eventId}):Promise.resolve(null)]).then(([a,b])=>{if(live){setAccount(a);setDetail(b);setInitialError('');setAccountLoading(false);}}).catch(e=>{if(live){setInitialError(e instanceof Error?e.message:'Nie udało się pobrać rozliczeń.');setAccountLoading(false);}});return()=>{live=false;};},[manager,selected,eventId,manageEvent]);
+ useLoad(()=>Promise.all([manager.call<Account>('group_finance_account',{group_id:selected}),eventId&&manageEvent?manager.call<EventFinance>('group_finance_detail',{group_id:selected,event_id:eventId}):Promise.resolve(null)]),([a,b])=>{setAccount(a);setDetail(b);setInitialError('');},setInitialError,'Nie udało się pobrać rozliczeń.',[manager,selected,eventId,manageEvent],{skip:!selected,onStart:()=>{setAccount(null);setAccountLoading(true);},onEnd:()=>setAccountLoading(false)});
  async function paymentAction(action:string,p:Payment,value?:number){await mutate('group_finance_'+action,{payment_id:p.id,group_id:selected,reason,expected_amount_cents:p.corrected_amount_cents,...(value===undefined?{}:{amount_cents:value})});await refresh();setPending([]);}
  const receipts=detail?.payments??pending;
  return <><MatchHeader title="Rozliczenia grupy" onBack={onBack}/>{(error||initialError)&&<p role="alert" className="slm-error">⚠ {error||initialError}</p>}{(busy||groupsLoading||accountLoading)&&<div role="status"><IonSpinner/><span>Wczytywanie rozliczeń…</span></div>}

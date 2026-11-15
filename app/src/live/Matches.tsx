@@ -12,6 +12,7 @@ import type { MatchFilter } from '../ui/MatchFilters';
 import type { Group } from './Groups';
 import Finance from './Finance';
 import { useOperation } from './useOperation';
+import { useLoad } from './useLoad';
 interface LiveMatch extends Match {own_participation:boolean;name:string;group_id:string;group_name:string;visibility:'public'|'private';access:'full'|'own'|'none';cost_cents:number;version:number;approved_at:string|null;can_manage:boolean;can_edit:boolean}
 interface Entry extends Omit<Participant,'status'> {status:'registered'|'reserve'|'withdrawn'}
 interface Detail {event:LiveMatch;participants:Entry[];server_now:string;can_register_paid:boolean}
@@ -23,7 +24,7 @@ export default function Matches({manager,userId,onLegacy,initialEventId}:{manage
  const {busy,error,run,mutate}=useOperation(manager);
  async function list(page=offset){const r=await manager.call<{events:LiveMatch[];server_now:string;member_creation_enabled?:boolean}>('matches_list',{offset:page,scope:filter==='mine'?'mine':'all',period:filter==='history'?'history':'upcoming'});setMatches(r.events);setMemberCreation(r.member_creation_enabled===true);setServerNow(r.server_now);setOffset(page);}
  async function open(id:string){const r=await manager.call<Detail>('matches_detail',{event_id:id});setDetail(r);setServerNow(r.server_now);setForm(null);setFinance(false);}
- useEffect(()=>{let live=true;Promise.all([manager.call<{events:LiveMatch[];server_now:string;member_creation_enabled?:boolean}>('matches_list',{offset:0,scope:filter==='mine'?'mine':'all',period:filter==='history'?'history':'upcoming'}),manager.call<{groups:Group[]}>('groups_list')]).then(([a,b])=>{if(!Array.isArray(a.events)||!Array.isArray(b.groups))throw new Error('Serwer zwrócił nieprawidłową listę meczów lub grup.');if(live){setMatches(a.events);setOffset(0);setMemberCreation(a.member_creation_enabled===true);setServerNow(a.server_now);setGroups(b.groups);setInitialError('');}}).catch(e=>{if(live)setInitialError(e instanceof Error?e.message:'Nie udało się pobrać meczów.');});return()=>{live=false;};},[manager,filter]);
+ useLoad(()=>Promise.all([manager.call<{events:LiveMatch[];server_now:string;member_creation_enabled?:boolean}>('matches_list',{offset:0,scope:filter==='mine'?'mine':'all',period:filter==='history'?'history':'upcoming'}),manager.call<{groups:Group[]}>('groups_list')]),([a,b])=>{if(!Array.isArray(a.events)||!Array.isArray(b.groups))throw new Error('Serwer zwrócił nieprawidłową listę meczów lub grup.');setMatches(a.events);setOffset(0);setMemberCreation(a.member_creation_enabled===true);setServerNow(a.server_now);setGroups(b.groups);setInitialError('');},setInitialError,'Nie udało się pobrać meczów.',[manager,filter]);
  useEffect(()=>{if(!initialEventId)return;let live=true;manager.call<Detail>('matches_detail',{event_id:initialEventId}).then(r=>{if(live){setDetail(r);setServerNow(r.server_now);}}).catch(e=>{if(live)setInitialError(e instanceof Error?e.message:'Nie udało się otworzyć meczu.');});return()=>{live=false;};},[manager,initialEventId]);
  const e=detail?.event,own=detail?.participants.find(p=>p.member_id===userId&&p.status!=='withdrawn');
  const organizers=groups.filter(g=>memberCreation||g.organizer||g.admin_id===userId);
