@@ -1,3 +1,16 @@
+# Bezpieczeństwo P1, zmiana nazwy grupy, kłódka widoczności — 2026-11-15 (zgoda właściciela)
+
+Main `0c9c352`. Supabase `hjtcyybkxebvdropchac` (po próbie na sucho z wycofaniem, zapisane w historii migracji):
+- `20261115200000_restrict_legacy_event_direct_reads` (dawny PR #49, nowy numer): `authenticated` bez SELECT na `slm_events`/`slm_event_participants`, usunięte polityki
+  `events_member_read`/`participants_member_read`. Przed wdrożeniem sprawdzono: brak bezpośrednich odczytów w kliencie, brak tabel w Realtime, brak funkcji invoker dostępnych dla authenticated.
+- `20261115210000_group_rename`: `public.slm_groups_dispatch` opakowuje `slm_private.groups_dispatch_rename_base` akcją `rename` (tylko administrator, 1–64 znaki); Edge bez zmian.
+Frontend: formularz „Nazwa grupy” w „Zarządzaniu grupą”; kłódka w kafelku szczegółów meczu dla założyciela (prywatny z potwierdzeniem, przez `matches_edit`).
+Strażnicy: `OWNER_SOURCE` = `abcb5de`, `app/src/demo/groups.ts` dopisany do `OWNER_FILES`, obie migracje w `OWNER_MIGRATIONS`. Kontrole: tsc PASS, Vitest 615/615, eslint 0 błędów,
+oba strażniki PASS, build PASS. Vercel produkcja = `0c9c352` (`dpl_8HkgB8JmzhoU4Bup9myaYqd6BJfV`). Gałąź PR #49 usunięta (tag `archive/fix/security-p1-p3-20261110`).
+Porządki GitHub: 11 gałęzi usuniętych (7 z tagami `archive/*`), PR #17/#18/#19/#49 zamknięte; zostały PR #40 i `preview/mvp-gold`. W przeglądarce nie testowano.
+
+---
+
 # Dzwonek — przypomnienie o zaległych płatnościach — 2026-11-15 (zgoda właściciela)
 
 Main `9edc04d` (gałąź `feat/payment-reminder-bell`): dzwonek na ekranie „Mecze” liczy własne mecze z nieopłaconą należnością (bez meczów ze zgłoszoną wpłatą oczekującą na akceptację)
