@@ -38,6 +38,35 @@ function password(body: Row, key: string, newPassword = false): string {
 // 9 losowych bajtów = 72 bity entropii i dokładnie 12 znaków base64url.
 export const randomPassword = () => btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(9))))
   .replace(/\+/g, '-').replace(/\//g, '_');
+// Porównanie sekretów w stałym czasie: porównujemy skróty o stałej długości.
+export async function secretEquals(given: string, expected: string): Promise<boolean> {
+  if (!expected) return false;
+  const digest = async (value: string) => new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value)));
+  const [a, b] = await Promise.all([digest(given), digest(expected)]);
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
+  return diff === 0;
+}
+// Do RPC trafiają wyłącznie pola znane danej grupie akcji. `action` zostaje, bo
+// rozliczenia porównują zapisane ciało żądania przy ponowieniu (idempotencja).
+export const RPC_FIELDS = {
+  settlements: ['action','absent','amount_cents','event_id','expected_amount_cents','expected_version','offset','participant_id','payable','payment_id','reason','replacement_id','request_id','user_id'],
+  notifications: ['action','binding_id','binding_version','category','device_id','device_secret','notification_id','offset','platform','push_enabled','token'],
+  events: ['action','absent','capacity','date','duration_minutes','event_id','guest_name','guest_phone','hourly_rate','list','location','offset','participant_id','reason','request_id','time','total_cost','user_id'],
+} as const;
+export function pickFields(body: Row, fields: readonly string[]): Row {
+  return Object.fromEntries(fields.filter(key => Object.hasOwn(body, key)).map(key => [key, body[key]]));
+}
+// Adres klienta ustawiany przez Cloudflare/bramę Supabase. Brak lub nietypowa
+// wartość => null: wtedy działa wyłącznie limit globalny, nigdy wspólny kubełek "unknown".
+export function clientAddress(request: Request): string | null {
+  for (const name of ['cf-connecting-ip', 'x-real-ip', 'x-forwarded-for']) {
+    const value = request.headers.get(name)?.split(',')[0]?.trim() ?? '';
+    if (value && value.length <= 45 && /^[0-9A-Fa-f:.]+$/.test(value)) return value.toLowerCase();
+  }
+  return null;
+}
+const EMAIL_ACTIONS = new Set(['signup', 'resend_verification', 'recover_email', 'verify_email', 'recover_password']);
 export function displayName(login: string, fullName: string, mode: string) {
   return mode === 'full_name' && fullName.trim() ? fullName.trim() : login;
 }
@@ -229,15 +258,20 @@ export function createHandler(env: Environment) {
       const body = parsed as Row;
       const action = field(body, 'action', 40);
       if(uploadRequest&&action!=='profile_photo_upload')throw new ApiError(400,'invalid_input','Nieprawidłowe żądanie.');
-      await rate('global', 300);
+      // Najpierw limit per adres (jeden klient nie zablokuje innych), potem wysoki bezpiecznik globalny.
+      const client = clientAddress(request);
+      if (client) await rate('ip:' + client, 180);
+      await rate('global', 3000);
+      if (client && EMAIL_ACTIONS.has(action)) await rate('email-flow-ip:' + client, 4);
       if(action==='account_privacy_worker'){
-        if(origin||request.headers.get('authorization')!==`Bearer ${env.service}`||!env.service)throw unauthorized();
+        if(origin||!env.service||!(await secretEquals(request.headers.get('authorization')??'',`Bearer ${env.service}`)))throw unauthorized();
         const jobs=await privacyRpc('deletion_work',{});
         let finished=0;
         for(const job of jobs){try{await finishDeletion(job.operation_id,null,deletion);finished++;}catch{/* Durable retry/backoff. */}}
         return respond({processed:finished});
       }
       if(action==='account_delete_resume'){
+        if(client)await rate('deletion-resume-ip:'+client,6);
         await rate('deletion-resume',12);
         let ticket;try{ticket=deletionProof(body);}catch{throw new ApiError(400,'deletion_invalid','Nieprawidłowa operacja usuwania.');}
         return respond(await finishDeletion(ticket.operation,ticket.proof,deletion));
@@ -276,7 +310,8 @@ export function createHandler(env: Environment) {
         return respond(await accept(session, s!.security_version));
       }
       if (action === 'refresh') {
-        await rate('refresh-global', 120);
+        if (client) await rate('refresh-ip:' + client, 30);
+        await rate('refresh-global', 600);
         const r = await call('/auth/v1/token?grant_type=refresh_token', 'POST', { refresh_token: field(body, 'refresh_token', 4096) });
         if (r.status >= 500) throw new ApiError(503, 'service_unavailable', 'Serwer jest chwilowo niedostępny. Spróbuj ponownie.');
         if (r.status === 429) throw new ApiError(429, 'rate_limited', 'Zbyt wiele prób. Spróbuj ponownie za minutę.');
@@ -454,27 +489,27 @@ export function createHandler(env: Environment) {
         if (!r.ok) {
           const code = typeof r.data?.message === 'string' ? r.data.message : '';
           const errors: Record<string, [number, string]> = {
-            session_invalid: [401, 'Sesja wygas?a. Zaloguj si? ponownie.'],
-            forbidden: [403, 'Brak uprawnie? do tej operacji.'],
+            session_invalid: [401, 'Sesja wygasła. Zaloguj się ponownie.'],
+            forbidden: [403, 'Brak uprawnień do tej operacji.'],
             not_found: [404, 'Nie znaleziono wskazanych danych.'],
-            registration_blocked: [403, 'Zaleg?o?ci blokuj? nowe zapisy na p?atne mecze.'],
-            event_full: [409, 'Brak wolnych miejsc. Mo?esz wybra? rezerw?.'],
-            duplicate_signup: [409, 'Ten zapis ju? istnieje.'],
-            registration_closed: [409, 'Zapisy s? zamkni?te.'],
-            event_cancelled: [409, 'Mecz zosta? odwo?any.'],
-            stale_version: [409, 'Dane zmieni?y si?. Od?wie? je przed ponown? decyzj?.'],
+            registration_blocked: [403, 'Zaległości blokują nowe zapisy na płatne mecze.'],
+            event_full: [409, 'Brak wolnych miejsc. Możesz wybrać rezerwę.'],
+            duplicate_signup: [409, 'Ten zapis już istnieje.'],
+            registration_closed: [409, 'Zapisy są zamknięte.'],
+            event_cancelled: [409, 'Mecz został odwołany.'],
+            stale_version: [409, 'Dane zmieniły się. Odśwież je przed ponowną decyzją.'],
             idempotency_conflict: [409, 'Identyfikator dotyczy innej operacji.'],
             consent_required: [409, 'Potwierdź przejście na pseudonim, aby ukryć dane.'],
-            payment_processed: [409, 'Wp?ata zosta?a ju? rozpatrzona.'],
+            payment_processed: [409, 'Wpłata została już rozpatrzona.'],
             already_paid: [409, 'Należność jest już opłacona. Odśwież płatności.'],
             overpayment: [409, 'Kwota przewyższa pozostałą należność za mecz.'],
             pending_payment_exists: [409, 'Wpłata czeka już na decyzję administratora.'],
-            request_processed: [409, 'Pro?ba zosta?a ju? rozpatrzona.'],
-            already_member: [409, 'Zawodnik ju? nale?y do grupy.'],
+            request_processed: [409, 'Prośba została już rozpatrzona.'],
+            already_member: [409, 'Zawodnik już należy do grupy.'],
             group_archived: [409, 'Grupa jest zarchiwizowana.'],
-            match_not_finished: [409, 'Mecz jeszcze si? nie zako?czy?.'],
-            already_approved: [409, 'Rozliczenie jest ju? zatwierdzone.'],
-            reason_required: [400, 'Podaj pow?d decyzji (do 500 znak?w).'],
+            match_not_finished: [409, 'Mecz jeszcze się nie zakończył.'],
+            already_approved: [409, 'Rozliczenie jest już zatwierdzone.'],
+            reason_required: [400, 'Podaj powód decyzji (do 500 znaków).'],
           };
           if(prefix==='groups_'){
             const messages:Record<string,string>={session_invalid:'Sesja wygasła. Zaloguj się ponownie.',forbidden:'Brak uprawnień do tej operacji.',not_found:'Grupa lub profil nie istnieje albo nie masz dostępu.',request_processed:'Zgłoszenie zostało już rozpatrzone. Odśwież grupę.',already_member:'Ta osoba już należy do grupy.',idempotency_conflict:'Identyfikator dotyczy innej operacji. Odśwież dane.',group_archived:'Grupa jest zarchiwizowana.'};
@@ -484,8 +519,8 @@ export function createHandler(env: Environment) {
           if (code === 'invalid_group' || code === 'invalid_input' || code === 'request_required') throw new ApiError(400, code, 'Sprawdź nazwę, opis i wymagane pola.');
           if (errors[code]) throw new ApiError(errors[code][0], code, errors[code][1]);
           if (r.data?.code === '22P02' || r.data?.code === '23514' || r.data?.code === '23502')
-            throw new ApiError(400, 'invalid_input', 'Sprawd? wymagane pola i poprawno?? danych.');
-          throw new ApiError(503, 'service_unavailable', 'Nie uda?o si? potwierdzi? operacji. Pon?w z tym samym identyfikatorem.');
+            throw new ApiError(400, 'invalid_input', 'Sprawdź wymagane pola i poprawność danych.');
+          throw new ApiError(503, 'service_unavailable', 'Nie udało się potwierdzić operacji. Ponów z tym samym identyfikatorem.');
         }
         if (action === 'matches_list' && (Object.hasOwn(payload, 'query') || payload.scope === 'groups') && r.data?.public_discovery_version !== 1)
           throw new ApiError(503, 'discovery_unavailable', 'Wyszukiwanie wymaga aktualnego backendu. Spróbuj ponownie po aktualizacji.');
@@ -494,7 +529,7 @@ export function createHandler(env: Environment) {
       if (action.startsWith('settlements_')) {
         await rate('settlements:' + ctx.id, 60);
         const r = await call('/rest/v1/rpc/slm_settlements_dispatch', 'POST', {
-          p_user: ctx.id, p_session: ctx.sid, p_action: action.slice(12), p_body: body,
+          p_user: ctx.id, p_session: ctx.sid, p_action: action.slice(12), p_body: pickFields(body, RPC_FIELDS.settlements),
         }, undefined, true);
         if (!r.ok) {
           const messages: Record<string, [number, string]> = {
@@ -532,7 +567,7 @@ export function createHandler(env: Environment) {
       if (action.startsWith('notifications_')) {
         await rate('notifications:' + ctx.id, 90);
         const r = await call('/rest/v1/rpc/slm_notifications_dispatch', 'POST', {
-          p_user: ctx.id, p_session: ctx.sid, p_action: action.slice(14), p_body: body,
+          p_user: ctx.id, p_session: ctx.sid, p_action: action.slice(14), p_body: pickFields(body, RPC_FIELDS.notifications),
         }, undefined, true);
         if (!r.ok) {
           const messages: Record<string, [number, string]> = {
@@ -571,7 +606,7 @@ export function createHandler(env: Environment) {
         }
         await rate('events:' + ctx.id, 90);
         const r = await call('/rest/v1/rpc/slm_events_dispatch', 'POST', {
-          p_user: ctx.id, p_session: ctx.sid, p_action: action.slice(7), p_body: body,
+          p_user: ctx.id, p_session: ctx.sid, p_action: action.slice(7), p_body: pickFields(body, RPC_FIELDS.events),
         }, undefined, true);
         if (!r.ok) {
           const messages: Record<string, [number, string]> = {
@@ -631,6 +666,7 @@ export function createHandler(env: Environment) {
         return respond(await profile(ctx.id));
       }
       if (action === 'save_profile') {
+        await rate('scoped:' + ctx.id, 90);
         const name = field(body, 'full_name', 100).trim();
         const mode = field(body, 'display_as');
         if (!['nickname', 'first_name', 'full_name'].includes(mode)) throw new ApiError(400, 'invalid_input', 'Wybierz nazwę wyświetlaną.');

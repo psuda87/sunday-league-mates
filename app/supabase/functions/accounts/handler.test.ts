@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { webcrypto } from 'node:crypto';
-import { createHandler, displayName, normalizeLogin, normalizePhone, randomPassword } from './handler';
+import { createHandler, displayName, normalizeLogin, normalizePhone, randomPassword, secretEquals, pickFields, RPC_FIELDS, clientAddress } from './handler';
 
 afterEach(() => vi.unstubAllGlobals());
 describe('brama rozliczeń (kontrolowane RPC)', () => {
@@ -207,4 +207,78 @@ it('returns a consent conflict instead of an outage when revocation lacks confir
  const handler=createHandler({url:'https://example.invalid',anon:'',service:'',origins:[]});
  const r=await handler(new Request('https://example.invalid',{method:'POST',headers:{authorization:'Bearer '+token},body:JSON.stringify({action:'groups_consent',share_full_name:false,request_id:webcrypto.randomUUID()})}));
  expect(r.status).toBe(409);expect((await r.json()).code).toBe('consent_required');
+});
+it('porównuje sekrety w stałym czasie i odrzuca pusty oczekiwany sekret', async () => {
+ vi.stubGlobal('crypto',webcrypto);
+ expect(await secretEquals('Bearer fixture-service','Bearer fixture-service')).toBe(true);
+ expect(await secretEquals('Bearer fixture-servicE','Bearer fixture-service')).toBe(false);
+ expect(await secretEquals('Bearer fixture-service-longer','Bearer fixture-service')).toBe(false);
+ expect(await secretEquals('','')).toBe(false);
+});
+it('save_profile podlega limitowi prób przed zapisem profilu', async () => {
+ vi.stubGlobal('crypto',webcrypto);
+ const id=webcrypto.randomUUID(),sid=webcrypto.randomUUID();
+ const token=['synthetic',btoa(JSON.stringify({sub:id,session_id:sid})),'unsigned'].join('.');
+ const rateKeys:string[]=[];let patched=false;
+ vi.stubGlobal('fetch',vi.fn(async(url:string,options:RequestInit)=>{
+  const reply=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status});
+  if(url.includes('slm_account_rate')){const key=JSON.parse(options.body as string).p_key;rateKeys.push(key);return reply(rateKeys.length===1);}
+  if(url.endsWith('/auth/v1/user'))return reply({id});
+  if(url.includes('slm_account_context'))return reply({user_id:id,role:'member',must_change_password:false});
+  if(url.includes('slm_profiles')&&options.method==='PATCH'){patched=true;return reply([]);}
+  throw new Error('Nieoczekiwane żądanie testowe '+url);
+ }));
+ const handler=createHandler({url:'https://example.invalid',anon:'',service:'',origins:[]});
+ const r=await handler(new Request('https://example.invalid',{method:'POST',headers:{authorization:'Bearer '+token},body:JSON.stringify({action:'save_profile',full_name:'Jan',display_as:'nickname'})}));
+ expect(r.status).toBe(429);expect(patched).toBe(false);expect(rateKeys).toHaveLength(2);
+});
+it.each([
+ ['settlements_detail','slm_settlements_dispatch',{event_id:'e1',offset:0}],
+ ['notifications_read','slm_notifications_dispatch',{notification_id:'n1'}],
+ ['events_detail','slm_events_dispatch',{event_id:'e1'}],
+])('%s przekazuje do RPC wyłącznie dozwolone pola',async(action,rpc,allowed)=>{
+ vi.stubGlobal('crypto',webcrypto);
+ const id=webcrypto.randomUUID(),sid=webcrypto.randomUUID();
+ const token=['synthetic',btoa(JSON.stringify({sub:id,session_id:sid})),'unsigned'].join('.');
+ let sent:Record<string,unknown>|undefined;
+ vi.stubGlobal('fetch',vi.fn(async(url:string,options:RequestInit)=>{
+  const reply=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status});
+  if(url.includes('slm_account_rate'))return reply(true);
+  if(url.endsWith('/auth/v1/user'))return reply({id});
+  if(url.includes('slm_account_context'))return reply({user_id:id,role:'member',must_change_password:false});
+  if(url.includes(rpc)){sent=JSON.parse(options.body as string).p_body;return reply({});}
+  if(url.includes('slm_phone_visibility'))return reply([]);
+  throw new Error('Nieoczekiwane żądanie testowe '+url);
+ }));
+ const handler=createHandler({url:'https://example.invalid',anon:'',service:'',origins:[]});
+ const r=await handler(new Request('https://example.invalid',{method:'POST',headers:{authorization:'Bearer '+token},body:JSON.stringify({action,...allowed,padding:'x'.repeat(5000),p_user:'spoofed',role:'admin'})}));
+ expect(r.status).toBe(200);expect(sent).toEqual({action,...allowed});
+});
+it('pickFields zachowuje tylko znane klucze',()=>{
+ expect(pickFields({action:'a',request_id:'r',junk:1},RPC_FIELDS.settlements)).toEqual({action:'a',request_id:'r'});
+});
+describe('limity per adres klienta', () => {
+ const sha=async(v:string)=>Array.from(new Uint8Array(await webcrypto.subtle.digest('SHA-256',new TextEncoder().encode(v)))).map(x=>x.toString(16).padStart(2,'0')).join('');
+ async function keysFor(headers:Record<string,string>,body:Record<string,unknown>={action:'login'}){
+  vi.stubGlobal('crypto',webcrypto);
+  const keys:string[]=[];
+  vi.stubGlobal('fetch',vi.fn(async(_url:string,options:RequestInit)=>{keys.push(JSON.parse(options.body as string).p_key);return new Response('false',{status:200});}));
+  const handler=createHandler({url:'https://example.invalid',anon:'',service:'',origins:[]});
+  const r=await handler(new Request('https://example.invalid',{method:'POST',headers,body:JSON.stringify(body)}));
+  return {status:r.status,keys};
+ }
+ it('sprawdza limit adresu przed globalnym i odmawia bez dalszych zapytań', async () => {
+  const r=await keysFor({'cf-connecting-ip':'203.0.113.7'});
+  expect(r.status).toBe(429);expect(r.keys).toEqual([await sha('ip:203.0.113.7')]);
+ });
+ it('bez wiarygodnego adresu używa tylko limitu globalnego, bez wspólnego kubełka', async () => {
+  expect((await keysFor({})).keys).toEqual([await sha('global')]);
+  expect((await keysFor({'x-forwarded-for':'unknown, 1.2.3.4'})).keys).toEqual([await sha('global')]);
+ });
+ it('rozpoznaje adres z nagłówków bramy w ustalonej kolejności', () => {
+  const req=(h:Record<string,string>)=>new Request('https://example.invalid',{headers:h});
+  expect(clientAddress(req({'cf-connecting-ip':'2001:DB8::1','x-real-ip':'198.51.100.1'}))).toBe('2001:db8::1');
+  expect(clientAddress(req({'x-forwarded-for':'198.51.100.2, 10.0.0.1'}))).toBe('198.51.100.2');
+  expect(clientAddress(req({'x-real-ip':'<script>'}))).toBeNull();
+ });
 });

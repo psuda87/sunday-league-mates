@@ -1,3 +1,25 @@
+# Utwardzenie bezpieczeństwa (audyt 2026-11-15) — gałąź, NIE wdrożone
+
+Gałąź `fix/security-hardening-20261115` z main `2329d32` (produkcja Vercel = `0c9c352`). Zmiany (od najprostszych):
+1. `3dedad2` Edge: przywrócone polskie znaki w komunikatach błędów matches/groups/finance.
+2. `dfbfc87` Vercel: `Permissions-Policy`, `Cross-Origin-Opener-Policy: same-origin`, `Strict-Transport-Security`.
+3. `32d7d93` Edge: sekret workera porównywany w stałym czasie (`secretEquals`); limit prób dla `save_profile`.
+4. `b733b7e` Edge: do RPC `settlements_`/`notifications_`/`events_` trafiają wyłącznie znane pola (`RPC_FIELDS`); `action` zostaje dla idempotencji rozliczeń.
+5. `4c45940` Edge: limity per adres klienta (`cf-connecting-ip`/`x-real-ip`/`x-forwarded-for`): `ip:` 180/min przed globalnym (300→3000/min); refresh 30/min/IP
+   (globalnie 120→600); e-mail 4/min/IP i usuwanie konta 6/min/IP przy niezmienionych limitach globalnych 12. Brak adresu → tylko limit globalny. Szczyt produkcyjny: 42 żądania/min/IP.
+6. `00ff626` Migracja `20261115230000_nickname_claim_hardening` (NIE zastosowana zdalnie): rezerwacja pseudonimu przy signup tylko dla poprawnego nicku (1–48, bez sterujących i `<>`);
+   niepotwierdzone konto >48 h bez danych aplikacji jest usuwane przy przejęciu jego nicku; `slm_nickname_available` pomija takie rezerwacje. Bez pg_cron.
+7. `react-router` 6.30 (moderate: backslash open redirect, SSR) — aktualizacja niemożliwa: `@ionic/react-router` 9.0.11 wymaga `<7`. Ryzyko zaakceptowane: jedyna nawigacja to statyczne
+   `<Navigate to="/home">`, brak SSR. Pozostałe alerty npm (`minimatch`, `ts-morph`) dotyczą narzędzi budowania.
+Strażnicy (`2096437`): `OWNER_SOURCE` = `00ff626`, migracja dopisana do `OWNER_MIGRATIONS` — wymaga przeglądu właściciela.
+Kontrole automatyczne: Vitest 624/624 (Edge 165), `typecheck:edge` PASS, eslint 0 błędów (7 ostrzeżeń jak na main), `verify:consolidation` PASS, `test:premium-policy` PASS,
+`build:premium-web` PASS. `scripts/check-premium-web-cases.mjs` FAIL także na czystym main (CSP zawiera `'wasm-unsafe-eval'`, test szuka podciągu `unsafe-eval`).
+NIE wykonano: test SQL `supabase/tests/nickname_claim_hardening.sql` (silnik Docker niedostępny), testy w przeglądarce, wdrożenie Edge, migracja zdalna, deploy Vercel.
+Poza kodem (panel Supabase Auth, Free): limity Auth dla logowania/rejestracji, „Secure password change” i „Secure email change”. CAPTCHA odłożona decyzją właściciela;
+Leaked Password Protection wymaga planu Pro — pominięte.
+Następny krok: przegląd właściciela → próba migracji na sucho z wycofaniem → PR → merge → deploy `accounts` (diff z wersją live) i Vercel — każdy krok za osobną zgodą.
+
+---
 # Porządki techniczne: indeksy kluczy obcych, RLS initplan, przegląd npm audit — 2026-11-16
 
 Gałąź `chore/db-fk-indexes-rls-initplan`. Migracja `20261116190000_fk_indexes_rls_initplan.sql` (źródło strażnika: `e0e9dc6`): 56 indeksów pokrywających klucze obce
@@ -11,11 +33,15 @@ Strażnik: `OWNER_SOURCE` = `e0e9dc6`, migracja dopisana do `OWNER_MIGRATIONS`. 
 Po zastosowaniu Performance Advisor: ostrzeżenia `auth_rls_initplan` (2) i `unindexed_foreign_keys` (56) zniknęły; zostały tylko informacje „unused index” (nowe indeksy jeszcze nie były użyte — norma przy małej bazie).
 Zmiana kodu aplikacji: brak.
 
+---
+
 # Statystyki w każdym profilu, przycisk „Zadzwoń” — 2026-11-16 (zgoda właściciela)
 
 Gałąź `fix/profile-call-button-and-group-stats`. Supabase `hjtcyybkxebvdropchac`: `20261116140000_rating_player_stats` (`slm_ratings_dispatch`, akcja `player` zwraca teraz także `stats` — Mecze/Gole/Asysty/MVP — dla członków wspólnej aktywnej grupy; uprawnienia funkcji bez zmian, tylko `service_role`).
 Frontend: profil z grupy i profil ze składów czytają statystyki z `usePlayerRating` (zamiast „—”); przycisk „Zadzwoń” jako `a.slm-call` (wygrywa z `Accounts.css`).
 Strażnik: `OWNER_SOURCE` = `c23abaa`, przepięty na commit z tymi zmianami, migracja dopisana do `OWNER_MIGRATIONS`. Kontrole: tsc PASS, lint PASS, Vitest events/groups/rating 169/169; `test:premium-policy` nie jest wiarygodny w płytkim klonie (84 błędy także bez zmian — brak historycznych commitów). Test ręczny na telefonie: do wykonania przez właściciela.
+
+---
 
 # Bezpieczeństwo P1, zmiana nazwy grupy, kłódka widoczności — 2026-11-15 (zgoda właściciela)
 
