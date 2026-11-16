@@ -5,7 +5,7 @@ export type GroupPerson=Pick<DemoPlayer,'id'|'name'|'nick'|'portrait'|'portraitE
 export type GroupWorld=Pick<World,'groupState'|'userId'|'notice'>&{players:GroupPerson[]};
 
 export interface DemoGroup {id:string;name:string;description:string;adminId:string;creationKey?:string}
-export interface Membership {groupId:string;playerId:string;joinedAt:string;organizer:boolean}
+export interface Membership {groupId:string;playerId:string;joinedAt:string;organizer:boolean;admin?:boolean}
 export interface GroupRequest {
  id:string;groupId:string;kind:'invite'|'proposal'|'join';status:'pending'|'accepted'|'rejected'|'cancelled';
  targetId:string|null;requestedBy:string;channel:'nick'|'phone';lookupKey?:string;
@@ -21,8 +21,9 @@ export type GroupAction =
  |{type:'group_permission';groupId:string;targetId:string;allow:boolean}
  |{type:'group_remove'|'group_transfer';groupId:string;targetId:string}
  |{type:'group_leave';groupId:string}
- |{type:'group_rename';groupId:string;name:string};
-const groupActions=new Set(['group_create','group_invite','group_phone','group_join','group_decide','group_cancel','group_permission','group_remove','group_transfer','group_leave','group_rename']);
+ |{type:'group_rename';groupId:string;name:string}
+ |{type:'group_admin';groupId:string;targetId:string;allow:boolean};
+const groupActions=new Set(['group_create','group_invite','group_phone','group_join','group_decide','group_cancel','group_permission','group_remove','group_transfer','group_leave','group_rename','group_admin']);
 export const isGroupAction=(action:{type:string}):action is GroupAction=>groupActions.has(action.type);
 export const foldGroup=(value:string)=>value.toLocaleLowerCase('pl').normalize('NFD').replace(/\p{Diacritic}/gu,'').replace(/ł/g,'l').trim();
 export function validGroupText(name:string,description:string) {
@@ -30,8 +31,11 @@ export function validGroupText(name:string,description:string) {
  !Array.from(name+description).some(char=>char.codePointAt(0)!<32||char.codePointAt(0)===127||char==='<'||char==='>');
 }
 export const membership=(world:GroupWorld,groupId:string,playerId=world.userId)=>world.groupState.members.find(m=>m.groupId===groupId&&m.playerId===playerId);
-export const groupAdmin=(world:GroupWorld,groupId:string)=>world.groupState.groups.some(g=>g.id===groupId&&g.adminId===world.userId)&&!!membership(world,groupId);
-export const groupCanOrganize=(world:GroupWorld,groupId:string,playerId=world.userId)=>!!membership(world,groupId,playerId)&&(world.groupState.groups.some(g=>g.id===groupId&&g.adminId===playerId)||membership(world,groupId,playerId)!.organizer);
+// Administrator główny (adminId) albo współadministrator (Membership.admin) — te same uprawnienia zarządzania.
+export const groupAdmin=(world:GroupWorld,groupId:string,playerId=world.userId)=>!!membership(world,groupId,playerId)&&(world.groupState.groups.some(g=>g.id===groupId&&g.adminId===playerId)||!!membership(world,groupId,playerId)!.admin);
+// Tylko administrator główny nadaje/odbiera uprawnienia administratora, przekazuje grupę i usuwa innych administratorów.
+export const groupOwner=(world:GroupWorld,groupId:string,playerId=world.userId)=>!!membership(world,groupId,playerId)&&world.groupState.groups.some(g=>g.id===groupId&&g.adminId===playerId);
+export const groupCanOrganize=(world:GroupWorld,groupId:string,playerId=world.userId)=>!!membership(world,groupId,playerId)&&(groupAdmin(world,groupId,playerId)||membership(world,groupId,playerId)!.organizer);
 export const groupMembers=(world:GroupWorld,groupId:string)=>membership(world,groupId)?world.groupState.members.filter(m=>m.groupId===groupId):[];
 export const canViewGroupProfile=(world:GroupWorld,groupId:string,targetId:string)=>!!membership(world,groupId)&&!!membership(world,groupId,targetId);
 export function publicGroups(world:GroupWorld,query:string) {
@@ -75,7 +79,10 @@ export function reduceGroups(previous:World,action:GroupAction):World {
  const world={...previous,groupState:structuredClone(state),notice:''},s=world.groupState;
  const nextId=(prefix:string)=>`${prefix}-${s.nextId++}`;
  const member=(groupId:string,playerId=user)=>s.members.find(m=>m.groupId===groupId&&m.playerId===playerId);
- const admin=(groupId:string)=>s.groups.some(g=>g.id===groupId&&g.adminId===user)&&!!member(groupId);
+ const owner=(groupId:string)=>s.groups.some(g=>g.id===groupId&&g.adminId===user)&&!!member(groupId);
+ const admin=(groupId:string)=>owner(groupId)||!!member(groupId)?.admin;
+ // Współadministrator nie zarządza innymi administratorami.
+ const protectedTarget=(groupId:string,targetId:string)=>!owner(groupId)&&!!member(groupId,targetId)?.admin;
  function addMember(groupId:string,playerId:string) {
   if(member(groupId,playerId)||!world.players.some(p=>p.id===playerId))return;
   s.members.push({groupId,playerId,joinedAt:new Date(Date.UTC(2026,9,19)+s.clock++*1000).toISOString(),organizer:false});
@@ -133,27 +140,31 @@ export function reduceGroups(previous:World,action:GroupAction):World {
   return world;
  }
  if(action.type==='group_permission') {
-  const target=member(group.id,action.targetId);if(!admin(group.id)||!target||action.targetId===group.adminId)return previous;
+  const target=member(group.id,action.targetId);if(!admin(group.id)||!target||action.targetId===group.adminId||protectedTarget(group.id,action.targetId))return previous;
   target.organizer=action.allow;world.notice=action.allow?'Nadano uprawnienie organizatora w tej grupie.':'Odebrano uprawnienie organizatora w tej grupie.';return world;
  }
  if(action.type==='group_rename') {
   const name=action.name.trim();if(!admin(group.id)||!validGroupText(name,''))return previous;
   group.name=name;world.notice='Zmieniono nazwę grupy · demo.';return world;
  }
+ if(action.type==='group_admin') {
+  const target=member(group.id,action.targetId);if(!owner(group.id)||!target||action.targetId===group.adminId)return previous;
+  target.admin=action.allow;world.notice=action.allow?'Nadano uprawnienia administratora w tej grupie.':'Odebrano uprawnienia administratora w tej grupie.';return world;
+ }
  if(action.type==='group_transfer') {
-  if(!admin(group.id)||!member(group.id,action.targetId)||action.targetId===user)return previous;
-  group.adminId=action.targetId;world.notice='Przekazano administrację grupy · demo.';return world;
+  if(!owner(group.id)||!member(group.id,action.targetId)||action.targetId===user)return previous;
+  group.adminId=action.targetId;member(group.id,action.targetId)!.admin=false;world.notice='Przekazano administrację grupy · demo.';return world;
  }
  if(action.type!=='group_leave'&&action.type!=='group_remove')return previous;
  const leaving=action.type==='group_leave';
  const targetId=leaving?user:action.targetId;
- if(!member(group.id,targetId)||(!leaving&&(!admin(group.id)||targetId===group.adminId)))return previous;
+ if(!member(group.id,targetId)||(!leaving&&(!admin(group.id)||targetId===group.adminId||protectedTarget(group.id,targetId))))return previous;
  s.members=s.members.filter(m=>!(m.groupId===group.id&&m.playerId===targetId));
  for(const r of s.requests)if(r.groupId===group.id&&r.kind==='proposal'&&r.requestedBy===targetId&&r.status==='pending')r.status='cancelled';
  if(leaving&&group.adminId===user) {
-  const remaining=s.members.filter(m=>m.groupId===group.id).sort((a,b)=>Number(b.organizer)-Number(a.organizer)||a.joinedAt.localeCompare(b.joinedAt)||a.playerId.localeCompare(b.playerId));
+  const remaining=s.members.filter(m=>m.groupId===group.id).sort((a,b)=>Number(!!b.admin)-Number(!!a.admin)||Number(b.organizer)-Number(a.organizer)||a.joinedAt.localeCompare(b.joinedAt)||a.playerId.localeCompare(b.playerId));
   if(!remaining.length){s.groups=s.groups.filter(g=>g.id!==group.id);s.requests=s.requests.filter(r=>r.groupId!==group.id);world.notice='Opuszczono i usunięto pustą grupę w demo.';return world;}
-  group.adminId=remaining[0].playerId;
+  group.adminId=remaining[0].playerId;remaining[0].admin=false;
   world.notice=`Opuszczono grupę. Administrację przejmuje ${world.players.find(p=>p.id===group.adminId)!.name}.`;
  } else world.notice=leaving?'Opuszczono grupę w demo.':'Usunięto członka i jego uprawnienia grupowe w demo.';
  return world;

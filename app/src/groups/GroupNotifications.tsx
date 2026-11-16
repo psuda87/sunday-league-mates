@@ -32,7 +32,7 @@ export default function GroupNotifications({manager,userId,onGroups,refreshKey,o
    void manager.call('group_finance_wallet').then(value=>{const wallet=paymentWallet(value,userId);if(current()){setDues(outstandingMatches(wallet));setBlocked(paidRegistrationBlocked(wallet));}}).catch(()=>undefined);
    try{
     const result=await manager.call<{groups:GroupSummary[]}>('groups_list');
-    const rows=result.groups.map(summary).filter(g=>g.admin_id===userId&&g.pending_count>0);
+    const rows=result.groups.map(summary).filter(g=>(g.admin_id===userId||g.admin===true)&&g.pending_count>0);
     if(alive&&ticket===epoch&&manager.getSnapshot().session===session)setGroups(rows);
    }catch{if(alive&&ticket===epoch)setError(true);}
   }

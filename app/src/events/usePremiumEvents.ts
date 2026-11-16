@@ -133,7 +133,7 @@ export function usePremiumEvents(manager:SessionManager,userId:string){
   }
   async function recheckFinancial(){const id=detail?.event.id;if(!id)return;const ticket=++detailEpoch.current;try{const d=matchDetail(await manager.call('matches_detail',{event_id:id}),id);if(authorized()&&ticket===detailEpoch.current)setDetail(d);}catch{if(authorized()){setDetail(null);setError('Nie potwierdzono uprawnień po zmianie finansów. Odśwież mecz.');}}}
   // New member creation is activated only by the versioned server contract.
-  const organizers=memberCreationEnabled?groups:groups.filter(g=>g.admin_id===userId||g.organizer);
+  const organizers=memberCreationEnabled?groups:groups.filter(g=>g.admin_id===userId||g.admin===true||g.organizer);
   function beginCreate(){back();if(organizers.length)setCreating(true);}
   function resetPage(){invalidate();if(debounce.current)clearTimeout(debounce.current);setOffset(0);setHasMore(false);setNextOffset(null);setEvents([]);}
   function selectGroup(id:string){back();resetPage();if(listFilter==='mine')setListFilter('upcoming');const next=['public','groups','mine'].includes(id)||groups.some(g=>g.id===id)?id:'';setActiveGroup(next);setSearch('');query.current={...query.current,scope:['public','groups','mine'].includes(next)?next:next?'group':'all',group_id:groups.some(g=>g.id===next)?next:''};delete query.current.query;void refresh();}
