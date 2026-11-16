@@ -18,6 +18,11 @@ grafiki w lokalnym folderze `badges/` (poza repo; wygląd odznak uznany za gotow
 - D5: Król strzelców — **osobno w każdej grupie**, sezon = rok kalendarzowy (1.01–31.12); przyznawany po zakończeniu roku.
 - D6: Rekruter — **każdy gość osobno**, także gdy to ta sama osoba w kolejnych meczach.
 - D9: **bez wyliczania wstecz** — odznaki liczone od dnia wdrożenia.
+- D3: seria (Żelazne płuca) — **kolejne mecze grupy**: każdy nieodwołany mecz grupy, w którym zawodnik nie zagrał,
+  przerywa serię (wariant B). Liczone osobno w każdej grupie.
+- D7a: **Turysta (SLM-ZER-010) usunięty** z zestawu.
+- Nowe (2026-11-16): 4 odznaki za staż/regularność — 3, 6, 12 miesięcy gry i regularna gra przez cały rok
+  (definicje i grafiki do ustalenia).
 
 ## Wygląd wiersza (propozycja)
 ```
@@ -48,7 +53,7 @@ grafiki w lokalnym folderze `badges/` (poza repo; wygląd odznak uznany za gotow
 | SLM-COM-001 | Powrót króla | `Powrót Króla_ Królewska Piłkarska Odznaka-3` |
 | SLM-GST-010 | Rekruter | `Metallic Esports Recruiting Badge-4` |
 | SLM-BEN-010 | Wieczny rezerwowy | `Glossy Eternal Substitute Bench Crest-5` |
-| SLM-ZER-010 | Turysta | `TURYSTA_ Zakaz Goli w Raju-6` |
+| ~~SLM-ZER-010~~ | ~~Turysta~~ | usunięta 2026-11-16 |
 | SLM-PHX-005 | Feniks | `Fiery Phoenix FENIKS Soccer Crest` |
 | SLM-LST-005 | Człowiek ostatniej chwili | `Człowiek Ostatniej Chwili – Sportowy Emblemat-2` |
 
@@ -69,14 +74,12 @@ gdzie szachownica jest wtopiona w obraz (np. `Neon Debutant`), docelowo `app/pub
 | COM-001 | powrót po przerwie | historia obecności | długość przerwy (D1) |
 | GST-010 | 10 przyprowadzonych gości | wpisy gości z `responsible_user_id`, gość zagrał | unikalność gości (D6) |
 | BEN-010 | 10 razy na rezerwie | `status='reserve'` w chwili meczu | D4 |
-| ZER-010 | 10 meczów z rzędu bez gola | `slm_match_stats` | mecz bez wpisanych statystyk (D7) |
+| ~~ZER-010~~ | usunięta | — | — |
 | LST-005 | 5 zapisów w ostatniej chwili | `joined_at` vs `starts_at` | okno czasowe (D2) |
 
 ## Do rozstrzygnięcia
 - D0, D1, D2, D7, D10 — rozstrzygnięte (wyżej).
-- D3. Żelazne płuca (seria 10 meczów z rzędu) i Niezawodny: co przerywa serię — patrz odpowiedź w rozmowie 2026-11-16.
-- D7a. Turysta: zostawić „10 meczów z rzędu bez gola” (tylko mecze z wpisanymi statystykami) czy zmienić na
-  „mniej niż X meczów w roku”?
+- D11. Definicje 4 nowych odznak (miesiące gry, regularność roku) i ich grafiki.
 - D8. Zakres pozostałych odznak: wszystkie grupy łącznie (propozycja) czy osobno w każdej grupie?
 
 ## Etapy (każdy: gałąź → testy → akceptacja → PR → merge → deploy, za zgodą)
