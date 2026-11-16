@@ -1,3 +1,16 @@
+# Współadministratorzy grupy — 2026-11-16 (zgoda właściciela)
+
+Gałąź `feat/group-coadmins`. Supabase `hjtcyybkxebvdropchac`: migracja `group_coadmins` (zdalnie `20261116205228`, repo `20261116220000`)
+po próbie na sucho z pełnym testem SQL `supabase/tests/group_coadmins.sql` i wymuszonym wycofaniem (PASS; pierwsza próba wykryła błąd kolejności
+następcy — poprawiony). `slm_group_members.admin`; `group_admin()` obejmuje współadministratorów (zgłoszenia, zaproszenia, nazwa, kłódka, uprawnienia
+organizatora, usuwanie zwykłych członków, finanse grupy, składy). Wyłącznie administrator główny (`slm_groups.admin_id`): `admin_grant`/`admin_revoke`,
+przekazanie, zarządzanie innymi administratorami. Odejście głównego: przejmuje najstarszy współadministrator. Edge `accounts` bez zmian.
+Frontend: role „Administrator główny”/„Administrator”, przycisk „Nadaj/Odbierz uprawnienia administratora” w „Uprawnienia członka”.
+Strażnicy: `OWNER_SOURCE` = commit z poprawką, migracja w `OWNER_MIGRATIONS`. Kontrole: Vitest 629/629 (5 nowych testów modelu), tsc PASS,
+eslint 0 błędów, oba strażniki PASS, `build:premium-web` PASS. W przeglądarce nie testowano.
+
+---
+
 # Utwardzenie bezpieczeństwa (audyt 2026-11-15) — WDROŻONE 2026-11-16 (zgoda właściciela)
 
 Main `3d6c791` (PR #70, po scaleniu PR #69 i #71). Supabase `hjtcyybkxebvdropchac`:
