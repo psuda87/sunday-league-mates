@@ -1,4 +1,14 @@
-# Utwardzenie bezpieczeństwa (audyt 2026-11-15) — gałąź, NIE wdrożone
+# Utwardzenie bezpieczeństwa (audyt 2026-11-15) — WDROŻONE 2026-11-16 (zgoda właściciela)
+
+Main `3d6c791` (PR #70, po scaleniu PR #69 i #71). Supabase `hjtcyybkxebvdropchac`:
+- migracja `nickname_claim_hardening` (wersja zdalna `20261116190204`) — przed zastosowaniem próba na sucho z testem SQL i wymuszonym wycofaniem: PASS, baza bez zmian;
+  po zastosowaniu: funkcje obecne, brak EXECUTE dla anon/authenticated, 20 kont / 20 rezerwacji.
+- Edge `accounts` wersja 30 (CLI `functions deploy --use-api`, `verify_jwt=false`); przed deployem wersja live = main (11/11 plików), po deployu live = main `3d6c791` (11/11).
+  Smoke test: 401 bez sesji, 400 zły JSON, 403 obcy origin. Logi v30: 200/204/401/403, brak 5xx i 429.
+Vercel: produkcja z main `3d6c791` (`dpl_Gpp2UAh1nxUksZHtfPbKPDdzokAy`) — READY; slm-soccer/slm-football/slm-ui-demo.vercel.app: HTTP 200, nowe nagłówki (Permissions-Policy, COOP, HSTS) obecne, CSP bez zmian.
+Do zrobienia przez właściciela (panel Supabase → Authentication): limity logowania/rejestracji, „Secure password change”, „Secure email change”.
+
+## Historia gałęzi (przed wdrożeniem)
 
 Gałąź `fix/security-hardening-20261115` z main `2329d32` (produkcja Vercel = `0c9c352`). Zmiany (od najprostszych):
 1. `3dedad2` Edge: przywrócone polskie znaki w komunikatach błędów matches/groups/finance.
