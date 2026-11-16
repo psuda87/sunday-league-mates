@@ -1,0 +1,143 @@
+{
+  "version": 1,
+  "status": "asset-design",
+  "notes": "Warunki nie są jeszcze podłączone do statystyk. COM-001 i LST-005 wymagają doprecyzowania okna czasowego. Rekruter: liczyć unikalne faktyczne uczestnictwa gości przypisane zapraszającemu; zasady powtórzeń do potwierdzenia.",
+  "badges": [
+    {
+      "code": "SLM-MAT-001",
+      "name": "Debiutant",
+      "category": "attendance",
+      "metric": "matches",
+      "threshold": 1,
+      "asset": "assets/badges/SLM-MAT-001.webp"
+    },
+    {
+      "code": "SLM-MAT-010",
+      "name": "Stały bywalec",
+      "category": "attendance",
+      "metric": "matches",
+      "threshold": 10,
+      "asset": "assets/badges/SLM-MAT-010.webp"
+    },
+    {
+      "code": "SLM-MAT-050",
+      "name": "Weteran",
+      "category": "attendance",
+      "metric": "matches",
+      "threshold": 50,
+      "asset": "assets/badges/SLM-MAT-050.webp"
+    },
+    {
+      "code": "SLM-MAT-100",
+      "name": "Legenda boiska",
+      "category": "attendance",
+      "metric": "matches",
+      "threshold": 100,
+      "asset": "assets/badges/SLM-MAT-100.webp"
+    },
+    {
+      "code": "SLM-STR-010",
+      "name": "Żelazne płuca",
+      "category": "attendance",
+      "metric": "consecutive_matches",
+      "threshold": 10,
+      "asset": "assets/badges/SLM-STR-010.webp"
+    },
+    {
+      "code": "SLM-GOL-100",
+      "name": "Snajper",
+      "category": "results",
+      "metric": "goals",
+      "threshold": 100,
+      "asset": "assets/badges/SLM-GOL-100.webp"
+    },
+    {
+      "code": "SLM-TOP-001",
+      "name": "Król strzelców",
+      "category": "results",
+      "metric": "season_top_scorer",
+      "threshold": 1,
+      "asset": "assets/badges/SLM-TOP-001.webp"
+    },
+    {
+      "code": "SLM-AST-100",
+      "name": "Asystent",
+      "category": "results",
+      "metric": "assists",
+      "threshold": 100,
+      "asset": "assets/badges/SLM-AST-100.webp"
+    },
+    {
+      "code": "SLM-WIN-005",
+      "name": "Niezwyciężony",
+      "category": "results",
+      "metric": "consecutive_wins",
+      "threshold": 5,
+      "asset": "assets/badges/SLM-WIN-005.webp"
+    },
+    {
+      "code": "SLM-ATT-020",
+      "name": "Pewniak",
+      "category": "activity",
+      "metric": "attended_signups",
+      "threshold": 20,
+      "asset": "assets/badges/SLM-ATT-020.webp"
+    },
+    {
+      "code": "SLM-REL-020",
+      "name": "Niezawodny",
+      "category": "activity",
+      "metric": "matches_without_unexcused_absence",
+      "threshold": 20,
+      "asset": "assets/badges/SLM-REL-020.webp"
+    },
+    {
+      "code": "SLM-COM-001",
+      "name": "Powrót króla",
+      "category": "activity",
+      "metric": "return_after_break_days",
+      "threshold": null,
+      "asset": "assets/badges/SLM-COM-001.webp"
+    },
+    {
+      "code": "SLM-GST-010",
+      "name": "Rekruter",
+      "category": "community",
+      "metric": "brought_guests",
+      "threshold": 10,
+      "asset": "assets/badges/SLM-GST-010.webp"
+    },
+    {
+      "code": "SLM-BEN-010",
+      "name": "Wieczny rezerwowy",
+      "category": "humor",
+      "metric": "reserve_appearances",
+      "threshold": 10,
+      "asset": "assets/badges/SLM-BEN-010.webp"
+    },
+    {
+      "code": "SLM-ZER-010",
+      "name": "Turysta",
+      "category": "humor",
+      "metric": "consecutive_goalless_matches",
+      "threshold": 10,
+      "asset": "assets/badges/SLM-ZER-010.webp"
+    },
+    {
+      "code": "SLM-PHX-005",
+      "name": "Feniks",
+      "category": "humor",
+      "metric": "win_after_consecutive_losses",
+      "threshold": 5,
+      "asset": "assets/badges/SLM-PHX-005.webp"
+    },
+    {
+      "code": "SLM-LST-005",
+      "name": "Człowiek ostatniej chwili",
+      "category": "humor",
+      "metric": "last_minute_signups",
+      "threshold": 5,
+      "asset": "assets/badges/SLM-LST-005.webp"
+    }
+  ]
+}
