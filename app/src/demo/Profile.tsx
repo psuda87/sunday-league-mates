@@ -6,6 +6,8 @@ import {AccountDeletion} from '../profile/PhoneEditor';
 import AppearanceSettings from '../ui/AppearanceSettings';
 import MatchHeader from '../ui/MatchHeader';
 import UltimatePlayerCard from './UltimatePlayerCard';
+import BadgeList from '../badges/BadgeList';
+import { demoBadgeStates } from '../badges/demoBadges';
 import type { PersonalProfileBinding } from '../ui/personalProfile';
 import type { Action, World } from './data';
 import { statistics } from './data';
@@ -60,6 +62,7 @@ export default function DemoProfile({world,id,onBack,dispatch,personal=false,onP
       <div><button type="submit">Zapisz numer</button><button type="button" onClick={()=>setEditing(false)}>Anuluj</button></div>
     </form>}
     <section className="slm-player-stats slm-ultimate-summary" aria-label={live?"Statystyki zawodnika · niedostępne":"Cztery podstawowe statystyki demonstracyjne"}><dl className="slm-ultimate-stats">{[[stats.played,'Mecze'],[player.demoTotals.goals,'Bramki'],[player.demoTotals.assists,'Asysty'],[player.demoTotals.mvp,'MVP']].map(([value,label],index)=><div key={label}><dt>{label}</dt><dd>{live?(liveStats?[liveStats.played,liveStats.goals,liveStats.assists,liveStats.mvp][index]:'—'):value}</dd></div>)}</dl></section>
+    {!live&&!liveAuth&&<BadgeList states={demoBadgeStates(stats.played,player.demoTotals,id)} own={own} label="Odznaki demonstracyjne · fikcyjne dane"/>}
     {personal&&own&&<div className="slm-my-identity">
       <div className="slm-identity-actions slm-my-actions"><button type="button" disabled={!!live&&(live.phase==='loading'||live.saving)} aria-expanded={editor==='identity'} onClick={()=>{if(live&&live.phase!=='ready'){live.reload();return;}setEditing(false);setEditor(editor==='identity'?null:'identity');}}>{live&&live.phase!=='ready'?'Ponów odczyt profilu':'Edytuj profil'}</button><button type="button" disabled={!!live&&(live.phase!=='ready'||live.photo?.saving||!live.photo)} aria-expanded={editor==='portrait'} onClick={()=>{setEditing(false);if(live?.photo?.phase==='error')live.photo.reload();setEditor(editor==='portrait'?null:'portrait');}}>Zmień zdjęcie</button><button type="button" onClick={()=>{if(settings.current){settings.current.open=!settings.current.open;if(settings.current.open)settings.current.scrollIntoView?.({block:'start',behavior:'smooth'});}}}>Ustawienia</button></div>
       {editor==='identity'&&(!live||live.phase==='ready')&&<IdentityEditor key={'identity:'+(profile?.user_id??id)} personalProfile={live} player={player} dispatch={dispatch} onClose={closeEditor} onNumber={editNumber}/>}

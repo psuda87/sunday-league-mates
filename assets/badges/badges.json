@@ -1,7 +1,7 @@
 {
   "version": 1,
   "status": "asset-design",
-  "notes": "Warunki nie są jeszcze podłączone do statystyk. COM-001: powrót po ≥60 dniach przerwy. LST-005: zapis w dniu meczu po 17:00 (Europe/Warsaw). Rekruter: każdy gość, który zagrał, liczy się osobno (także ten sam). 2026-11-16: usunięto SLM-ZER-010 (Turysta). Aktywny miesiąc = co najmniej 2 rozegrane mecze; miesiąc bez meczów grupy nie przerywa serii. SLM-YRS-080: ≥80% nieodwołanych meczów grupy w roku kalendarzowym, osobno w każdej grupie. Nazwy MON/YRS robocze. Grafiki WebP: app/public/assets/badges/<KOD>.webp.",
+  "notes": "Warunki nie są jeszcze podłączone do statystyk. COM-001: powrót po ≥60 dniach przerwy. LST-005: zapis w dniu meczu po 17:00 (Europe/Warsaw). Rekruter: każdy gość, który zagrał, liczy się osobno (także ten sam). 2026-11-16: usunięto SLM-ZER-010 (Turysta). Aktywny miesiąc = co najmniej 2 rozegrane mecze; miesiąc bez meczów grupy nie przerywa serii. SLM-YRS-<ROK>: ≥80% nieodwołanych meczów grupy w danym roku, osobno w każdej grupie; każdy rok to osobna odznaka z własną grafiką (pierwsza: 2027). Nazwy MON robocze. Grafiki WebP: app/public/assets/badges/<KOD>.webp.",
   "badges": [
     {
       "code": "SLM-MAT-001",
@@ -156,12 +156,13 @@
       "asset": "assets/badges/SLM-MON-012.webp"
     },
     {
-      "code": "SLM-YRS-080",
-      "name": "Regularny",
+      "code": "SLM-YRS-2027",
+      "name": "Regularny 2027",
       "category": "attendance",
       "metric": "season_group_attendance_percent",
       "threshold": 80,
-      "asset": "assets/badges/SLM-YRS-080.webp"
+      "asset": "assets/badges/SLM-YRS-2027.webp",
+      "season": 2027
     }
   ]
 }

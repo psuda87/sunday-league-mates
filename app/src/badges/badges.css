@@ -1,0 +1,131 @@
+/* Odznaki pod kartą zawodnika — tokeny aktywnego profilu kolorystycznego (variables.css). */
+.slm-badges {
+  margin: 0 0 18px;
+  padding: 14px 14px 10px;
+  border: 1px solid var(--slm-border);
+  border-radius: 14px;
+  background: var(--slm-panel);
+}
+.slm-badges-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.slm-badges-header h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.slm-badges-count {
+  font-weight: 700;
+  color: var(--slm-gold);
+  font-variant-numeric: tabular-nums;
+}
+.slm-badges-note,
+.slm-badges-empty {
+  margin: 4px 0 8px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--slm-text-secondary);
+}
+.slm-badge-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.slm-badge {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid var(--slm-border);
+}
+.slm-badge-list > .slm-badge:first-child {
+  border-top: 0;
+}
+.slm-badge-image {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+.slm-badge-locked .slm-badge-image {
+  filter: grayscale(1);
+  opacity: 0.45;
+}
+.slm-badge-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 10px;
+}
+.slm-badge-title strong {
+  font-size: 0.98rem;
+}
+.slm-badge-date {
+  font-size: 0.78rem;
+  color: var(--slm-gold);
+  white-space: nowrap;
+}
+.slm-badge-description {
+  margin: 2px 0 0;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--slm-text-secondary);
+}
+.slm-badge-progress {
+  display: grid;
+  gap: 4px;
+  margin-top: 6px;
+}
+.slm-badge-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--slm-border);
+  overflow: hidden;
+}
+.slm-badge-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--slm-gold);
+}
+.slm-badge-progress small,
+.slm-badge-pending {
+  font-size: 0.76rem;
+  color: var(--slm-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.slm-badge-pending {
+  display: block;
+  margin-top: 4px;
+}
+.slm-badges-toggle {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 6px;
+  border: 1px solid var(--slm-border);
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.slm-badges-toggle:focus-visible {
+  outline: 2px solid var(--slm-gold);
+  outline-offset: 2px;
+}
+.slm-badge-list-locked {
+  margin-top: 6px;
+}
+.slm-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

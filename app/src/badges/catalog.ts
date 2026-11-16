@@ -11,7 +11,7 @@ export interface BadgeDefinition {
   threshold: number;
   unit: string;
   scope: BadgeScope;
-  /** Odznaka przyznawana za każdy rok kalendarzowy osobno. */
+  /** Król strzelców: przyznawany za każdy rok kalendarzowy osobno (ta sama grafika). */
   yearly?: boolean;
 }
 
@@ -31,7 +31,7 @@ export const BADGES: readonly BadgeDefinition[] = [
   def('SLM-MON-003', 'Kwartał na boisku', '3 miesiące z rzędu, w każdym co najmniej 2 rozegrane mecze.', 'attendance', 3, 'miesiące z rzędu'),
   def('SLM-MON-006', 'Pół roku na boisku', '6 miesięcy z rzędu, w każdym co najmniej 2 rozegrane mecze.', 'attendance', 6, 'miesięcy z rzędu'),
   def('SLM-MON-012', 'Rok na boisku', '12 miesięcy z rzędu, w każdym co najmniej 2 rozegrane mecze.', 'attendance', 12, 'miesięcy z rzędu'),
-  def('SLM-YRS-080', 'Regularny', 'Co najmniej 80% meczów grupy w roku kalendarzowym.', 'attendance', 80, '% meczów grupy', 'per_group', true),
+  def('SLM-YRS-2027', 'Regularny 2027', 'Co najmniej 80% meczów grupy w 2027 roku.', 'attendance', 80, '% meczów grupy', 'per_group'),
   def('SLM-GOL-100', 'Snajper', '100 goli (liczone mecze, w których bramki zgadzają się z wynikiem).', 'results', 100, 'goli'),
   def('SLM-TOP-001', 'Król strzelców', 'Najwięcej goli w grupie w roku kalendarzowym.', 'results', 1, 'tytuł', 'per_group', true),
   def('SLM-AST-100', 'Asystent', '100 asyst (liczone mecze, w których bramki zgadzają się z wynikiem).', 'results', 100, 'asyst'),
