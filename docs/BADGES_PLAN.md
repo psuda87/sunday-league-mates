@@ -25,11 +25,11 @@ grafiki w lokalnym folderze `badges/` (poza repo; wygląd odznak uznany za gotow
   - SLM-MON-003 „Kwartał na boisku”, SLM-MON-006 „Pół roku na boisku”, SLM-MON-012 „Rok na boisku” —
     **3/6/12 kolejnych miesięcy kalendarzowych**, w każdym **co najmniej 2 rozegrane mecze**; jeden „zawalony” miesiąc
     zeruje licznik. Miesiąc, w którym grupa nie miała żadnego meczu (np. przerwa wakacyjna), nie przerywa serii.
-  - SLM-YRS-075 „Regularny” — **≥ 75% nieodwołanych meczów grupy** w roku kalendarzowym, osobno w każdej grupie.
+  - SLM-YRS-080 „Regularny” — **≥ 80% nieodwołanych meczów grupy** w roku kalendarzowym, osobno w każdej grupie.
   Zestaw: 20 odznak (17 − Turysta + 4).
   Grafiki: MON-003 `Neon Bronze Soccer Calendar 3 Badge-1`, MON-006 `Neon Shield Soccer Challenge 6 Badge-2`,
   MON-012 `Crowned Football Calendar 12Emblem-3`, YRS `Neon Golden Football Trophy 2027-4`
-  (ma wpisany rok 2027 i „80%” — do rozstrzygnięcia).
+  (próg 80% zgodny z grafiką; wpisany rok 2027 — do rozstrzygnięcia: wersja bez roku + rok wyświetlany w aplikacji).
 - D8: pozostałe odznaki liczone **łącznie ze wszystkich grup** (osobno byłoby za łatwo). Osobno w grupie liczą się
   tylko: seria (Żelazne płuca), Król strzelców i Regularny.
 

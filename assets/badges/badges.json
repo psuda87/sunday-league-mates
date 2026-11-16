@@ -1,7 +1,7 @@
 {
   "version": 1,
   "status": "asset-design",
-  "notes": "Warunki nie są jeszcze podłączone do statystyk. COM-001 i LST-005 wymagają doprecyzowania okna czasowego. Rekruter: liczyć unikalne faktyczne uczestnictwa gości przypisane zapraszającemu; zasady powtórzeń do potwierdzenia. 2026-11-16: usunięto SLM-ZER-010 (Turysta). Aktywny miesiąc = co najmniej 2 rozegrane mecze; miesiąc bez meczów grupy nie przerywa serii. SLM-YRS-075: ≥75% nieodwołanych meczów grupy w roku kalendarzowym, osobno w każdej grupie. Nazwy MON/YRS robocze, grafiki do dostarczenia.",
+  "notes": "Warunki nie są jeszcze podłączone do statystyk. COM-001 i LST-005 wymagają doprecyzowania okna czasowego. Rekruter: liczyć unikalne faktyczne uczestnictwa gości przypisane zapraszającemu; zasady powtórzeń do potwierdzenia. 2026-11-16: usunięto SLM-ZER-010 (Turysta). Aktywny miesiąc = co najmniej 2 rozegrane mecze; miesiąc bez meczów grupy nie przerywa serii. SLM-YRS-080: ≥80% nieodwołanych meczów grupy w roku kalendarzowym, osobno w każdej grupie. Nazwy MON/YRS robocze, grafiki do dostarczenia.",
   "badges": [
     {
       "code": "SLM-MAT-001",
@@ -156,12 +156,12 @@
       "asset": "assets/badges/SLM-MON-012.webp"
     },
     {
-      "code": "SLM-YRS-075",
+      "code": "SLM-YRS-080",
       "name": "Regularny",
       "category": "attendance",
       "metric": "season_group_attendance_percent",
-      "threshold": 75,
-      "asset": "assets/badges/SLM-YRS-075.webp"
+      "threshold": 80,
+      "asset": "assets/badges/SLM-YRS-080.webp"
     }
   ]
 }
