@@ -1,7 +1,7 @@
 {
   "version": 1,
   "status": "asset-design",
-  "notes": "Warunki nie są jeszcze podłączone do statystyk. COM-001 i LST-005 wymagają doprecyzowania okna czasowego. Rekruter: liczyć unikalne faktyczne uczestnictwa gości przypisane zapraszającemu; zasady powtórzeń do potwierdzenia. 2026-11-16: usunięto SLM-ZER-010 (Turysta). Aktywny miesiąc = co najmniej 2 rozegrane mecze; miesiąc bez meczów grupy nie przerywa serii. SLM-YRS-080: ≥80% nieodwołanych meczów grupy w roku kalendarzowym, osobno w każdej grupie. Nazwy MON/YRS robocze, grafiki do dostarczenia.",
+  "notes": "Warunki nie są jeszcze podłączone do statystyk. COM-001: powrót po ≥60 dniach przerwy. LST-005: zapis w dniu meczu po 17:00 (Europe/Warsaw). Rekruter: każdy gość, który zagrał, liczy się osobno (także ten sam). 2026-11-16: usunięto SLM-ZER-010 (Turysta). Aktywny miesiąc = co najmniej 2 rozegrane mecze; miesiąc bez meczów grupy nie przerywa serii. SLM-YRS-080: ≥80% nieodwołanych meczów grupy w roku kalendarzowym, osobno w każdej grupie. Nazwy MON/YRS robocze. Grafiki WebP: app/public/assets/badges/<KOD>.webp.",
   "badges": [
     {
       "code": "SLM-MAT-001",
