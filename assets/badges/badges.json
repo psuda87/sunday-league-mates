@@ -1,7 +1,7 @@
 {
   "version": 1,
   "status": "asset-design",
-  "notes": "Warunki nie są jeszcze podłączone do statystyk. COM-001 i LST-005 wymagają doprecyzowania okna czasowego. Rekruter: liczyć unikalne faktyczne uczestnictwa gości przypisane zapraszającemu; zasady powtórzeń do potwierdzenia.",
+  "notes": "Warunki nie są jeszcze podłączone do statystyk. COM-001 i LST-005 wymagają doprecyzowania okna czasowego. Rekruter: liczyć unikalne faktyczne uczestnictwa gości przypisane zapraszającemu; zasady powtórzeń do potwierdzenia. 2026-11-16: usunięto SLM-ZER-010 (Turysta). Aktywny miesiąc = co najmniej 2 rozegrane mecze; miesiąc bez meczów grupy nie przerywa serii. SLM-YRS-075: ≥75% nieodwołanych meczów grupy w roku kalendarzowym, osobno w każdej grupie. Nazwy MON/YRS robocze, grafiki do dostarczenia.",
   "badges": [
     {
       "code": "SLM-MAT-001",
@@ -116,14 +116,6 @@
       "asset": "assets/badges/SLM-BEN-010.webp"
     },
     {
-      "code": "SLM-ZER-010",
-      "name": "Turysta",
-      "category": "humor",
-      "metric": "consecutive_goalless_matches",
-      "threshold": 10,
-      "asset": "assets/badges/SLM-ZER-010.webp"
-    },
-    {
       "code": "SLM-PHX-005",
       "name": "Feniks",
       "category": "humor",
@@ -138,6 +130,38 @@
       "metric": "last_minute_signups",
       "threshold": 5,
       "asset": "assets/badges/SLM-LST-005.webp"
+    },
+    {
+      "code": "SLM-MON-003",
+      "name": "Kwartał na boisku",
+      "category": "attendance",
+      "metric": "consecutive_active_months",
+      "threshold": 3,
+      "asset": "assets/badges/SLM-MON-003.webp"
+    },
+    {
+      "code": "SLM-MON-006",
+      "name": "Pół roku na boisku",
+      "category": "attendance",
+      "metric": "consecutive_active_months",
+      "threshold": 6,
+      "asset": "assets/badges/SLM-MON-006.webp"
+    },
+    {
+      "code": "SLM-MON-012",
+      "name": "Rok na boisku",
+      "category": "attendance",
+      "metric": "consecutive_active_months",
+      "threshold": 12,
+      "asset": "assets/badges/SLM-MON-012.webp"
+    },
+    {
+      "code": "SLM-YRS-075",
+      "name": "Regularny",
+      "category": "attendance",
+      "metric": "season_group_attendance_percent",
+      "threshold": 75,
+      "asset": "assets/badges/SLM-YRS-075.webp"
     }
   ]
 }

@@ -21,8 +21,12 @@ grafiki w lokalnym folderze `badges/` (poza repo; wygląd odznak uznany za gotow
 - D3: seria (Żelazne płuca) — **kolejne mecze grupy**: każdy nieodwołany mecz grupy, w którym zawodnik nie zagrał,
   przerywa serię (wariant B). Liczone osobno w każdej grupie.
 - D7a: **Turysta (SLM-ZER-010) usunięty** z zestawu.
-- Nowe (2026-11-16): 4 odznaki za staż/regularność — 3, 6, 12 miesięcy gry i regularna gra przez cały rok
-  (definicje i grafiki do ustalenia).
+- Nowe (2026-11-16), nazwy robocze, grafiki do dostarczenia:
+  - SLM-MON-003 „Kwartał na boisku”, SLM-MON-006 „Pół roku na boisku”, SLM-MON-012 „Rok na boisku” —
+    **3/6/12 kolejnych miesięcy kalendarzowych**, w każdym **co najmniej 2 rozegrane mecze**; jeden „zawalony” miesiąc
+    zeruje licznik. Miesiąc, w którym grupa nie miała żadnego meczu (np. przerwa wakacyjna), nie przerywa serii.
+  - SLM-YRS-075 „Regularny” — **≥ 75% nieodwołanych meczów grupy** w roku kalendarzowym, osobno w każdej grupie.
+  Zestaw: 20 odznak (17 − Turysta + 4).
 
 ## Wygląd wiersza (propozycja)
 ```
