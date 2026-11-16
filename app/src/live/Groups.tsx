@@ -4,9 +4,9 @@ import MatchHeader from '../ui/MatchHeader';
 import type { SessionManager } from '../auth/sessionManager';
 import { normalizePolishPhone } from '../../supabase/functions/_shared/phone';
 import { useOperation } from './useOperation';
-export interface Group { id:string; name:string; description:string; admin_id:string; organizer:boolean }
+export interface Group { id:string; name:string; description:string; admin_id:string; organizer:boolean; admin?:boolean }
 interface Request { id:string; group_id:string; group_name?:string; kind:string; state:string; actor_id?:string; target_id?:string }
-interface Member {user_id:string; nickname:string;display_name?:string;organizer:boolean;contact_phone?:string|null}
+interface Member {user_id:string; nickname:string;display_name?:string;organizer:boolean;admin?:boolean;contact_phone?:string|null}
 interface Details {group:Group;members:Member[];requests:Request[]}
 export default function Groups({manager,userId}:{manager:SessionManager;userId:string}) {
  const [groups,setGroups]=useState<Group[]|null>(null),[inbox,setInbox]=useState<Request[]>([]),[detail,setDetail]=useState<Details|null>(null);
@@ -15,7 +15,7 @@ export default function Groups({manager,userId}:{manager:SessionManager;userId:s
  async function refresh(){const [a,b]=await Promise.all([manager.call<{groups:Group[]}>('groups_list'),manager.call<{requests:Request[]}>('groups_inbox')]);setGroups(a.groups);setInbox(b.requests);setInitialError('');}
  async function open(id:string){setDetail(await manager.call<Details>('groups_detail',{group_id:id}));}
  useEffect(()=>{let live=true;Promise.all([manager.call<{groups:Group[]}>('groups_list'),manager.call<{requests:Request[]}>('groups_inbox')]).then(([a,b])=>{if(!Array.isArray(a.groups)||!Array.isArray(b.requests))throw new Error('Serwer zwrócił nieprawidłową listę grup.');if(live){setGroups(a.groups);setInbox(b.requests);}}).catch(e=>{if(live)setInitialError(e instanceof Error?e.message:'Nie udało się pobrać grup.');});return()=>{live=false;};},[manager]);
- const admin=detail?.group.admin_id===userId;
+ const admin=detail?.group.admin_id===userId||detail?.members.some(m=>m.user_id===userId&&m.admin===true)===true;
  async function decide(request:Request,accept:boolean){await mutate('groups_decide',{id:request.id,accept});await refresh();if(detail)await open(detail.group.id);}
  return <><MatchHeader title="Grupy" onBack={detail?()=>setDetail(null):undefined} backLabel="Wróć do grup"/>
  {(error||initialError)&&<p role="alert" className="slm-error">⚠ {error||initialError}</p>}{busy&&<IonSpinner/>}
