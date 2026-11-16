@@ -6,12 +6,14 @@ import { isGroupAction } from '../demo/groups';
 import MatchHeader from '../ui/MatchHeader';
 import UltimatePlayerCard from '../ui/UltimatePlayerCard';
 import { useFrozenBack } from '../native/frozenDemoAndroid';
+import { usePlayerRating } from '../rating/RatingProvider';
 import { useGroups } from './useGroups';
 import type { GroupMember } from './model';
 
 export default function PremiumGroups({manager,userId}:{manager:SessionManager;userId:string}){
  const {world,binding,readMember,verified,verifiedSession}=useGroups(manager,userId);
  const [profile,setProfile]=useState<{member:GroupMember|null;error:string;id:string;groupId:string;session:Session|null}|null>(null);
+ const stats=usePlayerRating(profile?.member?profile.id:undefined)?.stats;
  const currentProfile=useRef(profile);currentProfile.current=profile;
  const generation=useRef(0);
  useEffect(()=>()=>{generation.current++;},[]);
@@ -33,8 +35,8 @@ export default function PremiumGroups({manager,userId}:{manager:SessionManager;u
  <UltimatePlayerCard playerId={profile.id} name={profile.member.display_name??profile.member.nickname} jerseyNumber={profile.member.jersey_number??undefined} portrait={world.players.find(p=>p.id===profile.id)?.portrait} portraitFit="cover" portraitDescription="Zdjęcie profilowe"/>
  <p className="slm-muted">Pseudonim: {profile.member.nickname}</p>{profile.member.full_name&&<p>Dane udostępnione: {profile.member.full_name}</p>}{!profile.member.full_name&&profile.member.first_name&&<p>Imię: {profile.member.first_name}</p>}
  {profile.member.contact_phone&&<a className="slm-call" href={'tel:'+profile.member.contact_phone}>Zadzwoń</a>}
- <section className="slm-player-stats slm-ultimate-summary" aria-label="Statystyki niedostępne"><dl className="slm-ultimate-stats">{['Mecze','Gole','Asysty','MVP'].map(label=><div key={label}><dt>{label}</dt><dd>—</dd></div>)}</dl></section>
- <p className="slm-muted">Statystyki zawodników są w przygotowaniu.</p>
+ <section className="slm-player-stats slm-ultimate-summary" aria-label={stats?'Statystyki zawodnika':'Statystyki niedostępne'}><dl className="slm-ultimate-stats">{[['Mecze',stats?.played],['Gole',stats?.goals],['Asysty',stats?.assists],['MVP',stats?.mvp]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value??'—'}</dd></div>)}</dl></section>
+ {!stats&&<p className="slm-muted">Statystyki zawodnika są niedostępne.</p>}
  </>}</section>}
  </div></>;
 }

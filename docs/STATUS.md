@@ -20,6 +20,13 @@ Leaked Password Protection wymaga planu Pro — pominięte.
 Następny krok: przegląd właściciela → próba migracji na sucho z wycofaniem → PR → merge → deploy `accounts` (diff z wersją live) i Vercel — każdy krok za osobną zgodą.
 
 ---
+# Statystyki w każdym profilu, przycisk „Zadzwoń” — 2026-11-16 (zgoda właściciela)
+
+Gałąź `fix/profile-call-button-and-group-stats`. Supabase `hjtcyybkxebvdropchac`: `20261116140000_rating_player_stats` (`slm_ratings_dispatch`, akcja `player` zwraca teraz także `stats` — Mecze/Gole/Asysty/MVP — dla członków wspólnej aktywnej grupy; uprawnienia funkcji bez zmian, tylko `service_role`).
+Frontend: profil z grupy i profil ze składów czytają statystyki z `usePlayerRating` (zamiast „—”); przycisk „Zadzwoń” jako `a.slm-call` (wygrywa z `Accounts.css`).
+Strażnik: `OWNER_SOURCE` = `c23abaa`, przepięty na commit z tymi zmianami, migracja dopisana do `OWNER_MIGRATIONS`. Kontrole: tsc PASS, lint PASS, Vitest events/groups/rating 169/169; `test:premium-policy` nie jest wiarygodny w płytkim klonie (84 błędy także bez zmian — brak historycznych commitów). Test ręczny na telefonie: do wykonania przez właściciela.
+
+---
 
 # Bezpieczeństwo P1, zmiana nazwy grupy, kłódka widoczności — 2026-11-15 (zgoda właściciela)
 
