@@ -222,7 +222,7 @@ Priorytety to propozycja organizacyjna, nie deklaracja wykonania.
 [OK] main = eed948f, Vercel produkcja = main. Wdrożone i na produkcji: moduł ocen 0.2 + MVP Gold, Tito (auto-przydział), potwierdzenie/przywracanie zapisu, dzwonek płatności, zmiana nazwy grupy, kłódka widoczności meczu, P1 bezpieczeństwo (odczyty legacy), statystyki w każdym profilu, przycisk „Zadzwoń”, profile kolorystyczne.
 [OK] Rozjazd baza↔repo: migracja prywatności (account_privacy_reconcile) zastosowana 15.11; usuwanie konta działa po stronie bazy. Pliku tej migracji nadal brak w repo.
 [OK] Supabase Security Advisor 16.11: 0 błędów, 1 ostrzeżenie (ochrona przed wyciekłymi hasłami w Auth), 44 informacje RLS bez polityk (zamierzone).
-[W TOKU] Migracja 20261116190000 (indeksy FK + RLS initplan): w repo na gałęzi chore/db-fk-indexes-rls-initplan, NIE zastosowana zdalnie.
+[OK] Migracja 20261116190000 (indeksy FK + RLS initplan) zastosowana na Supabase 16.11 za zgodą właściciela; PR #71 (draft) czeka na merge.
 [TODO] Odbiór ręczny na telefonie: statystyki w profilach, przycisk „Zadzwoń”, dzwonek płatności, kłódka, zmiana nazwy grupy.
 [TODO] Odznaki i medale (issue #68): czekają na decyzje właściciela (progi, seria, frekwencja).
 [TODO] Wygląd grup / „Przejdź do grup” (issue #38): wymaga wskazówek wizualnych.

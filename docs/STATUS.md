@@ -2,12 +2,13 @@
 
 Gałąź `chore/db-fk-indexes-rls-initplan`. Migracja `20261116190000_fk_indexes_rls_initplan.sql` (źródło strażnika: `e0e9dc6`): 56 indeksów pokrywających klucze obce
 (Supabase Performance Advisor) oraz `(select auth.uid())` w politykach `scoped_ledger_read` i `scoped_payments_read`. Bez zmiany uprawnień i logiki.
-**Nie zastosowana zdalnie** (czeka na zgodę właściciela). Próba na sucho (`begin`/`rollback`) na `hjtcyybkxebvdropchac`: PASS (58 indeksów `slm_*_idx` po zastosowaniu, polityka z `SELECT auth.uid()`).
+**Zastosowana zdalnie 2026-11-16 za zgodą właściciela** (`apply_migration` na `hjtcyybkxebvdropchac`; znacznik czasu w historii bazy będzie inny niż w pliku, jak przy wcześniejszych migracjach). Próba na sucho (`begin`/`rollback`) na `hjtcyybkxebvdropchac`: PASS (58 indeksów `slm_*_idx` po zastosowaniu, polityka z `SELECT auth.uid()`).
 Nieużywane indeksy (6, INFO) celowo zostawione: baza jest mała, a część (np. kolejka push, przypomnienia) dopiero ruszy.
 Bezpieczeństwo (Security Advisor): jedyne ostrzeżenie to wyłączona ochrona przed wyciekłymi hasłami (ustawienie Auth w panelu); 44 informacje „RLS bez polityk” wynikają z modelu (dostęp tylko `service_role`).
 npm audit: 17 umiarkowanych (8 w produkcji), 0 high/critical. Produkcyjne: `react-router`/`react-router-dom` (open redirect przez backslash w `Link`/`useNavigate`; SSR-owa luka nie dotyczy
 aplikacji klienckiej) — naprawa to major 8 niezgodny z `@ionic/react-router`, więc bez zmian do czasu Ionic 8.8+. Reszta to narzędzia deweloperskie (`@capacitor/cli`, `typescript-eslint`, `ts-morph`).
 Strażnik: `OWNER_SOURCE` = `e0e9dc6`, migracja dopisana do `OWNER_MIGRATIONS`. `verify:consolidation` i `test:premium-policy` NIE uruchomione: wymagają commita `a82397b`, którego nie ma na GitHubie — do odpalenia lokalnie u właściciela.
+Po zastosowaniu Performance Advisor: ostrzeżenia `auth_rls_initplan` (2) i `unindexed_foreign_keys` (56) zniknęły; zostały tylko informacje „unused index” (nowe indeksy jeszcze nie były użyte — norma przy małej bazie).
 Zmiana kodu aplikacji: brak.
 
 # Statystyki w każdym profilu, przycisk „Zadzwoń” — 2026-11-16 (zgoda właściciela)
