@@ -8,6 +8,12 @@ grafiki w lokalnym folderze `badges/` (poza repo; wygląd odznak uznany za gotow
 - Układ: **lista jedna pod drugą** — obrazek, nazwa, opis, status (zdobyta + data) albo pasek postępu.
 - Grafiki: przygotowane pliki z folderu `badges/` (styl uznany za gotowy).
 - Karta zawodnika (`UltimatePlayerCard`) bez zmian.
+- D0: grafiki wybrane — 17 plików w głównym folderze `badges/` (podfoldery to odrzucone warianty i arkusze).
+- D1: Powrót króla — powrót po **60 dniach** przerwy.
+- D2: Ostatnia chwila — zapis **w dniu meczu po 17:00** (Europe/Warsaw, ta sama granica co odpowiedzialność finansowa).
+- D7: gole/asysty wpisywane przez zawodników akceptowane; liczą się wyłącznie, gdy suma bramek drużyny
+  **zgadza się z wynikiem** meczu (`score_a`/`score_b` dla `lineup_last_team`) — niezgodne statystyki meczu są pomijane.
+- D10: sekcja zwinięta — **zdobyte zawsze widoczne**, niezdobyte (z postępem) pod „Pokaż pozostałe (N)”.
 
 ## Wygląd wiersza (propozycja)
 ```
@@ -24,10 +30,10 @@ grafiki w lokalnym folderze `badges/` (poza repo; wygląd odznak uznany za gotow
 ## Grafiki → kody
 | Kod | Nazwa | Plik w `badges/` |
 |---|---|---|
-| SLM-MAT-001 | Debiutant | **3 warianty**: `Debiutant_ Pierwszy Mecz-2`, `Metallic Debutant Soccer Shield Badge-1`, `Neon Debutant Football Crest-1` |
-| SLM-MAT-010 | Stały bywalec | `Neon Soccer Badge_ Stały Bywalec 10-4` |
-| SLM-MAT-050 | Weteran | **2 warianty**: `Veteran 50 Soccer Crest-5`, `Veteran Soccer Achievement Badge-4` |
-| SLM-MAT-100 | Legenda boiska | **2 warianty**: `Legendary Football 100 Badge-5`, `-6` |
+| SLM-MAT-001 | Debiutant | `Metallic Debutant Soccer Shield Badge-1` |
+| SLM-MAT-010 | Stały bywalec | `Metallic Soccer Shield Badge with Cyan Glow-3` |
+| SLM-MAT-050 | Weteran | `Veteran Soccer Achievement Badge-4` |
+| SLM-MAT-100 | Legenda boiska | `Legendary Football 100 Badge-5` |
 | SLM-STR-010 | Żelazne płuca | `Żelazne Płuca Neonowy Emblemat-6` |
 | SLM-GOL-100 | Snajper | `Neon SNAJPER Soccer Champion Badge-7` |
 | SLM-TOP-001 | Król strzelców | `Król Strzelców Emblem Badge-1` |
@@ -41,7 +47,6 @@ grafiki w lokalnym folderze `badges/` (poza repo; wygląd odznak uznany za gotow
 | SLM-ZER-010 | Turysta | `TURYSTA_ Zakaz Goli w Raju-6` |
 | SLM-PHX-005 | Feniks | `Fiery Phoenix FENIKS Soccer Crest` |
 | SLM-LST-005 | Człowiek ostatniej chwili | `Człowiek Ostatniej Chwili – Sportowy Emblemat-2` |
-| — | ? | `Metallic Soccer Shield Badge with Cyan Glow-3`, `Neon Crown Soccer Champion Badge-4` — bez przypisania |
 
 Obróbka techniczna (bez zmiany wyglądu): WebP ok. 256 px (~30 KB zamiast ~2 MB), prawdziwa przezroczystość tam,
 gdzie szachownica jest wtopiona w obraz (np. `Neon Debutant`), docelowo `app/public/assets/badges/<KOD>.webp`.
@@ -64,18 +69,14 @@ gdzie szachownica jest wtopiona w obraz (np. `Neon Debutant`), docelowo `app/pub
 | LST-005 | 5 zapisów w ostatniej chwili | `joined_at` vs `starts_at` | okno czasowe (D2) |
 
 ## Do rozstrzygnięcia
-- D0. Warianty grafik: który Debiutant, Weteran i Legenda; do czego dwa nieprzypisane pliki.
-- D1. Powrót króla: po ilu dniach przerwy (propozycja: 60)?
-- D2. Ostatnia chwila: zapis ile przed meczem (propozycja: w dniu meczu po 17:00 albo < 3 h przed startem)?
+- D0, D1, D2, D7, D10 — rozstrzygnięte (wyżej).
 - D3. Seria i „nieusprawiedliwiona nieobecność”: nieobecność mimo zapisu albo rezygnacja po 17:00 (jak w #68)?
 - D4. Rezerwowy: liczyć bycie na rezerwie w chwili rozpoczęcia meczu?
 - D5. Król strzelców: sezon = rok kalendarzowy, osobno w każdej grupie?
 - D6. Rekruter: każdy gość osobno czy unikalne osoby (po telefonie/nazwie)?
-- D7. Gole/asysty wpisują sami zawodnicy — akceptujemy ryzyko „nabijania” dla GOL/AST/TOP/ZER?
-  Mecz bez wpisanych statystyk: liczy się jako 0 goli (Turysta) czy jest pomijany?
+- D7a. Turysta: mecz bez wpisanych statystyk liczy się jako 0 goli czy jest pomijany (propozycja: pomijany)?
 - D8. Zakres: wszystkie grupy łącznie (propozycja) czy osobno w każdej grupie?
 - D9. Wyliczyć wstecz z historii przy wdrożeniu (propozycja: tak)?
-- D10. Lista: wszystkie 17 od razu, czy zwinięta sekcja „Odznaki 5/17” rozwijana dotknięciem?
 
 ## Etapy (każdy: gałąź → testy → akceptacja → PR → merge → deploy, za zgodą)
 1. Grafiki: wybór wariantów, WebP, `app/public/assets/badges/`, manifest w `app/src`.
