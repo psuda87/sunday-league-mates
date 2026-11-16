@@ -27,6 +27,11 @@ grafiki w lokalnym folderze `badges/` (poza repo; wygląd odznak uznany za gotow
     zeruje licznik. Miesiąc, w którym grupa nie miała żadnego meczu (np. przerwa wakacyjna), nie przerywa serii.
   - SLM-YRS-075 „Regularny” — **≥ 75% nieodwołanych meczów grupy** w roku kalendarzowym, osobno w każdej grupie.
   Zestaw: 20 odznak (17 − Turysta + 4).
+  Grafiki: MON-003 `Neon Bronze Soccer Calendar 3 Badge-1`, MON-006 `Neon Shield Soccer Challenge 6 Badge-2`,
+  MON-012 `Crowned Football Calendar 12Emblem-3`, YRS `Neon Golden Football Trophy 2027-4`
+  (ma wpisany rok 2027 i „80%” — do rozstrzygnięcia).
+- D8: pozostałe odznaki liczone **łącznie ze wszystkich grup** (osobno byłoby za łatwo). Osobno w grupie liczą się
+  tylko: seria (Żelazne płuca), Król strzelców i Regularny.
 
 ## Wygląd wiersza (propozycja)
 ```
@@ -84,7 +89,7 @@ gdzie szachownica jest wtopiona w obraz (np. `Neon Debutant`), docelowo `app/pub
 ## Do rozstrzygnięcia
 - D0, D1, D2, D7, D10 — rozstrzygnięte (wyżej).
 - D11. Definicje 4 nowych odznak (miesiące gry, regularność roku) i ich grafiki.
-- D8. Zakres pozostałych odznak: wszystkie grupy łącznie (propozycja) czy osobno w każdej grupie?
+
 
 ## Etapy (każdy: gałąź → testy → akceptacja → PR → merge → deploy, za zgodą)
 1. Grafiki: wybór wariantów, WebP, `app/public/assets/badges/`, manifest w `app/src`.
