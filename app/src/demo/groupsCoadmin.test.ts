@@ -39,8 +39,11 @@ describe('współadministratorzy grupy', () => {
     expect(w.groupState.groups.find(g => g.id === 'group-1')?.name).toBe('Nowa nazwa');
   });
 
-  it('po odejściu administratora głównego przejmuje najstarszy współadministrator', () => {
+  it('po odejściu administratora głównego przejmuje najstarszy współadministrator, nawet gdy młodszy jest organizatorem', () => {
     let w = grant(grant(as(initialWorld(), 'p01'), 'p03'), 'p02');
+    w = reduceGroups(w, { type: 'group_permission', groupId: 'group-1', targetId: 'p02', allow: false });
+    expect(membership(w, 'group-1', 'p02')?.organizer).toBe(false);
+    expect(membership(w, 'group-1', 'p03')?.organizer).toBe(true);
     w = reduceGroups(w, { type: 'group_leave', groupId: 'group-1' });
     const group = w.groupState.groups.find(g => g.id === 'group-1')!;
     expect(group.adminId).toBe('p02');

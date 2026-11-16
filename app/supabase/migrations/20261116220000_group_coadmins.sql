@@ -27,32 +27,30 @@ revoke all on function slm_private.group_owner(uuid,uuid) from public,anon,authe
 grant execute on function slm_private.group_owner(uuid,uuid) to service_role;
 
 -- Dokładne podmiany w istniejących funkcjach (bez przepisywania ich treści ręcznie).
-create function slm_private.coadmin_patch(p_sig text, p_find text, p_repl text, p_expected int) returns void
-language plpgsql set search_path='' as $$
-declare d text; n int;
+-- Każda podmiana musi trafić dokładnie oczekiwaną liczbę razy, inaczej cała migracja się wycofuje.
+do $patch$
+declare p record; d text; n int;
 begin
- d:=pg_get_functiondef(p_sig::regprocedure);
- n:=(length(d)-length(replace(d,p_find,'')))/length(p_find);
- if n<>p_expected then raise exception 'coadmin patch %: expected % occurrence(s) of [%], found %',p_sig,p_expected,p_find,n;end if;
- execute replace(d,p_find,p_repl);
-end $$;
-
-select slm_private.coadmin_patch('slm_private.shared_profile(uuid)','g.admin_id=auth.uid()','slm_private.group_admin(g.id,auth.uid())',2);
-select slm_private.coadmin_patch('slm_private.groups_dispatch_b3_projection(uuid,uuid,text,jsonb)','a.admin_id=p_user','slm_private.group_admin(a.id,p_user)',1);
-select slm_private.coadmin_patch('slm_private.groups_dispatch_b3_projection(uuid,uuid,text,jsonb)','g.admin_id=p_user','slm_private.group_admin(g.id,p_user)',1);
-select slm_private.coadmin_patch('slm_private.groups_dispatch_b3_projection(uuid,uuid,text,jsonb)','select a.*,m.organizer,(','select a.*,m.organizer,m.admin,(',1);
-select slm_private.coadmin_patch('slm_private.lineup_present(jsonb,uuid)','g.admin_id=p_viewer','slm_private.group_admin(g.id,p_viewer)',1);
-select slm_private.coadmin_patch('public.slm_lineups_dispatch(uuid,uuid,text,jsonb)',
- 'select 1 from public.slm_groups where id=e.group_id and admin_id=p_user and not archived','select 1 where slm_private.group_admin(e.group_id,p_user)',1);
-select slm_private.coadmin_patch('slm_private.group_profile(uuid,uuid,uuid)',$f$'organizer',m.organizer,$f$,
- $f$'organizer',m.organizer,'admin',(m.admin or exists(select 1 from public.slm_groups og where og.id=p_group and og.admin_id=m.user_id)),'owner',exists(select 1 from public.slm_groups og where og.id=p_group and og.admin_id=m.user_id),$f$,1);
--- Następca odchodzącego administratora głównego: najpierw współadministratorzy.
-select slm_private.coadmin_patch('slm_private.groups_dispatch_b3_base(uuid,uuid,text,jsonb)',
- 'order by organizer desc,sequence,user_id limit 1','order by admin desc,organizer desc,sequence,user_id limit 1',1);
--- Dotychczasowy dispatcher staje się bazą nowej warstwy.
-select slm_private.coadmin_patch('public.slm_groups_dispatch(uuid,uuid,text,jsonb)',
- 'FUNCTION public.slm_groups_dispatch(','FUNCTION slm_private.groups_dispatch_coadmin_base(',1);
-drop function slm_private.coadmin_patch(text,text,text,int);
+ for p in select * from (values
+  (1,'slm_private.shared_profile(uuid)','g.admin_id=auth.uid()','slm_private.group_admin(g.id,auth.uid())',2),
+  (2,'slm_private.groups_dispatch_b3_projection(uuid,uuid,text,jsonb)','a.admin_id=p_user','slm_private.group_admin(a.id,p_user)',1),
+  (3,'slm_private.groups_dispatch_b3_projection(uuid,uuid,text,jsonb)','g.admin_id=p_user','slm_private.group_admin(g.id,p_user)',1),
+  (4,'slm_private.groups_dispatch_b3_projection(uuid,uuid,text,jsonb)','select a.*,m.organizer,(','select a.*,m.organizer,m.admin,(',1),
+  (5,'slm_private.lineup_present(jsonb,uuid)','g.admin_id=p_viewer','slm_private.group_admin(g.id,p_viewer)',1),
+  (6,'public.slm_lineups_dispatch(uuid,uuid,text,jsonb)','select 1 from public.slm_groups where id=e.group_id and admin_id=p_user and not archived','select 1 where slm_private.group_admin(e.group_id,p_user)',1),
+  (7,'slm_private.group_profile(uuid,uuid,uuid)',$f$'organizer',m.organizer,$f$,
+     $f$'organizer',m.organizer,'admin',(m.admin or exists(select 1 from public.slm_groups og where og.id=p_group and og.admin_id=m.user_id)),'owner',exists(select 1 from public.slm_groups og where og.id=p_group and og.admin_id=m.user_id),$f$,1),
+  -- Następca odchodzącego administratora głównego: najstarszy współadministrator, potem jak dotąd organizator, potem staż.
+  (8,'slm_private.groups_dispatch_b3_base(uuid,uuid,text,jsonb)','order by organizer desc,sequence,user_id limit 1','order by admin desc,(admin or organizer) desc,sequence,user_id limit 1',1),
+  -- Dotychczasowy dispatcher staje się bazą nowej warstwy.
+  (9,'public.slm_groups_dispatch(uuid,uuid,text,jsonb)','FUNCTION public.slm_groups_dispatch(','FUNCTION slm_private.groups_dispatch_coadmin_base(',1)
+ ) as x(ord,sig,find,repl,expected) order by ord loop
+  d:=pg_get_functiondef(p.sig::regprocedure);
+  n:=(length(d)-length(replace(d,p.find,'')))/length(p.find);
+  if n<>p.expected then raise exception 'coadmin patch %: expected % occurrence(s) of [%], found %',p.sig,p.expected,p.find,n;end if;
+  execute replace(d,p.find,p.repl);
+ end loop;
+end $patch$;
 revoke all on function slm_private.groups_dispatch_coadmin_base(uuid,uuid,text,jsonb) from public,anon,authenticated;
 grant execute on function slm_private.groups_dispatch_coadmin_base(uuid,uuid,text,jsonb) to service_role;
 

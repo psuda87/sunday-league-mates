@@ -162,7 +162,7 @@ export function reduceGroups(previous:World,action:GroupAction):World {
  s.members=s.members.filter(m=>!(m.groupId===group.id&&m.playerId===targetId));
  for(const r of s.requests)if(r.groupId===group.id&&r.kind==='proposal'&&r.requestedBy===targetId&&r.status==='pending')r.status='cancelled';
  if(leaving&&group.adminId===user) {
-  const remaining=s.members.filter(m=>m.groupId===group.id).sort((a,b)=>Number(!!b.admin)-Number(!!a.admin)||Number(b.organizer)-Number(a.organizer)||a.joinedAt.localeCompare(b.joinedAt)||a.playerId.localeCompare(b.playerId));
+  const remaining=s.members.filter(m=>m.groupId===group.id).sort((a,b)=>Number(!!b.admin)-Number(!!a.admin)||Number(!!b.admin||b.organizer)-Number(!!a.admin||a.organizer)||a.joinedAt.localeCompare(b.joinedAt)||a.playerId.localeCompare(b.playerId));
   if(!remaining.length){s.groups=s.groups.filter(g=>g.id!==group.id);s.requests=s.requests.filter(r=>r.groupId!==group.id);world.notice='Opuszczono i usunięto pustą grupę w demo.';return world;}
   group.adminId=remaining[0].playerId;remaining[0].admin=false;
   world.notice=`Opuszczono grupę. Administrację przejmuje ${world.players.find(p=>p.id===group.adminId)!.name}.`;
