@@ -216,4 +216,17 @@ Priorytety to propozycja organizacyjna, nie deklaracja wykonania.
 [W TOKU] Rating 1.0: logika domenowa w src/rating (z testami) i komponent RatingStars; brak backendu, brak podłączenia do karty; formuła nadal niezatwierdzona.
 [TODO] Dodać assety MVP Gold do docs/rating/assets (nadal brak plików w repo).
 
+===========================================================
+13. STAN NA 16.11.2026 (aktualizacja rejestru)
+===========================================================
+[OK] main = eed948f, Vercel produkcja = main. Wdrożone i na produkcji: moduł ocen 0.2 + MVP Gold, Tito (auto-przydział), potwierdzenie/przywracanie zapisu, dzwonek płatności, zmiana nazwy grupy, kłódka widoczności meczu, P1 bezpieczeństwo (odczyty legacy), statystyki w każdym profilu, przycisk „Zadzwoń”, profile kolorystyczne.
+[OK] Rozjazd baza↔repo: migracja prywatności (account_privacy_reconcile) zastosowana 15.11; usuwanie konta działa po stronie bazy. Pliku tej migracji nadal brak w repo.
+[OK] Supabase Security Advisor 16.11: 0 błędów, 1 ostrzeżenie (ochrona przed wyciekłymi hasłami w Auth), 44 informacje RLS bez polityk (zamierzone).
+[OK] Migracja 20261116190000 (indeksy FK + RLS initplan) zastosowana na Supabase 16.11 za zgodą właściciela; PR #71 (draft) czeka na merge.
+[TODO] Odbiór ręczny na telefonie: statystyki w profilach, przycisk „Zadzwoń”, dzwonek płatności, kłódka, zmiana nazwy grupy.
+[TODO] Odznaki i medale (issue #68): czekają na decyzje właściciela (progi, seria, frekwencja).
+[TODO] Wygląd grup / „Przejdź do grup” (issue #38): wymaga wskazówek wizualnych.
+[TODO] Assety MVP Gold do docs/rating/assets (nadal brak plików), logo/ikona z oryginalnego herbu, FCM/push, decyzja iOS, ochrona main, CAPTCHA.
+[BLOKADA] Strażniki verify:consolidation / test:premium-policy: wymagają commita a82397b spoza GitHuba; uruchamiać lokalnie.
+
 KONIEC RAPORTU. Ten plik jest żywym rejestrem: aktualizować po każdym audycie, naprawie, teście, odbiorze i merge.
