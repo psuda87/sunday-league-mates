@@ -14,6 +14,10 @@ grafiki w lokalnym folderze `badges/` (poza repo; wygląd odznak uznany za gotow
 - D7: gole/asysty wpisywane przez zawodników akceptowane; liczą się wyłącznie, gdy suma bramek drużyny
   **zgadza się z wynikiem** meczu (`score_a`/`score_b` dla `lineup_last_team`) — niezgodne statystyki meczu są pomijane.
 - D10: sekcja zwinięta — **zdobyte zawsze widoczne**, niezdobyte (z postępem) pod „Pokaż pozostałe (N)”.
+- D4: Wieczny rezerwowy — liczy się każdy **zapis na rezerwę**, bez względu na to, czy zawodnik wszedł do gry.
+- D5: Król strzelców — **osobno w każdej grupie**, sezon = rok kalendarzowy (1.01–31.12); przyznawany po zakończeniu roku.
+- D6: Rekruter — **każdy gość osobno**, także gdy to ta sama osoba w kolejnych meczach.
+- D9: **bez wyliczania wstecz** — odznaki liczone od dnia wdrożenia.
 
 ## Wygląd wiersza (propozycja)
 ```
@@ -70,13 +74,10 @@ gdzie szachownica jest wtopiona w obraz (np. `Neon Debutant`), docelowo `app/pub
 
 ## Do rozstrzygnięcia
 - D0, D1, D2, D7, D10 — rozstrzygnięte (wyżej).
-- D3. Seria i „nieusprawiedliwiona nieobecność”: nieobecność mimo zapisu albo rezygnacja po 17:00 (jak w #68)?
-- D4. Rezerwowy: liczyć bycie na rezerwie w chwili rozpoczęcia meczu?
-- D5. Król strzelców: sezon = rok kalendarzowy, osobno w każdej grupie?
-- D6. Rekruter: każdy gość osobno czy unikalne osoby (po telefonie/nazwie)?
-- D7a. Turysta: mecz bez wpisanych statystyk liczy się jako 0 goli czy jest pomijany (propozycja: pomijany)?
-- D8. Zakres: wszystkie grupy łącznie (propozycja) czy osobno w każdej grupie?
-- D9. Wyliczyć wstecz z historii przy wdrożeniu (propozycja: tak)?
+- D3. Żelazne płuca (seria 10 meczów z rzędu) i Niezawodny: co przerywa serię — patrz odpowiedź w rozmowie 2026-11-16.
+- D7a. Turysta: zostawić „10 meczów z rzędu bez gola” (tylko mecze z wpisanymi statystykami) czy zmienić na
+  „mniej niż X meczów w roku”?
+- D8. Zakres pozostałych odznak: wszystkie grupy łącznie (propozycja) czy osobno w każdej grupie?
 
 ## Etapy (każdy: gałąź → testy → akceptacja → PR → merge → deploy, za zgodą)
 1. Grafiki: wybór wariantów, WebP, `app/public/assets/badges/`, manifest w `app/src`.
