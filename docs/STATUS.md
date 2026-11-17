@@ -1,3 +1,14 @@
+# PWA — ikona na pulpicie i ekran startowy — 2026-11-17 (prośba właściciela)
+
+Gałąź `feat/pwa-icon-splash`. Przyczyna: produkcyjny HTML Premium nie podpinał `manifest.json` (białe tło, ikona z fallbacku), a stara ikona miała herb na ~30% powierzchni.
+Zmiany: nowe pliki `slm-pwa-icon-192/512`, `slm-pwa-maskable-192/512`, `slm-apple-touch-180`, `slm-boot-crest.webp` (zamrożone grafiki bez zmian); `manifest.json` ciemny
+(`#0b0c10`), ikony any + maskable; `build-premium-web.mjs` dokłada manifest, `theme-color`, `apple-touch-icon`, meta iOS i ekran startowy w `#root` (czysty CSS — herb wjeżdża,
+złota poświata i błysk, pasek ładowania; `prefers-reduced-motion` wyłącza animacje). Strażnicy: `OWNER_SOURCE` = `336a75e`.
+Kontrole: Vitest 661/661, `verify:consolidation` PASS, `test:premium-policy` 107/107, `build:premium-web` PASS; `check-premium-web-cases` 2/1 — ten sam błąd co na main (`wasm-unsafe-eval`).
+Niewdrożone. Na telefonie nie sprawdzano (po wdrożeniu: usunąć starą ikonę i dodać ponownie do ekranu głównego).
+
+---
+
 # Wydajność (lazy-cache) — przygotowanie do scalenia — 2026-11-17 (polecenie właściciela)
 
 Gałąź `perf/lazy-cache-merged-main` + PR #77. Strażnicy: `app/src/auth/sessionManager.ts` (współdzielenie równoczesnych `groups_list`/`groups_inbox`) i `app/vite.config.ts`
