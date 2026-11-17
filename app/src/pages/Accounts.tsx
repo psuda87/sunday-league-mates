@@ -1,10 +1,5 @@
-import LiveGroups from '../live/Groups';
-import LiveMatches from '../live/Matches';
-import GroupFinance from '../live/Finance';
 import { AccountHeading, PasswordField, SignInFields } from '../account-ui/Fields';
-import Players from '../ui/Players';
 import { notificationsOutline } from 'ionicons/icons';
-import AppearanceSettings from '../ui/AppearanceSettings';
 import BottomNav from '../ui/BottomNav';
 import PhoneInput from '../components/PhoneInput';
 import { normalizePolishPhone, normalizePhoneUpdate, nationalPhone } from '../../supabase/functions/_shared/phone';
@@ -18,9 +13,7 @@ import type { ManagedAccount, Profile } from '../auth/api';
 import { SessionManager } from '../auth/sessionManager';
 import { tokenStore } from '../auth/tokenStore';
 import './Accounts.css';
-import Events from './Events';
-import Settlements from './Settlements';
-import Notifications from './Notifications';
+import { AppearanceSettings, Events, GroupFinance, LiveGroups, LiveMatches, Notifications, Players, Settlements } from './lazyScreens';
 import { NativePush } from '../notifications/nativePush';
 import type { NotificationItem } from '../notifications/model';
 

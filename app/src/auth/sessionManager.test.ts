@@ -97,3 +97,18 @@ describe('zapisane sesje',()=>{
     expect(manager.getSnapshot().phase).toBe('ready');
   });
 });
+describe('współdzielone odczyty list',()=>{
+  it('równoczesne groups_list wysyłają jedno żądanie, a kolejne po zakończeniu pobierają dane ponownie',async()=>{
+    const disk=memory();let lists=0;
+    const manager=new SessionManager(disk.store,api(async action=>{
+      if(action==='login')return session();
+      if(action==='groups_list'){lists++;await Promise.resolve();return {groups:[]};}
+      return {};
+    }));
+    await manager.signIn('Fikcyjny',crypto.randomUUID());
+    await Promise.all([manager.call('groups_list'),manager.call('groups_list')]);
+    expect(lists).toBe(1);
+    await manager.call('groups_list');
+    expect(lists).toBe(2);
+  });
+});
