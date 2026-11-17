@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import {forbiddenDemoModule} from './scripts/demoModulePolicy';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const app = fileURLToPath(new URL('.', import.meta.url));
@@ -21,6 +21,7 @@ const allowed = new Set([
   'src/ui/PremiumPitch.tsx', 'src/ui/Players.tsx', 'src/ui/MatchHeader.tsx', 'src/ui/ParticipantGroup.tsx', 'src/ui/MatchFilters.tsx', 'src/ui/MatchCapacityProgress.tsx', 'src/ui/capacity.ts', 'src/ui/BottomNav.tsx',
   'src/ui/AppearanceSettings.tsx', 'src/ui/MatchSections.tsx', 'src/ui/MatchTabs.tsx', 'src/ui/theme.ts', 'src/theme/variables.css',
   'src/pages/Accounts.css',
+  'src/badges/BadgeList.tsx', 'src/badges/badges.css', 'src/badges/catalog.ts', 'src/badges/demoBadges.ts', // Presentation + fictional demo data only; no Auth/API.
 ]);
 export default defineConfig({
   root: fileURLToPath(new URL('./demo', import.meta.url)),
@@ -38,6 +39,8 @@ export default defineConfig({
         }
       }
       this.emitFile({type:'asset',fileName:'assets/demo/fictional-portraits.webp',source:readFileSync(new URL('./public/assets/demo/fictional-portraits.webp',import.meta.url))});
+      for (const badge of readdirSync(new URL('./public/assets/badges/',import.meta.url)).filter(name=>/^SLM-[A-Z]{3}-\d{3,4}\.webp$/.test(name)))
+        this.emitFile({type:'asset',fileName:'assets/badges/'+badge,source:readFileSync(new URL('./public/assets/badges/'+badge,import.meta.url))});
       for (const name of ['slm-logo-primary-transparent.png', 'slm-favicon-64.png', 'stadium-bg-card.jpg', 'stadium-bg-main.jpg', 'espana-dark-texture.jpg']) {
         this.emitFile({ type: 'asset', fileName: `assets/branding/${name}`, source: readFileSync(new URL(`./public/assets/branding/${name}`, import.meta.url)) });
       }

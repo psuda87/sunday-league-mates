@@ -1,0 +1,168 @@
+{
+  "version": 1,
+  "status": "asset-design",
+  "notes": "Warunki nie są jeszcze podłączone do statystyk. COM-001: powrót po ≥60 dniach przerwy. LST-005: zapis w dniu meczu po 17:00 (Europe/Warsaw). Rekruter: każdy gość, który zagrał, liczy się osobno (także ten sam). 2026-11-16: usunięto SLM-ZER-010 (Turysta). Aktywny miesiąc = co najmniej 2 rozegrane mecze; miesiąc bez meczów grupy nie przerywa serii. SLM-YRS-<ROK>: ≥80% nieodwołanych meczów grupy w danym roku, osobno w każdej grupie; każdy rok to osobna odznaka z własną grafiką (pierwsza: 2027). Nazwy MON robocze. Grafiki WebP: app/public/assets/badges/<KOD>.webp.",
+  "badges": [
+    {
+      "code": "SLM-MAT-001",
+      "name": "Debiutant",
+      "category": "attendance",
+      "metric": "matches",
+      "threshold": 1,
+      "asset": "assets/badges/SLM-MAT-001.webp"
+    },
+    {
+      "code": "SLM-MAT-010",
+      "name": "Stały bywalec",
+      "category": "attendance",
+      "metric": "matches",
+      "threshold": 10,
+      "asset": "assets/badges/SLM-MAT-010.webp"
+    },
+    {
+      "code": "SLM-MAT-050",
+      "name": "Weteran",
+      "category": "attendance",
+      "metric": "matches",
+      "threshold": 50,
+      "asset": "assets/badges/SLM-MAT-050.webp"
+    },
+    {
+      "code": "SLM-MAT-100",
+      "name": "Legenda boiska",
+      "category": "attendance",
+      "metric": "matches",
+      "threshold": 100,
+      "asset": "assets/badges/SLM-MAT-100.webp"
+    },
+    {
+      "code": "SLM-STR-010",
+      "name": "Żelazne płuca",
+      "category": "attendance",
+      "metric": "consecutive_matches",
+      "threshold": 10,
+      "asset": "assets/badges/SLM-STR-010.webp"
+    },
+    {
+      "code": "SLM-GOL-100",
+      "name": "Snajper",
+      "category": "results",
+      "metric": "goals",
+      "threshold": 100,
+      "asset": "assets/badges/SLM-GOL-100.webp"
+    },
+    {
+      "code": "SLM-TOP-001",
+      "name": "Król strzelców",
+      "category": "results",
+      "metric": "season_top_scorer",
+      "threshold": 1,
+      "asset": "assets/badges/SLM-TOP-001.webp"
+    },
+    {
+      "code": "SLM-AST-100",
+      "name": "Asystent",
+      "category": "results",
+      "metric": "assists",
+      "threshold": 100,
+      "asset": "assets/badges/SLM-AST-100.webp"
+    },
+    {
+      "code": "SLM-WIN-005",
+      "name": "Niezwyciężony",
+      "category": "results",
+      "metric": "consecutive_wins",
+      "threshold": 5,
+      "asset": "assets/badges/SLM-WIN-005.webp"
+    },
+    {
+      "code": "SLM-ATT-020",
+      "name": "Pewniak",
+      "category": "activity",
+      "metric": "attended_signups",
+      "threshold": 20,
+      "asset": "assets/badges/SLM-ATT-020.webp"
+    },
+    {
+      "code": "SLM-REL-020",
+      "name": "Niezawodny",
+      "category": "activity",
+      "metric": "matches_without_unexcused_absence",
+      "threshold": 20,
+      "asset": "assets/badges/SLM-REL-020.webp"
+    },
+    {
+      "code": "SLM-COM-001",
+      "name": "Powrót króla",
+      "category": "activity",
+      "metric": "return_after_break_days",
+      "threshold": null,
+      "asset": "assets/badges/SLM-COM-001.webp"
+    },
+    {
+      "code": "SLM-GST-010",
+      "name": "Rekruter",
+      "category": "community",
+      "metric": "brought_guests",
+      "threshold": 10,
+      "asset": "assets/badges/SLM-GST-010.webp"
+    },
+    {
+      "code": "SLM-BEN-010",
+      "name": "Wieczny rezerwowy",
+      "category": "humor",
+      "metric": "reserve_appearances",
+      "threshold": 10,
+      "asset": "assets/badges/SLM-BEN-010.webp"
+    },
+    {
+      "code": "SLM-PHX-005",
+      "name": "Feniks",
+      "category": "humor",
+      "metric": "win_after_consecutive_losses",
+      "threshold": 5,
+      "asset": "assets/badges/SLM-PHX-005.webp"
+    },
+    {
+      "code": "SLM-LST-005",
+      "name": "Człowiek ostatniej chwili",
+      "category": "humor",
+      "metric": "last_minute_signups",
+      "threshold": 5,
+      "asset": "assets/badges/SLM-LST-005.webp"
+    },
+    {
+      "code": "SLM-MON-003",
+      "name": "Kwartał na boisku",
+      "category": "attendance",
+      "metric": "consecutive_active_months",
+      "threshold": 3,
+      "asset": "assets/badges/SLM-MON-003.webp"
+    },
+    {
+      "code": "SLM-MON-006",
+      "name": "Pół roku na boisku",
+      "category": "attendance",
+      "metric": "consecutive_active_months",
+      "threshold": 6,
+      "asset": "assets/badges/SLM-MON-006.webp"
+    },
+    {
+      "code": "SLM-MON-012",
+      "name": "Rok na boisku",
+      "category": "attendance",
+      "metric": "consecutive_active_months",
+      "threshold": 12,
+      "asset": "assets/badges/SLM-MON-012.webp"
+    },
+    {
+      "code": "SLM-YRS-2027",
+      "name": "Regularny 2027",
+      "category": "attendance",
+      "metric": "season_group_attendance_percent",
+      "threshold": 80,
+      "asset": "assets/badges/SLM-YRS-2027.webp",
+      "season": 2027
+    }
+  ]
+}

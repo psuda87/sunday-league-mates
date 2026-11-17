@@ -11,10 +11,14 @@ import type {OutstandingMatch} from '../finance/paymentModel';
 import {financeChangedEvent,requestOwnPayments} from '../finance/paymentsIntent';
 import {formatCents} from '../settlements/model';
 import {matchDate} from '../events/model';
+import {useOwnBadgeNotices} from '../badges/BadgesProvider';
+import {requestOwnBadges} from '../badges/badgeContracts';
+import {BADGES} from '../badges/catalog';
 import './GroupControls.css';
 
 // One bell for everyone: own outstanding match payments plus, for group admins, pending join requests.
-export default function GroupNotifications({manager,userId,onGroups,refreshKey,onPayments}:{manager:SessionManager;userId:string;onGroups:()=>void;refreshKey:boolean;onPayments?:()=>void}){
+export default function GroupNotifications({manager,userId,onGroups,refreshKey,onPayments,onBadges}:{manager:SessionManager;userId:string;onGroups:()=>void;refreshKey:boolean;onPayments?:()=>void;onBadges?:()=>void}){
+ const badgeNotices=useOwnBadgeNotices();
  const auth=useSyncExternalStore(manager.subscribe,manager.getSnapshot);
  const [groups,setGroups]=useState<GroupSummary[]>([]),[open,setOpen]=useState(false),[error,setError]=useState(false);
  const [dues,setDues]=useState<OutstandingMatch[]>([]),[blocked,setBlocked]=useState(false);
@@ -48,8 +52,9 @@ export default function GroupNotifications({manager,userId,onGroups,refreshKey,o
   document.addEventListener('pointerdown',outside);document.addEventListener('keydown',escape);
   return()=>{window.removeEventListener('resize',position);window.removeEventListener('scroll',position,true);document.removeEventListener('pointerdown',outside);document.removeEventListener('keydown',escape);};
  },[open]);
- const requests=groups.reduce((n,g)=>n+g.pending_count,0),total=requests+dues.length;
- const label=dues.length?`Powiadomienia: ${total}. Zaległe płatności: ${dues.length}${requests?`, prośby do grup: ${requests}`:''}`:`Oczekujące zgłoszenia do grup: ${requests}`;
+ const requests=groups.reduce((n,g)=>n+g.pending_count,0),total=requests+dues.length+badgeNotices.bell.length;
+ const badgeLabel=badgeNotices.bell.length?`, nowe odznaki: ${badgeNotices.bell.length}`:'';
+ const label=dues.length?`Powiadomienia: ${total}. Zaległe płatności: ${dues.length}${requests?`, prośby do grup: ${requests}`:''}${badgeLabel}`:`Oczekujące zgłoszenia do grup: ${requests}${badgeLabel}`;
  const admin=groups.length>0||error;
  return <aside className="slm-group-notifications" aria-label="Powiadomienia">
   <button ref={bell} type="button" className="slm-group-bell" aria-label={label} aria-expanded={open} onClick={()=>setOpen(!open)}><IonIcon icon={notificationsOutline} aria-hidden="true"/>{total>0&&<span className="slm-group-count">{total}</span>}</button>
@@ -57,6 +62,7 @@ export default function GroupNotifications({manager,userId,onGroups,refreshKey,o
    {dues.length>0&&<div className="slm-payment-reminder"><h2>Zaległe płatności</h2><ul>{dues.map(d=><li key={`${d.group_id}:${d.event_id}`}><span><strong>{d.name??'Mecz'}</strong> · {d.group_name}</span><span>{matchDate(d.starts_at)} · do zapłaty {formatCents(d.outstanding_cents)}</span></li>)}</ul>
     <p className="slm-payment-reminder-warning" role="note">{blocked?'⚠ Zapisy na płatne mecze są zablokowane do czasu wpłaty.':dues.length===1?'Druga zaległość zablokuje zapisy na płatne mecze.':'⚠ Dwie zaległości mogą zablokować zapisy na płatne mecze.'}</p>
     {onPayments&&<button type="button" className="slm-payment-reminder-cta" onClick={()=>{setOpen(false);requestOwnPayments();onPayments();}}>Zgłoś wpłatę</button>}</div>}
+   {badgeNotices.bell.length>0&&<div className="slm-badge-notices"><h2>Odznaki</h2><ul>{badgeNotices.bell.map(b=><li key={`${b.code}:${b.group_id??''}:${b.season??''}`}><button type="button" onClick={()=>{setOpen(false);badgeNotices.dismiss();requestOwnBadges();onBadges?.();}}><strong>Nowa odznaka: {BADGES.find(d=>d.code===b.code)?.name??b.code}</strong><span>{[b.group_name,b.season,matchDate(b.earned_at)].filter(Boolean).join(' · ')}</span></button></li>)}</ul></div>}
    {(admin||dues.length===0)&&<><h2>Prośby do Twoich grup</h2>{error?<p role="alert">Nie udało się odczytać zgłoszeń. Odśwież mecze.</p>:requests===0?<p>Brak oczekujących zgłoszeń.</p>:<ul>{groups.map(g=><li key={g.id}><button type="button" onClick={()=>{setOpen(false);onGroups();window.location.hash=`group/${g.id}`;}}><strong>{g.name}</strong><span>Oczekujące: {g.pending_count}</span></button></li>)}</ul>}</>}
   </section>,document.body)}
  </aside>;

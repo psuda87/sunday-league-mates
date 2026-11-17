@@ -430,6 +430,26 @@ export function createHandler(env: Environment) {
         }
         return respond(r.data);
       }
+      if (action === 'badges_player' || action === 'badges_seen') {
+        await rate('badges:' + ctx.id, 60);
+        const fields = action === 'badges_player' ? ['user_id'] : ['scope'];
+        if (Object.keys(body).some(key => key !== 'action' && !fields.includes(key)))
+          throw new ApiError(400, 'invalid_input', 'Żądanie odznak zawiera niedozwolone pola.');
+        const payload = Object.fromEntries(fields.filter(key => Object.hasOwn(body,key)).map(key => [key,body[key]]));
+        const r = await call('/rest/v1/rpc/slm_badges_dispatch', 'POST', {p_user:ctx.id,p_session:ctx.sid,p_action:action.slice(7),p_body:payload}, undefined, true);
+        if (!r.ok) {
+          const code = typeof r.data?.message === 'string' ? r.data.message : '';
+          const errors: Record<string,[number,string]> = {
+            session_invalid:[401,'Sesja wygasła. Zaloguj się ponownie.'],
+            not_found:[404,'Zawodnik nie istnieje albo nie masz dostępu do jego odznak.'],
+            invalid_input:[400,'Nieprawidłowe dane odznak.'],
+            invalid_action:[400,'Nieznana akcja odznak.'],
+          };
+          if (errors[code]) throw new ApiError(errors[code][0], code, errors[code][1]);
+          throw new ApiError(503, 'service_unavailable', 'Nie udało się pobrać odznak.');
+        }
+        return respond(r.data);
+      }
       if (action === 'lineups_get' || action === 'lineups_save') {
         await rate('lineups:' + ctx.id, 60);
         const fields = action === 'lineups_get' ? ['event_id'] : ['event_id','expected_version','expected_roster_version','team_a','team_b','request_id'];
