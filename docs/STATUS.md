@@ -1,3 +1,25 @@
+# Odznaki — etapy 3–4 — 2026-11-17 — NIEWDROŻONE (blokada próby na sucho)
+
+Gałąź `feat/badges` (scalony `origin/main` z PR #70–#73). Kod: migracja `20261117120000_badges.sql` (`slm_badges`, RLS bez polityk, tylko
+`service_role`; leniwe przyznawanie po zamknięciu okna ocen, idempotentne, liczone od zera — tylko mecze z `starts_at` ≥ wdrożenia),
+test `app/supabase/tests/badges.sql`, akcje `badges_player`/`badges_seen` w Edge `accounts`, lista odznak w Moim profilu / profilu z grupy /
+ze składów, wpis „Nowa odznaka: X” w dzwonku, okienko „Nowa odznaka!”. Strażnicy: `OWNER_SOURCE` = `de7e7c1`, migracja w `OWNER_MIGRATIONS`.
+
+Kontrole automatyczne (lokalnie, `app/`): `tsc --noEmit` PASS; `npm run lint` 0 błędów (9 ostrzeżeń, jak wcześniej); `npx vitest run` 94 pliki /
+656 testów PASS (w tym 14 testów handlera odznak i 5 testów UI); `verify:consolidation` PASS; `test:premium-policy` 107/107 PASS;
+`typecheck:edge` PASS. `build:premium-web` **NIE PRZESZEDŁ** w tym środowisku: polityka sieci blokuje `cdn.jsdelivr.net` (HTTP 403 proxy)
+przy pobieraniu zasobów MediaPipe; zastępczy build tej samej konfiguracji bez pobierania MediaPipe — PASS (to nie zastępuje kontroli).
+Test SQL `badges.sql` **niewykonany**: próba na sucho przez Supabase MCP `execute_sql` czekała na potwierdzenie użytkownika (pytanie serwera
+bez odpowiedzi w uruchomieniu automatycznym, limit 60 s) — brak potwierdzenia, że SQL się wykonał; transakcja i tak kończyła się wymuszonym
+wycofaniem. Brak lokalnej bazy (Docker niedostępny).
+
+Produkcja: **bez zmian** — brak `apply_migration`, brak deployu Edge `accounts`, brak merge do main, brak deployu Vercel.
+Następny krok: uruchomić próbę na sucho (`begin; migracja; badges.sql; raise 'DRY_RUN_COMPLETE_ROLLBACK'`) z potwierdzeniem pytania MCP
+i `build:premium-web` w środowisku z dostępem do cdn.jsdelivr.net; po zielonych wynikach wdrożenie wg PR. Interfejs ukrywa odznaki, dopóki
+backend nie odpowiada (bez fikcyjnych danych). W przeglądarce nie testowano.
+
+---
+
 # Współadministratorzy grupy — 2026-11-16 (zgoda właściciela)
 
 Gałąź `feat/group-coadmins`. Supabase `hjtcyybkxebvdropchac`: migracja `group_coadmins` (zdalnie `20261116205228`, repo `20261116220000`)
