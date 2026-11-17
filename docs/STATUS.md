@@ -1,3 +1,12 @@
+# PWA — ekran startowy jako nakładka — 2026-11-17
+
+Gałąź `fix/pwa-splash-overlay`. Ekran startowy był w `#root`, więc React usuwał go natychmiast, a potem widać było ekran „sprawdzania sesji”.
+Teraz `#slm-boot` jest obok `#root`, a `/boot-splash.js` (plik z `public`, zgodny z CSP) chowa go po zakończeniu sprawdzania sesji (min. 1,2 s, maks. 10 s, wygaszenie 0,45 s).
+Strażnicy: `OWNER_SOURCE` = `6c4a942`. Kontrole: Vitest 661/661, `verify:consolidation` PASS, `test:premium-policy` 107/107, `build:premium-web` PASS, `check-premium-web-cases` 2/1 jak na main.
+Systemowy ekran Androida (ikona na białym tle) pochodzi z manifestu zapisanego przy instalacji — wymaga ponownego dodania aplikacji do ekranu głównego.
+
+---
+
 # PWA — ikona na pulpicie i ekran startowy — 2026-11-17 (prośba właściciela)
 
 Gałąź `feat/pwa-icon-splash`. Przyczyna: produkcyjny HTML Premium nie podpinał `manifest.json` (białe tło, ikona z fallbacku), a stara ikona miała herb na ~30% powierzchni.
