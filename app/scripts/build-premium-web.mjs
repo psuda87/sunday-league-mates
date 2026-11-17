@@ -89,6 +89,8 @@ export function premiumWebConfig(base,env=process.env){
    return html.replace(/<meta http-equiv="Content-Security-Policy" content="[^"]*" \/>/,
     '<meta http-equiv="Content-Security-Policy" content="'+CSP.replace("; frame-ancestors 'none'",'')+'" />')
     .replace('<title>SLM — demonstracja UI España</title>','<title>Sunday League Mates</title>')
+    // Chrome na Androidzie: klawiatura zmniejsza widok aplikacji (jak w natywnej), więc cały formularz da się przewinąć.
+    .replace('content="width=device-width, initial-scale=1, viewport-fit=cover"','content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content"')
     .replace('</head>',PWA_HEAD+'\n  </head>')
     .replace('<div id="root"></div>','<div id="root"></div>'+BOOT_SPLASH);
   }}],build:{...base.build,outDir:'../dist-premium-web',emptyOutDir:true,sourcemap:false}};
