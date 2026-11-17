@@ -4121,3 +4121,6 @@ button.slm-group-card {
   .slm-matches-screen .slm-match-filters { gap: 7px; margin-bottom: 12px; flex-wrap: wrap; }
   .slm-matches-screen .slm-match-filters button { min-height: 40px; padding: 8px 12px; font-size: .76rem; }
 }
+
+/* Odstęp przycisku „Pokaż wszystkich / Pokaż mniej” od dividera */
+.slm-roster-group .slm-roster-expand { margin-top: 12px; padding: 10px 0; }

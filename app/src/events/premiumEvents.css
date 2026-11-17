@@ -256,3 +256,7 @@
 .slm-premium-events li.slm-live-entry[data-status="withdrawn"] .slm-demo-person-meta { justify-items: start; gap: 2px; }
 .slm-premium-events li.slm-live-entry[data-status="withdrawn"] .slm-demo-person-meta ion-button { justify-self: start; margin: 0; --padding-start: 0; --padding-end: 0; height: auto; min-height: 36px; }
 .slm-premium-events .slm-roster-group .slm-roster-expand { margin-top: 14px; }
+
+/* Dialog w portalu: ponad dolnym paskiem, z przewijaniem treści */
+.slm-dialog-portal .slm-join-dialog-backdrop { z-index: 100000; align-items: flex-start; padding-top: max(16px, env(safe-area-inset-top)); padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+.slm-dialog-portal .slm-join-dialog { margin: auto; max-height: calc(100dvh - 32px); }
