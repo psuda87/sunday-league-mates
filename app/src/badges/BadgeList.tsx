@@ -41,14 +41,14 @@ function Row({ badge, state }: { badge: BadgeDefinition; state?: BadgeState }) {
  * Odznaki pod kartą zawodnika: zdobyte zawsze widoczne, niezdobyte zwinięte pod „Pokaż pozostałe”
  * (decyzja właściciela 2026-11-16, docs/BADGES_PLAN.md).
  */
-export default function BadgeList({ states, own = false, label }: { states: readonly BadgeState[]; own?: boolean; label?: string }) {
+export default function BadgeList({ states, own = false, label, anchorId }: { states: readonly BadgeState[]; own?: boolean; label?: string; anchorId?: string }) {
   const [open, setOpen] = useState(false);
   const headingId = useId(), listId = useId();
   const byCode = new Map(states.map(s => [s.code, s]));
   const earned = BADGES.filter(b => byCode.get(b.code)?.earnedAt)
     .sort((a, b) => (byCode.get(b.code)!.earnedAt!).localeCompare(byCode.get(a.code)!.earnedAt!));
   const locked = BADGES.filter(b => !byCode.get(b.code)?.earnedAt);
-  return <section className="slm-badges" aria-labelledby={headingId}>
+  return <section id={anchorId} className="slm-badges" aria-labelledby={headingId} tabIndex={anchorId ? -1 : undefined}>
     <header className="slm-badges-header">
       <h2 id={headingId}>Odznaki</h2>
       <span className="slm-badges-count" aria-label={`Zdobyte ${earned.length} z ${BADGES.length}`}>{earned.length}/{BADGES.length}</span>

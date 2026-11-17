@@ -129,3 +129,71 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+/* Okienko „Nowa odznaka!” — odznaka powiększa się z poświatą; bez ruchu przy prefers-reduced-motion. */
+.slm-badge-celebration-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.72);
+}
+.slm-badge-celebration {
+  width: min(100%, 340px);
+  padding: 22px 18px 18px;
+  border: 1px solid var(--slm-border);
+  border-radius: 18px;
+  background: var(--slm-panel);
+  color: var(--ion-text-color);
+  text-align: center;
+}
+.slm-badge-celebration-kicker {
+  margin: 0 0 8px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--slm-gold);
+}
+.slm-badge-celebration-image {
+  display: grid;
+  place-items: center;
+  margin: 6px auto 12px;
+  width: 168px;
+  height: 168px;
+  border-radius: 50%;
+  animation: slm-badge-pop 900ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.slm-badge-celebration-image img {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 18px color-mix(in srgb, var(--slm-gold) 70%, transparent));
+}
+.slm-badge-celebration h2 {
+  margin: 0 0 6px;
+  font-size: 1.25rem;
+}
+.slm-badge-celebration p {
+  margin: 0 0 14px;
+  line-height: 1.5;
+  color: var(--slm-text-secondary);
+}
+.slm-badge-celebration button {
+  min-width: 140px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 999px;
+  font-weight: 800;
+  background: var(--ion-color-primary);
+  color: var(--ion-color-primary-contrast);
+}
+@keyframes slm-badge-pop {
+  0% { transform: scale(0.3); opacity: 0; box-shadow: 0 0 0 0 transparent; }
+  60% { transform: scale(1.12); opacity: 1; box-shadow: 0 0 48px 8px color-mix(in srgb, var(--slm-gold) 55%, transparent); }
+  100% { transform: scale(1); box-shadow: 0 0 28px 2px color-mix(in srgb, var(--slm-gold) 35%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .slm-badge-celebration-image { animation: none; box-shadow: 0 0 28px 2px color-mix(in srgb, var(--slm-gold) 35%, transparent); }
+}

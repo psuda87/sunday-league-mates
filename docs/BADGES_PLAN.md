@@ -18,6 +18,8 @@ grafiki w lokalnym folderze `badges/` (poza repo; wygląd odznak uznany za gotow
 - D5: Król strzelców — **osobno w każdej grupie**, sezon = rok kalendarzowy (1.01–31.12); przyznawany po zakończeniu roku.
 - D6: Rekruter — **każdy gość osobno**, także gdy to ta sama osoba w kolejnych meczach.
 - D9: **bez wyliczania wstecz** — odznaki liczone od dnia wdrożenia.
+- D9a (2026-11-17): **liczenie od zera** — wyłącznie mecze z `starts_at` ≥ dacie wdrożenia
+  (`slm_badge_config.enabled_from`, ustawiane przy migracji); wcześniejsze mecze nie liczą się do żadnej odznaki ani postępu.
 - D3: seria (Żelazne płuca) — **kolejne mecze grupy**: każdy nieodwołany mecz grupy, w którym zawodnik nie zagrał,
   przerywa serię (wariant B). Liczone osobno w każdej grupie.
 - D7a: **Turysta (SLM-ZER-010) usunięty** z zestawu.
@@ -85,6 +87,21 @@ gdzie szachownica jest wtopiona w obraz (np. `Neon Debutant`), docelowo `app/pub
 | BEN-010 | 10 razy na rezerwie | `status='reserve'` w chwili meczu | D4 |
 | ~~ZER-010~~ | usunięta | — | — |
 | LST-005 | 5 zapisów w ostatniej chwili | `joined_at` vs `starts_at` | okno czasowe (D2) |
+
+## Implementacja (etapy 3–4, 2026-11-17)
+- Migracja `20261117120000_badges.sql`: `slm_badges` (unikalność user/code/group/season, RLS bez polityk, tylko `service_role`),
+  `slm_badge_config`, `slm_badge_processed`, `slm_badge_seasons`; `public.slm_badges_dispatch` (`player`, `seen`).
+- Mecz liczy się po zamknięciu okna ocen (`slm_match_rating_state.finalized_at`), nieodwołany. Przyznawanie leniwe pod tą samą
+  blokadą co oceny (`rating_settle` → `badges_settle`), idempotentne; postęp liczony przy odczycie.
+- Drużyna zawodnika: ze składu (`slm_match_lineups`), a gdy go tam nie ma — `lineup_last_team`.
+- Seria wygranych/Feniks: liczą się tylko mecze z wynikiem i znaną drużyną; remis przerywa obie serie.
+- Niezawodny: seria rozegranych meczów; zeruje nieobecność mimo zapisu albo rezygnacja po 17:00 w dniu meczu
+  (gdy zawodnik ostatecznie nie zagrał).
+- Wieczny rezerwowy / Ostatnia chwila: liczone raz na mecz (historia `reserved` / `joined`).
+- Miesiące z rzędu: miesiąc bez meczów grup zawodnika albo jeszcze nierozliczony nie przerywa serii.
+- Król strzelców (wszyscy z remisem na szczycie) i Regularny 2027 — po zamknięciu roku i rozliczeniu wszystkich meczów grupy.
+- UI: lista w Moim profilu, profilu z grupy i ze składów; wpis „Nowa odznaka: X” w dzwonku (7 dni) prowadzi do sekcji odznak;
+  jednorazowe okienko „Nowa odznaka!” (po kolei, bez ruchu przy `prefers-reduced-motion`), po „Super” `badges_seen`.
 
 ## Do rozstrzygnięcia
 - D0, D1, D2, D7, D10 — rozstrzygnięte (wyżej).
