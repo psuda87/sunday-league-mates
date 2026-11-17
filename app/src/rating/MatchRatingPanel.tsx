@@ -31,7 +31,7 @@ export default function MatchRatingPanel({ manager, userId, eventId, active = tr
   const [action, setAction] = useState<Team | null>(null);
   const [goals, setGoals] = useState('0'), [assists, setAssists] = useState('0');
   const [scoreA, setScoreA] = useState(''), [scoreB, setScoreB] = useState('');
-  const [confirm, setConfirm] = useState(false);
+  const [confirm, setConfirm] = useState(false), [showHelp, setShowHelp] = useState(false);
   const stamp = s ? JSON.stringify([s.event_id, s.my, s.score]) : '';
   useEffect(() => {
     if (!s) return;
@@ -49,7 +49,8 @@ export default function MatchRatingPanel({ manager, userId, eventId, active = tr
   const earlyMvp = s.phase === 'open' && s.gold_user ? s.participants.find(p => p.user_id === s.gold_user)?.display_name ?? 'Zawodnik' : null;
   const canBallot = s.phase === 'open' && s.can_rate && !s.my.submitted;
   return <section className="slm-panel slm-rating-panel" aria-busy={api.pending}>
-    <h2>Oceny</h2>
+    <div className="slm-rating-head"><h2>Oceny</h2><button type="button" className="slm-rating-info-button" aria-label="Jak działają oceny" aria-expanded={showHelp} aria-controls="slm-rating-help" onClick={() => setShowHelp(v => !v)}>i</button></div>
+    {showHelp && <div id="slm-rating-help" role="note" className="slm-rating-help"><p>Każdy uczestnik meczu ocenia pozostałych w skali 1–10. Oceny są anonimowe, a ocenianie trwa 48 godzin od końca meczu.</p><p>Zatwierdzonego głosu nie można zmienić. Brak oceny nie wpływa na średnią.</p><p>Nowy zawodnik zaczyna od 7,0, a pierwsza zmiana oceny następuje po 5 ocenionych meczach. Potem ocena zmienia się po każdym ocenionym meczu.</p><p>Głos na MVP oddajesz na jednego zawodnika. Gdy wynik jest już przesądzony, MVP trafia do zawodnika od razu.</p><p>Gole, asysty i frekwencja tylko dodają niewielki bonus.</p></div>}
     {s.phase === 'disabled' && <p className="slm-rating-note">Ten mecz nie podlega ocenianiu.</p>}
     {s.phase === 'before' && <p className="slm-rating-note">Ocenianie otworzy się po zakończeniu meczu i potrwa 48 godzin.</p>}
     {s.phase === 'open' && <p className="slm-rating-note">Ocenianie otwarte do: <strong>{when(s.closes_at)}</strong>. Oceny są anonimowe.</p>}

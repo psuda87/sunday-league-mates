@@ -18,6 +18,16 @@ function setup(state: MatchRatingState, reply: (action: string, body: Record<str
 }
 
 describe('MatchRatingPanel', () => {
+  it('explains how ratings work under the info button', async () => {
+    setup(base);
+    await screen.findByText(/Ocenianie otwarte do/);
+    expect(screen.queryByRole('note')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Jak działają oceny' }));
+    expect(screen.getByRole('note')).toHaveTextContent('anonimowe');
+    expect(screen.getByRole('note')).toHaveTextContent('48 godzin');
+    fireEvent.click(screen.getByRole('button', { name: 'Jak działają oceny' }));
+    expect(screen.queryByRole('note')).toBeNull();
+  });
   it('lets a participant rate others (never themselves), vote MVP and the action of the match, then sends one ballot', async () => {
     const call = setup(base);
     await screen.findByText(/Ocenianie otwarte do/);
