@@ -1,3 +1,13 @@
+# PWA — formularz przy otwartej klawiaturze — 2026-11-17
+
+Gałąź `fix/pwa-keyboard-scroll`. Zgłoszenie: na „Nowym meczu” przy otwartej klawiaturze nie da się przewinąć do góry. Przyczyna: Chrome na Androidzie domyślnie
+tylko przykrywa stronę klawiaturą i przesuwa widok; przewijanie `ion-content` nie odsłania góry. Poprawka: `build-premium-web.mjs` dodaje do meta viewport
+`interactive-widget=resizes-content` (widok zmniejsza się nad klawiaturą jak w natywnym Androidzie; iOS ignoruje). Strażnicy: `OWNER_SOURCE` = `9f90691`.
+Kontrole: Vitest 661/661, `verify:consolidation` PASS, `test:premium-policy` 107/107, `build:premium-web` PASS, `check-premium-web-cases` 2/1 jak na main.
+Na telefonie nie sprawdzano. Niewdrożone. Główna produkcja = `cfbf8c9`.
+
+---
+
 # PWA — płynne przejście z systemowego ekranu Androida — 2026-11-17
 
 Gałąź `fix/pwa-seamless-splash`. Main/produkcja = `1efacfd` (PR #81, ekran w kolorach profilu — wdrożone). Problem: najpierw systemowy splash (ikona-kwadrat), potem „nowy” ekran.
