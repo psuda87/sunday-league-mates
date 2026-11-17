@@ -26,3 +26,9 @@
 
 .slm-rating-confirm { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px 12px; border: 1px solid var(--slm-gold); border-radius: 12px; }
 .slm-rating-confirm p { grid-column: 1 / -1; margin: 0 0 4px; }
+
+.slm-rating-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.slm-rating-head h2 { margin: 0; }
+.slm-rating-info-button { flex: none; width: 32px; height: 32px; border: 1px solid currentColor; border-radius: 50%; background: transparent; color: var(--slm-text-secondary); font: italic 700 1rem/1 serif; cursor: pointer; }
+.slm-rating-help { display: grid; gap: 8px; padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,.06); color: var(--slm-text-secondary); font-size: .85rem; line-height: 1.4; }
+.slm-rating-help p { margin: 0; }

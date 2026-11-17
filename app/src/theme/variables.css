@@ -3861,8 +3861,20 @@ button.slm-group-card {
   padding: 0;
   margin: 0;
 }
-.slm-group-roster li {
+.slm-group-roster ul:not(.slm-roster-list) li {
   border-bottom: 1px solid var(--slm-border);
+}
+.slm-group-roster .slm-roster-list > li {
+  gap: 12px;
+  padding: 12px 14px;
+  min-height: 60px;
+  box-sizing: border-box;
+}
+.slm-group-roster .slm-roster-list > li .slm-group-person {
+  padding: 0;
+}
+.slm-group-roster .slm-roster-group .slm-roster-expand {
+  margin-top: 14px;
 }
 .slm-group-person {
   display: flex;
@@ -4121,3 +4133,4 @@ button.slm-group-card {
   .slm-matches-screen .slm-match-filters { gap: 7px; margin-bottom: 12px; flex-wrap: wrap; }
   .slm-matches-screen .slm-match-filters button { min-height: 40px; padding: 8px 12px; font-size: .76rem; }
 }
+
