@@ -34,7 +34,7 @@ export const PWA_HEAD=[
  '<link rel="preload" as="image" href="'+BOOT_LOGO+'" />',
  // Ekran startowy: czysty CSS (CSP bez inline JS); React zastępuje zawartość #root przy pierwszym renderze.
  '<style>html,body{background:'+BOOT_BG+'}'
- +'.slm-boot{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;'
+ +'.slm-boot{position:fixed;inset:0;z-index:2147483000;transition:opacity .45s ease;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;'
  +'background:radial-gradient(ellipse at 50% 46%,#3a0c17 0%,#1a0b10 42%,'+BOOT_BG+' 75%);color:#e6b94e;font:600 13px/1.2 system-ui,sans-serif;letter-spacing:.22em;text-transform:uppercase}'
  +'.slm-boot-crest{position:relative;width:min(46vw,210px);aspect-ratio:420/471;animation:slm-boot-in .7s cubic-bezier(.2,1.4,.4,1) both,slm-boot-glow 2.4s ease-in-out .7s infinite}'
  +'.slm-boot-crest img{width:100%;height:100%;object-fit:contain;display:block}'
@@ -42,6 +42,7 @@ export const PWA_HEAD=[
  +'background:linear-gradient(110deg,transparent 35%,rgba(255,240,173,.75) 50%,transparent 65%) -200% 0/250% 100% no-repeat;animation:slm-boot-shine 2.4s ease-in-out .9s infinite}'
  +'.slm-boot-bar{width:min(40vw,150px);height:3px;border-radius:3px;background:rgba(230,185,78,.18);overflow:hidden}'
  +'.slm-boot-bar:before{content:"";display:block;width:40%;height:100%;border-radius:3px;background:linear-gradient(90deg,#9c641e,#fff0ad,#e6b94e);animation:slm-boot-bar 1.1s ease-in-out infinite}'
+ +'.slm-boot.slm-boot-out{opacity:0;pointer-events:none}'
  +'.slm-boot-text{opacity:.85;animation:slm-boot-fade .9s ease .4s both}'
  +'@keyframes slm-boot-in{from{opacity:0;transform:scale(.6) translateY(12px)}to{opacity:1;transform:none}}'
  +'@keyframes slm-boot-glow{0%,100%{filter:drop-shadow(0 0 10px rgba(230,185,78,.25))}50%{filter:drop-shadow(0 0 26px rgba(230,185,78,.6))}}'
@@ -50,9 +51,11 @@ export const PWA_HEAD=[
  +'@keyframes slm-boot-fade{from{opacity:0}}'
  +'@media (prefers-reduced-motion:reduce){.slm-boot *,.slm-boot *:before,.slm-boot *:after{animation:none!important}}</style>'
 ].join('\n    ');
-export const BOOT_SPLASH='<div class="slm-boot" role="status" aria-label="Uruchamianie Sunday League Mates">'
+export const BOOT_SPLASH='<div id="slm-boot" class="slm-boot" role="status" aria-label="Uruchamianie Sunday League Mates">'
  +'<div class="slm-boot-crest"><img src="'+BOOT_LOGO+'" alt="" width="420" height="471" /></div>'
- +'<div class="slm-boot-bar"></div><div class="slm-boot-text">Sunday League Mates</div></div>';
+ +'<div class="slm-boot-bar"></div><div class="slm-boot-text">Sunday League Mates</div></div>'
+ // Nakładka obok #root: React jej nie czyści; /boot-splash.js chowa ją po sprawdzeniu sesji.
+ +'<script src="/boot-splash.js" defer></script>';
 export function premiumWebConfig(base,env=process.env){
  if(env.VITE_SLM_FUNCTION_URL&&env.VITE_SLM_FUNCTION_URL!==ACCOUNTS)throw new Error('Only the approved HTTPS accounts endpoint is allowed');
  const define={...base.define,'import.meta.env.VITE_SLM_FUNCTION_URL':JSON.stringify(ACCOUNTS)};
@@ -70,7 +73,7 @@ export function premiumWebConfig(base,env=process.env){
     '<meta http-equiv="Content-Security-Policy" content="'+CSP.replace("; frame-ancestors 'none'",'')+'" />')
     .replace('<title>SLM — demonstracja UI España</title>','<title>Sunday League Mates</title>')
     .replace('</head>',PWA_HEAD+'\n  </head>')
-    .replace('<div id="root"></div>','<div id="root">'+BOOT_SPLASH+'</div>');
+    .replace('<div id="root"></div>','<div id="root"></div>'+BOOT_SPLASH);
   }}],build:{...base.build,outDir:'../dist-premium-web',emptyOutDir:true,sourcemap:false}};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
