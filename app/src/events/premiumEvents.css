@@ -248,3 +248,11 @@
 .slm-premium-events .slm-match-detail button.slm-event-privacy-toggle {font:inherit;font-size:.6rem;line-height:1.2;cursor:pointer;position:relative;border-color:var(--slm-gold);}
 .slm-premium-events .slm-match-detail button.slm-event-privacy-toggle::after {content:"";position:absolute;inset:-10px -6px;}
 .slm-premium-events .slm-match-detail button.slm-event-privacy-toggle:disabled {opacity:.6;cursor:default;}
+
+/* Zdjęcia w miniaturach uczestników, wycofane wpisy, odstęp przycisku rozwijania listy */
+.slm-premium-events .slm-roster-avatar { overflow: hidden; }
+.slm-premium-events .slm-roster-avatar img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.slm-premium-events li.slm-live-entry[data-status="withdrawn"] { align-items: center; }
+.slm-premium-events li.slm-live-entry[data-status="withdrawn"] .slm-demo-person-meta { justify-items: start; gap: 2px; }
+.slm-premium-events li.slm-live-entry[data-status="withdrawn"] .slm-demo-person-meta ion-button { justify-self: start; margin: 0; --padding-start: 0; --padding-end: 0; height: auto; min-height: 36px; }
+.slm-premium-events .slm-roster-group .slm-roster-expand { margin-top: 14px; }
