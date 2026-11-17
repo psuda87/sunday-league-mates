@@ -17,7 +17,9 @@ create table public.slm_badges (
  season integer check(season between 2026 and 2100),
  earned_at timestamptz not null default clock_timestamp(),
  source_event_id uuid references public.slm_matches(id) on delete set null,
+ -- seen_at: wpis w dzwonku odklikany; dialog_seen_at: okienko „Nowa odznaka!” zamknięte.
  seen_at timestamptz,
+ dialog_seen_at timestamptz,
  constraint slm_badges_once unique nulls not distinct (user_id,code,group_id,season)
 );
 create index slm_badges_group_id_idx on public.slm_badges(group_id);
@@ -248,7 +250,8 @@ begin
  end loop;
 end $$;
 
--- Dispatcher: player (badges + progress, visibility like the player card: self or a shared active group) and seen.
+-- Dispatcher: player (badges + progress, visibility like the player card: self or a shared active group) and seen
+-- (scope 'dialog' = okienko zamknięte; scope 'bell' = wpis w dzwonku odklikany, oznacza też okienko).
 create function public.slm_badges_dispatch(p_user uuid,p_session uuid,p_action text,p_body jsonb default '{}') returns jsonb
 language plpgsql security invoker set search_path='' as $$
 declare target uuid; k integer;
@@ -263,8 +266,13 @@ begin
  perform slm_private.badges_settle();
 
  if p_action='seen' then
-  if p_body<>'{}'::jsonb then raise exception 'invalid_input';end if;
-  update public.slm_badges set seen_at=clock_timestamp() where user_id=p_user and seen_at is null;
+  if exists(select 1 from jsonb_object_keys(p_body) x where x<>'scope') or coalesce(p_body->>'scope','') not in ('dialog','bell')
+   or jsonb_typeof(p_body->'scope') is distinct from 'string' then raise exception 'invalid_input';end if;
+  if p_body->>'scope'='dialog' then
+   update public.slm_badges set dialog_seen_at=clock_timestamp() where user_id=p_user and dialog_seen_at is null;
+  else
+   update public.slm_badges set seen_at=clock_timestamp(),dialog_seen_at=coalesce(dialog_seen_at,clock_timestamp()) where user_id=p_user and seen_at is null;
+  end if;
   get diagnostics k=row_count;
   return jsonb_build_object('seen',k);
  end if;
@@ -279,7 +287,8 @@ begin
   'earned',(select coalesce(jsonb_agg(jsonb_build_object('code',b.code,'group_id',b.group_id,
      'group_name',case when b.group_id is not null and exists(select 1 from public.slm_group_members m where m.group_id=b.group_id and m.user_id=p_user)
       then (select gg.name from public.slm_groups gg where gg.id=b.group_id) end,
-     'season',b.season,'earned_at',b.earned_at,'new',target=p_user and b.seen_at is null) order by b.earned_at,b.id),'[]'::jsonb)
+     'season',b.season,'earned_at',b.earned_at,'new',target=p_user and b.seen_at is null,
+     'celebrate',target=p_user and b.dialog_seen_at is null) order by b.earned_at,b.id),'[]'::jsonb)
    from public.slm_badges b where b.user_id=target),
   'progress',(select coalesce(jsonb_agg(jsonb_build_object('code',x.code,'progress',x.progress,'threshold',x.threshold) order by x.code),'[]'::jsonb)
    from (select y.b_code code,max(y.b_progress) progress,max(y.b_threshold) threshold from slm_private.badge_progress(target) y group by y.b_code) x));

@@ -100,8 +100,9 @@ gdzie szachownica jest wtopiona w obraz (np. `Neon Debutant`), docelowo `app/pub
 - Wieczny rezerwowy / Ostatnia chwila: liczone raz na mecz (historia `reserved` / `joined`).
 - Miesiące z rzędu: miesiąc bez meczów grup zawodnika albo jeszcze nierozliczony nie przerywa serii.
 - Król strzelców (wszyscy z remisem na szczycie) i Regularny 2027 — po zamknięciu roku i rozliczeniu wszystkich meczów grupy.
-- UI: lista w Moim profilu, profilu z grupy i ze składów; wpis „Nowa odznaka: X” w dzwonku (7 dni) prowadzi do sekcji odznak;
-  jednorazowe okienko „Nowa odznaka!” (po kolei, bez ruchu przy `prefers-reduced-motion`), po „Super” `badges_seen`.
+- UI: lista w Moim profilu, profilu z grupy i ze składów; wpis „Nowa odznaka: X” w dzwonku **zostaje do odklikania**
+  (decyzja właściciela 2026-11-17; `seen_at`, `badges_seen` scope=bell) i prowadzi do sekcji odznak; jednorazowe okienko
+  „Nowa odznaka!” (po kolei, bez ruchu przy `prefers-reduced-motion`), po „Super” `badges_seen` scope=dialog (`dialog_seen_at`).
 
 ## Do rozstrzygnięcia
 - D0, D1, D2, D7, D10 — rozstrzygnięte (wyżej).

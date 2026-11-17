@@ -432,7 +432,7 @@ export function createHandler(env: Environment) {
       }
       if (action === 'badges_player' || action === 'badges_seen') {
         await rate('badges:' + ctx.id, 60);
-        const fields = action === 'badges_player' ? ['user_id'] : [];
+        const fields = action === 'badges_player' ? ['user_id'] : ['scope'];
         if (Object.keys(body).some(key => key !== 'action' && !fields.includes(key)))
           throw new ApiError(400, 'invalid_input', 'Żądanie odznak zawiera niedozwolone pola.');
         const payload = Object.fromEntries(fields.filter(key => Object.hasOwn(body,key)).map(key => [key,body[key]]));

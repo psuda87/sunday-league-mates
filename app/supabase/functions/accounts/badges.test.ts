@@ -29,9 +29,9 @@ it('badges_player przekazuje wyłącznie user_id z zweryfikowanym aktorem i sesj
  expect(result.status).toBe(200); expect(result.headers.get('cache-control')).toBe('no-store');
  expect(rpc.mock.calls[0][0]).toMatchObject({p_action:'player',p_body:{user_id:target}});
 });
-it('badges_seen nie przyjmuje żadnych pól i oznacza wyłącznie własne odznaki', async () => {
- const ok = await request({action:'badges_seen'});
- expect(ok.result.status).toBe(200); expect(ok.rpc.mock.calls[0][0]).toMatchObject({p_action:'seen',p_body:{}});
+it('badges_seen przyjmuje wyłącznie scope i oznacza wyłącznie własne odznaki', async () => {
+ const ok = await request({action:'badges_seen',scope:'bell'});
+ expect(ok.result.status).toBe(200); expect(ok.rpc.mock.calls[0][0]).toMatchObject({p_action:'seen',p_body:{scope:'bell'}});
  const forged = await request({action:'badges_seen',user_id:webcrypto.randomUUID()});
  expect(forged.result.status).toBe(400); expect(forged.rpc).not.toHaveBeenCalled();
 });

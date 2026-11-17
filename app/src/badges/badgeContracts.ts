@@ -2,7 +2,7 @@
 import { BADGES } from './catalog';
 import type { BadgeState } from './BadgeList';
 
-export interface EarnedBadge { code: string; group_id: string | null; group_name: string | null; season: number | null; earned_at: string; new: boolean }
+export interface EarnedBadge { code: string; group_id: string | null; group_name: string | null; season: number | null; earned_at: string; new: boolean; celebrate: boolean }
 export interface PlayerBadges { user_id: string; own: boolean; earned: EarnedBadge[]; progress: { code: string; progress: number; threshold: number }[] }
 
 const isObject = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -12,7 +12,7 @@ export function playerBadges(value: unknown): PlayerBadges {
   if (!isObject(value) || typeof value.user_id !== 'string' || !Array.isArray(value.earned) || !Array.isArray(value.progress)) throw Error('Invalid badges');
   const earned = value.earned.filter(isObject).filter(b => typeof b.code === 'string' && typeof b.earned_at === 'string').map(b => ({
     code: b.code as string, group_id: typeof b.group_id === 'string' ? b.group_id : null, group_name: typeof b.group_name === 'string' ? b.group_name : null,
-    season: typeof b.season === 'number' ? b.season : null, earned_at: b.earned_at as string, new: b.new === true,
+    season: typeof b.season === 'number' ? b.season : null, earned_at: b.earned_at as string, new: b.new === true, celebrate: b.celebrate === true,
   }));
   const progress = value.progress.filter(isObject).filter(p => typeof p.code === 'string' && typeof p.progress === 'number' && Number.isFinite(p.progress))
     .map(p => ({ code: p.code as string, progress: p.progress as number, threshold: typeof p.threshold === 'number' ? p.threshold : 0 }));
@@ -31,15 +31,12 @@ export function badgeStates(data: PlayerBadges): BadgeState[] {
   return [...states.values()];
 }
 
-/** Nowe (jeszcze nieoglądane) odznaki, w kolejności zdobycia. */
-export const unseenBadges = (data: PlayerBadges): EarnedBadge[] => data.own ? data.earned.filter(b => b.new && known.has(b.code)) : [];
+/** Odznaki do jednorazowego okienka „Nowa odznaka!”, w kolejności zdobycia. */
+export const celebrateBadges = (data: PlayerBadges): EarnedBadge[] => data.own ? data.earned.filter(b => b.celebrate && known.has(b.code)) : [];
 
-/** Odznaki zdobyte w ostatnich 7 dniach — wpisy „Nowa odznaka” w dzwonku. */
-export function recentBadges(data: PlayerBadges, now = Date.now()): EarnedBadge[] {
-  if (!data.own) return [];
-  return data.earned.filter(b => known.has(b.code) && (b.new || now - Date.parse(b.earned_at) <= 7 * 24 * 3600 * 1000))
-    .sort((a, b) => b.earned_at.localeCompare(a.earned_at));
-}
+/** Wpisy „Nowa odznaka” w dzwonku: zostają do odklikania (decyzja właściciela 2026-11-17), najnowsze pierwsze. */
+export const bellBadges = (data: PlayerBadges): EarnedBadge[] => data.own
+  ? data.earned.filter(b => b.new && known.has(b.code)).sort((a, b) => b.earned_at.localeCompare(a.earned_at)) : [];
 
 // Dzwonek → Mój profil, sekcja odznak (profil może zamontować się po żądaniu).
 export const ownBadgesRequestEvent = 'slm-open-own-badges';

@@ -134,13 +134,20 @@ begin
   raise exception 'stranger saw badges';exception when raise_exception then if sqlerrm<>'not_found' then raise;end if;end;
  begin perform public.slm_badges_dispatch(c,sc,'player',jsonb_build_object('user_id',d));
   raise exception 'stranger read d';exception when raise_exception then if sqlerrm<>'not_found' then raise;end if;end;
- -- seen: tylko własne.
- r:=public.slm_badges_dispatch(a,sa,'seen','{}'::jsonb);
- if (r->>'seen')::integer<>7 then raise exception 'seen count %',r;end if;
+ -- seen: okienko i dzwonek osobno, tylko własne.
+ r:=public.slm_badges_dispatch(a,sa,'seen',jsonb_build_object('scope','dialog'));
+ if (r->>'seen')::integer<>7 then raise exception 'dialog seen count %',r;end if;
+ r:=public.slm_badges_dispatch(a,sa,'player',jsonb_build_object('user_id',a));
+ if exists(select 1 from jsonb_array_elements(r->'earned') x where (x->>'celebrate')::boolean)
+  or not exists(select 1 from jsonb_array_elements(r->'earned') x where (x->>'new')::boolean) then raise exception 'dialog seen cleared bell: %',r->'earned';end if;
+ r:=public.slm_badges_dispatch(a,sa,'seen',jsonb_build_object('scope','bell'));
+ if (r->>'seen')::integer<>7 then raise exception 'bell seen count %',r;end if;
  if exists(select 1 from public.slm_badges where user_id=a and seen_at is null)
-  or not exists(select 1 from public.slm_badges where user_id=d and seen_at is null) then raise exception 'seen scope wrong';end if;
+  or not exists(select 1 from public.slm_badges where user_id=d and seen_at is null and dialog_seen_at is null) then raise exception 'seen scope wrong';end if;
  begin perform public.slm_badges_dispatch(a,sa,'seen',jsonb_build_object('user_id',d));
   raise exception 'seen accepted body';exception when raise_exception then if sqlerrm<>'invalid_input' then raise;end if;end;
+ begin perform public.slm_badges_dispatch(a,sa,'seen','{}'::jsonb);
+  raise exception 'seen accepted empty';exception when raise_exception then if sqlerrm<>'invalid_input' then raise;end if;end;
  begin perform public.slm_badges_dispatch(a,sb,'player',jsonb_build_object('user_id',a));
   raise exception 'foreign session accepted';exception when raise_exception then if sqlerrm<>'session_invalid' then raise;end if;end;
  begin perform public.slm_badges_dispatch(a,sa,'player',jsonb_build_object('user_id','nope'));
