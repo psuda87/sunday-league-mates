@@ -1,3 +1,14 @@
+# Odznaki — frontend z `feat/badges` na produkcji Vercel — 2026-11-17 (polecenie właściciela)
+
+Na prośbę właściciela (podgląd na telefonie; link preview nie jest na liście dozwolonych originów) produkcja Vercel
+`dpl_J9KpzDYHu432Ur5JydnjqdpXLnMJ` z `feat/badges` `9d65332` — READY, aliasy slm-soccer/slm-football/slm-ui-demo.vercel.app.
+To kod spoza main (PR #74 nie scalony). Backend odznak (migracja, Edge `accounts`) NIEWDROŻONY — UI ukrywa odznaki do czasu wdrożenia.
+Zmiana: wpis „Nowa odznaka” w dzwonku zostaje do odklikania (`seen_at`), okienko ma osobny `dialog_seen_at`. Vitest 656/656, strażnicy PASS,
+build na Vercelu PASS. Próba na sucho nadal niewykonana (pytanie potwierdzające Supabase MCP nie dociera do klienta właściciela).
+Powrót: redeploy produkcji z main `8b6aba5`.
+
+---
+
 # Odznaki — etapy 3–4 — 2026-11-17 — NIEWDROŻONE (blokada próby na sucho)
 
 Gałąź `feat/badges` (scalony `origin/main` z PR #70–#73). Kod: migracja `20261117120000_badges.sql` (`slm_badges`, RLS bez polityk, tylko
