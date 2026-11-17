@@ -1,3 +1,13 @@
+# PWA — ekran startowy w kolorach profilu — 2026-11-17 (zgoda właściciela na wdrożenie)
+
+Gałąź `fix/pwa-splash-palettes`. `/boot-splash.js` (synchronicznie, przed pierwszym malowaniem) czyta `slm.palette` i `slm.appearance` jak `theme.ts`
+(domyślnie España, ciemny) i ustawia `data-p`/`data-m`; kolory 4 profili × jasny/ciemny w `build-premium-web.mjs`, także `theme-color`. Ciemne tło strony tylko,
+dopóki istnieje `#slm-boot` (`:has`). Systemowy ekran Androida nadal z manifestu (`#0b0c10`) — jeden kolor na instalację; istniejące instalacje Chrome zaktualizuje sam.
+Strażnicy: `OWNER_SOURCE` = `1ab9a7f`. Kontrole: Vitest 661/661, `verify:consolidation` PASS, `test:premium-policy` 107/107, `build:premium-web` PASS, `check-premium-web-cases` 2/1 jak na main.
+Właściciel obejrzał 8 wariantów w lokalnym podglądzie i zaakceptował.
+
+---
+
 # PWA — ekran startowy jako nakładka — 2026-11-17
 
 Gałąź `fix/pwa-splash-overlay`. Ekran startowy był w `#root`, więc React usuwał go natychmiast, a potem widać było ekran „sprawdzania sesji”.
