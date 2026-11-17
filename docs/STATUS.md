@@ -1,3 +1,12 @@
+# Wydajność (lazy-cache) — przygotowanie do scalenia — 2026-11-17 (polecenie właściciela)
+
+Gałąź `perf/lazy-cache-merged-main` + PR #77. Strażnicy: `app/src/auth/sessionManager.ts` (współdzielenie równoczesnych `groups_list`/`groups_inbox`) i `app/vite.config.ts`
+(bez `plugin-legacy`) dopisane do `OWNER_FILES`, `OWNER_SOURCE` = `18d69d9`. Kontrole lokalne: Vitest 95 plików / 661 testów PASS, tsc PASS, lint 0 błędów,
+`typecheck:edge` PASS, `verify:consolidation` PASS, `test:premium-policy` 107/107, `build:premium-web` i `build` PASS.
+Próba na sucho `badges.sql` (jako `service_role`) na `hjtcyybkxebvdropchac`: **PASS**, wycofana; po niej 0 danych fixture, `enabled_from` i ograniczenie sezonu bez zmian.
+
+---
+
 # Zaległe kontrole po sesji online (odznaki, PR #76) — 2026-11-17 (lokalnie)
 
 Main `9f08f01`. Lokalnie (Windows, z dostępem do cdn.jsdelivr.net): `build:premium-web` PASS (zaległe z etapów 3–4), Vitest 94 pliki / 657 testów PASS, `tsc --noEmit` PASS.
@@ -117,6 +126,16 @@ Zmiana kodu aplikacji: brak.
 Gałąź `fix/profile-call-button-and-group-stats`. Supabase `hjtcyybkxebvdropchac`: `20261116140000_rating_player_stats` (`slm_ratings_dispatch`, akcja `player` zwraca teraz także `stats` — Mecze/Gole/Asysty/MVP — dla członków wspólnej aktywnej grupy; uprawnienia funkcji bez zmian, tylko `service_role`).
 Frontend: profil z grupy i profil ze składów czytają statystyki z `usePlayerRating` (zamiast „—”); przycisk „Zadzwoń” jako `a.slm-call` (wygrywa z `Accounts.css`).
 Strażnik: `OWNER_SOURCE` = `c23abaa`, przepięty na commit z tymi zmianami, migracja dopisana do `OWNER_MIGRATIONS`. Kontrole: tsc PASS, lint PASS, Vitest events/groups/rating 169/169; `test:premium-policy` nie jest wiarygodny w płytkim klonie (84 błędy także bez zmian — brak historycznych commitów). Test ręczny na telefonie: do wykonania przez właściciela.
+# Wydajność frontendu — gałąź perf/lazy-cache-cleanup — 2026-11-15
+
+Zmiany: ekrany konta ładowane leniwie (`app/src/pages/lazyScreens.tsx`), usunięty `@vitejs/plugin-legacy` z domyślnego `vite.config.ts` (bez drugiego pakietu legacy),
+`SessionManager.call` współdzieli równoczesne identyczne `groups_list`/`groups_inbox` (bez cache po zakończeniu — dane zawsze z serwera). Wygląd, routing Premium, migracje i Edge bez zmian.
+Pomiar `npm run build` (domyślny LIVE): główny JS 1490 → 1363 KB (gzip 338 → 303 KB), CSS 139,6 → 125,1 KB, `dist` 5,1 → 3,4 MB; reszta to Ionic/React (kod aplikacji ok. 59 KB).
+Kontrole: tsc PASS, Vitest 615/615 + nowy test współdzielenia odczytów, eslint na zmienionych plikach 0 błędów. `verify:consolidation` nie uruchomiony: strażnik wymaga commita `a82397b`,
+którego nie ma na GitHubie (uruchomić lokalnie). W przeglądarce/na Androidzie nie testowano. Dodatkowo: hook `app/src/live/useLoad.ts` zastąpił powtarzany wzorzec ładowania w `Matches`, `Groups`, `Finance` i `Settlements` (+3 testy; Vitest 619/619). Odświeżanie szczegółów meczu
+(`useVisibleRefresh`) już pobiera wyłącznie `matches_detail`, więc bez zmian. Baza: największa tabela ma 97 wierszy, więc 56 indeksów FK nie ma sensu (tylko koszt zapisów). Migracja RLS
+`(select auth.uid())` dla `slm_group_ledger.scoped_ledger_read` i `slm_group_payments.scoped_payments_read` NIE dodana: strażnik `premium-route-policy.mjs` wymaga dokładnego zestawu migracji,
+a zmiana strażników wymaga przeglądu właściciela. Do rozważenia później: `alter policy ... using (slm_private.current_session_valid() and (user_id = (select auth.uid()) or slm_private.own_finance_scope(group_id, event_id)))`.
 
 ---
 

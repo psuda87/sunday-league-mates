@@ -16,6 +16,7 @@ function validate(value: Session) {
     throw new AccountError('Serwer nie potwierdził sesji. Spróbuj ponownie.', 'server_error');
 }
 
+const SHARED_READS = new Set(['groups_list', 'groups_inbox']);
 export class SessionManager {
   private state: SessionState = { phase: 'checking', session: null, message: '' };
   private listeners = new Set<() => void>();
@@ -127,7 +128,20 @@ export class SessionManager {
     this.mutation = flight;
     return flight;
   }
-  async call<T>(action: string, values: Record<string, unknown> = {}): Promise<T> {
+  // Równoczesne identyczne odczyty list współdzielą jedno żądanie. Bez cache po zakończeniu,
+  // więc dane zawsze pochodzą z serwera, a zmiana członkostwa nie jest maskowana.
+  private readFlights = new Map<string, Promise<unknown>>();
+  call<T>(action: string, values: Record<string, unknown> = {}): Promise<T> {
+    if (!SHARED_READS.has(action)) return this.execute<T>(action, values);
+    const key = this.generation + ':' + action + JSON.stringify(values);
+    let flight = this.readFlights.get(key) as Promise<T> | undefined;
+    if (!flight) {
+      const own: Promise<T> = this.execute<T>(action, values).finally(() => { if (this.readFlights.get(key) === own) this.readFlights.delete(key); });
+      this.readFlights.set(key, own); flight = own;
+    }
+    return flight;
+  }
+  private async execute<T>(action: string, values: Record<string, unknown>): Promise<T> {
     if(this.refreshFlight)await this.refreshFlight;
     if (this.current && this.expiresAt - this.now() < 60000) await this.refresh();
     if (this.state.phase !== 'ready' || !this.current) throw new AccountError(unavailableMessage, 'access_unavailable');

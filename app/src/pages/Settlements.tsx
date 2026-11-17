@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { IonButton, IonInput, IonSelect, IonSelectOption, IonSpinner } from '@ionic/react';
 import type { ManagedAccount, Session } from '../auth/api';
 import type { SessionManager } from '../auth/sessionManager';
@@ -7,6 +7,7 @@ import { centsText, decisionName, formatCents, ledgerKind, parseCents, paymentSt
 import type { FinanceAccount, Payment } from '../settlements/model';
 import { useFinanceOperation } from '../settlements/useFinanceOperation';
 import './Settlements.css';
+import { useLoad } from '../live/useLoad';
 
 export default function Settlements({ manager, session }: { manager: SessionManager; session: Session }) {
   const admin = session.role === 'admin';
@@ -38,18 +39,12 @@ export default function Settlements({ manager, session }: { manager: SessionMana
     try { await work(); } catch (e) { op.setError(e instanceof Error ? e.message : 'Nie udało się pobrać danych.'); }
     finally { setLoading(false); }
   }
-  useEffect(() => {
-    let alive = true;
-    setAccount(null); setLoading(true);
-    Promise.all([
-      manager.call<FinanceAccount>('settlements_account', { user_id: userId, offset }),
-      admin ? manager.call<{ payments: Payment[] }>('settlements_pending', { offset: pendingOffset }) : Promise.resolve({ payments: [] }),
-    ]).then(([a, p]) => { if (alive) { setAccount(a); setPayments(p.payments); } })
-      .catch(e => { if (alive) setOperationError(e instanceof Error ? e.message : 'Nie udało się pobrać rozliczeń.'); })
-      .finally(() => { if (alive) setLoading(false); });
-    return () => { alive = false; };
-    // setError jest stabilnym setterem useState.
-  }, [manager, userId, offset, pendingOffset, admin, setOperationError]);
+  useLoad(() => Promise.all([
+    manager.call<FinanceAccount>('settlements_account', { user_id: userId, offset }),
+    admin ? manager.call<{ payments: Payment[] }>('settlements_pending', { offset: pendingOffset }) : Promise.resolve({ payments: [] }),
+  ]), ([a, p]) => { setAccount(a); setPayments(p.payments); }, setOperationError, 'Nie udało się pobrać rozliczeń.',
+  [manager, userId, offset, pendingOffset, admin, setOperationError],
+  { onStart: () => { setAccount(null); setLoading(true); }, onEnd: () => setLoading(false) });
   const disabled = op.busy || loading || !!op.pending;
   async function loadPeople(page: number) {
     setPeople(await manager.call<ManagedAccount[]>('list_accounts', { offset: page })); setPeopleOffset(page);
