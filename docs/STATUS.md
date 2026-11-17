@@ -1,3 +1,14 @@
+# Zaległe kontrole po sesji online (odznaki, PR #76) — 2026-11-17 (lokalnie)
+
+Main `9f08f01`. Lokalnie (Windows, z dostępem do cdn.jsdelivr.net): `build:premium-web` PASS (zaległe z etapów 3–4), Vitest 94 pliki / 657 testów PASS, `tsc --noEmit` PASS.
+Strażnicy na main **nie przechodzili**: PR #76 zmienił pliki właściciela (`GroupScreens.tsx`, `PremiumEvents.tsx`, `premiumEvents.css`, `variables.css`) bez przepięcia.
+Gałąź `chore/guards-repin-pr76`: `OWNER_SOURCE` = `9f08f01` (merge PR #76) → `verify:consolidation` PASS, `test:premium-policy` 107/107 PASS.
+Test `supabase/tests/badges.sql` uzupełniony: wywołania dispatchera jako `service_role` (funkcje są security invoker — tak wykryłby błąd z `auth.users`).
+Próba na sucho na `hjtcyybkxebvdropchac` (CLI `db query --remote`, wymuszony raise): fixture zamyka sezon 2025, a `slm_badges.season` ma `check(2026..2100)` —
+błąd testu, nie produkcji (odznaki liczone od 2026-11-17). Test poszerza zakres w swojej transakcji; ponowna próba **niewykonana** (zablokowana jako DDL na produkcji) — do decyzji właściciela.
+
+---
+
 # Odznaki — stan produkcji po scaleniu PR #74 — 2026-11-17
 
 Main `16b4c8d` (PR #74 scalony). Na Supabase `hjtcyybkxebvdropchac` zastosowano (poza tą sesją) migracje `badges` (`20261117063739`)

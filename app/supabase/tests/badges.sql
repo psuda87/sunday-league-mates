@@ -24,6 +24,9 @@ begin
  insert into public.slm_group_members(group_id,user_id) values(g1,a),(g1,b),(g2,d),(g2,b),(g3,c);
  yr:=extract(year from clock_timestamp() at time zone 'Europe/Warsaw')::integer;
  update public.slm_badge_config set enabled_from=make_timestamptz(yr-2,1,1,0,0,0,'Europe/Warsaw');
+ -- Produkcja liczy od 2026 (season >= 2026); fixture zamyka sezon yr-1, więc tylko w tej (wycofywanej) transakcji poszerzamy zakres.
+ alter table public.slm_badges drop constraint slm_badges_season_check;
+ alter table public.slm_badges add constraint slm_badges_season_check check(season between 2000 and 2100);
 
  -- G1: 12 counted matches, 2 per month over the 6 previous months. A always team a, B team b.
  -- A: 5 wins, 5 losses, win (Feniks), draw. B withdraws after 17:00 on match day of match 9.
@@ -97,6 +100,9 @@ begin
   or has_function_privilege('authenticated','public.slm_badges_dispatch(uuid,uuid,text,jsonb)','execute')
   or has_function_privilege('anon','slm_private.badge_progress(uuid)','execute') then raise exception 'badges exposed';end if;
  if not exists(select 1 from pg_class where oid='public.slm_badges'::regclass and relrowsecurity) then raise exception 'rls off';end if;
+
+ -- Dalej jak Edge: funkcje są security invoker, więc brak uprawnień service_role (np. do auth.users) musi wywrócić test.
+ execute 'set local role service_role';
 
  r:=public.slm_badges_dispatch(a,sa,'player',jsonb_build_object('user_id',a));
  if not (r->>'own')::boolean then raise exception 'own flag';end if;
