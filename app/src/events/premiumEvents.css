@@ -138,8 +138,8 @@
 .slm-premium-events .slm-lineup-confirm-actions {margin:10px 0;gap:8px;}
 .slm-premium-events .slm-lineup-confirm-actions button {min-height:44px;padding:7px 8px;font-size:.8125rem;}
 .slm-premium-events .slm-match-info ion-button,.slm-premium-events .slm-events-controls ion-button {--padding-top:8px;--padding-bottom:8px;font-size:.875rem;min-height:44px;}
-.slm-premium-events .slm-join-dialog-backdrop {position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.7);box-sizing:border-box;}
-.slm-premium-events .slm-join-dialog {width:min(100%,420px);max-height:calc(100dvh - 32px);overflow:auto;padding:18px;border:1px solid var(--slm-gold);border-radius:14px;background:var(--slm-panel);color:var(--slm-text);box-shadow:0 12px 36px rgba(0,0,0,.5);}
+.slm-premium-events .slm-join-dialog-backdrop {position:fixed;inset:0;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.7);box-sizing:border-box;}
+.slm-premium-events .slm-join-dialog {width:min(100%,420px);max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch;padding:18px;border:1px solid var(--slm-gold);border-radius:14px;background:var(--slm-panel);color:var(--slm-text);box-shadow:0 12px 36px rgba(0,0,0,.5);}
 .slm-premium-events .slm-join-dialog h2 {margin:0 0 10px;font-size:1.1rem;}
 .slm-premium-events .slm-join-dialog p {margin:0 0 16px;line-height:1.45;font-size:.9rem;}
 .slm-premium-events .slm-join-dialog-actions {display:flex;gap:8px;flex-wrap:wrap;}

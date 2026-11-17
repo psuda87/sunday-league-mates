@@ -1178,3 +1178,8 @@ Wykonano minimum/default10 i własny telefon PL/+48/hasło, migracja43tylko w no
 ## 2026-11-03 21:01 Europe/Warsaw — finalna stabilizacja fix/slm2-minimum-phone
 
 Naprawy A–E oraz administratorzy składów/migracja44 wykonane. PASS395Vitest/71policy/Linux35+107/SQL52/HTTP27/Cypress6/JVM1/native5, TS/lint/strictEdge/buildy i rzeczywisty emulator. Premium55 niezmieniony w tej stabilizacji. Backend43 zachowany; nowa fixture44/55441 działa, bez migracji istniejących baz i Cloud. Następnie: sprawdzenie refów merge33→RC i32→main, zwykłe merge tylko poPASS, APK z finalnego main. POCO/hosted/Cloud/Storage/FCM NOTRUN. Szczegóły docs/SLM_2_0_RC.md; chronologia docs/ODPOWIEDZI_CODEX.txt.
+
+# Okno info meczu (przewijanie) i opis ocen pod „i” — 2026-11-17
+
+Gałąź `fix/lock-info-scroll-rating-hint` z main `c9e1985`. Okno „Informacje o meczu”: przewijanie wewnątrz okna (overscroll/touch-action), rozwinięte „Zarządzanie meczem” przewija się do widoku. Panel „Oceny”: przycisk „i” z krótkim opisem zasad. Kłódka widoczności meczu: przyczyny nie ustalono (brak powtórzenia, w logach Supabase brak treści żądań); przycisk jest klikalny tylko dla założyciela meczu — do potwierdzenia na telefonie.
+Kontrole: tsc PASS, eslint 0 błędów, Vitest src/rating 42/42; src/events 144/145 (1 test wymaga historii git, której płytki clone nie ma), vite build PASS. Strażniki verify:consolidation/test:premium-policy NIE uruchomione (wymagają commita a82397b); zmienione pliki mogą wymagać re-pina OWNER_SOURCE. Bez migracji, bez wdrożenia, w przeglądarce/na telefonie nie testowano.
