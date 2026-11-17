@@ -1,3 +1,12 @@
+# PWA — płynne przejście z systemowego ekranu Androida — 2026-11-17
+
+Gałąź `fix/pwa-seamless-splash`. Main/produkcja = `1efacfd` (PR #81, ekran w kolorach profilu — wdrożone). Problem: najpierw systemowy splash (ikona-kwadrat), potem „nowy” ekran.
+Zmiany: ikony `slm-pwa-*` z płaskim tłem `#0b0c10` (kolor `background_color`), więc na splashu Androida widać sam herb; nasz ekran startuje jako herb na `#0b0c10`
+(nakładka `:before` wygasza się w 0,8 s, herb rośnie z 0,8 bez zanikania, pasek wchodzi po 0,6 s). `apple-touch` bez zmian. Strażnicy: `OWNER_SOURCE` = `768604d`.
+Kontrole: Vitest 661/661, `verify:consolidation` PASS, `test:premium-policy` 107/107, `build:premium-web` PASS, `check-premium-web-cases` 2/1 jak na main. Niewdrożone.
+
+---
+
 # PWA — ekran startowy w kolorach profilu — 2026-11-17 (zgoda właściciela na wdrożenie)
 
 Gałąź `fix/pwa-splash-palettes`. `/boot-splash.js` (synchronicznie, przed pierwszym malowaniem) czyta `slm.palette` i `slm.appearance` jak `theme.ts`
