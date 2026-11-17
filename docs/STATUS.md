@@ -1,3 +1,13 @@
+# Odznaki — stan produkcji po scaleniu PR #74 — 2026-11-17
+
+Main `16b4c8d` (PR #74 scalony). Na Supabase `hjtcyybkxebvdropchac` zastosowano (poza tą sesją) migracje `badges` (`20261117063739`)
+i `badges_fix_auth_users_privilege` (`20261117065016`; `service_role` nie czyta `auth.users` — kontrola konta przez `slm_account_security`).
+Edge `accounts` wersja 31 = pliki z repo (11/11). Zweryfikowano: funkcje odznak bez odwołań do `auth.users`, dispatcher z `dialog_seen_at`,
+`enabled_from` = 2026-11-17 06:37:39 UTC, 0 odznak. Poprawkę dopisano do repo jako `20261117065016_badges_fix_auth_users_privilege.sql`
+(gałąź `fix/badges-auth-users-sync`, strażnicy PASS). Test SQL `badges.sql` uruchamiany jako `postgres` nie wykrył problemu uprawnień — do uzupełnienia.
+
+---
+
 # Odznaki — frontend z `feat/badges` na produkcji Vercel — 2026-11-17 (polecenie właściciela)
 
 Na prośbę właściciela (podgląd na telefonie; link preview nie jest na liście dozwolonych originów) produkcja Vercel
