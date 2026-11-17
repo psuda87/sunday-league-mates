@@ -1,3 +1,12 @@
+# Wydajność (lazy-cache) — przygotowanie do scalenia — 2026-11-17 (polecenie właściciela)
+
+Gałąź `perf/lazy-cache-merged-main` + PR #77. Strażnicy: `app/src/auth/sessionManager.ts` (współdzielenie równoczesnych `groups_list`/`groups_inbox`) i `app/vite.config.ts`
+(bez `plugin-legacy`) dopisane do `OWNER_FILES`, `OWNER_SOURCE` = `18d69d9`. Kontrole lokalne: Vitest 95 plików / 661 testów PASS, tsc PASS, lint 0 błędów,
+`typecheck:edge` PASS, `verify:consolidation` PASS, `test:premium-policy` 107/107, `build:premium-web` i `build` PASS.
+Próba na sucho `badges.sql` (jako `service_role`) na `hjtcyybkxebvdropchac`: **PASS**, wycofana; po niej 0 danych fixture, `enabled_from` i ograniczenie sezonu bez zmian.
+
+---
+
 # Zaległe kontrole po sesji online (odznaki, PR #76) — 2026-11-17 (lokalnie)
 
 Main `9f08f01`. Lokalnie (Windows, z dostępem do cdn.jsdelivr.net): `build:premium-web` PASS (zaległe z etapów 3–4), Vitest 94 pliki / 657 testów PASS, `tsc --noEmit` PASS.
