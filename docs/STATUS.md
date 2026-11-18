@@ -1,3 +1,11 @@
+# Powiadomienia — archiwum 7 dni i powrót do dzwonka — 2026-11-18
+
+Gałąź `feat/web-push`. Dzwonek jest tylko na liście meczów, więc stuknięcie powiadomienia z aplikacji w tle lądowało na ostatnim ekranie bez dzwonka. Teraz stuknięcie zamyka szczegóły/formularz, przełącza na zakładkę Mecze i otwiera dzwonek (zdarzenie `slm-open-bell` obsługują `DemoApp` i `PremiumEvents`).
+Archiwum: dzwonek pokazuje powiadomienia z ostatnich 7 dni (licznik też), starsze są w Profil → „Ustawienia aplikacji i konta” → „Archiwum powiadomień” (`NotificationArchive`, odczyt przez `notifications_list`, do 200 ostatnich rekordów; każdy widzi tylko swoje, bo serwer filtruje po sesji). Bez zmian w bazie.
+Kontrole: `tsc` czysto, `eslint` bez błędów (ostrzeżenia react-refresh), 359 testów, jedyny błąd `titoContracts` (płytki klon, tak samo na `main`). Nie testowane na urządzeniu w chwili wpisu.
+
+---
+
 # Powiadomienia push — treść w powiadomieniu i otwieranie dzwonka — 2026-11-18
 
 Gałąź `feat/web-push`. Test na telefonie: push dotarł, ale (1) rozwinięte powiadomienie pokazywało tylko ogólny tekst, (2) po stuknięciu dzwonek z licznikiem 1 mignął i zniknął.

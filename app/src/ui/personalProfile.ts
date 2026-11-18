@@ -9,7 +9,7 @@ export interface PersonalProfileData {
  display_as:'nickname'|'first_name'|'full_name';display_name:string;
 }
 export interface PersonalProfileBinding {
- payments?:ReactNode;
+ payments?:ReactNode;notifications?:ReactNode;
  phase:'loading'|'ready'|'missing'|'error';profile:PersonalProfileData|null;
  changeAlias?:(login:string,currentPassword:string)=>Promise<boolean>;
  changePhone?:(phone:string,currentPassword:string,share?:boolean)=>Promise<boolean>;

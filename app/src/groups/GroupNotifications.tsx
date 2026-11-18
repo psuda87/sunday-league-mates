@@ -16,6 +16,7 @@ import {requestOwnBadges} from '../badges/badgeContracts';
 import {BADGES} from '../badges/catalog';
 import PushSection from '../notifications/PushSection';
 import {usePushState} from '../notifications/usePushState';
+import {ARCHIVE_AFTER_MS} from '../notifications/NotificationArchive';
 import {NOTIFICATIONS_EVENT,OPEN_BELL_EVENT,takeBellRequest} from '../notifications/shared';
 import './GroupControls.css';
 
@@ -37,7 +38,7 @@ export default function GroupNotifications({manager,userId,onGroups,refreshKey,o
    if(manager.getSnapshot().phase!=='ready'||session?.user_id!==userId)return;
    try{
     const r=await manager.call<{notifications?:InboxItem[];unread?:number}>('notifications_list',{offset:0});
-    if(alive&&Array.isArray(r?.notifications)){setInbox(r.notifications.slice(0,10));setUnread(Number(r.unread)||0);}
+    if(alive&&Array.isArray(r?.notifications)){const recent=r.notifications.filter(n=>Date.parse(n.created_at)>=Date.now()-ARCHIVE_AFTER_MS);setInbox(recent.slice(0,10));setUnread(recent.filter(n=>!n.read_at).length);}
    }catch{/* Lista w dzwonku jest dodatkiem; błąd nie blokuje reszty. */}
   }
   void load();window.addEventListener(NOTIFICATIONS_EVENT,load);

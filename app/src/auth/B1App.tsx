@@ -14,6 +14,7 @@ import { b1Port } from './b1Port';
 import { useB1Lifecycle } from './useB1Lifecycle';
 import { installFocusVisibility } from '../native/focusVisibility';
 import { pushFor } from '../notifications/shared';
+import NotificationArchive from '../notifications/NotificationArchive';
 import { consumeEmailCallback,legalDocuments } from './emailCallback';
 import { AccountUiFailure,accountMessage } from '../account-ui/model';
 import { AccountError } from './api';
@@ -46,10 +47,11 @@ export default function B1App({manager:provided}:{manager?:SessionManager}){
  const pushUser=ready&&!forced?auth.session!.user_id:null;
  useEffect(()=>{if(!push)return;void push.start();return()=>{void push.stop();};},[push]);
  useEffect(()=>{if(!push)return;if(pushUser)void push.resume();else push.pause();},[push,pushUser]);
- const personalProfile=useOwnProfile(manager,owner,{
+ const ownProfile=useOwnProfile(manager,owner,{
   begin:()=>{if(ready&&!forced)setPicker({owner:auth.session!.user_id,done:false});},
   end:()=>setPicker(previous=>previous?{...previous,done:true}:null),
  });
+ const personalProfile=useMemo(()=>({...ownProfile,notifications:owner?<NotificationArchive manager={manager} userId={owner}/>:undefined}),[ownProfile,manager,owner]);
  useEffect(()=>{
   if(picker&&(auth.phase!=='checking'&&(auth.phase!=='ready'||forced||auth.session?.user_id!==picker.owner)||ready&&picker.done))setPicker(null);
  },[auth.phase,auth.session,forced,ready,picker]);

@@ -84,3 +84,5 @@
 .slm-inbox li time {font-size:.8rem;opacity:.65;}
 .slm-inbox-unread strong::before {content:'';display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:50%;background:var(--slm-gold);}
 .slm-inbox button {min-height:44px;padding:8px 14px;border:1px solid var(--slm-gold);border-radius:12px;background:transparent;color:var(--slm-gold);font:inherit;font-weight:700;}
+.slm-notification-archive {margin:12px 0;display:grid;gap:8px;}
+.slm-notification-archive button {min-height:44px;padding:8px 14px;border:1px solid var(--slm-gold);border-radius:12px;background:transparent;color:var(--slm-gold);font:inherit;font-weight:700;}

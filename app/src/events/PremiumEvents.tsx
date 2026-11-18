@@ -1,4 +1,5 @@
 import GroupNotifications from '../groups/GroupNotifications';
+import {OPEN_BELL_EVENT} from '../notifications/shared';
 import GuestForm from './GuestForm';
 import { visiblePremiumEvents } from './eventFilters';
 import PremiumScrollHeader from './PremiumScrollHeader';
@@ -50,6 +51,9 @@ function PremiumEventsScreen({data,userId,onGroups,manager,onOwnProfile}:{manage
     setDetailVisible?.(!!e?.id&&!editing&&!finance&&!selectedParticipant&&!data.revalidating);
     return ()=>setDetailVisible?.(false);
   },[setDetailVisible,data.revalidating,e?.id,editing,finance,selectedParticipant]);
+  const dataRef=useRef(data);dataRef.current=data;
+  // Stuknięcie powiadomienia zamyka szczegóły/formularz, bo dzwonek jest tylko na liście meczów.
+  useEffect(()=>{const leave=()=>{setEditing(false);setFinance(false);setSelectedParticipant(null);if(dataRef.current.detail||dataRef.current.creating)dataRef.current.back();};window.addEventListener(OPEN_BELL_EVENT,leave);return()=>window.removeEventListener(OPEN_BELL_EVENT,leave);},[]);
   useEffect(()=>{setReason('');setEditing(false);setConfirmJoin(false);setSelectedParticipant(null);},[e?.id]);
   const hasPlace=!!e&&full&&e.registered_count!<e.capacity!,closed=!e?.registration_open||e.status==='cancelled';
   useEffect(()=>{setUndoWithdraw(false);setConfirmWithdraw(null);setShowInfo(false);setConfirmPrivate(false);setLockMsg('');},[e?.id]);
