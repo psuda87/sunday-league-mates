@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { IonButton, IonSpinner, IonToggle } from '@ionic/react';
 import type { SessionManager } from '../auth/sessionManager';
-import type { NativePush } from '../notifications/nativePush';
+import type { PushController } from '../notifications/pushController';
 import { categories } from '../notifications/model';
 import type { Category, NotificationList } from '../notifications/model';
 import './Notifications.css';
 
 export default function Notifications({ manager, push, pushStatus, onOpen, onRefresh }: {
-  manager: SessionManager; push: NativePush; pushStatus: string; onOpen: (id: string) => Promise<void>; onRefresh: () => void;
+  manager: SessionManager; push: PushController; pushStatus: string; onOpen: (id: string) => Promise<void>; onRefresh: () => void;
 }) {
   const [list, setList] = useState<NotificationList | null>(null);
   const [offset, setOffset] = useState(0);

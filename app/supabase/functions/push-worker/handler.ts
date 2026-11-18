@@ -1,6 +1,8 @@
 import { accessToken, classify, message, tokenHash } from './fcm.ts';
 import type { Delivery, FirebaseAccount } from './fcm.ts';
-export interface WorkerEnvironment { url: string; service: string; workerSecret: string; firebaseAccount?: string }
+import { classifyWebPush, endpointAllowed, sendWebPush } from './webpush.ts';
+import type { VapidConfig } from './webpush.ts';
+export interface WorkerEnvironment { url: string; service: string; workerSecret: string; firebaseAccount?: string; vapid?: VapidConfig }
 export function createWorker(env: WorkerEnvironment, fetcher = fetch) {
   async function rpc<T>(name: string, body: Record<string, unknown> = {}): Promise<T> {
     const response = await fetcher(env.url + '/rest/v1/rpc/' + name, { method: 'POST',
@@ -20,11 +22,16 @@ export function createWorker(env: WorkerEnvironment, fetcher = fetch) {
     if (difference !== 0) return reply({ code: 'forbidden' }, 403);
     try {
       await rpc('slm_notifications_prepare');
-      if (!env.firebaseAccount) return reply({ status: 'fcm_unconfigured', claimed: 0 });
-      // Nie rezerwujemy zadań przy braku klucza / niedostępnym OAuth.
-      const account = JSON.parse(env.firebaseAccount) as FirebaseAccount;
-      const bearer = await accessToken(account, fetcher);
-      const jobs = await rpc<Delivery[]>('slm_push_claim', { p_limit: 12 });
+      // Każdy kanał jest niezależny: brak Firebase nie blokuje Web Push i odwrotnie. Nie rezerwujemy zadań bez konfiguracji.
+      const platforms: string[] = [];
+      let bearer = '', account: FirebaseAccount | null = null;
+      if (env.firebaseAccount) {
+        try { account = JSON.parse(env.firebaseAccount) as FirebaseAccount; bearer = await accessToken(account, fetcher); platforms.push('android', 'ios'); }
+        catch { account = null; /* Błędny klucz/OAuth nie zużywa prób wiadomości. */ }
+      }
+      if (env.vapid) platforms.push('web');
+      if (!platforms.length) return reply({ status: 'push_unconfigured', claimed: 0 });
+      const jobs = await rpc<Delivery[]>('slm_push_claim', { p_limit: 12, p_platforms: platforms });
       let sent = 0, failed = 0;
       async function send(job: Delivery) {
         const hash = await tokenHash(job.token);
@@ -33,10 +40,19 @@ export function createWorker(env: WorkerEnvironment, fetcher = fetch) {
           const valid = await rpc<boolean>('slm_push_check', { p_queue: job.queue_id, p_lease: job.lease_id, p_token_hash: hash });
           if (!valid) { result = 'cancelled'; code = 'not_eligible'; }
           else {
-            const response = await fetcher(`https://fcm.googleapis.com/v1/projects/${account.project_id}/messages:send`, {
-              method: 'POST', headers: { Authorization: 'Bearer ' + bearer, 'Content-Type': 'application/json' },
-              body: JSON.stringify(message(job)), signal: AbortSignal.timeout(10000) });
-            const outcome = classify(response.status, await response.json().catch(() => ({})));
+            let response: Response, outcome: { result: typeof result; code: string };
+            if (job.platform === 'web') {
+              // Adres subskrypcji pochodzi od klienta: łączymy się tylko ze znanymi usługami push.
+              if (!env.vapid || !endpointAllowed(job.token)) { result = 'dead'; code = 'endpoint_not_allowed'; throw new Error(code); }
+              response = await sendWebPush(job, env.vapid, fetcher);
+              outcome = classifyWebPush(response.status);
+            } else {
+              if (!account) throw new Error('fcm_unavailable');
+              response = await fetcher(`https://fcm.googleapis.com/v1/projects/${account.project_id}/messages:send`, {
+                method: 'POST', headers: { Authorization: 'Bearer ' + bearer, 'Content-Type': 'application/json' },
+                body: JSON.stringify(message(job)), signal: AbortSignal.timeout(10000) });
+              outcome = classify(response.status, await response.json().catch(() => ({})));
+            }
             result = outcome.result; code = outcome.code;
             const retry = response.headers.get('retry-after');
             if (retry) retryAfter = /^\d+$/.test(retry) ? Number(retry) : Math.max(0,Math.ceil((Date.parse(retry)-Date.now())/1000));

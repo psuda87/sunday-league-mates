@@ -1,7 +1,8 @@
 export interface FirebaseAccount { project_id: string; client_email: string; private_key: string }
 export interface Delivery {
   queue_id: string; lease_id: string; notification_id: string; event_id: string | null;
-  kind: string; platform: 'android' | 'ios'; token: string; expires_at: string;
+  kind: string; platform: 'android' | 'ios' | 'web'; token: string; expires_at: string;
+  p256dh?: string | null; auth?: string | null;
 }
 const encoder = new TextEncoder();
 const base64url = (data: Uint8Array) => btoa(String.fromCharCode(...data)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
