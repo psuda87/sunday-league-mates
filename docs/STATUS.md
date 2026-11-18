@@ -1,3 +1,11 @@
+# Powiadomienia push — treść w powiadomieniu i otwieranie dzwonka — 2026-11-18
+
+Gałąź `feat/web-push`. Test na telefonie: push dotarł, ale (1) rozwinięte powiadomienie pokazywało tylko ogólny tekst, (2) po stuknięciu dzwonek z licznikiem 1 mignął i zniknął.
+Poprawki: (1) Web Push niesie tytuł i treść (przycięte do 80/160 znaków) w ładunku szyfrowanym end-to-end do urządzenia; `slm_push_claim` zwraca je tylko dla platformy web (migracja `web_push_content`, zastosowana), FCM/APK nadal dostaje ogólny komunikat; `sw.js` pokazuje tytuł i treść, a przy ich braku tekst ogólny. (2) Prośba o otwarcie dzwonka jest zapamiętywana (`requestBellOpen`/`takeBellRequest`), więc stuknięcie przy zimnym starcie, zanim dzwonek się zamontuje, nie ginie.
+Worker `push-worker` wdrożony jako v2. Kontrole: `tsc`, `eslint`, testy grup/powiadomień/funkcji (221) bez błędów; nie testowane na urządzeniu w chwili wpisu.
+
+---
+
 # Powiadomienia push — lista w dzwonku Premium — 2026-11-18
 
 Gałąź `feat/web-push`. Test na telefonie Piotra: push dotarł na ekran blokady (worker: `sent`, FCM przyjął), ale po otwarciu aplikacji dzwonek Premium nic nie pokazywał — pokazywał tylko zaległe płatności, prośby do grup i odznaki, a skrzynka `slm_notifications` nie miała w nim widoku.

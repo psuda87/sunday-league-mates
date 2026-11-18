@@ -1,7 +1,7 @@
 // Web Push (RFC 8030) z szyfrowaniem aes128gcm (RFC 8291/8188) i uwierzytelnieniem VAPID (RFC 8292).
 // Tylko WebCrypto; bez zależności zewnętrznych. Klucz prywatny VAPID żyje wyłącznie w sekretach Edge.
 export interface VapidConfig { publicKey: string; privateKey: string; subject: string }
-export interface WebDelivery { notification_id: string; kind: string; token: string; p256dh?: string | null; auth?: string | null; expires_at: string }
+export interface WebDelivery { notification_id: string; kind: string; title?: string | null; body?: string | null; token: string; p256dh?: string | null; auth?: string | null; expires_at: string }
 export type WebResult = 'sent' | 'retry' | 'dead' | 'invalid_token';
 const encoder = new TextEncoder();
 export const encode64 = (data: Uint8Array) => btoa(String.fromCharCode(...data)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
@@ -68,7 +68,8 @@ export function classifyWebPush(status: number): { result: WebResult; code: stri
 }
 /** Ekran blokady: tylko identyfikator powiadomienia; treść jest stała po stronie service workera (bez nazw, miejsc i kwot). */
 export function payload(job: WebDelivery): Uint8Array {
-  return encoder.encode(JSON.stringify({ notification_id: job.notification_id, kind: job.kind }));
+  const clip = (value: unknown, max: number) => typeof value === 'string' ? Array.from(value).slice(0, max).join('') : undefined;
+  return encoder.encode(JSON.stringify({ notification_id: job.notification_id, kind: job.kind, title: clip(job.title, 80), body: clip(job.body, 160) }));
 }
 export async function sendWebPush(job: WebDelivery, vapid: VapidConfig, fetcher = fetch): Promise<Response> {
   if (!endpointAllowed(job.token) || !job.p256dh || !job.auth) throw new Error('web_push_endpoint_invalid');

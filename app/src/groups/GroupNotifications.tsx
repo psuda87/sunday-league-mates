@@ -16,7 +16,7 @@ import {requestOwnBadges} from '../badges/badgeContracts';
 import {BADGES} from '../badges/catalog';
 import PushSection from '../notifications/PushSection';
 import {usePushState} from '../notifications/usePushState';
-import {NOTIFICATIONS_EVENT,OPEN_BELL_EVENT} from '../notifications/shared';
+import {NOTIFICATIONS_EVENT,OPEN_BELL_EVENT,takeBellRequest} from '../notifications/shared';
 import './GroupControls.css';
 
 interface InboxItem{id:string;title:string;body:string;created_at:string;read_at:string|null}
@@ -44,7 +44,7 @@ export default function GroupNotifications({manager,userId,onGroups,refreshKey,o
   return()=>{alive=false;window.removeEventListener(NOTIFICATIONS_EVENT,load);};
  },[manager,userId,auth.session,auth.phase,open]);
  async function markAllRead(){try{await manager.call('notifications_read_all');}catch{/* Ponowna próba przy następnym otwarciu. */}window.dispatchEvent(new Event(NOTIFICATIONS_EVENT));}
- useEffect(()=>{const show=()=>setOpen(true);window.addEventListener(OPEN_BELL_EVENT,show);return()=>window.removeEventListener(OPEN_BELL_EVENT,show);},[]);
+ useEffect(()=>{const show=()=>{takeBellRequest();setOpen(true);};if(takeBellRequest())setOpen(true);window.addEventListener(OPEN_BELL_EVENT,show);return()=>window.removeEventListener(OPEN_BELL_EVENT,show);},[]);
 
  useEffect(()=>{
   let alive=true,epoch=0;
