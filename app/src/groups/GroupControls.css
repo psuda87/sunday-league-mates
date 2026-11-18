@@ -89,3 +89,9 @@
 .slm-notification-archive button {min-height:44px;padding:8px 14px;border:1px solid var(--slm-gold);border-radius:12px;background:transparent;color:var(--slm-gold);font:inherit;font-weight:700;}
 /* Przycisk „Zapisz nazwę”: pełny wygląd przycisku głównego (ramka, zaokrąglenie, wypełnienie, odstępy). */
 .slm-groups .slm-group-rename button {padding:8px 18px;border:1px solid var(--slm-premium-gold,var(--slm-gold));border-radius:12px;font-size:.9rem;font-weight:700;}
+.slm-app-banner {position:fixed;z-index:30;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom,0px) + 84px);display:grid;gap:10px;padding:14px;border:1px solid var(--slm-gold);border-radius:16px;background:var(--slm-panel,#1a1214);color:var(--ion-text-color);box-shadow:0 12px 28px -12px var(--slm-shadow,#000);}
+.slm-app-banner p {margin:4px 0 0;opacity:.85;font-size:.9rem;}
+.slm-app-banner-actions {display:flex;gap:8px;flex-wrap:wrap;}
+.slm-app-banner button {min-height:44px;padding:8px 16px;border:1px solid var(--slm-gold);border-radius:12px;background:transparent;color:var(--slm-gold);font:inherit;font-weight:700;}
+.slm-app-banner button.slm-payment-reminder-cta {background:var(--slm-gold);color:#1a1214;}
+@media(min-width:700px){.slm-app-banner{left:auto;max-width:420px;bottom:24px;}}

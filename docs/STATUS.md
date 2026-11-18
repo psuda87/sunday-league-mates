@@ -1,3 +1,11 @@
+# PWA — baner instalacji i baner zgody na powiadomienia — 2026-11-18
+
+Nowy `src/pwa/AppBanners.tsx` (montowany w `B1App`): jeden baner naraz. (1) „Zainstaluj aplikację” — na Androidzie/Chrome po zdarzeniu `beforeinstallprompt` (przechwytywanym od załadowania modułu, bo bywa wysyłane przed montażem Reacta) z przyciskiem „Zainstaluj”; na iPhonie w Safari instrukcja „Udostępnij → Dodaj do ekranu początkowego”; widoczny także przed zalogowaniem, ukrywany w trybie standalone. (2) Po zalogowaniu „Włącz powiadomienia” (przycisk wywołuje `push.enable()` bezpośrednio z kliknięcia), niepokazywany na iPhonie przed instalacją ani po odmowie w przeglądarce. „Później” zapamiętuje wybór w localStorage (instalacja 7 dni, powiadomienia 14 dni).
+Ograniczenie: przeglądarka sama decyduje, kiedy wysłać `beforeinstallprompt` (kryteria PWA, odstęp po odrzuceniu, aplikacja już zainstalowana), dlatego baner instalacji nie pojawia się zawsze — to wyjaśnia, czemu systemowy komunikat „zainstaluj” bywał nieregularny.
+Kontrole: `tsc` czysto, `eslint` bez błędów, 114 testów w src/pwa, auth, notifications (w tym 2 nowe). Nie sprawdzone na urządzeniu.
+
+---
+
 # Powiadomienia — przypomnienia o płatności — 2026-11-18
 
 Migracja `payment_reminders` (zastosowana w bazie) dodaje `slm_private.payment_reminders()`, wywoływaną z `slm_notifications_prepare` (worker co minutę). Dwa przypomnienia push, kategoria `finance`: (1) 24 h po zakończeniu meczu (okno 24–72 h, żeby stare zaległości nie wywołały lawiny) dla każdej zaległości z `group_dues`; (2) 24 h przed kolejnym meczem (od 30 min do 24 h przed startem), na który osoba jest zapisana (`registered`), jeśli ma jakąkolwiek zaległość. Idempotencja: klucz źródła `payreminder:post|pre:<mecz>:<użytkownik>`. Przypomnienie przed meczem było i pozostaje tylko dla zapisanych; wolne miejsce bez zmian (wszyscy rezerwowi naraz).

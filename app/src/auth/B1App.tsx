@@ -15,6 +15,7 @@ import { useB1Lifecycle } from './useB1Lifecycle';
 import { installFocusVisibility } from '../native/focusVisibility';
 import { pushFor } from '../notifications/shared';
 import NotificationArchive from '../notifications/NotificationArchive';
+import AppBanners from '../pwa/AppBanners';
 import { consumeEmailCallback,legalDocuments } from './emailCallback';
 import { AccountUiFailure,accountMessage } from '../account-ui/model';
 import { AccountError } from './api';
@@ -96,6 +97,7 @@ export default function B1App({manager:provided}:{manager?:SessionManager}){
  }
  useFrozenBack(()=>{if(!view)return false;if(ready&&!forced)setRequested(null);else if(view==='login'||forced)minimizeFrozenDemo();else navigate('login');return true;},()=>scope.current,15);
  return <>
+ <AppBanners manager={manager} signedIn={!!pushUser}/>
  {owner&&<div hidden={view!==null} className="slm-demo-world"><WorldApp key={owner} manager={manager} userId={owner} liveAuth personalProfile={personalProfile} groupsView={<PremiumGroups key={owner} manager={manager} userId={owner}/>} onAccount={next=>{if(next==='password')setRequested('password');}} onLogout={()=>{setRequested(null);void port.signOut();}}/></div>}
  {view&&<IonPage className="slm-demo slm-account-page"><IonContent ref={scope}><main className="slm-accounts"><div className="slm-account-shell"><header className="slm-account-brand"><span>SUNDAY LEAGUE MATES</span><img src="/assets/branding/slm-logo-primary-transparent.png" width="450" height="505" alt="Sunday League Mates"/></header>
  <AccountScreens key={view} view={view} port={port} onNavigate={navigate} loginOrPhone legal={legal} messageForError={liveAccountMessage}/>
