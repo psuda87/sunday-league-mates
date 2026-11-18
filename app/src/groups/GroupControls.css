@@ -72,3 +72,8 @@
 .slm-groups .slm-group-rename button {flex:none;min-height:44px;}
 .slm-groups .slm-group-rename button:disabled {opacity:.5;}
 .slm-groups .slm-group-rename small {color:var(--ion-color-danger,#c5000f);}
+.slm-push-section {margin:0 0 16px;padding-bottom:14px;border-bottom:1px solid var(--slm-border);}
+.slm-push-section p {margin:0 0 10px;line-height:1.4;}
+.slm-push-section button:not(.slm-payment-reminder-cta) {min-height:44px;padding:8px 14px;border:1px solid var(--slm-gold);border-radius:12px;background:transparent;color:var(--slm-gold);font:inherit;font-weight:700;}
+.slm-group-bell {position:relative;}
+.slm-group-dot {position:absolute;top:6px;right:6px;width:10px;height:10px;border-radius:50%;background:var(--slm-gold);box-shadow:0 0 0 2px var(--slm-panel,#181b1e);}

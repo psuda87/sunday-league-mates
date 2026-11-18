@@ -14,6 +14,9 @@ import {matchDate} from '../events/model';
 import {useOwnBadgeNotices} from '../badges/BadgesProvider';
 import {requestOwnBadges} from '../badges/badgeContracts';
 import {BADGES} from '../badges/catalog';
+import PushSection from '../notifications/PushSection';
+import {usePushState} from '../notifications/usePushState';
+import {OPEN_BELL_EVENT} from '../notifications/shared';
 import './GroupControls.css';
 
 // One bell for everyone: own outstanding match payments plus, for group admins, pending join requests.
@@ -24,6 +27,8 @@ export default function GroupNotifications({manager,userId,onGroups,refreshKey,o
  const [dues,setDues]=useState<OutstandingMatch[]>([]),[blocked,setBlocked]=useState(false);
  const bell=useRef<HTMLButtonElement>(null),panel=useRef<HTMLElement>(null);
  const [panelTop,setPanelTop]=useState(0);
+ const pushState=usePushState(manager);
+ useEffect(()=>{const show=()=>setOpen(true);window.addEventListener(OPEN_BELL_EVENT,show);return()=>window.removeEventListener(OPEN_BELL_EVENT,show);},[]);
 
  useEffect(()=>{
   let alive=true,epoch=0;
@@ -55,10 +60,12 @@ export default function GroupNotifications({manager,userId,onGroups,refreshKey,o
  const requests=groups.reduce((n,g)=>n+g.pending_count,0),total=requests+dues.length+badgeNotices.bell.length;
  const badgeLabel=badgeNotices.bell.length?`, nowe odznaki: ${badgeNotices.bell.length}`:'';
  const label=dues.length?`Powiadomienia: ${total}. Zaległe płatności: ${dues.length}${requests?`, prośby do grup: ${requests}`:''}${badgeLabel}`:`Oczekujące zgłoszenia do grup: ${requests}${badgeLabel}`;
+ const needsPush=pushState.supported&&!pushState.enabled&&!pushState.denied;
  const admin=groups.length>0||error;
  return <aside className="slm-group-notifications" aria-label="Powiadomienia">
-  <button ref={bell} type="button" className="slm-group-bell" aria-label={label} aria-expanded={open} onClick={()=>setOpen(!open)}><IonIcon icon={notificationsOutline} aria-hidden="true"/>{total>0&&<span className="slm-group-count">{total}</span>}</button>
+  <button ref={bell} type="button" className="slm-group-bell" aria-label={needsPush?label+'. Włącz powiadomienia na telefonie':label} aria-expanded={open} onClick={()=>setOpen(!open)}><IonIcon icon={notificationsOutline} aria-hidden="true"/>{total>0&&<span className="slm-group-count">{total}</span>}{total===0&&needsPush&&<span className="slm-group-dot" aria-hidden="true"/>}</button>
   {open&&createPortal(<section ref={panel} className="slm-group-notification-panel" style={{top:panelTop}} aria-label="Powiadomienia">
+   <PushSection manager={manager}/>
    {dues.length>0&&<div className="slm-payment-reminder"><h2>Zaległe płatności</h2><ul>{dues.map(d=><li key={`${d.group_id}:${d.event_id}`}><span><strong>{d.name??'Mecz'}</strong> · {d.group_name}</span><span>{matchDate(d.starts_at)} · do zapłaty {formatCents(d.outstanding_cents)}</span></li>)}</ul>
     <p className="slm-payment-reminder-warning" role="note">{blocked?'⚠ Zapisy na płatne mecze są zablokowane do czasu wpłaty.':dues.length===1?'Druga zaległość zablokuje zapisy na płatne mecze.':'⚠ Dwie zaległości mogą zablokować zapisy na płatne mecze.'}</p>
     {onPayments&&<button type="button" className="slm-payment-reminder-cta" onClick={()=>{setOpen(false);requestOwnPayments();onPayments();}}>Zgłoś wpłatę</button>}</div>}

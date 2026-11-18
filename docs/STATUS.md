@@ -1,3 +1,12 @@
+# Powiadomienia push — przycisk w interfejsie Premium — 2026-11-18
+
+Gałąź `feat/web-push`. Błąd: pierwszy wpis dodał przycisk „Włącz na tym urządzeniu” tylko do starego ekranu `pages/Notifications`, którego build Premium (`B1App`) nie używa, więc na telefonie nie było jak włączyć push (w bazie 0 urządzeń).
+Poprawka: `src/notifications/shared.ts` (jeden kontroler Web Push na SessionManager; w APK `null`), cykl życia w `B1App` (start/resume po zalogowaniu, odpięcie przy wylogowaniu),
+sekcja „Powiadomienia na telefonie” w dzwonku (`PushSection`) z przyciskiem wywoływanym kliknięciem (wymóg przeglądarek), kropka na dzwonku, gdy push nie jest włączony; kliknięcie powiadomienia otwiera dzwonek.
+Kontrole: Vitest 675/676 (jedyny błąd to `titoContracts` — brak starszych commitów w płytkim klonie, tak samo na `main`), `tsc` i `eslint` bez błędów. Na telefonie jeszcze niesprawdzone.
+
+---
+
 # Powiadomienia push w PWA (Web Push, bez Firebase) — 2026-11-18 (zgoda właściciela na wdrożenie)
 
 Gałąź `feat/web-push`. Audyt: wcześniej nic nie dochodziło — brak workera, brak crona, brak urządzeń, klient tylko natywny (Capacitor), brak service workera, a baza dopuszczała platformy tylko `android`/`ios`.
