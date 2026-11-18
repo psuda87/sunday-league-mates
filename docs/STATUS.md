@@ -1,6 +1,7 @@
 # UI — przycisk „Zapisz nazwę” i krawędź nagłówka z logo — 2026-11-18
 
 Gałąź `feat/web-push`. (1) „Zapisz nazwę” w ustawieniach grupy miał tylko kolor i tło głównego przycisku, bez ramki, zaokrąglenia i odstępów; dodano je w `GroupControls.css`. (2) Poświata nagłówka z logo (`.slm-compact-header::before`, środek ok. 88–92% szerokości) kończyła się ostrą krawędzią na prawym brzegu ekranu; maska CSS wygasza ją z prawej i od dołu. Tło nagłówka jest przezroczyste, więc nie trzeba go usuwać ani robić sticky.
+Po zrzucie z telefonu: po prawej widać ok. 45 px (≈15 px CSS) jaśniejszego pasa, w którym nagłówek się kończy — diagnoza: pasek przewijania zajmujący miejsce; dodano ukrycie pasków przewijania (`ion-content::part(scroll)`, html/body).
 Kontrola: tylko CSS, nie renderowane w sandboxie (build Premium wymaga cdn.jsdelivr.net); do potwierdzenia wzrokowo na telefonie.
 
 ---

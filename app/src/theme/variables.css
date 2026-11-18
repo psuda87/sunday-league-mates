@@ -4145,3 +4145,21 @@ button.slm-group-card {
   -webkit-mask-composite: source-in;
   mask-composite: intersect;
 }
+
+/* Pasek przewijania zajmował ok. 15 px po prawej (jasny pas na zrzucie), przez co nagłówek z logo kończył się przed krawędzią ekranu.
+   Treść nadal się przewija; pasek jest ukryty, a zawartość zajmuje całą szerokość. */
+ion-content::part(scroll) {
+  scrollbar-width: none;
+  scrollbar-gutter: auto;
+}
+ion-content::part(scroll)::-webkit-scrollbar {
+  display: none;
+}
+html,
+body {
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
