@@ -1,3 +1,10 @@
+# UI — przycisk „Zapisz nazwę” i krawędź nagłówka z logo — 2026-11-18
+
+Gałąź `feat/web-push`. (1) „Zapisz nazwę” w ustawieniach grupy miał tylko kolor i tło głównego przycisku, bez ramki, zaokrąglenia i odstępów; dodano je w `GroupControls.css`. (2) Poświata nagłówka z logo (`.slm-compact-header::before`, środek ok. 88–92% szerokości) kończyła się ostrą krawędzią na prawym brzegu ekranu; maska CSS wygasza ją z prawej i od dołu. Tło nagłówka jest przezroczyste, więc nie trzeba go usuwać ani robić sticky.
+Kontrola: tylko CSS, nie renderowane w sandboxie (build Premium wymaga cdn.jsdelivr.net); do potwierdzenia wzrokowo na telefonie.
+
+---
+
 # Powiadomienia — archiwum 7 dni i powrót do dzwonka — 2026-11-18
 
 Gałąź `feat/web-push`. Dzwonek jest tylko na liście meczów, więc stuknięcie powiadomienia z aplikacji w tle lądowało na ostatnim ekranie bez dzwonka. Teraz stuknięcie zamyka szczegóły/formularz, przełącza na zakładkę Mecze i otwiera dzwonek (zdarzenie `slm-open-bell` obsługują `DemoApp` i `PremiumEvents`).

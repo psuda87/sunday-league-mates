@@ -86,3 +86,5 @@
 .slm-inbox button {min-height:44px;padding:8px 14px;border:1px solid var(--slm-gold);border-radius:12px;background:transparent;color:var(--slm-gold);font:inherit;font-weight:700;}
 .slm-notification-archive {margin:12px 0;display:grid;gap:8px;}
 .slm-notification-archive button {min-height:44px;padding:8px 14px;border:1px solid var(--slm-gold);border-radius:12px;background:transparent;color:var(--slm-gold);font:inherit;font-weight:700;}
+/* Przycisk „Zapisz nazwę”: pełny wygląd przycisku głównego (ramka, zaokrąglenie, wypełnienie, odstępy). */
+.slm-groups .slm-group-rename button {padding:8px 18px;border:1px solid var(--slm-premium-gold,var(--slm-gold));border-radius:12px;font-size:.9rem;font-weight:700;}
