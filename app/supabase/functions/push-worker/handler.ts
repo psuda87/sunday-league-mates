@@ -2,8 +2,12 @@ import { accessToken, classify, message, tokenHash } from './fcm.ts';
 import type { Delivery, FirebaseAccount } from './fcm.ts';
 import { classifyWebPush, endpointAllowed, sendWebPush } from './webpush.ts';
 import type { VapidConfig } from './webpush.ts';
-export interface WorkerEnvironment { url: string; service: string; workerSecret: string; firebaseAccount?: string; vapid?: VapidConfig }
+export interface WorkerEnvironment { url: string; service: string; workerSecret: string; firebaseAccount?: string; vapid?: VapidConfig;
+  /** Gdy true, brakujące sekrety (klucze VAPID, sekret schedulera) są czytane z Supabase Vault przez slm_push_config (tylko service_role). */
+  vaultConfig?: boolean }
+interface VaultConfig { worker_secret?: string | null; vapid_public?: string | null; vapid_private?: string | null; vapid_subject?: string | null }
 export function createWorker(env: WorkerEnvironment, fetcher = fetch) {
+  let cached: { at: number; value: VaultConfig } | null = null;
   async function rpc<T>(name: string, body: Record<string, unknown> = {}): Promise<T> {
     const response = await fetcher(env.url + '/rest/v1/rpc/' + name, { method: 'POST',
       headers: { apikey: env.service, Authorization: 'Bearer ' + env.service, 'Content-Type': 'application/json' },
@@ -14,10 +18,21 @@ export function createWorker(env: WorkerEnvironment, fetcher = fetch) {
   return async (request: Request): Promise<Response> => {
     const reply = (data: unknown, status = 200) => Response.json(data, { status });
     if (request.method !== 'POST') return reply({ code: 'method_not_allowed' }, 405);
-    if (!env.workerSecret || !env.service || !env.url) return reply({ code: 'worker_unconfigured' }, 503);
+    if (!env.service || !env.url) return reply({ code: 'worker_unconfigured' }, 503);
+    let workerSecret = env.workerSecret, vapid = env.vapid;
+    if (env.vaultConfig && (!workerSecret || !vapid)) {
+      // Konfiguracja z Vault jest buforowana, aby nieuwierzytelnione żądania nie obciążały bazy.
+      if (!cached || Date.now() - cached.at > 60000) {
+        try { cached = { at: Date.now(), value: await rpc<VaultConfig>('slm_push_config') }; } catch { return reply({ code: 'worker_unconfigured' }, 503); }
+      }
+      const c = cached.value;
+      workerSecret = workerSecret || c.worker_secret || '';
+      if (!vapid && c.vapid_public && c.vapid_private) vapid = { publicKey: c.vapid_public, privateKey: c.vapid_private, subject: c.vapid_subject || 'https://slm-soccer.vercel.app' };
+    }
+    if (!workerSecret) return reply({ code: 'worker_unconfigured' }, 503);
     // Porównanie skrótów, nie sekretów; żadnych sekretów/tokenów w logach.
     const provided = request.headers.get('authorization')?.replace(/^Bearer /, '') ?? '';
-    const a = await tokenHash(provided), b = await tokenHash(env.workerSecret);
+    const a = await tokenHash(provided), b = await tokenHash(workerSecret);
     let difference = 0; for (let i = 0; i < a.length; i++) difference |= a.charCodeAt(i) ^ b.charCodeAt(i);
     if (difference !== 0) return reply({ code: 'forbidden' }, 403);
     try {
@@ -29,7 +44,7 @@ export function createWorker(env: WorkerEnvironment, fetcher = fetch) {
         try { account = JSON.parse(env.firebaseAccount) as FirebaseAccount; bearer = await accessToken(account, fetcher); platforms.push('android', 'ios'); }
         catch { account = null; /* Błędny klucz/OAuth nie zużywa prób wiadomości. */ }
       }
-      if (env.vapid) platforms.push('web');
+      if (vapid) platforms.push('web');
       if (!platforms.length) return reply({ status: 'push_unconfigured', claimed: 0 });
       const jobs = await rpc<Delivery[]>('slm_push_claim', { p_limit: 12, p_platforms: platforms });
       let sent = 0, failed = 0;
@@ -43,8 +58,8 @@ export function createWorker(env: WorkerEnvironment, fetcher = fetch) {
             let response: Response, outcome: { result: typeof result; code: string };
             if (job.platform === 'web') {
               // Adres subskrypcji pochodzi od klienta: łączymy się tylko ze znanymi usługami push.
-              if (!env.vapid || !endpointAllowed(job.token)) { result = 'dead'; code = 'endpoint_not_allowed'; throw new Error(code); }
-              response = await sendWebPush(job, env.vapid, fetcher);
+              if (!vapid || !endpointAllowed(job.token)) { result = 'dead'; code = 'endpoint_not_allowed'; throw new Error(code); }
+              response = await sendWebPush(job, vapid, fetcher);
               outcome = classifyWebPush(response.status);
             } else {
               if (!account) throw new Error('fcm_unavailable');

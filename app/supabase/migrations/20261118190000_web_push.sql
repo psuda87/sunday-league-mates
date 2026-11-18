@@ -116,3 +116,15 @@ begin
 end $$;
 revoke all on function public.slm_push_claim(integer,text[]) from public,anon,authenticated;
 grant execute on function public.slm_push_claim(integer,text[]) to service_role;
+
+-- Konfiguracja workera z Supabase Vault (klucze VAPID i sekret schedulera). Dostęp wyłącznie dla service_role.
+create function public.slm_push_config() returns jsonb
+language sql stable security definer set search_path='' as $$
+ select jsonb_build_object(
+  'worker_secret',(select decrypted_secret from vault.decrypted_secrets where name='slm_push_worker_secret' limit 1),
+  'vapid_public',(select decrypted_secret from vault.decrypted_secrets where name='slm_vapid_public' limit 1),
+  'vapid_private',(select decrypted_secret from vault.decrypted_secrets where name='slm_vapid_private' limit 1),
+  'vapid_subject',(select decrypted_secret from vault.decrypted_secrets where name='slm_vapid_subject' limit 1));
+$$;
+revoke all on function public.slm_push_config() from public,anon,authenticated;
+grant execute on function public.slm_push_config() to service_role;

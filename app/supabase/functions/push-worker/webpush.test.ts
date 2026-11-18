@@ -118,4 +118,18 @@ describe('worker z Web Push', () => {
     expect(evil.calls.find(c => c.name === 'slm_push_finish')!.body).toMatchObject({ p_result: 'dead', p_code: 'endpoint_not_allowed' });
     expect(evil.fetcher.mock.calls.some(c => String(c[0]).includes('169.254'))).toBe(false);
   });
+  it('czyta sekret i klucze VAPID z Vault, gdy nie ma ich w środowisku, i buforuje konfigurację', async () => {
+    const v = await vapidKeys(); let configCalls = 0;
+    const fetcher = vi.fn(async (url: string | URL | Request) => {
+      const u = String(url);
+      if (u.endsWith('/rpc/slm_push_config')) { configCalls++; return Response.json({ worker_secret: secret, vapid_public: v.publicKey, vapid_private: v.privateKey, vapid_subject: v.subject }); }
+      if (u.endsWith('/rpc/slm_push_claim')) return Response.json([]);
+      return Response.json(null);
+    });
+    const handler = createWorker({ url: 'https://db.example.invalid', service: 'synthetic-service', workerSecret: '', vaultConfig: true }, fetcher);
+    const call = (token: string) => handler(new Request('https://x.invalid', { method: 'POST', headers: { Authorization: 'Bearer ' + token } }));
+    const ok = await call(secret); expect(ok.status).toBe(200);
+    expect(JSON.parse(String(fetcher.mock.calls.find(c => String(c[0]).endsWith('/rpc/slm_push_claim'))![1]!.body))).toEqual({ p_limit: 12, p_platforms: ['web'] });
+    expect((await call('zly-sekret')).status).toBe(403); expect(configCalls).toBe(1);
+  });
 });
