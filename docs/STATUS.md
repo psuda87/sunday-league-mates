@@ -1,3 +1,21 @@
+# Powiadomienia push w PWA (Web Push, bez Firebase) — 2026-11-18 (zgoda właściciela na wdrożenie)
+
+Gałąź `feat/web-push`. Audyt: wcześniej nic nie dochodziło — brak workera, brak crona, brak urządzeń, klient tylko natywny (Capacitor), brak service workera, a baza dopuszczała platformy tylko `android`/`ios`.
+Zrobione: platforma `web` (Web Push/VAPID, RFC 8030/8291/8292, tylko WebCrypto — bez płatnych usług i limitów), klient `WebPush` (`src/notifications/webPush.ts`), `public/sw.js` (stały, ogólny tekst na ekranie blokady),
+worker rozbudowany o kanał web (adresy tylko z listy znanych usług push — ochrona SSRF, `redirect:'manual'`), `slm_push_claim(p_limit,p_platforms)` (brak Firebase nie blokuje Web Push),
+`slm_push_config()` (Vault, tylko `service_role`). FCM zostaje na później (APK).
+Wdrożone na `hjtcyybkxebvdropchac`: migracja `web_push` (20261118190000), rozszerzenia `pg_cron` i `pg_net`, sekrety Vault (`slm_push_worker_url/secret`, `slm_vapid_public/private/subject`),
+zadania cron `slm-notification-reminders` (co minutę) i `slm-push-dispatch` (co minutę, tylko gdy w kolejce są zadania do wysłania), Edge `push-worker` v1 i `accounts` v32 (tylko `RPC_FIELDS.notifications` + `p256dh`,`auth`).
+Podgląd: build `dpl_2GUj1tf39LLnwpqh1m7PrWvuzDH4` (commit `8162176`) pod `slm-soccer.vercel.app`; `slm-ui-demo.vercel.app` bez zmian.
+Kontrole: testy `push-worker` + `src/notifications` 18/18 (szyfrowanie sprawdzone niezależnie biblioteką http_ece, podpis VAPID zweryfikowany), `tsc` bez błędów, `eslint` bez błędów (9 ostrzeżeń jak na main),
+worker wywołany z Vault: 200 `{claimed:0}`; `accounts` v32 odpowiada 401 `session_invalid` bez tokenu; `/sw.js` na `slm-soccer` serwowany.
+Nie sprawdzono: dostarczenia na prawdziwym telefonie (potrzebna zgoda przeglądarki i konto) oraz iOS. W sandboxie `build:premium-web` nie działa (brak sieci do cdn.jsdelivr.net) — zbudował Vercel.
+`test:premium-policy` (84 błędy) i `verify:consolidation` oraz `titoContracts.test.tsx` padają w płytkim klonie (brak starszych commitów) — identycznie na `main`, nie przez tę zmianę.
+Otwarte: test na telefonie (Android Chrome → zainstalowana PWA → Powiadomienia → „Włącz na tym urządzeniu”); iPhone: najpierw „Dodaj do ekranu początkowego”, iOS 16.4+; cron przypomnień włączony po raz pierwszy.
+Następny krok: APK (FCM/Capacitor) i Google Play; merge do `main` wymaga osobnej zgody.
+
+---
+
 # PWA — formularz przy otwartej klawiaturze — 2026-11-17
 
 Gałąź `fix/pwa-keyboard-scroll`. Zgłoszenie: na „Nowym meczu” przy otwartej klawiaturze nie da się przewinąć do góry. Przyczyna: Chrome na Androidzie domyślnie

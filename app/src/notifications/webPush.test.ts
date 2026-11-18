@@ -10,7 +10,7 @@ function setup(permission: 'granted' | 'denied') {
   vi.stubGlobal('Notification', Object.assign(class {}, { permission: 'default', requestPermission: vi.fn(async () => permission) }));
   Object.defineProperty(navigator, 'serviceWorker', { configurable: true, value: { register: vi.fn(async () => registration), ready: Promise.resolve(registration),
     addEventListener: vi.fn(), removeEventListener: vi.fn(), getRegistration: vi.fn(async () => registration) } });
-  const call = vi.fn(async (..._args: unknown[]) => ({}));
+  const call = vi.fn<(...args: unknown[]) => Promise<object>>(async () => ({}));
   const manager = { call, getSnapshot: () => ({ phase: 'ready', session: { user_id: user, must_change_password: false } }) } as unknown as SessionManager;
   const report = vi.fn();
   return { push: new WebPush(manager, vi.fn(), vi.fn(), report), call, report, subscribe };
