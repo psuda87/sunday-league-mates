@@ -1,8 +1,9 @@
 /* Wyłącznie kontrolki B3; bez zmian wspólnych kart i nawigacji. */
 .slm-group-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
 .slm-group-toolbar .slm-groups-demo { margin:4px 0; }
-.slm-groups .slm-group-refresh { flex:0 0 44px; width:44px; height:44px; display:grid; place-items:center; padding:0; border:1px solid var(--slm-border); border-radius:12px; background:var(--slm-panel); color:var(--slm-gold); }
+.slm-groups .slm-group-refresh,.slm-compact-header .slm-group-refresh { flex:0 0 44px; width:44px; height:44px; display:grid; place-items:center; padding:0; border:1px solid var(--slm-border); border-radius:12px; background:var(--slm-panel); color:var(--slm-gold); }
 .slm-group-refresh ion-icon { font-size:22px; }
+.slm-compact-header .slm-group-refresh { position:relative; z-index:3; cursor:pointer; }
 .slm-group-refresh[aria-busy="true"] ion-icon { animation:slm-group-refresh-spin 1s linear infinite; }
 .slm-group-consent { display:flex; align-items:center; gap:12px; margin:16px 0; padding:12px; border:1px solid var(--slm-border); border-radius:12px; background:var(--slm-panel); }
 .slm-group-consent > div { flex:1; min-width:0; }
@@ -72,3 +73,19 @@
 .slm-groups .slm-group-rename button {flex:none;min-height:44px;}
 .slm-groups .slm-group-rename button:disabled {opacity:.5;}
 .slm-groups .slm-group-rename small {color:var(--ion-color-danger,#c5000f);}
+.slm-push-section {margin:0 0 16px;padding-bottom:14px;border-bottom:1px solid var(--slm-border);}
+.slm-push-section p {margin:0 0 10px;line-height:1.4;}
+.slm-push-section button:not(.slm-payment-reminder-cta) {min-height:44px;padding:8px 14px;border:1px solid var(--slm-gold);border-radius:12px;background:transparent;color:var(--slm-gold);font:inherit;font-weight:700;}
+.slm-group-bell {position:relative;}
+.slm-group-dot {position:absolute;top:6px;right:6px;width:10px;height:10px;border-radius:50%;background:var(--slm-gold);box-shadow:0 0 0 2px var(--slm-panel,#181b1e);}
+.slm-inbox {margin:0 0 16px;padding-bottom:14px;border-bottom:1px solid var(--slm-border);}
+.slm-inbox ul {list-style:none;margin:0 0 10px;padding:0;display:grid;gap:10px;}
+.slm-inbox li {display:grid;gap:2px;overflow-wrap:anywhere;}
+.slm-inbox li span {opacity:.85;}
+.slm-inbox li time {font-size:.8rem;opacity:.65;}
+.slm-inbox-unread strong::before {content:'';display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:50%;background:var(--slm-gold);}
+.slm-inbox button {min-height:44px;padding:8px 14px;border:1px solid var(--slm-gold);border-radius:12px;background:transparent;color:var(--slm-gold);font:inherit;font-weight:700;}
+.slm-notification-archive {margin:12px 0;display:grid;gap:8px;}
+.slm-notification-archive button {min-height:44px;padding:8px 14px;border:1px solid var(--slm-gold);border-radius:12px;background:transparent;color:var(--slm-gold);font:inherit;font-weight:700;}
+/* Przycisk „Zapisz nazwę”: pełny wygląd przycisku głównego (ramka, zaokrąglenie, wypełnienie, odstępy). */
+.slm-groups .slm-group-rename button {padding:8px 18px;border:1px solid var(--slm-premium-gold,var(--slm-gold));border-radius:12px;font-size:.9rem;font-weight:700;}

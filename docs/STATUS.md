@@ -1,3 +1,69 @@
+# UI — jeden przycisk odświeżania w Meczach i Grupach — 2026-11-18
+
+Gałąź `feat/web-push`. Mecze miały przezroczysty `IonButton` w nagłówku, Grupy ramkowany kwadrat 44 px w osobnym wierszu pod nagłówkiem. Oba używają teraz `GroupRefresh` (ramkowany kwadrat, złota ikona, obrót podczas ładowania) i stoją w tym samym miejscu: w nagłówku obok logo (Grupy: slot `action` w `MatchHeader`). Opisy: „Odśwież mecze” / „Odśwież grupy”.
+Kontrole: `tsc` czysto, `eslint` bez błędów, 220 testów (src/demo, events, groups), jedyny błąd `titoContracts` (płytki klon, tak samo na `main`). Nie renderowane w sandboxie; do potwierdzenia wzrokowo na telefonie.
+
+---
+
+# UI — przycisk „Zapisz nazwę” i krawędź nagłówka z logo — 2026-11-18
+
+Gałąź `feat/web-push`. (1) „Zapisz nazwę” w ustawieniach grupy miał tylko kolor i tło głównego przycisku, bez ramki, zaokrąglenia i odstępów; dodano je w `GroupControls.css`. (2) Poświata nagłówka z logo (`.slm-compact-header::before`, środek ok. 88–92% szerokości) kończyła się ostrą krawędzią na prawym brzegu ekranu; maska CSS wygasza ją z prawej i od dołu. Tło nagłówka jest przezroczyste, więc nie trzeba go usuwać ani robić sticky.
+Po zrzucie z telefonu: po prawej widać ok. 45 px (≈15 px CSS) jaśniejszego pasa, w którym nagłówek się kończy — diagnoza: pasek przewijania zajmujący miejsce; dodano ukrycie pasków przewijania (`ion-content::part(scroll)`, html/body).
+Kontrola: tylko CSS, nie renderowane w sandboxie (build Premium wymaga cdn.jsdelivr.net); do potwierdzenia wzrokowo na telefonie.
+
+---
+
+# Powiadomienia — archiwum 7 dni i powrót do dzwonka — 2026-11-18
+
+Gałąź `feat/web-push`. Dzwonek jest tylko na liście meczów, więc stuknięcie powiadomienia z aplikacji w tle lądowało na ostatnim ekranie bez dzwonka. Teraz stuknięcie zamyka szczegóły/formularz, przełącza na zakładkę Mecze i otwiera dzwonek (zdarzenie `slm-open-bell` obsługują `DemoApp` i `PremiumEvents`).
+Archiwum: dzwonek pokazuje powiadomienia z ostatnich 7 dni (licznik też), starsze są w Profil → „Ustawienia aplikacji i konta” → „Archiwum powiadomień” (`NotificationArchive`, odczyt przez `notifications_list`, do 200 ostatnich rekordów; każdy widzi tylko swoje, bo serwer filtruje po sesji). Bez zmian w bazie.
+Kontrole: `tsc` czysto, `eslint` bez błędów (ostrzeżenia react-refresh), 359 testów, jedyny błąd `titoContracts` (płytki klon, tak samo na `main`). Nie testowane na urządzeniu w chwili wpisu.
+
+---
+
+# Powiadomienia push — treść w powiadomieniu i otwieranie dzwonka — 2026-11-18
+
+Gałąź `feat/web-push`. Test na telefonie: push dotarł, ale (1) rozwinięte powiadomienie pokazywało tylko ogólny tekst, (2) po stuknięciu dzwonek z licznikiem 1 mignął i zniknął.
+Poprawki: (1) Web Push niesie tytuł i treść (przycięte do 80/160 znaków) w ładunku szyfrowanym end-to-end do urządzenia; `slm_push_claim` zwraca je tylko dla platformy web (migracja `web_push_content`, zastosowana), FCM/APK nadal dostaje ogólny komunikat; `sw.js` pokazuje tytuł i treść, a przy ich braku tekst ogólny. (2) Prośba o otwarcie dzwonka jest zapamiętywana (`requestBellOpen`/`takeBellRequest`), więc stuknięcie przy zimnym starcie, zanim dzwonek się zamontuje, nie ginie.
+Worker `push-worker` wdrożony jako v2. Kontrole: `tsc`, `eslint`, testy grup/powiadomień/funkcji (221) bez błędów; nie testowane na urządzeniu w chwili wpisu.
+
+---
+
+# Powiadomienia push — lista w dzwonku Premium — 2026-11-18
+
+Gałąź `feat/web-push`. Test na telefonie Piotra: push dotarł na ekran blokady (worker: `sent`, FCM przyjął), ale po otwarciu aplikacji dzwonek Premium nic nie pokazywał — pokazywał tylko zaległe płatności, prośby do grup i odznaki, a skrzynka `slm_notifications` nie miała w nim widoku.
+Poprawka: dzwonek czyta `notifications_list`, dolicza nieprzeczytane do licznika, wyświetla 10 ostatnich i ma „Oznacz jako przeczytane” (`notifications_read_all`); odświeża się przy otwarciu, po push przy otwartej aplikacji i po stuknięciu powiadomienia (które otwiera dzwonek).
+Kontrole: nowy test `inboxBell` PASS, testy grup/odznak/powiadomień/zdarzeń 148, jedyny błąd `titoContracts` (płytki klon, tak samo na `main`), `tsc` i `eslint` bez błędów.
+
+---
+
+# Powiadomienia push — przycisk w interfejsie Premium — 2026-11-18
+
+Gałąź `feat/web-push`. Błąd: pierwszy wpis dodał przycisk „Włącz na tym urządzeniu” tylko do starego ekranu `pages/Notifications`, którego build Premium (`B1App`) nie używa, więc na telefonie nie było jak włączyć push (w bazie 0 urządzeń).
+Poprawka: `src/notifications/shared.ts` (jeden kontroler Web Push na SessionManager; w APK `null`), cykl życia w `B1App` (start/resume po zalogowaniu, odpięcie przy wylogowaniu),
+sekcja „Powiadomienia na telefonie” w dzwonku (`PushSection`) z przyciskiem wywoływanym kliknięciem (wymóg przeglądarek), kropka na dzwonku, gdy push nie jest włączony; kliknięcie powiadomienia otwiera dzwonek.
+Kontrole: Vitest 675/676 (jedyny błąd to `titoContracts` — brak starszych commitów w płytkim klonie, tak samo na `main`), `tsc` i `eslint` bez błędów. Na telefonie jeszcze niesprawdzone.
+
+---
+
+# Powiadomienia push w PWA (Web Push, bez Firebase) — 2026-11-18 (zgoda właściciela na wdrożenie)
+
+Gałąź `feat/web-push`. Audyt: wcześniej nic nie dochodziło — brak workera, brak crona, brak urządzeń, klient tylko natywny (Capacitor), brak service workera, a baza dopuszczała platformy tylko `android`/`ios`.
+Zrobione: platforma `web` (Web Push/VAPID, RFC 8030/8291/8292, tylko WebCrypto — bez płatnych usług i limitów), klient `WebPush` (`src/notifications/webPush.ts`), `public/sw.js` (stały, ogólny tekst na ekranie blokady),
+worker rozbudowany o kanał web (adresy tylko z listy znanych usług push — ochrona SSRF, `redirect:'manual'`), `slm_push_claim(p_limit,p_platforms)` (brak Firebase nie blokuje Web Push),
+`slm_push_config()` (Vault, tylko `service_role`). FCM zostaje na później (APK).
+Wdrożone na `hjtcyybkxebvdropchac`: migracja `web_push` (20261118190000), rozszerzenia `pg_cron` i `pg_net`, sekrety Vault (`slm_push_worker_url/secret`, `slm_vapid_public/private/subject`),
+zadania cron `slm-notification-reminders` (co minutę) i `slm-push-dispatch` (co minutę, tylko gdy w kolejce są zadania do wysłania), Edge `push-worker` v1 i `accounts` v32 (tylko `RPC_FIELDS.notifications` + `p256dh`,`auth`).
+Podgląd: build `dpl_2GUj1tf39LLnwpqh1m7PrWvuzDH4` (commit `8162176`) pod `slm-soccer.vercel.app`; `slm-ui-demo.vercel.app` bez zmian.
+Kontrole: testy `push-worker` + `src/notifications` 18/18 (szyfrowanie sprawdzone niezależnie biblioteką http_ece, podpis VAPID zweryfikowany), `tsc` bez błędów, `eslint` bez błędów (9 ostrzeżeń jak na main),
+worker wywołany z Vault: 200 `{claimed:0}`; `accounts` v32 odpowiada 401 `session_invalid` bez tokenu; `/sw.js` na `slm-soccer` serwowany.
+Nie sprawdzono: dostarczenia na prawdziwym telefonie (potrzebna zgoda przeglądarki i konto) oraz iOS. W sandboxie `build:premium-web` nie działa (brak sieci do cdn.jsdelivr.net) — zbudował Vercel.
+`test:premium-policy` (84 błędy) i `verify:consolidation` oraz `titoContracts.test.tsx` padają w płytkim klonie (brak starszych commitów) — identycznie na `main`, nie przez tę zmianę.
+Otwarte: test na telefonie (Android Chrome → zainstalowana PWA → Powiadomienia → „Włącz na tym urządzeniu”); iPhone: najpierw „Dodaj do ekranu początkowego”, iOS 16.4+; cron przypomnień włączony po raz pierwszy.
+Następny krok: APK (FCM/Capacitor) i Google Play; merge do `main` wymaga osobnej zgody.
+
+---
+
 # PWA — formularz przy otwartej klawiaturze — 2026-11-17
 
 Gałąź `fix/pwa-keyboard-scroll`. Zgłoszenie: na „Nowym meczu” przy otwartej klawiaturze nie da się przewinąć do góry. Przyczyna: Chrome na Androidzie domyślnie

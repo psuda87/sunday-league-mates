@@ -7,6 +7,7 @@ import { canCreateEvents, canEditEvent, canViewEventProfile, eventAccess } from 
 import { EventPrivacy, EventLabel, LockedEvent, OwnEvent } from './EventAccessView';
 import { groupCanOrganize } from './groups';
 import { useEffect, useReducer, useRef, useState } from 'react';
+import { OPEN_BELL_EVENT } from '../notifications/shared';
 import { IonButton, IonContent, IonFooter, IonPage } from '@ionic/react';
 import MatchHeader from '../ui/MatchHeader';
 import MatchHero from '../ui/MatchHero';
@@ -67,6 +68,8 @@ export default function DemoApp({initialPlayer,initialTab,onAccount,onLogout,liv
     try {const scroll=await content.current?.getScrollElement();setFrames(previous=>[...previous,{key:++sequence.current,kind,id,groupId,gameId,y:scroll?.scrollTop??0,focus:focused}]);await content.current?.scrollToTop(0);} finally {opening.current=false;}
   }
   function pop(){const frame=latestFrames.current.at(-1);if(!frame)return;setFrames(previous=>previous.slice(0,-1));requestAnimationFrame(()=>{frame.focus?.focus({preventScroll:true});void content.current?.scrollToPoint(0,frame.y,0);});}
+  // Stuknięcie powiadomienia: wróć na ekran z dzwonkiem (Mecze), niezależnie od tego, gdzie aplikacja była w tle.
+  useEffect(()=>{const toBell=()=>{setFrames([]);setForm(null);setTab('events');goHome();};window.addEventListener(OPEN_BELL_EVENT,toBell);return()=>window.removeEventListener(OPEN_BELL_EVENT,toBell);},[]);
   useEffect(()=>{const listener=()=>{setFrames([]);setForm(!realEvents&&window.location.hash==='#match-create'?'create':null);setTab(window.location.hash.startsWith('#group')?'groups':'events');setDetail(window.location.hash.startsWith('#details'));void content.current?.scrollToTop(0);};window.addEventListener('hashchange',listener);return()=>window.removeEventListener('hashchange',listener);},[realEvents]);
   const visible=world.games.filter(game=>filter==='history'?game.status!=='upcoming':game.status==='upcoming'&&(filter!=='mine'||game.entries.some(e=>e.playerId===world.userId&&e.status!=='withdrawn'))).sort((a,b)=>filter==='history'?b.startsAt.localeCompare(a.startsAt):a.startsAt.localeCompare(b.startsAt));
   function gameScreen(game:Game,onBack:()=>void,backLabel='Wróć do meczów'){

@@ -4134,3 +4134,32 @@ button.slm-group-card {
   .slm-matches-screen .slm-match-filters button { min-height: 40px; padding: 8px 12px; font-size: .76rem; }
 }
 
+
+/* Nagłówek z logo: poświata (::before) była ucinana na prawej krawędzi ekranu i tworzyła widoczną krawędź.
+   Maska wygasza ją poziomo i od dołu, więc tło nagłówka zlewa się z tłem ekranu po obu stronach. */
+.slm-compact-header::before {
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 14%, #000 80%, transparent 100%),
+    linear-gradient(to bottom, #000 0, #000 65%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 14%, #000 80%, transparent 100%),
+    linear-gradient(to bottom, #000 0, #000 65%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+/* Pasek przewijania zajmował ok. 15 px po prawej (jasny pas na zrzucie), przez co nagłówek z logo kończył się przed krawędzią ekranu.
+   Treść nadal się przewija; pasek jest ukryty, a zawartość zajmuje całą szerokość. */
+ion-content::part(scroll) {
+  scrollbar-width: none;
+  scrollbar-gutter: auto;
+}
+ion-content::part(scroll)::-webkit-scrollbar {
+  display: none;
+}
+html,
+body {
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}

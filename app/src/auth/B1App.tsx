@@ -13,6 +13,8 @@ import { useOwnProfile } from './useOwnProfile';
 import { b1Port } from './b1Port';
 import { useB1Lifecycle } from './useB1Lifecycle';
 import { installFocusVisibility } from '../native/focusVisibility';
+import { pushFor } from '../notifications/shared';
+import NotificationArchive from '../notifications/NotificationArchive';
 import { consumeEmailCallback,legalDocuments } from './emailCallback';
 import { AccountUiFailure,accountMessage } from '../account-ui/model';
 import { AccountError } from './api';
@@ -40,10 +42,16 @@ export default function B1App({manager:provided}:{manager?:SessionManager}){
  else if(auth.phase!=='checking'||loggingOut.current)continuation.current=null;
  const owner=loggingOut.current||emailGate?null:ready&&!forced?auth.session!.user_id:auth.phase==='checking'?continuation.current:null;
  useEffect(()=>installFocusVisibility(),[]);
- const personalProfile=useOwnProfile(manager,owner,{
+ // Web Push (PWA): cykl życia po zalogowaniu; prośbę o zgodę pokazuje dopiero przycisk w dzwonku (wymaga kliknięcia).
+ const push=useMemo(()=>pushFor(manager),[manager]);
+ const pushUser=ready&&!forced?auth.session!.user_id:null;
+ useEffect(()=>{if(!push)return;void push.start();return()=>{void push.stop();};},[push]);
+ useEffect(()=>{if(!push)return;if(pushUser)void push.resume();else push.pause();},[push,pushUser]);
+ const ownProfile=useOwnProfile(manager,owner,{
   begin:()=>{if(ready&&!forced)setPicker({owner:auth.session!.user_id,done:false});},
   end:()=>setPicker(previous=>previous?{...previous,done:true}:null),
  });
+ const personalProfile=useMemo(()=>({...ownProfile,notifications:owner?<NotificationArchive manager={manager} userId={owner}/>:undefined}),[ownProfile,manager,owner]);
  useEffect(()=>{
   if(picker&&(auth.phase!=='checking'&&(auth.phase!=='ready'||forced||auth.session?.user_id!==picker.owner)||ready&&picker.done))setPicker(null);
  },[auth.phase,auth.session,forced,ready,picker]);
@@ -68,7 +76,7 @@ export default function B1App({manager:provided}:{manager?:SessionManager}){
   return()=>{alive=false;};
  },[manager,callback,base]);
  const port:AccountUiPort={...base,
-  async signOut(){loggingOut.current=true;continuation.current=null;setPicker(null);try{await base.signOut();}finally{loggingOut.current=false;}},
+  async signOut(){loggingOut.current=true;continuation.current=null;setPicker(null);try{await push?.beforeLogout();await base.signOut();}finally{loggingOut.current=false;}},
   async signIn(identifier,password){base.discardProof();setPending('login');try{await base.signIn(identifier,password);setRequested(null);}finally{setPending(null);}},
   async signUp(profile,email,password){await base.signUp(profile,email,password);setRequested('verify');},
   async updatePassword(password,current){setPending(current?'password':'reset');try{await base.updatePassword(password,current);setRequested(current?null:'password-saved');}finally{setPending(null);}},

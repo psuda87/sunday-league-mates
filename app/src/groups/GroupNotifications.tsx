@@ -14,8 +14,13 @@ import {matchDate} from '../events/model';
 import {useOwnBadgeNotices} from '../badges/BadgesProvider';
 import {requestOwnBadges} from '../badges/badgeContracts';
 import {BADGES} from '../badges/catalog';
+import PushSection from '../notifications/PushSection';
+import {usePushState} from '../notifications/usePushState';
+import {ARCHIVE_AFTER_MS} from '../notifications/NotificationArchive';
+import {NOTIFICATIONS_EVENT,OPEN_BELL_EVENT,takeBellRequest} from '../notifications/shared';
 import './GroupControls.css';
 
+interface InboxItem{id:string;title:string;body:string;created_at:string;read_at:string|null}
 // One bell for everyone: own outstanding match payments plus, for group admins, pending join requests.
 export default function GroupNotifications({manager,userId,onGroups,refreshKey,onPayments,onBadges}:{manager:SessionManager;userId:string;onGroups:()=>void;refreshKey:boolean;onPayments?:()=>void;onBadges?:()=>void}){
  const badgeNotices=useOwnBadgeNotices();
@@ -24,6 +29,23 @@ export default function GroupNotifications({manager,userId,onGroups,refreshKey,o
  const [dues,setDues]=useState<OutstandingMatch[]>([]),[blocked,setBlocked]=useState(false);
  const bell=useRef<HTMLButtonElement>(null),panel=useRef<HTMLElement>(null);
  const [panelTop,setPanelTop]=useState(0);
+ const pushState=usePushState(manager);
+ const [inbox,setInbox]=useState<InboxItem[]>([]),[unread,setUnread]=useState(0);
+ useEffect(()=>{
+  let alive=true;
+  async function load(){
+   const session=manager.getSnapshot().session;
+   if(manager.getSnapshot().phase!=='ready'||session?.user_id!==userId)return;
+   try{
+    const r=await manager.call<{notifications?:InboxItem[];unread?:number}>('notifications_list',{offset:0});
+    if(alive&&Array.isArray(r?.notifications)){const recent=r.notifications.filter(n=>Date.parse(n.created_at)>=Date.now()-ARCHIVE_AFTER_MS);setInbox(recent.slice(0,10));setUnread(recent.filter(n=>!n.read_at).length);}
+   }catch{/* Lista w dzwonku jest dodatkiem; błąd nie blokuje reszty. */}
+  }
+  void load();window.addEventListener(NOTIFICATIONS_EVENT,load);
+  return()=>{alive=false;window.removeEventListener(NOTIFICATIONS_EVENT,load);};
+ },[manager,userId,auth.session,auth.phase,open]);
+ async function markAllRead(){try{await manager.call('notifications_read_all');}catch{/* Ponowna próba przy następnym otwarciu. */}window.dispatchEvent(new Event(NOTIFICATIONS_EVENT));}
+ useEffect(()=>{const show=()=>{takeBellRequest();setOpen(true);};if(takeBellRequest())setOpen(true);window.addEventListener(OPEN_BELL_EVENT,show);return()=>window.removeEventListener(OPEN_BELL_EVENT,show);},[]);
 
  useEffect(()=>{
   let alive=true,epoch=0;
@@ -52,13 +74,17 @@ export default function GroupNotifications({manager,userId,onGroups,refreshKey,o
   document.addEventListener('pointerdown',outside);document.addEventListener('keydown',escape);
   return()=>{window.removeEventListener('resize',position);window.removeEventListener('scroll',position,true);document.removeEventListener('pointerdown',outside);document.removeEventListener('keydown',escape);};
  },[open]);
- const requests=groups.reduce((n,g)=>n+g.pending_count,0),total=requests+dues.length+badgeNotices.bell.length;
+ const requests=groups.reduce((n,g)=>n+g.pending_count,0),total=requests+dues.length+badgeNotices.bell.length+unread;
  const badgeLabel=badgeNotices.bell.length?`, nowe odznaki: ${badgeNotices.bell.length}`:'';
  const label=dues.length?`Powiadomienia: ${total}. Zaległe płatności: ${dues.length}${requests?`, prośby do grup: ${requests}`:''}${badgeLabel}`:`Oczekujące zgłoszenia do grup: ${requests}${badgeLabel}`;
+ const needsPush=pushState.supported&&!pushState.enabled&&!pushState.denied;
  const admin=groups.length>0||error;
  return <aside className="slm-group-notifications" aria-label="Powiadomienia">
-  <button ref={bell} type="button" className="slm-group-bell" aria-label={label} aria-expanded={open} onClick={()=>setOpen(!open)}><IonIcon icon={notificationsOutline} aria-hidden="true"/>{total>0&&<span className="slm-group-count">{total}</span>}</button>
+  <button ref={bell} type="button" className="slm-group-bell" aria-label={(unread?label+'. Nowe powiadomienia: '+unread:label)+(needsPush?'. Włącz powiadomienia na telefonie':'')} aria-expanded={open} onClick={()=>setOpen(!open)}><IonIcon icon={notificationsOutline} aria-hidden="true"/>{total>0&&<span className="slm-group-count">{total}</span>}{total===0&&needsPush&&<span className="slm-group-dot" aria-hidden="true"/>}</button>
   {open&&createPortal(<section ref={panel} className="slm-group-notification-panel" style={{top:panelTop}} aria-label="Powiadomienia">
+   <PushSection manager={manager}/>
+   {inbox.length>0&&<div className="slm-inbox"><h2>Ostatnie powiadomienia</h2><ul>{inbox.map(n=><li key={n.id} className={n.read_at?undefined:'slm-inbox-unread'}><strong>{n.title}</strong><span>{n.body}</span><time dateTime={n.created_at}>{new Date(n.created_at).toLocaleString('pl-PL',{dateStyle:'short',timeStyle:'short'})}</time></li>)}</ul>
+    {unread>0&&<button type="button" onClick={()=>void markAllRead()}>Oznacz jako przeczytane</button>}</div>}
    {dues.length>0&&<div className="slm-payment-reminder"><h2>Zaległe płatności</h2><ul>{dues.map(d=><li key={`${d.group_id}:${d.event_id}`}><span><strong>{d.name??'Mecz'}</strong> · {d.group_name}</span><span>{matchDate(d.starts_at)} · do zapłaty {formatCents(d.outstanding_cents)}</span></li>)}</ul>
     <p className="slm-payment-reminder-warning" role="note">{blocked?'⚠ Zapisy na płatne mecze są zablokowane do czasu wpłaty.':dues.length===1?'Druga zaległość zablokuje zapisy na płatne mecze.':'⚠ Dwie zaległości mogą zablokować zapisy na płatne mecze.'}</p>
     {onPayments&&<button type="button" className="slm-payment-reminder-cta" onClick={()=>{setOpen(false);requestOwnPayments();onPayments();}}>Zgłoś wpłatę</button>}</div>}

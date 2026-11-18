@@ -15,6 +15,8 @@ import { tokenStore } from '../auth/tokenStore';
 import './Accounts.css';
 import { AppearanceSettings, Events, GroupFinance, LiveGroups, LiveMatches, Notifications, Players, Settlements } from './lazyScreens';
 import { NativePush } from '../notifications/nativePush';
+import { WebPush } from '../notifications/webPush';
+import type { PushController } from '../notifications/pushController';
 import type { NotificationItem } from '../notifications/model';
 
 export default function Accounts() {
@@ -29,7 +31,8 @@ export default function Accounts() {
   const [unread, setUnread] = useState<number | null>(null);
   const [notificationVersion, setNotificationVersion] = useState(0);
   const [pushStatus, setPushStatus] = useState('Systemowy push jest opcjonalny.');
-  const [push] = useState(() => new NativePush(manager,setPendingNotification,
+  // Aplikacja natywna (APK) używa FCM; przeglądarka i PWA używają Web Push (VAPID).
+  const [push] = useState<PushController>(() => new (Capacitor.isNativePlatform() ? NativePush : WebPush)(manager,setPendingNotification,
     () => setNotificationVersion(v => v+1),setPushStatus));
   const busyFlight=useRef(false);
   const [busy, setBusy] = useState(false);

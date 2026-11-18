@@ -51,7 +51,7 @@ export async function secretEquals(given: string, expected: string): Promise<boo
 // rozliczenia porównują zapisane ciało żądania przy ponowieniu (idempotencja).
 export const RPC_FIELDS = {
   settlements: ['action','absent','amount_cents','event_id','expected_amount_cents','expected_version','offset','participant_id','payable','payment_id','reason','replacement_id','request_id','user_id'],
-  notifications: ['action','binding_id','binding_version','category','device_id','device_secret','notification_id','offset','platform','push_enabled','token'],
+  notifications: ['action','auth','binding_id','binding_version','category','device_id','device_secret','notification_id','offset','p256dh','platform','push_enabled','token'],
   events: ['action','absent','capacity','date','duration_minutes','event_id','guest_name','guest_phone','hourly_rate','list','location','offset','participant_id','reason','request_id','time','total_cost','user_id'],
 } as const;
 export function pickFields(body: Row, fields: readonly string[]): Row {
