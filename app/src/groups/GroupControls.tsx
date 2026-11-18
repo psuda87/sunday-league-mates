@@ -13,9 +13,9 @@ export function GroupConsent({checked,busy,onChange,mode='nickname',first=false}
  </div>;
 }
 
-export function GroupRefresh({loading,disabled,onRefresh}:{loading:boolean;disabled:boolean;onRefresh:()=>Promise<void>}) {
- return <button className="slm-group-refresh" type="button" aria-label="Odśwież grupy" aria-busy={loading} disabled={loading||disabled} onClick={()=>void onRefresh()}>
+export function GroupRefresh({loading,disabled,onRefresh,label='Odśwież grupy',busyText='Odświeżanie grup…'}:{loading:boolean;disabled:boolean;onRefresh:()=>Promise<void>;label?:string;busyText?:string}) {
+ return <button className="slm-group-refresh" type="button" aria-label={label} aria-busy={loading} disabled={loading||disabled} onClick={()=>void onRefresh()}>
   <IonIcon icon={refreshOutline} aria-hidden="true"/>
-  <span className="slm-sr-only" role="status">{loading?'Odświeżanie grup…':''}</span>
+  <span className="slm-sr-only" role="status">{loading?busyText:''}</span>
  </button>;
 }

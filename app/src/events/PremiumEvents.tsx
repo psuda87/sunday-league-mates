@@ -1,4 +1,5 @@
 import GroupNotifications from '../groups/GroupNotifications';
+import {GroupRefresh} from '../groups/GroupControls';
 import {OPEN_BELL_EVENT} from '../notifications/shared';
 import GuestForm from './GuestForm';
 import { visiblePremiumEvents } from './eventFilters';
@@ -8,7 +9,7 @@ import PremiumGroupFinance from '../finance/PremiumGroupFinance';
 import type { SessionManager } from '../auth/sessionManager';
 import { useEffect,useRef,useState } from 'react';
 import { IonButton,IonIcon } from '@ionic/react';
-import { lockClosedOutline,lockOpenOutline,refreshOutline } from 'ionicons/icons';
+import { lockClosedOutline,lockOpenOutline } from 'ionicons/icons';
 import MatchHero from '../ui/MatchHero';
 import MatchFilters from '../ui/MatchFilters';
 import type { MatchFilter } from '../ui/MatchFilters';
@@ -64,7 +65,7 @@ function PremiumEventsScreen({data,userId,onGroups,manager,onOwnProfile}:{manage
   const lockToggle=(m:EventSummary)=>(m.created_by===userId||e?.can_manage===true)&&m.can_edit&&m.registration_open&&m.status!=='cancelled'
    ?<button type="button" className="slm-event-privacy slm-event-privacy-toggle" disabled={data.busy||data.loading} aria-label={`Widoczność meczu: ${m.visibility==='public'?'publiczny':'prywatny'}. Zmień na ${m.visibility==='public'?'prywatny':'publiczny'}`} onClick={()=>m.visibility==='public'?setConfirmPrivate(true):setVisibility('public')}><IonIcon icon={m.visibility==='public'?lockOpenOutline:lockClosedOutline} aria-hidden="true"/>{m.visibility==='public'?'Publiczne':'Prywatne'}</button>
    :badge(m);
-  const refresh=<IonButton fill="clear" aria-label="Odśwież mecze" aria-busy={data.loading} disabled={writeDisabled} onClick={()=>{void (e?data.open(e.id):data.refresh(data.offset));}}><IonIcon icon={refreshOutline} aria-hidden="true"/></IonButton>;
+  const refresh=<GroupRefresh label="Odśwież mecze" busyText="Odświeżanie meczów…" loading={data.loading} disabled={writeDisabled} onRefresh={async()=>{await (e?data.open(e.id):data.refresh(data.offset));}}/>;
   const messages=<>{data.error&&<p className="slm-error" role="alert">{data.error}<button type="button" disabled={writeDisabled} onClick={()=>{void(e?data.open(e.id):data.refresh(data.offset));}}>Spróbuj ponownie</button></p>}{data.notice&&<p role="status" className="slm-notice">{data.notice}</p>}{data.loading&&<p role="status">Wczytywanie meczów…</p>}</>;
   const goldHolders=useMvpGoldHolders();
   const photos=useGroupPhotos(manager,e?.group_id);

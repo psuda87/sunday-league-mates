@@ -1,8 +1,9 @@
 /* Wyłącznie kontrolki B3; bez zmian wspólnych kart i nawigacji. */
 .slm-group-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
 .slm-group-toolbar .slm-groups-demo { margin:4px 0; }
-.slm-groups .slm-group-refresh { flex:0 0 44px; width:44px; height:44px; display:grid; place-items:center; padding:0; border:1px solid var(--slm-border); border-radius:12px; background:var(--slm-panel); color:var(--slm-gold); }
+.slm-groups .slm-group-refresh,.slm-compact-header .slm-group-refresh { flex:0 0 44px; width:44px; height:44px; display:grid; place-items:center; padding:0; border:1px solid var(--slm-border); border-radius:12px; background:var(--slm-panel); color:var(--slm-gold); }
 .slm-group-refresh ion-icon { font-size:22px; }
+.slm-compact-header .slm-group-refresh { position:relative; z-index:3; cursor:pointer; }
 .slm-group-refresh[aria-busy="true"] ion-icon { animation:slm-group-refresh-spin 1s linear infinite; }
 .slm-group-consent { display:flex; align-items:center; gap:12px; margin:16px 0; padding:12px; border:1px solid var(--slm-border); border-radius:12px; background:var(--slm-panel); }
 .slm-group-consent > div { flex:1; min-width:0; }

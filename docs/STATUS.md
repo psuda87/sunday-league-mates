@@ -1,3 +1,10 @@
+# UI — jeden przycisk odświeżania w Meczach i Grupach — 2026-11-18
+
+Gałąź `feat/web-push`. Mecze miały przezroczysty `IonButton` w nagłówku, Grupy ramkowany kwadrat 44 px w osobnym wierszu pod nagłówkiem. Oba używają teraz `GroupRefresh` (ramkowany kwadrat, złota ikona, obrót podczas ładowania) i stoją w tym samym miejscu: w nagłówku obok logo (Grupy: slot `action` w `MatchHeader`). Opisy: „Odśwież mecze” / „Odśwież grupy”.
+Kontrole: `tsc` czysto, `eslint` bez błędów, 220 testów (src/demo, events, groups), jedyny błąd `titoContracts` (płytki klon, tak samo na `main`). Nie renderowane w sandboxie; do potwierdzenia wzrokowo na telefonie.
+
+---
+
 # UI — przycisk „Zapisz nazwę” i krawędź nagłówka z logo — 2026-11-18
 
 Gałąź `feat/web-push`. (1) „Zapisz nazwę” w ustawieniach grupy miał tylko kolor i tło głównego przycisku, bez ramki, zaokrąglenia i odstępów; dodano je w `GroupControls.css`. (2) Poświata nagłówka z logo (`.slm-compact-header::before`, środek ok. 88–92% szerokości) kończyła się ostrą krawędzią na prawym brzegu ekranu; maska CSS wygasza ją z prawej i od dołu. Tło nagłówka jest przezroczyste, więc nie trzeba go usuwać ani robić sticky.
