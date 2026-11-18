@@ -1,3 +1,11 @@
+# Powiadomienia — przypomnienia o płatności — 2026-11-18
+
+Migracja `payment_reminders` (zastosowana w bazie) dodaje `slm_private.payment_reminders()`, wywoływaną z `slm_notifications_prepare` (worker co minutę). Dwa przypomnienia push, kategoria `finance`: (1) 24 h po zakończeniu meczu (okno 24–72 h, żeby stare zaległości nie wywołały lawiny) dla każdej zaległości z `group_dues`; (2) 24 h przed kolejnym meczem (od 30 min do 24 h przed startem), na który osoba jest zapisana (`registered`), jeśli ma jakąkolwiek zaległość. Idempotencja: klucz źródła `payreminder:post|pre:<mecz>:<użytkownik>`. Przypomnienie przed meczem było i pozostaje tylko dla zapisanych; wolne miejsce bez zmian (wszyscy rezerwowi naraz).
+Zakres: przypomnienie przed kolejnym meczem sprawdza zapisy w `slm_match_entries` (model v2), starsze wydarzenia (`slm_events`) objęte tylko przypomnieniem po meczu. Po zastosowaniu wywołanie ręczne wyemitowało 2 wpisy „przed meczem” dla realnych kont; brak urządzeń push, więc widoczne tylko w dzwonku.
+Nie testowane automatycznie (brak testów SQL w repo); sprawdzone wywołaniem na bazie.
+
+---
+
 # UI — jeden przycisk odświeżania w Meczach i Grupach — 2026-11-18
 
 Gałąź `feat/web-push`. Mecze miały przezroczysty `IonButton` w nagłówku, Grupy ramkowany kwadrat 44 px w osobnym wierszu pod nagłówkiem. Oba używają teraz `GroupRefresh` (ramkowany kwadrat, złota ikona, obrót podczas ładowania) i stoją w tym samym miejscu: w nagłówku obok logo (Grupy: slot `action` w `MatchHeader`). Opisy: „Odśwież mecze” / „Odśwież grupy”.
