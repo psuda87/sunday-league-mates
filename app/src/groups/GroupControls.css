@@ -77,3 +77,10 @@
 .slm-push-section button:not(.slm-payment-reminder-cta) {min-height:44px;padding:8px 14px;border:1px solid var(--slm-gold);border-radius:12px;background:transparent;color:var(--slm-gold);font:inherit;font-weight:700;}
 .slm-group-bell {position:relative;}
 .slm-group-dot {position:absolute;top:6px;right:6px;width:10px;height:10px;border-radius:50%;background:var(--slm-gold);box-shadow:0 0 0 2px var(--slm-panel,#181b1e);}
+.slm-inbox {margin:0 0 16px;padding-bottom:14px;border-bottom:1px solid var(--slm-border);}
+.slm-inbox ul {list-style:none;margin:0 0 10px;padding:0;display:grid;gap:10px;}
+.slm-inbox li {display:grid;gap:2px;overflow-wrap:anywhere;}
+.slm-inbox li span {opacity:.85;}
+.slm-inbox li time {font-size:.8rem;opacity:.65;}
+.slm-inbox-unread strong::before {content:'';display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:50%;background:var(--slm-gold);}
+.slm-inbox button {min-height:44px;padding:8px 14px;border:1px solid var(--slm-gold);border-radius:12px;background:transparent;color:var(--slm-gold);font:inherit;font-weight:700;}

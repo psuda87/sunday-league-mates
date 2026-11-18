@@ -1,3 +1,11 @@
+# Powiadomienia push — lista w dzwonku Premium — 2026-11-18
+
+Gałąź `feat/web-push`. Test na telefonie Piotra: push dotarł na ekran blokady (worker: `sent`, FCM przyjął), ale po otwarciu aplikacji dzwonek Premium nic nie pokazywał — pokazywał tylko zaległe płatności, prośby do grup i odznaki, a skrzynka `slm_notifications` nie miała w nim widoku.
+Poprawka: dzwonek czyta `notifications_list`, dolicza nieprzeczytane do licznika, wyświetla 10 ostatnich i ma „Oznacz jako przeczytane” (`notifications_read_all`); odświeża się przy otwarciu, po push przy otwartej aplikacji i po stuknięciu powiadomienia (które otwiera dzwonek).
+Kontrole: nowy test `inboxBell` PASS, testy grup/odznak/powiadomień/zdarzeń 148, jedyny błąd `titoContracts` (płytki klon, tak samo na `main`), `tsc` i `eslint` bez błędów.
+
+---
+
 # Powiadomienia push — przycisk w interfejsie Premium — 2026-11-18
 
 Gałąź `feat/web-push`. Błąd: pierwszy wpis dodał przycisk „Włącz na tym urządzeniu” tylko do starego ekranu `pages/Notifications`, którego build Premium (`B1App`) nie używa, więc na telefonie nie było jak włączyć push (w bazie 0 urządzeń).
