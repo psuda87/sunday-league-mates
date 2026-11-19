@@ -224,6 +224,10 @@ Main `3d6c791` (PR #70, po scaleniu PR #69 i #71). Supabase `hjtcyybkxebvdropcha
 Vercel: produkcja z main `3d6c791` (`dpl_Gpp2UAh1nxUksZHtfPbKPDdzokAy`) — READY; slm-soccer/slm-football/slm-ui-demo.vercel.app: HTTP 200, nowe nagłówki (Permissions-Policy, COOP, HSTS) obecne, CSP bez zmian.
 Do zrobienia przez właściciela (panel Supabase → Authentication): limity logowania/rejestracji, „Secure password change”, „Secure email change”.
 
+## Zaległości: sprawdzanie przy zdarzeniach, nie co minutę — 2026-11-20
+
+Usunięto wywołanie `debt_enforce_registrations()` z crona (`slm_notifications_prepare`). Sprawdzenie działa po zatwierdzeniu/korekcie rozliczenia (`slm_settlements_dispatch`) oraz po `accept_payment`/`correct_payment` (`slm_group_finance_dispatch`); zapis blokuje jak dotąd `registration_allowed`. Dispatchery opakowane (`*_base`). Migracja 20261120010000.
+
 ## Historia gałęzi (przed wdrożeniem)
 
 Gałąź `fix/security-hardening-20261115` z main `2329d32` (produkcja Vercel = `0c9c352`). Zmiany (od najprostszych):
