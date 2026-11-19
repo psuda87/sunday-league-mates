@@ -78,7 +78,7 @@ export default function MatchRatingPanel({ manager, userId, eventId, active = tr
         <div className="slm-rating-score">
           <label>Gole<input inputMode="numeric" value={goals} onChange={e => setGoals(e.target.value.replace(/\D/g, '').slice(0, 2))} /></label>
           <label>Asysty<input inputMode="numeric" value={assists} onChange={e => setAssists(e.target.value.replace(/\D/g, '').slice(0, 2))} /></label>
-          <button type="button" onClick={() => void api.saveStats(count(goals), count(assists))}>Zapisz</button>
+          <button type="button" onClick={() => void api.saveStats(count(goals), count(assists)).then(saved => { if (saved) refreshRatings(); })}>Zapisz</button>
         </div>
       </fieldset>
     </>}
