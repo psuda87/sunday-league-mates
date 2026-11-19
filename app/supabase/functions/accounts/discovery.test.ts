@@ -85,3 +85,10 @@ it('forwards invalid search parameters for server validation without silently tr
   expect(response.status).toBe(400);
   expect(rpc.mock.calls[0][0]).toMatchObject({ p_body: { query: 'x'.repeat(101), offset: -1 } });
 });
+it('answers an unmapped business rejection with 409 so the client is not signed out, but keeps 503 for real outages', async () => {
+  const rejected = await request({}, 'some_new_rule');
+  expect(rejected.response.status).toBe(409);
+  expect((await rejected.response.json()).code).toBe('operation_rejected');
+  const outage = await request({}, 'connection refused by upstream');
+  expect(outage.response.status).toBe(503);
+});

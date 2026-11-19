@@ -224,6 +224,7 @@ Priorytety to propozycja organizacyjna, nie deklaracja wykonania.
 [OK] Supabase Security Advisor 16.11: 0 błędów, 1 ostrzeżenie (ochrona przed wyciekłymi hasłami w Auth), 44 informacje RLS bez polityk (zamierzone).
 [OK] Migracja 20261116190000 (indeksy FK + RLS initplan) zastosowana na Supabase 16.11 za zgodą właściciela; PR #71 (draft) czeka na merge.
 [TODO] Odbiór ręczny na telefonie: statystyki w profilach, przycisk „Zadzwoń”, dzwonek płatności, kłódka, zmiana nazwy grupy.
+[TODO] Nadpłata (decyzja właściciela 19.11.2026): jeśli zawodnik ma zaległość 65 zł, a wpłaci 100 zł i admin wpisze 100 zł, to nadwyżka 35 zł zostaje na koncie zawodnika jako saldo na poczet kolejnych meczów (dziś system odrzuca kwotę większą niż należność za mecz: kod overpayment).
 [TODO] Odznaki i medale (issue #68): czekają na decyzje właściciela (progi, seria, frekwencja).
 [TODO] Wygląd grup / „Przejdź do grup” (issue #38): wymaga wskazówek wizualnych.
 [TODO] Assety MVP Gold do docs/rating/assets (nadal brak plików), logo/ikona z oryginalnego herbu, FCM/push, decyzja iOS, ochrona main, CAPTCHA.

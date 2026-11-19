@@ -1,3 +1,12 @@
+# Bramki na profilu, historia 48 h, odznaka debiutanta, zaległości, błąd wylogowania — 2026-11-19/20
+
+Migracja `20261120000000_goals_profile_history_debut_debt` (zastosowana w bazie): (1) gole i asysty z zakończonych meczów od razu w statystykach profilu (bez podwójnego liczenia po finalizacji), okno poprawy 48 h bez zmian, oceny bez zmian; (2) `match_discovery_list`: mecz trafia do historii 48 h po zakończeniu (start + czas trwania), wcześniej od startu; (3) `badges_debut()` w `badges_settle`: SLM-MAT-001 od razu po zakończeniu meczu; (4) `debt_enforce_registrations()` w `slm_notifications_prepare` (co minutę): zapis na przyszły płatny mecz zawodnika z min. 2 nieuregulowanymi płatnościami jest wycofywany (jak „withdraw”: historia, skład, powiadomienie „Zapis anulowany”).
+Klient: panel ocen — osobne szkice sekcji (zapis bramek nie kasuje niezapisanych ocen), po zapisie bramek odświeżenie profilu; listy meczów (`matchIsOld`) — 48 h po końcu. Edge `accounts`: odmowa biznesowa bez własnego mapowania zwraca 409 `operation_rejected` zamiast 503 (503 wylogowuje klienta; przyczyna „wywala z apki” po akceptacji płatności); dodane `group_mismatch`.
+Porządek: 19.11 po 21:00 ChatGPT zastosował i cofnął 4 migracje (profile_live_goal_stats…); funkcje ocen w bazie zgodne z main (hash). Aliasy slm-football i slm-ui-demo-peters-projects… przywrócone na build main z 18.11.
+Nie sprawdzone na urządzeniu.
+
+---
+
 # PWA — baner instalacji i baner zgody na powiadomienia — 2026-11-18
 
 Nowy `src/pwa/AppBanners.tsx` (montowany w `B1App`): jeden baner naraz. (1) „Zainstaluj aplikację” — na Androidzie/Chrome po zdarzeniu `beforeinstallprompt` (przechwytywanym od załadowania modułu, bo bywa wysyłane przed montażem Reacta) z przyciskiem „Zainstaluj”; na iPhonie w Safari instrukcja „Udostępnij → Dodaj do ekranu początkowego”; widoczny także przed zalogowaniem, ukrywany w trybie standalone. (2) Po zalogowaniu „Włącz powiadomienia” (przycisk wywołuje `push.enable()` bezpośrednio z kliknięcia), niepokazywany na iPhonie przed instalacją ani po odmowie w przeglądarce. „Później” zapamiętuje wybór w localStorage (instalacja 7 dni, powiadomienia 14 dni).

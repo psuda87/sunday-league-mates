@@ -8,3 +8,11 @@ it('current groups/public upcoming and current-group/own former history have dis
  expect(list('upcoming')).toEqual(['member','public']);expect(list('history')).toEqual(['group-history','own-history']);
  expect(list('upcoming','public')).toEqual(['public']);expect(list('upcoming','g')).toEqual(['member']);expect(list('history','mine')).toEqual(['own-history']);
 });
+it('keeps a finished match in the current list for 48 hours before moving it to history',()=>{
+ const now=Date.parse('2026-11-20T12:00:00Z'),at=(hoursAgo:number)=>new Date(now-hoursAgo*3600*1000).toISOString();
+ const m=(id:string,hoursAgo:number)=>({...event(id,'g'),starts_at:at(hoursAgo),duration_minutes:90}) as EventSummary;
+ const events=[m('running',1),m('ended-1h',3),m('ended-47h',48.4),m('ended-50h',52)];
+ const groups=[{id:'g'}],serverNow=new Date(now).toISOString();
+ expect(visiblePremiumEvents(events,groups,serverNow,'upcoming','').map(e=>e.id).sort()).toEqual(['ended-1h','ended-47h','running']);
+ expect(visiblePremiumEvents(events,groups,serverNow,'history','').map(e=>e.id)).toEqual(['ended-50h']);
+});

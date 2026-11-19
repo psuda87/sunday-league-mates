@@ -523,6 +523,7 @@ export function createHandler(env: Environment) {
             payment_processed: [409, 'Wpłata została już rozpatrzona.'],
             already_paid: [409, 'Należność jest już opłacona. Odśwież płatności.'],
             overpayment: [409, 'Kwota przewyższa pozostałą należność za mecz.'],
+            group_mismatch: [409, 'Wpłata dotyczy innego meczu lub grupy. Odśwież listę.'],
             pending_payment_exists: [409, 'Wpłata czeka już na decyzję administratora.'],
             request_processed: [409, 'Prośba została już rozpatrzona.'],
             already_member: [409, 'Zawodnik już należy do grupy.'],
@@ -540,6 +541,9 @@ export function createHandler(env: Environment) {
           if (errors[code]) throw new ApiError(errors[code][0], code, errors[code][1]);
           if (r.data?.code === '22P02' || r.data?.code === '23514' || r.data?.code === '23502')
             throw new ApiError(400, 'invalid_input', 'Sprawdź wymagane pola i poprawność danych.');
+          // Znany kod biznesowy, którego nie mapujemy powyżej, to odmowa operacji, a nie awaria serwera.
+          // 503 klient traktuje jak utratę sesji i wylogowuje użytkownika, więc nie wolno nim odpowiadać na odmowę.
+          if (/^[a-z][a-z0-9_]{2,60}$/.test(code)) throw new ApiError(409, 'operation_rejected', 'Serwer odrzucił operację (' + code + '). Odśwież dane i spróbuj ponownie.');
           throw new ApiError(503, 'service_unavailable', 'Nie udało się potwierdzić operacji. Ponów z tym samym identyfikatorem.');
         }
         if (action === 'matches_list' && (Object.hasOwn(payload, 'query') || payload.scope === 'groups') && r.data?.public_discovery_version !== 1)
