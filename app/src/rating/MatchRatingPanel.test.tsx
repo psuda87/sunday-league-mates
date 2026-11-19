@@ -56,6 +56,24 @@ describe('MatchRatingPanel', () => {
     expect(await screen.findByRole('note')).toHaveTextContent('wpisali 3 goli, a wynik to 1');
     expect(screen.getByText(/Ostatnia zmiana: Adam/)).toBeInTheDocument();
   });
+  it('keeps saving goals and saving ratings independent: saving goals does not wipe an unsent ballot', async () => {
+    const afterGoals: MatchRatingState = { ...base, my: { ...base.my, goals: 2 } };
+    const call = setup(base, action => (action === 'ratings_stats' ? afterGoals : base));
+    await screen.findByText(/Ocenianie otwarte do/);
+    fireEvent.click(screen.getAllByRole('radio', { name: '9' })[0]);
+    fireEvent.click(screen.getAllByRole('radio', { name: 'MVP' })[1]);
+    fireEvent.change(screen.getByLabelText('Gole'), { target: { value: '2' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Zapisz' }));
+    await waitFor(() => expect(call).toHaveBeenCalledWith('ratings_stats', { event_id: 'e1', goals: 2, assists: 0 }));
+    expect(await screen.findByRole('status')).toHaveTextContent('Gole i asysty zapisane');
+    expect(call).not.toHaveBeenCalledWith('ratings_rate', expect.anything());
+    expect(screen.getAllByRole('radio', { name: '9' })[0]).toHaveAttribute('aria-checked', 'true');
+    expect(screen.getAllByRole('radio', { name: 'MVP' })[1]).toBeChecked();
+    fireEvent.click(screen.getByRole('button', { name: 'Zapisz oceny' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Tak, zapisz' }));
+    await waitFor(() => expect(call).toHaveBeenCalledWith('ratings_rate', { event_id: 'e1', ratings: { u2: 9 }, mvp_user: 'u3', action_team: null }));
+    expect(call).toHaveBeenCalledTimes(3);
+  });
   it('shows no form to a group member who did not play', async () => {
     setup({ ...base, can_rate: false });
     expect(await screen.findByText('Oceniać mogą tylko zawodnicy, którzy zagrali w tym meczu.')).toBeInTheDocument();

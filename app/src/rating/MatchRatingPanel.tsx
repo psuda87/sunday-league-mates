@@ -32,14 +32,26 @@ export default function MatchRatingPanel({ manager, userId, eventId, active = tr
   const [goals, setGoals] = useState('0'), [assists, setAssists] = useState('0');
   const [scoreA, setScoreA] = useState(''), [scoreB, setScoreB] = useState('');
   const [confirm, setConfirm] = useState(false), [showHelp, setShowHelp] = useState(false);
-  const stamp = s ? JSON.stringify([s.event_id, s.my, s.score]) : '';
+  // Każda sekcja (głos, gole i asysty, wynik) ma własny szkic i resetuje go tylko wtedy, gdy zmieni się jej własna kopia z serwera.
+  // Dzięki temu zapis bramek nie kasuje niezapisanych ocen i odwrotnie.
+  const ballotStamp = s ? JSON.stringify([s.event_id, s.my.submitted, s.my.ratings, s.my.mvp_user, s.my.action_team]) : '';
+  const statsStamp = s ? JSON.stringify([s.event_id, s.my.goals, s.my.assists]) : '';
+  const scoreStamp = s ? JSON.stringify([s.event_id, s.score]) : '';
   useEffect(() => {
     if (!s) return;
-    setRatings(s.my.ratings); setMvp(s.my.mvp_user); setAction(s.my.action_team);
+    setRatings(s.my.ratings); setMvp(s.my.mvp_user); setAction(s.my.action_team); setConfirm(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reset the ballot draft only when its server copy changes
+  }, [ballotStamp]);
+  useEffect(() => {
+    if (!s) return;
     setGoals(String(s.my.goals)); setAssists(String(s.my.assists));
-    setScoreA(s.score ? String(s.score.a) : ''); setScoreB(s.score ? String(s.score.b) : ''); setConfirm(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- reset drafts only when the server copy changes
-  }, [stamp]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reset the goals draft only when its server copy changes
+  }, [statsStamp]);
+  useEffect(() => {
+    if (!s) return;
+    setScoreA(s.score ? String(s.score.a) : ''); setScoreB(s.score ? String(s.score.b) : '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- reset the score draft only when its server copy changes
+  }, [scoreStamp]);
   useEffect(() => { if (s?.result) refreshRatings(); }, [s?.result, refreshRatings]);
 
   if (!s) return <section className="slm-panel slm-rating-panel"><h2>Oceny</h2>{api.error ? <><p role="alert">{api.error}</p><button type="button" onClick={() => void api.reload()}>Spróbuj ponownie</button></> : <p>Ładowanie ocen…</p>}</section>;
@@ -78,7 +90,7 @@ export default function MatchRatingPanel({ manager, userId, eventId, active = tr
         <div className="slm-rating-score">
           <label>Gole<input inputMode="numeric" value={goals} onChange={e => setGoals(e.target.value.replace(/\D/g, '').slice(0, 2))} /></label>
           <label>Asysty<input inputMode="numeric" value={assists} onChange={e => setAssists(e.target.value.replace(/\D/g, '').slice(0, 2))} /></label>
-          <button type="button" onClick={() => void api.saveStats(count(goals), count(assists))}>Zapisz</button>
+          <button type="button" onClick={() => void api.saveStats(count(goals), count(assists)).then(saved => { if (saved) refreshRatings(); })}>Zapisz</button>
         </div>
       </fieldset>
     </>}

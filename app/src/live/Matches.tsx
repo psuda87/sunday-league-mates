@@ -13,6 +13,7 @@ import type { Group } from './Groups';
 import Finance from './Finance';
 import { useOperation } from './useOperation';
 import { useLoad } from './useLoad';
+import { matchIsOld } from '../events/eventFilters';
 interface LiveMatch extends Match {own_participation:boolean;name:string;group_id:string;group_name:string;visibility:'public'|'private';access:'full'|'own'|'none';cost_cents:number;version:number;approved_at:string|null;can_manage:boolean;can_edit:boolean}
 interface Entry extends Omit<Participant,'status'> {status:'registered'|'reserve'|'withdrawn'}
 interface Detail {event:LiveMatch;participants:Entry[];server_now:string;can_register_paid:boolean}
@@ -31,7 +32,7 @@ export default function Matches({manager,userId,onLegacy,initialEventId}:{manage
  async function operation(action:string,values:Record<string,unknown>={}){if(!e)return;await mutate('matches_'+action,{event_id:e.id,...values});await open(e.id);await list();}
  function edit(m?:LiveMatch){setEditing(m??null);setForm(m?{...empty(m.group_id),...warsawFields(m.starts_at),name:m.name,location:m.location,duration_minutes:String(m.duration_minutes),hourly_rate:String(m.hourly_rate),total_cost:String(m.total_cost),capacity:String(m.capacity),visibility:m.visibility}:empty(organizers[0]?.id));}
  function update(key:keyof Form,value:string){setForm(previous=>{if(!previous)return previous;const next={...previous,[key]:value};if(key==='duration_minutes'||key==='hourly_rate')next.total_cost=(Number(next.duration_minutes)*Number(next.hourly_rate)/60).toFixed(2);return next;});}
- const subset=matches?.filter(m=>{const old=m.status==='cancelled'||Date.parse(m.starts_at)<=Date.parse(serverNow);return filter==='history'?old:!old&&(filter!=='mine'||m.own_participation);}).sort((a,b)=>filter==='history'?Date.parse(b.starts_at)-Date.parse(a.starts_at):Date.parse(a.starts_at)-Date.parse(b.starts_at));
+ const subset=matches?.filter(m=>{const old=matchIsOld(m as {status:string;starts_at:string;duration_minutes?:number},Date.parse(serverNow));return filter==='history'?old:!old&&(filter!=='mine'||m.own_participation);}).sort((a,b)=>filter==='history'?Date.parse(b.starts_at)-Date.parse(a.starts_at):Date.parse(a.starts_at)-Date.parse(b.starts_at));
  if(finance&&e)return <Finance manager={manager} manageEvent={e.can_manage} eventId={e.id} groupId={e.group_id} onBack={()=>{setFinance(false);void run(()=>open(e.id));}}/>;
  return <><MatchHeader title={form?'Formularz meczu':detail?'Szczegóły meczu':'Mecze'} onBack={detail||form?()=>{setDetail(null);setForm(null);void run(()=>list());}:undefined}/>
  {(error||initialError)&&<p role="alert" className="slm-error">⚠ {error||initialError}</p>}{busy&&<IonSpinner/>}
