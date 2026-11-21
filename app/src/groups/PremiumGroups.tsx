@@ -9,13 +9,15 @@ import { useFrozenBack } from '../native/frozenDemoAndroid';
 import { usePlayerRating } from '../rating/RatingProvider';
 import BadgeList from '../badges/BadgeList';
 import { usePlayerBadges } from '../badges/BadgesProvider';
+import MemberDebtPanel from '../finance/MemberDebtPanel';
 import { useGroups } from './useGroups';
 import type { GroupMember } from './model';
 
 export default function PremiumGroups({manager,userId}:{manager:SessionManager;userId:string}){
  const {world,binding,readMember,verified,verifiedSession}=useGroups(manager,userId);
  const [profile,setProfile]=useState<{member:GroupMember|null;error:string;id:string;groupId:string;session:Session|null}|null>(null);
- const stats=usePlayerRating(profile?.member?profile.id:undefined)?.stats;
+ // Profil zawsze pobiera świeże statystyki (gole, asysty, mecze), a nie kopię z początku sesji.
+ const stats=usePlayerRating(profile?.member?profile.id:undefined,true)?.stats;
  const badges=usePlayerBadges(profile?.member?profile.id:undefined);
  const currentProfile=useRef(profile);currentProfile.current=profile;
  const generation=useRef(0);
@@ -40,6 +42,7 @@ export default function PremiumGroups({manager,userId}:{manager:SessionManager;u
  {profile.member.contact_phone&&<a className="slm-call" href={'tel:'+profile.member.contact_phone}>Zadzwoń</a>}
  <section className="slm-player-stats slm-ultimate-summary" aria-label={stats?'Statystyki zawodnika':'Statystyki niedostępne'}><dl className="slm-ultimate-stats">{[['Mecze',stats?.played],['Gole',stats?.goals],['Asysty',stats?.assists],['MVP',stats?.mvp]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value??'—'}</dd></div>)}</dl></section>
  {!stats&&<p className="slm-muted">Statystyki zawodnika są niedostępne.</p>}
+ <MemberDebtPanel manager={manager} userId={userId} groupId={profile.groupId} memberId={profile.id}/>
  {badges&&<BadgeList states={badges} own={profile.id===userId}/>}
  </>}</section>}
  </div></>;

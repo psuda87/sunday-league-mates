@@ -1,3 +1,11 @@
+# Zadłużenie w profilu zawodnika (admin), świeże statystyki profilu — 2026-11-21
+
+Nowy panel `MemberDebtPanel` (`app/src/finance/`) w profilu zawodnika (`PremiumGroups`, `LineupPlayerProfile`): administrator grupy widzi zaległość zawodnika (suma, lista meczów od najstarszego, zgłoszone wpłaty oczekujące, nadpłatę, blokadę zapisów po 2 zaległych meczach). Bez zmian w backendzie: `group_finance_account` z `user_id`; uprawnienie rozstrzyga serwer (`surplus` w własnym koncie = admin, `forbidden` = panel ukryty), zwykły członek nie pobiera cudzych danych. Finanse nadal poza publiczną kartą zawodnika.
+Statystyki: profil pobiera zawodnika świeżo przy każdym otwarciu (`usePlayerRating(id, true)`; wcześniej kopia z początku sesji), odczyty w toku nie dublują się, odświeżenie własnego przeglądu w trakcie odczytu jest ponawiane. Migracja `20261121120000_profile_live_played` (NIEZASTOSOWANA w bazie, czeka na zgodę): „Mecze” liczy rozegrane, jeszcze niesfinalizowane mecze od razu (`slm_private.rating_live_played`), tak jak gole i asysty. Sprawdzona na bazie w transakcji wycofanej (łatka obu miejsc w `slm_ratings_dispatch` działa).
+Kontrole: `tsc`/build czysto, eslint bez błędów, nowe testy (memberDebt, RatingProvider) przechodzą. Na czystym main już padają: test `titoContracts`, `verify:consolidation`, `verify-frozen-ui` (src/demo/App.tsx), `test:premium-policy` — nie z tej zmiany. Nie sprawdzone na urządzeniu.
+
+---
+
 # Bramki na profilu, historia 48 h, odznaka debiutanta, zaległości, błąd wylogowania — 2026-11-19/20
 
 Migracja `20261120000000_goals_profile_history_debut_debt` (zastosowana w bazie): (1) gole i asysty z zakończonych meczów od razu w statystykach profilu (bez podwójnego liczenia po finalizacji), okno poprawy 48 h bez zmian, oceny bez zmian; (2) `match_discovery_list`: mecz trafia do historii 48 h po zakończeniu (start + czas trwania), wcześniej od startu; (3) `badges_debut()` w `badges_settle`: SLM-MAT-001 od razu po zakończeniu meczu; (4) `debt_enforce_registrations()` w `slm_notifications_prepare` (co minutę): zapis na przyszły płatny mecz zawodnika z min. 2 nieuregulowanymi płatnościami jest wycofywany (jak „withdraw”: historia, skład, powiadomienie „Zapis anulowany”).

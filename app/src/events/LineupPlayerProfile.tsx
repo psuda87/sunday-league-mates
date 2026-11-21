@@ -5,6 +5,7 @@ import type {GroupMember} from '../groups/model';
 import UltimatePlayerCard from '../ui/UltimatePlayerCard';
 import {usePlayerRating} from '../rating/RatingProvider';
 import BadgeList from '../badges/BadgeList';
+import MemberDebtPanel from '../finance/MemberDebtPanel';
 import {usePlayerBadges} from '../badges/BadgesProvider';
 import {useFrozenBack} from '../native/frozenDemoAndroid';
 
@@ -31,7 +32,8 @@ export default function LineupPlayerProfile({context, memberId, onBack, backLabe
     return () => {active = false;};
   }, [manager, userId, groupId, memberId, ready, revision]);
   const p = ready ? state.value : null;
-  const stats = usePlayerRating(p ? memberId : undefined)?.stats;
+  // Profil zawsze pobiera świeże statystyki (gole, asysty, mecze), a nie kopię z początku sesji.
+  const stats = usePlayerRating(p ? memberId : undefined, true)?.stats;
   const badges = usePlayerBadges(p ? memberId : undefined);
   return <section ref={area} className="slm-players-screen slm-ultimate-profile" aria-label="Profil zawodnika ze składów">
     <div className="slm-team-actions"><button type="button" onClick={onBack}>{backLabel}</button></div>
@@ -43,6 +45,7 @@ export default function LineupPlayerProfile({context, memberId, onBack, backLabe
       <UltimatePlayerCard playerId={memberId} headingRef={heading} name={typeof p.display_name === 'string' && p.display_name.trim() ? p.display_name : p.nickname} jerseyNumber={p.jersey_number ?? undefined}/>
       <section className="slm-player-stats slm-ultimate-summary" aria-label={stats ? 'Statystyki zawodnika' : 'Statystyki niedostępne'}><dl className="slm-ultimate-stats">{([['Mecze', stats?.played], ['Gole', stats?.goals], ['Asysty', stats?.assists], ['MVP', stats?.mvp]] as const).map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value ?? '—'}</dd></div>)}</dl></section>
       {!stats && <p className="slm-muted">Statystyki zawodnika są niedostępne.</p>}
+      <MemberDebtPanel manager={manager} userId={userId} groupId={groupId} memberId={memberId}/>
       {badges && <BadgeList states={badges} own={memberId === userId}/>}
     </>}
   </section>;
