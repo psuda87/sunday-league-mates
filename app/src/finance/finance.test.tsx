@@ -66,3 +66,14 @@ it('a group-role refresh removes cached administrator detail but keeps own accou
  await waitFor(()=>expect(result.current.own).not.toBeNull());expect(result.current.detail).toBeNull();expect(result.current.own?.surplus).toBeNull();
  expect(vi.mocked(m.call).mock.calls.filter(c=>c[0]==='group_finance_detail')).toHaveLength(detailCalls);
 });
+
+it('removes an accepted receipt from the list at once, even when the readback fails',async()=>{
+ const receipt={id:'r1',group_id:'g',event_id:null,user_id:'member',corrected_amount_cents:2300,status:'pending' as const};
+ const roster={group_id:'g',players:[{user_id:'member',name:'Fixture',account:{...own(),surplus:[],payments:[receipt]}}],events:[]};
+ let accepted=false;
+ const m={call:vi.fn(async(a:string)=>{if(a==='group_finance_accept_payment'){accepted=true;return {ok:true,group_id:'g'};}
+  if(accepted)throw Error('Lost readback');if(a==='group_finance_account')return {...own('member','g'),surplus:[]};if(a==='group_finance_roster')return roster;throw Error(a);}),subscribe:()=>()=>{},getSnapshot:()=>({phase:'ready',session:{user_id:'member'}})} as unknown as SessionManager;
+ const {result}=renderHook(()=>usePremiumFinance(m,'member','g'));await waitFor(()=>expect(result.current.pending).toHaveLength(1));
+ await act(async()=>{await result.current.mutate('accept_payment',{payment_id:'r1',expected_amount_cents:2300});});
+ expect(result.current.pending).toHaveLength(0);expect(result.current.players).toHaveLength(1);expect(result.current.notice).toContain('Operacja potwierdzona');expect(result.current.error).toBe('');
+});
