@@ -108,3 +108,35 @@ it('names an old report for a different unassessed match and does not mark it ac
  expect(screen.queryByText(/nieaktualne zgłoszenie/)).toBeNull();expect(isSettledReport(own,own.payments[1])).toBe(false);
  expect(own.payments[1].status).toBe('pending');
 });
+
+function generalFixture(withDue:boolean){
+ let pending=true;
+ const general:Receipt={id:'gen',group_id:'g',event_id:null,user_id:'u',corrected_amount_cents:2300,status:'pending'};
+ const own=():Account=>({group_id:'g',user_id:'u',balance_cents:withDue?-4600:0,registration_allowed:true,
+  dues:withDue?[{event_id:'e',starts_at:'2026-11-04T18:00:00Z',due_cents:4600,covered_cents:0,outstanding_cents:4600}]:[],
+  payments:pending?[general]:[],history:[],surplus:[]});
+ const events=[{id:'e',name:'Mecz testowy',starts_at:'2026-11-04T18:00:00Z'}];
+ const call=vi.fn(async(action:string,_body?:Record<string,unknown>)=>{
+  if(action==='group_finance_account')return own();
+  if(action==='group_finance_roster')return {group_id:'g',players:[{user_id:'u',name:'Zawodnik fixture',account:own()}],events};
+  if(action==='group_finance_accept_payment'){pending=false;return {ok:true,group_id:'g'};}
+  throw Error(action);
+ });
+ return {manager:{call,subscribe:()=>()=>{},getSnapshot:()=>({phase:'ready',session:{user_id:'u'}})} as unknown as SessionManager,call};
+}
+it('shows one card for a debt with a general report, and its confirm button works',async()=>{
+ const f=generalFixture(true);render(<PremiumFinance manager={f.manager} userId="u" groupId="g" manage/>);
+ const cards=await screen.findAllByRole('article',{name:'Płatności: Zawodnik fixture'});
+ expect(cards).toHaveLength(1);expect(within(cards[0]).getByText(/Zgłoszono wpłatę ogólną: 23,00/)).toBeTruthy();expect(within(cards[0]).getByText(/Do zapłaty: 46,00/)).toBeTruthy();
+ const accept=within(cards[0]).getByRole('button',{name:'Akceptuj zgłoszoną wpłatę'});expect(accept).not.toBeDisabled();
+ fireEvent.click(accept);
+ await waitFor(()=>expect(f.call).toHaveBeenCalledWith('group_finance_accept_payment',expect.objectContaining({payment_id:'gen',expected_amount_cents:2300})));
+ expect(f.call.mock.calls.find(c=>c[0]==='group_finance_accept_payment')![1]).not.toHaveProperty('event_id');
+ await waitFor(()=>expect(screen.getByText(/Brak zgłoszenia wpłaty/)).toBeTruthy());
+});
+it('explains why a general report cannot be accepted when there is no debt',async()=>{
+ const f=generalFixture(false);render(<PremiumFinance manager={f.manager} userId="u" groupId="g" manage/>);
+ const card=await screen.findByRole('article',{name:'Płatności: Zawodnik fixture'});
+ expect(within(card).getByRole('button',{name:'Akceptuj zgłoszoną wpłatę'})).toBeDisabled();
+ expect(within(card).getByText(/nie ma zaległości do pokrycia/)).toBeTruthy();expect(within(card).getByRole('button',{name:'Odrzuć'})).not.toBeDisabled();
+});

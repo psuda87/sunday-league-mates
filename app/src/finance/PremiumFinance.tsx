@@ -27,9 +27,14 @@ export default function PremiumFinance({manager,userId,groupId,eventId,manage=fa
      const payments=person.account.payments.filter(p=>!eventId||p.event_id===null||p.event_id===eventId);
      const pending=payments.filter(p=>p.status==='pending');
      const accepted=payments.filter(p=>p.status==='accepted'&&p.corrected_amount_cents>0);
-     const items=[...dues.map(d=>({due:d,payment:pending.find(p=>p.event_id===d.event_id)})),...pending.filter(p=>!dues.some(d=>d.event_id===p.event_id)).map(payment=>({due:undefined,payment}))];
+     // Zgłoszenie dotyczące meczu leży przy swojej zaległości. Wpłata ogólna (bez meczu) jest dołączona do pierwszej zaległości
+     // zawodnika, żeby nie powstawały dwa kafelki jednej sprawy z nieaktywnym przyciskiem; osobny kafelek tylko bez zaległości.
+     const general=pending.find(p=>p.event_id===null);
+     const firstOpen=dues.find(d=>!pending.some(p=>p.event_id===d.event_id));
+     const items=[...dues.map(d=>({due:d,payment:pending.find(p=>p.event_id===d.event_id)??(general&&d===firstOpen?general:undefined)})),...pending.filter(p=>!dues.some(d=>d.event_id===p.event_id)&&!(p===general&&firstOpen)).map(payment=>({due:undefined,payment}))];
      return items.map(({due:d,payment:p})=>{
       const id=d?.event_id??p?.event_id;
+      const tooMuch=!!p&&p.event_id!==null&&p.corrected_amount_cents>person.account.dues.filter(x=>x.event_id===id).reduce((sum,x)=>sum+x.outstanding_cents,0);
       const remaining=person.account.dues.filter(d=>!id||d.event_id===id).reduce((sum,d)=>sum+d.outstanding_cents,0);
       const previous=accepted.find(r=>r.event_id===id);
       const generalPending=!p&&pending.some(r=>r.event_id===null);
@@ -37,13 +42,15 @@ export default function PremiumFinance({manager,userId,groupId,eventId,manage=fa
       return <article className="slm-payment-card" key={`${person.user_id}:${d?.event_id??p!.id}`} aria-label={`Płatności: ${person.name}`}>
        <h3>{person.name}{person.user_id===userId?' · Ty':''}</h3>
        <p><strong>{id?title(id):'Wpłata ogólna'}</strong>{d&&<><br/>{matchDate(d.starts_at)}</>}<br/>Do zapłaty: {formatCents(remaining)}</p>
-       <p className="slm-payment-report">{p?`Zgłoszono wpłatę: ${formatCents(p.corrected_amount_cents)}`:generalPending?'Zgłoszono wpłatę ogólną — rozpatrz jej kafelek.':'Brak zgłoszenia wpłaty'}</p>
+       <p className="slm-payment-report">{p?`Zgłoszono wpłatę${p.event_id===null?' ogólną':''}: ${formatCents(p.corrected_amount_cents)}`:generalPending?'Zgłoszono wpłatę ogólną — potwierdź ją przy pierwszej zaległości tego zawodnika.':'Brak zgłoszenia wpłaty'}</p>
        <div className="slm-payment-actions" role="group" aria-label="Decyzje dotyczące wpłaty">
         <button className={`slm-payment-accept ${p?'is-reported':'is-unreported'}`} aria-label={p?'Akceptuj zgłoszoną wpłatę':'Akceptuj wpłatę bez zgłoszenia'} disabled={f.busy||covered||generalPending||!!d?.legacy||!!p&&p.event_id!==null&&p.corrected_amount_cents>remaining} onClick={()=>{void(p?f.mutate('accept_payment',{payment_id:p.id,expected_amount_cents:p.corrected_amount_cents,...(p.event_id?{event_id:p.event_id}:{})}):f.mutate('record_payment',{event_id:d!.event_id,user_id:person.user_id,amount_cents:d!.outstanding_cents}));}}>{p?'Potwierdź zgłoszenie':'Oznacz jako opłacone'}</button>
         <button disabled={f.busy||!p} onClick={()=>{if(p)void f.mutate('reject_payment',{payment_id:p.id,...(p.event_id?{event_id:p.event_id}:{})});}}>Odrzuć</button>
         <button disabled={f.busy||!previous} title={previous?'Cofnij zatwierdzoną wpłatę':'Nie ma zatwierdzonej wpłaty do anulowania'} onClick={()=>{if(previous)void f.mutate('cancel_payment',{payment_id:previous.id,expected_amount_cents:previous.corrected_amount_cents,...(previous.event_id?{event_id:previous.event_id}:{})});}}>Anuluj</button>
        </div>
-       {p&&covered&&<small>Wpłata została już zaksięgowana. To zgłoszenie jest nieaktualne — odrzuć tylko zgłoszenie; nie anuluj zaksięgowanej wpłaty.</small>}
+       {tooMuch&&<small>Kwota zgłoszenia przewyższa pozostałą należność za ten mecz. Odrzuć zgłoszenie i zapisz właściwą kwotę.</small>}
+       {p&&p.event_id===null&&covered&&<small>Zawodnik nie ma zaległości do pokrycia tą wpłatą, więc nie można jej zaksięgować. Odrzuć zgłoszenie.</small>}
+       {p&&p.event_id!==null&&covered&&<small>Wpłata została już zaksięgowana. To zgłoszenie jest nieaktualne — odrzuć tylko zgłoszenie; nie anuluj zaksięgowanej wpłaty.</small>}
        {!p&&previous&&covered&&<small>Opłacono — wpłata jest zaksięgowana.</small>}
       </article>;
      });

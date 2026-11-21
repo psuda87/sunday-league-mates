@@ -7,9 +7,10 @@ Klient: profil zawodnika (`MemberDebtPanel`) pokazuje wpłaty z przyciskami Zatw
 ---
 
 # Nadpłata: admin wpisuje wpłatę większą niż dług — 2026-11-21
+# Potwierdzanie wpłat: jeden kafelek zamiast dwóch, powód przy nieaktywnym przycisku — 2026-11-21
 
-Backend bez zmian: wpłata ogólna (`record_payment` bez `event_id`) może przekraczać zaległość; `group_dues` rozlicza ją po datach meczów, a saldo (`balance_cents`) robi się dodatnie (sprawdzone w transakcji wycofanej: dług 23 zł + wpłata 98 zł → zaległość 0, saldo +75 zł). Nadpłata przechodzi na kolejne zatwierdzone mecze. Ograniczenia serwera, bez zmian: wpłatę ogólną można zapisać tylko przy zaległości (`already_paid` bez długu) i nie przy oczekującym zgłoszeniu (`pending_payment_exists`); wpłata przypisana do meczu nadal nie może przekroczyć jego należności (`overpayment`).
-Klient: `MemberDebtPanel` ma formularz „Wpłata zawodnika (zł)” dla admina (ten sam identyfikator żądania przy ponowieniu tej kwoty, walidacja kwoty, komunikaty po polsku); nadpłata widoczna w panelu admina oraz u zawodnika („Nadpłata: X — zostanie zaliczona na kolejne mecze” w Moich płatnościach i Bieżących płatnościach). Testy: 3 nowe w memberDebt. Nie sprawdzone na urządzeniu.
+Zgłoszenie: „po kliknięciu Potwierdź nic się nie dzieje”, na liście dwa pola z zaległością. Przyczyna (dane organizatora: dług 46 zł za mecz + oczekująca wpłata ogólna 23 zł bez meczu): `PremiumFinance` robił dwa kafelki — kafelek zaległości z nieaktywnym przyciskiem „Oznacz jako opłacone” (`generalPending`, tekst „rozpatrz jej kafelek”) i osobny kafelek wpłaty ogólnej. Klik w nieaktywny przycisk nic nie robił. Baza akceptuje to zgłoszenie poprawnie (sprawdzone w transakcji wycofanej na wszystkich 5 oczekujących).
+Teraz wpłata ogólna jest dołączona do pierwszej zaległości zawodnika (jeden kafelek, aktywne „Potwierdź zgłoszenie”); osobny kafelek tylko gdy zawodnik nie ma zaległości, z wyjaśnieniem, że nie da się jej zaksięgować (serwer: `already_paid`). Dodano też tekst przy zgłoszeniu przewyższającym należność za mecz. Testy: 2 nowe w payments.test. Nie sprawdzone na urządzeniu.
 
 ---
 
