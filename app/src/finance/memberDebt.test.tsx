@@ -1,4 +1,4 @@
-import {render,screen,waitFor} from '@testing-library/react';
+import {fireEvent,render,screen,waitFor} from '@testing-library/react';
 import {describe,expect,it,vi} from 'vitest';
 import type {SessionManager} from '../auth/sessionManager';
 import {AccountError} from '../auth/api';
@@ -49,5 +49,45 @@ describe('MemberDebtPanel',()=>{
   render(<MemberDebtPanel manager={mgr(broken)} userId="admin" groupId="g" memberId="m2"/>);
   expect(await screen.findByRole('alert')).toHaveTextContent('Nie udało się');
   expect(screen.getByRole('button',{name:'Spróbuj ponownie'})).toBeInTheDocument();
+ });
+});
+
+describe('MemberDebtPanel: wpłata i nadpłata',()=>{
+ const owing=()=>acc('m1',{balance_cents:-2500,dues:[due('e1','2026-11-03T18:00:00Z',2500)]});
+ it('records a general payment larger than the debt, without an event, and reloads the account',async()=>{
+  let paid=false;
+  const call=vi.fn(async(a:string,b:Record<string,unknown>={})=>{
+   if(a==='group_finance_record_payment'){paid=true;return {ok:true,group_id:'g'};}
+   return b.user_id==='m1'?(paid?acc('m1',{balance_cents:7500}):owing()):acc('admin',{surplus:[]});});
+  render(<MemberDebtPanel manager={mgr(call)} userId="admin" groupId="g" memberId="m1"/>);
+  fireEvent.change(await screen.findByLabelText(/Wpłata zawodnika/),{target:{value:'100'}});
+  fireEvent.click(screen.getByRole('button',{name:'Zapisz wpłatę'}));
+  expect(await screen.findByText(/Zapisano wpłatę 100,00/)).toBeInTheDocument();
+  const write=call.mock.calls.find(c=>c[0]==='group_finance_record_payment')!;
+  expect(write[1]).toMatchObject({group_id:'g',user_id:'m1',amount_cents:10000});expect(write[1]).not.toHaveProperty('event_id');expect(typeof write[1]?.request_id).toBe('string');
+  expect(await screen.findByText(/nadpłata 75,00/)).toBeInTheDocument();expect(screen.getByText('Brak zaległości')).toBeInTheDocument();
+ });
+ it('reuses the request id when the same amount is retried after a failed save',async()=>{
+  let n=0;const call=vi.fn(async(a:string,b:Record<string,unknown>={})=>{
+   if(a==='group_finance_record_payment'){if(++n===1)throw new Error('lost');return {ok:true,group_id:'g'};}
+   return b.user_id==='m1'?owing():acc('admin',{surplus:[]});});
+  render(<MemberDebtPanel manager={mgr(call)} userId="admin" groupId="g" memberId="m1"/>);
+  fireEvent.change(await screen.findByLabelText(/Wpłata zawodnika/),{target:{value:'100'}});
+  fireEvent.click(screen.getByRole('button',{name:'Zapisz wpłatę'}));
+  expect(await screen.findByRole('alert')).toHaveTextContent('Nie potwierdzono zapisu');
+  fireEvent.click(screen.getByRole('button',{name:'Zapisz wpłatę'}));
+  await waitFor(()=>expect(call.mock.calls.filter(c=>c[0]==='group_finance_record_payment')).toHaveLength(2));
+  const w=call.mock.calls.filter(c=>c[0]==='group_finance_record_payment');expect(w[0][1]?.request_id).toBe(w[1][1]?.request_id);
+ });
+ it('rejects an invalid amount locally and hides the form while a report waits for a decision',async()=>{
+  const call=vi.fn(async(a:string,b:Record<string,unknown>={})=>b.user_id==='m1'?owing():acc('admin',{surplus:[]}));
+  const {unmount}=render(<MemberDebtPanel manager={mgr(call)} userId="admin" groupId="g" memberId="m1"/>);
+  fireEvent.change(await screen.findByLabelText(/Wpłata zawodnika/),{target:{value:'abc'}});
+  fireEvent.click(screen.getByRole('button',{name:'Zapisz wpłatę'}));
+  expect(await screen.findByRole('alert')).toHaveTextContent('Podaj kwotę');expect(call.mock.calls.some(c=>c[0]==='group_finance_record_payment')).toBe(false);
+  unmount();
+  const pending=vi.fn(async(a:string,b:Record<string,unknown>={})=>b.user_id==='m1'?{...owing(),payments:[{id:'p',group_id:'g',event_id:null,user_id:'m1',corrected_amount_cents:2500,status:'pending' as const}]}:acc('admin',{surplus:[]}));
+  render(<MemberDebtPanel manager={mgr(pending)} userId="admin" groupId="g" memberId="m1"/>);
+  expect(await screen.findByText(/Zgłoszona wpłata czeka/)).toBeInTheDocument();expect(screen.queryByLabelText(/Wpłata zawodnika/)).toBeNull();
  });
 });
