@@ -1,4 +1,4 @@
-import {fireEvent,render,screen,waitFor} from '@testing-library/react';
+import {fireEvent,render,screen,waitFor,within} from '@testing-library/react';
 import {describe,expect,it,vi} from 'vitest';
 import type {SessionManager} from '../auth/sessionManager';
 import {AccountError} from '../auth/api';
@@ -97,7 +97,7 @@ describe('MemberDebtPanel: wpłata i nadpłata',()=>{
    return b.user_id==='m1'?(done?acc('m1',{payments:[{id:'p',group_id:'g',event_id:null,user_id:'m1',corrected_amount_cents:2500,status:'accepted'}]}):{...owing(),payments:[{id:'p',group_id:'g',event_id:null,user_id:'m1',corrected_amount_cents:2500,status:'pending' as const}]}):acc('admin',{surplus:[]});});
   render(<MemberDebtPanel manager={mgr(call)} userId="admin" groupId="g" memberId="m1"/>);
   fireEvent.click(await screen.findByRole('button',{name:'Zatwierdź'}));
-  expect(await screen.findByText('Wpłata zatwierdzona.')).toBeInTheDocument();
+  expect(await screen.findByText('Wpłata zatwierdzona: 25,00 zł.')).toBeInTheDocument();
   const w=call.mock.calls.find(c=>c[0]==='group_finance_accept_payment')!;
   expect(w[1]).toMatchObject({group_id:'g',payment_id:'p',expected_amount_cents:2500});expect(typeof w[1]?.request_id).toBe('string');
   expect(await screen.findByText(/25,00 zł · zaksięgowana/)).toBeInTheDocument();expect(screen.queryByRole('button',{name:'Zatwierdź'})).toBeNull();
@@ -118,5 +118,68 @@ describe('MemberDebtPanel: wpłata i nadpłata',()=>{
   fireEvent.click(await screen.findByRole('button',{name:'Cofnij'}));
   expect(await screen.findByText('Wpłata cofnięta.')).toBeInTheDocument();
   expect(cancel.mock.calls.find(c=>c[0]==='group_finance_cancel_payment')![1]).toMatchObject({payment_id:'a',expected_amount_cents:1000,event_id:'e1'});
+ });
+ it('approves a report with the amount the admin typed (accept, then correct) and corrects an accepted payment',async()=>{
+  let state:'pending'|'accepted'='pending';let amount=2500;
+  const call=vi.fn(async(a:string,b:Record<string,unknown>={})=>{
+   if(a==='group_finance_accept_payment'){state='accepted';return {ok:true,group_id:'g'};}
+   if(a==='group_finance_correct_payment'){amount=Number(b.amount_cents);return {ok:true,group_id:'g'};}
+   return b.user_id==='m1'?{...owing(),payments:[{id:'p',group_id:'g',event_id:null,user_id:'m1',corrected_amount_cents:amount,status:state}]}:acc('admin',{surplus:[]});});
+  render(<MemberDebtPanel manager={mgr(call)} userId="admin" groupId="g" memberId="m1"/>);
+  const input=await screen.findByLabelText('Kwota (zł)');expect(input).toHaveValue('25,00');
+  fireEvent.change(input,{target:{value:'100'}});fireEvent.click(screen.getByRole('button',{name:'Zatwierdź'}));
+  expect(await screen.findByText('Wpłata zatwierdzona: 100,00 zł.')).toBeInTheDocument();
+  const names=call.mock.calls.map(c=>c[0]).filter(n=>/accept|correct/.test(n));expect(names).toEqual(['group_finance_accept_payment','group_finance_correct_payment']);
+  expect(call.mock.calls.find(c=>c[0]==='group_finance_correct_payment')![1]).toMatchObject({payment_id:'p',expected_amount_cents:2500,amount_cents:10000});
+  expect(await screen.findByText(/100,00 zł · zaksięgowana/)).toBeInTheDocument();
+  fireEvent.change(screen.getByLabelText('Kwota (zł)'),{target:{value:'80'}});fireEvent.click(screen.getByRole('button',{name:'Popraw kwotę'}));
+  expect(await screen.findByText('Kwota wpłaty poprawiona: 80,00 zł.')).toBeInTheDocument();
+  expect(call.mock.calls.filter(c=>c[0]==='group_finance_correct_payment')[1][1]).toMatchObject({expected_amount_cents:10000,amount_cents:8000});
+ });
+ it('refuses a zero or invalid typed amount without calling the server',async()=>{
+  const call=vi.fn(async(a:string,b:Record<string,unknown>={})=>b.user_id==='m1'?{...owing(),payments:[{id:'p',group_id:'g',event_id:null,user_id:'m1',corrected_amount_cents:2500,status:'pending' as const}]}:acc('admin',{surplus:[]}));
+  render(<MemberDebtPanel manager={mgr(call)} userId="admin" groupId="g" memberId="m1"/>);
+  fireEvent.change(await screen.findByLabelText('Kwota (zł)'),{target:{value:'0'}});fireEvent.click(screen.getByRole('button',{name:'Zatwierdź'}));
+  expect(await screen.findByRole('alert')).toHaveTextContent('Wpłata musi być dodatnia');expect(call.mock.calls.some(c=>/accept|correct/.test(c[0]))).toBe(false);
+ });
+ it('opens a Rozliczenie popup where the admin types the amount and approves, and closes it with Escape',async()=>{
+  let state:'pending'|'accepted'='pending';
+  const call=vi.fn(async(a:string,b:Record<string,unknown>={})=>{
+   if(a==='group_finance_accept_payment'){state='accepted';return {ok:true,group_id:'g'};}
+   return b.user_id==='m1'?{...owing(),payments:[{id:'p',group_id:'g',event_id:null,user_id:'m1',corrected_amount_cents:2500,status:state}]}:acc('admin',{surplus:[]});});
+  render(<MemberDebtPanel manager={mgr(call)} userId="admin" groupId="g" memberId="m1"/>);
+  expect(screen.queryByRole('dialog')).toBeNull();
+  fireEvent.click(await screen.findByRole('button',{name:'Rozliczenie'}));
+  const dialog=await screen.findByRole('dialog',{name:'Rozliczenie zawodnika'});
+  expect(within(dialog).getByText(/Zaległość/)).toBeInTheDocument();
+  fireEvent.click(within(dialog).getByRole('button',{name:'Zatwierdź'}));
+  expect(await within(dialog).findByText('Wpłata zatwierdzona: 25,00 zł.')).toBeInTheDocument();
+  expect(await within(dialog).findByText(/25,00 zł · zaksięgowana/)).toBeInTheDocument();
+  fireEvent.keyDown(dialog,{key:'Escape'});
+  await waitFor(()=>expect(screen.queryByRole('dialog')).toBeNull());
+ });
+ it('records a new payment from the popup with the typed amount',async()=>{
+  const call=vi.fn(async(a:string,b:Record<string,unknown>={})=>a==='group_finance_record_payment'?{ok:true,group_id:'g'}:b.user_id==='m1'?owing():acc('admin',{surplus:[]}));
+  render(<MemberDebtPanel manager={mgr(call)} userId="admin" groupId="g" memberId="m1"/>);
+  fireEvent.click(await screen.findByRole('button',{name:'Rozliczenie'}));
+  const dialog=await screen.findByRole('dialog');
+  fireEvent.change(within(dialog).getByLabelText(/Wpłata zawodnika/),{target:{value:'100'}});
+  fireEvent.click(within(dialog).getByRole('button',{name:'Zapisz wpłatę'}));
+  expect(await within(dialog).findByText(/Zapisano wpłatę 100,00/)).toBeInTheDocument();
+  expect(call.mock.calls.find(c=>c[0]==='group_finance_record_payment')![1]).toMatchObject({user_id:'m1',amount_cents:10000});
+ });
+ it('lets the admin record an advance for a player with no debt, kept as credit',async()=>{
+  let paid=false;
+  const call=vi.fn(async(a:string,b:Record<string,unknown>={})=>{
+   if(a==='group_finance_record_payment'){paid=true;return {ok:true,group_id:'g'};}
+   return b.user_id==='m1'?acc('m1',{balance_cents:paid?10000:0}):acc('admin',{surplus:[]});});
+  render(<MemberDebtPanel manager={mgr(call)} userId="admin" groupId="g" memberId="m1"/>);
+  expect(await screen.findByText('Brak zaległości')).toBeInTheDocument();
+  expect(screen.getByText(/cała kwota zostanie na koncie jako nadpłata/)).toBeInTheDocument();
+  fireEvent.change(screen.getByLabelText(/Wpłata zawodnika/),{target:{value:'100'}});
+  fireEvent.click(screen.getByRole('button',{name:'Zapisz wpłatę'}));
+  expect(await screen.findByText(/Zapisano wpłatę 100,00/)).toBeInTheDocument();
+  const w=call.mock.calls.find(c=>c[0]==='group_finance_record_payment')![1]!;expect(w).toMatchObject({user_id:'m1',amount_cents:10000});expect(w).not.toHaveProperty('event_id');
+  expect(await screen.findByText(/nadpłata 100,00/)).toBeInTheDocument();
  });
 });

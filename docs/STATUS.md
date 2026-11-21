@@ -1,3 +1,17 @@
+# Nadpłata dla zawodnika bez zaległości — 2026-11-21
+
+Problem: admin nie mógł wpisać wpłaty zawodnikowi bez długu (formularz ukryty, serwer zwracał `already_paid`). Migracja `20261121200000_advance_payment_without_debt.sql`: `payment_pending_guard_base` przyjmuje ogólną wpłatę admina (bez `event_id`) przy zerowej zaległości — całość zostaje jako nadpłata. Dalej blokowane: zgłoszenie wpłaty przez samego zawodnika bez długu oraz wpłata na konkretny mecz bez należności/ponad nią. Sprawdzone w wycofywanej transakcji pod `service_role` (100 zł dla zawodnika bez długu → saldo +100 zł; wpłata na mecz → `already_paid`).
+Klient: formularz „Wpłata zawodnika (zł)” widoczny także bez zaległości, z podpowiedzią o nadpłacie.
+
+---
+
+# Profil zawodnika: kwota wpłaty wpisywana ręcznie — 2026-11-21
+
+Przy każdej wpłacie w profilu admin ma pole „Kwota (zł)” (domyślnie kwota z serwera). Zgłoszenie: „Zatwierdź” zatwierdza z wpisaną kwotą (jeśli inna niż zgłoszona: `accept_payment`, potem `correct_payment`; przy błędzie korekty komunikat mówi, że zatwierdzono kwotę zgłoszoną). Zaksięgowana: „Popraw kwotę” (`correct_payment`) i „Cofnij”. Sprawdzone pod `service_role` w wycofywanej transakcji (accept + correct). Brak zmian w bazie.
+Przycisk „Rozliczenie” w panelu otwiera okno (popup): zaległość, wpłaty z polem kwoty (Zatwierdź / Odrzuć / Popraw kwotę / Cofnij) i formularz nowej wpłaty; Esc, × lub kliknięcie tła zamyka. Dotychczasowy widok w panelu zostaje bez zmian.
+
+---
+
 # Akceptacja wpłat nic nie robiła + decyzje o wpłatach w profilu — 2026-11-21
 
 Przyczyna: `service_role` nie miał EXECUTE na `slm_private.privacy_redaction_ok`, wołanym przez wyzwalacz `group_payment_identity` przy UPDATE wpłaty. Akceptacja/odrzucenie/cofnięcie kończyły się 42501 (PostgREST 403), Edge zwracał 503 i UI nie pokazywał efektu. Wcześniejsze testy w SQL przechodziły, bo biegły jako superużytkownik; błąd widać dopiero pod `set local role service_role`.
