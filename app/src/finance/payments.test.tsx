@@ -116,7 +116,7 @@ function generalFixture(withDue:boolean){
   dues:withDue?[{event_id:'e',starts_at:'2026-11-04T18:00:00Z',due_cents:4600,covered_cents:0,outstanding_cents:4600}]:[],
   payments:pending?[general]:[],history:[],surplus:[]});
  const events=[{id:'e',name:'Mecz testowy',starts_at:'2026-11-04T18:00:00Z'}];
- const call=vi.fn(async(action:string)=>{
+ const call=vi.fn(async(action:string,_body?:Record<string,unknown>)=>{
   if(action==='group_finance_account')return own();
   if(action==='group_finance_roster')return {group_id:'g',players:[{user_id:'u',name:'Zawodnik fixture',account:own()}],events};
   if(action==='group_finance_accept_payment'){pending=false;return {ok:true,group_id:'g'};}
