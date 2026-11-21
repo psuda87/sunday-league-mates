@@ -1,6 +1,7 @@
 # Profil zawodnika: kwota wpłaty wpisywana ręcznie — 2026-11-21
 
 Przy każdej wpłacie w profilu admin ma pole „Kwota (zł)” (domyślnie kwota z serwera). Zgłoszenie: „Zatwierdź” zatwierdza z wpisaną kwotą (jeśli inna niż zgłoszona: `accept_payment`, potem `correct_payment`; przy błędzie korekty komunikat mówi, że zatwierdzono kwotę zgłoszoną). Zaksięgowana: „Popraw kwotę” (`correct_payment`) i „Cofnij”. Sprawdzone pod `service_role` w wycofywanej transakcji (accept + correct). Brak zmian w bazie.
+Przycisk „Rozliczenie” w panelu otwiera okno (popup): zaległość, wpłaty z polem kwoty (Zatwierdź / Odrzuć / Popraw kwotę / Cofnij) i formularz nowej wpłaty; Esc, × lub kliknięcie tła zamyka. Dotychczasowy widok w panelu zostaje bez zmian.
 
 ---
 
