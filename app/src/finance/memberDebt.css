@@ -1,0 +1,12 @@
+/* Panel zadłużenia w profilu zawodnika (administrator grupy). Stan zawsze opisany tekstem i symbolem, nie samym kolorem. */
+.slm-member-debt {margin-block:14px;padding:14px 16px;border:1px solid var(--slm-border,rgba(255,255,255,.14));border-radius:14px;background:var(--slm-panel,#15221d);}
+.slm-member-debt h3 {margin:0 0 8px;font-size:1rem;}
+.slm-member-debt p {margin:6px 0;overflow-wrap:anywhere;}
+.slm-member-debt-total[data-state=owed] {color:var(--ion-color-danger,#ff8a80);}
+.slm-member-debt-total[data-state=clear] {color:var(--ion-color-success,#80d4c5);}
+.slm-member-debt-list {margin:6px 0;padding:0;list-style:none;}
+.slm-member-debt-list li {display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding-block:7px;border-top:1px solid var(--slm-border,rgba(255,255,255,.14));}
+.slm-member-debt-block {color:var(--ion-color-danger,#ff8a80);}
+.slm-member-debt-note {font-size:.75rem;}
+.slm-member-debt button {min-height:44px;box-sizing:border-box;padding:8px 14px;border:1px solid var(--slm-border,rgba(255,255,255,.14));border-radius:10px;background:transparent;color:inherit;cursor:pointer;}
+.slm-member-debt button:focus-visible {outline:2px solid var(--slm-gold,#d9b45a);outline-offset:3px;}

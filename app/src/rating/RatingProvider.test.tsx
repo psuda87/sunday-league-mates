@@ -4,8 +4,8 @@ import type { SessionManager } from '../auth/sessionManager';
 import { RatingProvider, usePlayerRating, useRatingsAvailable } from './RatingProvider';
 import { useMvpGold } from './mvpGold';
 
-function Probe({ id }: { id: string }) {
-  const r = usePlayerRating(id), gold = useMvpGold(id), available = useRatingsAvailable();
+function Probe({ id, fresh = false }: { id: string; fresh?: boolean }) {
+  const r = usePlayerRating(id, fresh), gold = useMvpGold(id), available = useRatingsAvailable();
   return <span data-testid={id}>{r ? `${r.rating}:${r.final}` : 'none'}|{gold ? 'gold' : 'plain'}|{available ? 'on' : 'off'}</span>;
 }
 const snapshot = { phase: 'ready', session: { user_id: 'me' }, message: '' };
@@ -28,5 +28,16 @@ describe('RatingProvider', () => {
     render(<RatingProvider manager={manager(call)} userId="me"><Probe id="me" /></RatingProvider>);
     await waitFor(() => expect(call).toHaveBeenCalled());
     expect(screen.getByTestId('me')).toHaveTextContent('none|plain|off');
+  });
+  it('re-reads a player on every profile open (fresh) but not for list cards', async () => {
+    let goals = 1;
+    const call = vi.fn(async (action: string, body?: Record<string, unknown>) => action === 'ratings_overview'
+      ? { me: { user_id: 'me', rating: 7, final: true, rated_matches: 1 }, gold: [] }
+      : { user_id: body!.user_id, rating: 8, final: true, rated_matches: goals++, gold: false });
+    const m = manager(call);
+    const view = render(<RatingProvider manager={m} userId="me"><Probe id="u2" /></RatingProvider>);
+    await waitFor(() => expect(screen.getByTestId('u2')).toHaveTextContent('8:true'));
+    view.rerender(<RatingProvider manager={m} userId="me"><Probe id="u2" /><Probe id="u2" fresh /></RatingProvider>);
+    await waitFor(() => expect(call.mock.calls.filter(c => c[0] === 'ratings_player')).toHaveLength(2));
   });
 });
