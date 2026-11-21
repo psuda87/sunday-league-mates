@@ -1,3 +1,9 @@
+# Profil zawodnika: kwota wpłaty wpisywana ręcznie — 2026-11-21
+
+Przy każdej wpłacie w profilu admin ma pole „Kwota (zł)” (domyślnie kwota z serwera). Zgłoszenie: „Zatwierdź” zatwierdza z wpisaną kwotą (jeśli inna niż zgłoszona: `accept_payment`, potem `correct_payment`; przy błędzie korekty komunikat mówi, że zatwierdzono kwotę zgłoszoną). Zaksięgowana: „Popraw kwotę” (`correct_payment`) i „Cofnij”. Sprawdzone pod `service_role` w wycofywanej transakcji (accept + correct). Brak zmian w bazie.
+
+---
+
 # Akceptacja wpłat nic nie robiła + decyzje o wpłatach w profilu — 2026-11-21
 
 Przyczyna: `service_role` nie miał EXECUTE na `slm_private.privacy_redaction_ok`, wołanym przez wyzwalacz `group_payment_identity` przy UPDATE wpłaty. Akceptacja/odrzucenie/cofnięcie kończyły się 42501 (PostgREST 403), Edge zwracał 503 i UI nie pokazywał efektu. Wcześniejsze testy w SQL przechodziły, bo biegły jako superużytkownik; błąd widać dopiero pod `set local role service_role`.

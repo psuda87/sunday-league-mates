@@ -46,19 +46,40 @@ export default function MemberDebtPanel({manager,userId,groupId,memberId}:{manag
  // Decyzje o wpłatach z profilu: ten sam identyfikator dla tej samej decyzji, dopóki serwer jej nie potwierdzi.
  const decisionIds=useRef(new Map<string,string>());
  const [deciding,setDeciding]=useState('');
- async function decide(action:'accept_payment'|'reject_payment'|'cancel_payment',p:Receipt){
+ // Kwota wpisywana przez administratora przy każdej wpłacie; domyślnie kwota z serwera.
+ const [typed,setTyped]=useState<Record<string,string>>({});
+ const step=async(action:string,fingerprint:string,body:Record<string,unknown>)=>{
+  let id=decisionIds.current.get(fingerprint);if(!id){id=crypto.randomUUID();decisionIds.current.set(fingerprint,id);}
+  await manager.call(`group_finance_${action}`,{group_id:groupId,...body,request_id:id});decisionIds.current.delete(fingerprint);
+ };
+ async function decide(action:'accept_payment'|'reject_payment'|'cancel_payment'|'correct_payment',p:Receipt){
   if(deciding)return;
-  setFormError('');setNotice('');setDeciding(p.id);
-  const reasons={accept_payment:'Akceptacja zgłoszonej wpłaty w profilu zawodnika',reject_payment:'Odrzucenie zgłoszonej wpłaty w profilu zawodnika',cancel_payment:'Anulowanie zatwierdzonej wpłaty w profilu zawodnika'};
-  const fingerprint=`${key}:${action}:${p.id}`;let id=decisionIds.current.get(fingerprint);if(!id){id=crypto.randomUUID();decisionIds.current.set(fingerprint,id);}
+  setFormError('');setNotice('');
+  let cents=p.corrected_amount_cents;
+  if(action==='accept_payment'||action==='correct_payment'){
+   const raw=typed[p.id];if(raw!==undefined&&raw.trim()){try{cents=parseCents(raw);}catch(e){setFormError(e instanceof Error?e.message:'Podaj kwotę wpłaty.');return;}}
+   if(cents<=0){setFormError('Kwota musi być większa od zera. Aby usunąć wpłatę, użyj „Odrzuć” lub „Cofnij”.');return;}
+  }
+  setDeciding(p.id);
+  const reasons={accept_payment:'Akceptacja zgłoszonej wpłaty w profilu zawodnika',reject_payment:'Odrzucenie zgłoszonej wpłaty w profilu zawodnika',cancel_payment:'Anulowanie zatwierdzonej wpłaty w profilu zawodnika',correct_payment:'Korekta kwoty wpłaty w profilu zawodnika'};
+  const scope={...(p.event_id?{event_id:p.event_id}:{})};
+  const fp=(a:string,extra='')=>`${key}:${a}:${p.id}${extra}`;
+  let accepted=false;
   try{
-   await manager.call(`group_finance_${action}`,{group_id:groupId,payment_id:p.id,...(action==='reject_payment'?{}:{expected_amount_cents:p.corrected_amount_cents}),...(p.event_id?{event_id:p.event_id}:{}),reason:reasons[action],request_id:id});
-   decisionIds.current.delete(fingerprint);
-   setNotice(action==='accept_payment'?'Wpłata zatwierdzona.':action==='reject_payment'?'Zgłoszenie odrzucone.':'Wpłata cofnięta.');
+   if(action==='accept_payment'){
+    await step('accept_payment',fp('accept_payment'),{payment_id:p.id,expected_amount_cents:p.corrected_amount_cents,...scope,reason:reasons.accept_payment});accepted=true;
+    if(cents!==p.corrected_amount_cents)await step('correct_payment',fp('correct_payment',`:${cents}`),{payment_id:p.id,expected_amount_cents:p.corrected_amount_cents,amount_cents:cents,...scope,reason:'Korekta kwoty przy zatwierdzeniu zgłoszenia w profilu zawodnika'});
+   }else if(action==='correct_payment'){
+    await step('correct_payment',fp('correct_payment',`:${cents}`),{payment_id:p.id,expected_amount_cents:p.corrected_amount_cents,amount_cents:cents,...scope,reason:reasons.correct_payment});
+   }else{
+    await step(action,fp(action),{payment_id:p.id,...(action==='reject_payment'?{}:{expected_amount_cents:p.corrected_amount_cents}),...scope,reason:reasons[action]});
+   }
+   setTyped(t=>{const {[p.id]:_,...rest}=t;return rest;});
+   setNotice(action==='accept_payment'?`Wpłata zatwierdzona: ${formatCents(cents)}.`:action==='correct_payment'?`Kwota wpłaty poprawiona: ${formatCents(cents)}.`:action==='reject_payment'?'Zgłoszenie odrzucone.':'Wpłata cofnięta.');
    window.dispatchEvent(new Event(financeChangedEvent));
   }catch(e){
    const code=e instanceof AccountError?e.code:'';
-   setFormError(code==='payment_processed'||code==='stale_version'?'Dane zmieniły się na serwerze. Lista została odświeżona.':code==='forbidden'?'Brak uprawnień do decyzji o wpłacie.':'Nie potwierdzono operacji. Sprawdź stan po odświeżeniu przed ponowną próbą.');
+   setFormError(accepted?`Zgłoszenie zatwierdzono na zgłoszoną kwotę ${formatCents(p.corrected_amount_cents)}, ale nie udało się zmienić jej na ${formatCents(cents)}. Popraw kwotę w liście wpłat.`:code==='payment_processed'||code==='stale_version'?'Dane zmieniły się na serwerze. Lista została odświeżona.':code==='no_change'?'Kwota jest taka sama jak zapisana.':code==='forbidden'?'Brak uprawnień do decyzji o wpłacie.':'Nie potwierdzono operacji. Sprawdź stan po odświeżeniu przed ponowną próbą.');
   }finally{setDeciding('');setAttempt(n=>n+1);}
  }
  async function record(){
@@ -89,12 +110,13 @@ export default function MemberDebtPanel({manager,userId,groupId,memberId}:{manag
    </>
    :<p className="slm-member-debt-total" data-state="clear"><span aria-hidden="true">✓ </span><strong>Brak zaległości</strong>{state.debt.creditCents>0&&<> · nadpłata {formatCents(state.debt.creditCents)} (zaliczana na kolejne mecze)</>}</p>)}
     {state.phase==='ready'&&state.debt.blocked&&<p className="slm-member-debt-block"><span aria-hidden="true">⛔ </span>Zapisy na płatne mecze są zablokowane (co najmniej dwa zaległe mecze).</p>}
-  {state.phase==='ready'&&state.debt.payments.length>0&&<ul className="slm-member-debt-payments" aria-label="Wpłaty zawodnika">{state.debt.payments.map(p=><li key={p.id}>
-   <span>{formatCents(p.corrected_amount_cents)} · {p.status==='pending'?'zgłoszona, czeka na decyzję':'zaksięgowana'}</span>
-   <span className="slm-member-debt-actions">{p.status==='pending'
+  {state.phase==='ready'&&state.debt.payments.length>0&&<ul className="slm-member-debt-payments" aria-label="Wpłaty zawodnika">{state.debt.payments.map(p=>{const pend=p.status==='pending';return <li key={p.id}>
+   <span>{formatCents(p.corrected_amount_cents)} · {pend?'zgłoszona, czeka na decyzję':'zaksięgowana'}</span>
+   <label className="slm-member-debt-amount">Kwota (zł)<input inputMode="decimal" value={typed[p.id]??(p.corrected_amount_cents/100).toFixed(2).replace('.',',')} onChange={e=>setTyped(t=>({...t,[p.id]:e.target.value}))} disabled={!!deciding}/></label>
+   <span className="slm-member-debt-actions">{pend
     ?<><button type="button" disabled={!!deciding} onClick={()=>{void decide('accept_payment',p);}}>Zatwierdź</button><button type="button" disabled={!!deciding} onClick={()=>{void decide('reject_payment',p);}}>Odrzuć</button></>
-    :<button type="button" disabled={!!deciding} onClick={()=>{void decide('cancel_payment',p);}}>Cofnij</button>}</span>
-  </li>)}</ul>}
+    :<><button type="button" disabled={!!deciding} onClick={()=>{void decide('correct_payment',p);}}>Popraw kwotę</button><button type="button" disabled={!!deciding} onClick={()=>{void decide('cancel_payment',p);}}>Cofnij</button></>}</span>
+  </li>;})}</ul>}
   {state.phase==='ready'&&state.debt.totalCents>0&&state.debt.pendingCount===0&&<form className="slm-member-debt-form" onSubmit={e=>{e.preventDefault();void record();}}>
    <label>Wpłata zawodnika (zł)<input inputMode="decimal" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="np. 100" disabled={saving}/></label>
    <button type="submit" disabled={saving||!amount.trim()}>{saving?'Zapisywanie…':'Zapisz wpłatę'}</button>

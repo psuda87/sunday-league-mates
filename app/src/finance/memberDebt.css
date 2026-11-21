@@ -18,3 +18,5 @@
 .slm-member-debt-payments {margin:8px 0;padding:0;list-style:none;}
 .slm-member-debt-payments li {display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding-block:7px;border-top:1px solid var(--slm-border,rgba(255,255,255,.14));}
 .slm-member-debt-actions {display:flex;flex-wrap:wrap;gap:8px;}
+.slm-member-debt-amount {display:grid;gap:4px;font-size:.85rem;flex:1 1 140px;}
+.slm-member-debt-amount input {min-height:44px;box-sizing:border-box;padding:8px 12px;border:1px solid var(--slm-border,rgba(255,255,255,.14));border-radius:10px;background:transparent;color:inherit;font:inherit;}
