@@ -1,7 +1,7 @@
-# Potwierdzanie wpłat: brak wylogowania przy błędzie serwera, zgłoszenie znika od razu — 2026-11-21
+# Nadpłata: admin wpisuje wpłatę większą niż dług — 2026-11-21
 
-Przyczyna wylogowań: każda odpowiedź 503 (Edge zamienia na 503 także kod 555 bramki Supabase na wywołaniu limitera `slm_account_rate`; 17 takich zdarzeń 20.11, serie przy próbach potwierdzania) przy zwykłej operacji zrzucała sesję do stanu „niedostępne” (`SessionManager.execute` → `problem`). Teraz tylko `session_invalid` i zgubiona odpowiedź (`network_error`) wymuszają weryfikację sesji; 5xx/limit kończą się błędem operacji, sesja zostaje. Akceptacja wpłaty na bazie działa (5 oczekujących zgłoszeń sprawdzone w transakcjach wycofanych, 30–120 ms).
-`usePremiumFinance.mutate`: po potwierdzeniu przez serwer zgłoszenie znika z listy od razu (bez pustego ekranu), odczyt w tle (`reload(true)`); gdy odczyt zawiedzie, klucz idempotencji zostaje, a komunikat mówi, że operacja jest potwierdzona. Testy: sessionManager (3 kody + session_invalid), finance (zniknięcie zgłoszenia przy nieudanym odczycie). Nie sprawdzone na urządzeniu. Nie wyjaśniono, co powoduje same odpowiedzi 555 (do obserwacji).
+Backend bez zmian: wpłata ogólna (`record_payment` bez `event_id`) może przekraczać zaległość; `group_dues` rozlicza ją po datach meczów, a saldo (`balance_cents`) robi się dodatnie (sprawdzone w transakcji wycofanej: dług 23 zł + wpłata 98 zł → zaległość 0, saldo +75 zł). Nadpłata przechodzi na kolejne zatwierdzone mecze. Ograniczenia serwera, bez zmian: wpłatę ogólną można zapisać tylko przy zaległości (`already_paid` bez długu) i nie przy oczekującym zgłoszeniu (`pending_payment_exists`); wpłata przypisana do meczu nadal nie może przekroczyć jego należności (`overpayment`).
+Klient: `MemberDebtPanel` ma formularz „Wpłata zawodnika (zł)” dla admina (ten sam identyfikator żądania przy ponowieniu tej kwoty, walidacja kwoty, komunikaty po polsku); nadpłata widoczna w panelu admina oraz u zawodnika („Nadpłata: X — zostanie zaliczona na kolejne mecze” w Moich płatnościach i Bieżących płatnościach). Testy: 3 nowe w memberDebt. Nie sprawdzone na urządzeniu.
 
 ---
 

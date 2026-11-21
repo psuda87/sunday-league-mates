@@ -34,6 +34,7 @@ function OwnPaymentForm({manager,userId,group,onChanged,refreshVersion}:{manager
    <div role="tablist" aria-label="Moje płatności"><button role="tab" aria-selected={tab==='pay'} onClick={()=>setTab('pay')}>Zgłoś wpłatę</button><button role="tab" aria-selected={tab==='history'} onClick={()=>setTab('history')}>Historia wpłat</button></div>
    {tab==='pay'?<div role="tabpanel" aria-label="Zgłoszenie wpłaty">
     <p>Saldo: {formatCents(f.own.balance_cents)}</p>
+    {f.own.balance_cents>0&&<p className="slm-credit">Nadpłata: <strong>{formatCents(f.own.balance_cents)}</strong> — zostanie zaliczona na kolejne mecze.</p>}
     {f.own.dues.filter(d=>d.outstanding_cents>0).map(d=><p key={d.event_id}>{title(d.event_id)} · {matchDate(d.starts_at)} · do zapłaty {formatCents(d.outstanding_cents)}</p>)}
     {pending.map(p=><p key={p.id}>Zgłoszono {formatCents(p.corrected_amount_cents)} · {p.event_id?title(p.event_id):'wpłata ogólna'} · {isSettledReport(f.own!,p)?'nieaktualne zgłoszenie — należność już opłacona. Administrator może odrzucić to zgłoszenie.':p.event_id&&!f.own!.dues.some(d=>d.event_id===p.event_id)?'oczekiwanie na decyzję — za ten mecz nie ma obecnie naliczonej składki':'oczekiwanie na decyzję'}</p>)}
     {f.own.dues.some(d=>d.outstanding_cents>0)?<form className="slm-finance-form" aria-label="Zgłoś własną wpłatę" noValidate onSubmit={e=>{e.preventDefault();void submit();}}>

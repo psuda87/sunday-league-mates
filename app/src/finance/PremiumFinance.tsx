@@ -19,6 +19,7 @@ export default function PremiumFinance({manager,userId,groupId,eventId,manage=fa
    <div role="tablist" aria-label="Widok płatności"><button role="tab" aria-selected={tab==='current'} onClick={()=>setTab('current')}>Bieżące płatności</button><button role="tab" aria-selected={tab==='history'} onClick={()=>setTab('history')}>Historia wpłat</button></div>
    {tab==='current'?<div role="tabpanel" aria-label="Bieżące płatności">
     <p>Twoje saldo: <strong>{formatCents(f.own.balance_cents)}</strong></p>
+    {f.own.balance_cents>0&&<p className="slm-credit">Nadpłata: <strong>{formatCents(f.own.balance_cents)}</strong> — zostanie zaliczona na kolejne mecze.</p>}
     {!admin&&<><p>Zgłoszenie wpłaty znajdziesz w swoim profilu, w sekcji „Moje płatności”.</p>{f.own.dues.filter(d=>!eventId||d.event_id===eventId).map(d=><p key={d.event_id}>{matchDate(d.starts_at)} · {d.outstanding_cents>0?'Do zapłaty':'Opłacono'}: {formatCents(d.outstanding_cents)}</p>)}</>}
     {f.detail&&!f.detail.event.approved_at&&<article className="slm-payment-card"><h3>Rozliczenie meczu</h3><p>Koszt {formatCents(f.detail.event.cost_cents)}. Składki zostaną naliczone po zatwierdzeniu zakończonego meczu.</p><button disabled={f.busy} onClick={()=>{void f.mutate('approve',{event_id:eventId,expected_version:f.detail!.event.version});}}>Zatwierdź zakończony mecz</button></article>}
     {admin&&people.map(person=>{

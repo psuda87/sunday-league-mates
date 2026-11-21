@@ -10,3 +10,8 @@
 .slm-member-debt-note {font-size:.75rem;}
 .slm-member-debt button {min-height:44px;box-sizing:border-box;padding:8px 14px;border:1px solid var(--slm-border,rgba(255,255,255,.14));border-radius:10px;background:transparent;color:inherit;cursor:pointer;}
 .slm-member-debt button:focus-visible {outline:2px solid var(--slm-gold,#d9b45a);outline-offset:3px;}
+.slm-member-debt-form {display:grid;gap:8px;margin-block:10px;}
+.slm-member-debt-form label {display:grid;gap:4px;font-size:.85rem;}
+.slm-member-debt-form input {min-height:44px;box-sizing:border-box;padding:8px 12px;border:1px solid var(--slm-border,rgba(255,255,255,.14));border-radius:10px;background:transparent;color:inherit;font:inherit;}
+.slm-member-debt-form input:focus-visible {outline:2px solid var(--slm-gold,#d9b45a);outline-offset:2px;}
+.slm-credit {color:var(--ion-color-success,#80d4c5);}
