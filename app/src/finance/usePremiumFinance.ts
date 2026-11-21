@@ -19,8 +19,8 @@ export function usePremiumFinance(manager:SessionManager,userId:string,groupId:s
   const auth=manager.getSnapshot();if(auth.phase==='signed_out'||auth.phase==='storage_error'||auth.session&&auth.session.user_id!==registry.owner)registry.keys.clear();
  });},[manager,registry]);
  const valid=useCallback(()=>alive.current&&currentScope.current===scope&&manager.getSnapshot().phase==='ready'&&manager.getSnapshot().session?.user_id===userId,[manager,userId,scope]);
- const reload=useCallback(async()=>{
-  const ticket=++generation.current;setLoading(true);setError('');setState({scope,own:null,detail:null,pending:[],names:{},players:[],events:[]});
+ const reload=useCallback(async(silent=false)=>{
+  const ticket=++generation.current;if(!silent){setLoading(true);setError('');setState({scope,own:null,detail:null,pending:[],names:{},players:[],events:[]});}
   try{const own=account(await manager.call('group_finance_account',{group_id:groupId}),groupId,userId);
    const event=eventId&&manage&&own.surplus!==null?detail(await manager.call('group_finance_detail',{group_id:groupId,event_id:eventId}),groupId,eventId):null;
    const names:Record<string,string>={};
@@ -28,7 +28,7 @@ export function usePremiumFinance(manager:SessionManager,userId:string,groupId:s
    for(const p of board?.players??[])names[p.user_id]=p.name;
    const pending=board?board.players.flatMap(p=>p.account.payments.filter(r=>r.status==='pending')):[];
    if(valid()&&generation.current===ticket){setState({scope,own,detail:event,pending,names,players:board?.players??[],events:board?.events??[]});return true;}return false;
-  }catch{if(valid()&&generation.current===ticket)setError('Nie udało się potwierdzić rozliczeń. Odśwież i spróbuj ponownie.');return false;}
+  }catch{if(!silent&&valid()&&generation.current===ticket)setError('Nie udało się potwierdzić rozliczeń. Odśwież i spróbuj ponownie.');return false;}
   finally{if(alive.current&&generation.current===ticket)setLoading(false);}
  },[manager,userId,groupId,eventId,manage,valid,scope,adminView]);
  useEffect(()=>{alive.current=true;void reload();return()=>{alive.current=false;};},[reload,refreshVersion]);
@@ -39,7 +39,14 @@ export function usePremiumFinance(manager:SessionManager,userId:string,groupId:s
   const reasons:Record<string,string>={submit_payment:'Zgłoszenie wpłaty przez zawodnika',record_payment:'Wpłata oznaczona przez administratora',accept_payment:'Akceptacja zgłoszonej wpłaty',reject_payment:'Odrzucenie zgłoszonej wpłaty',cancel_payment:'Anulowanie zatwierdzonej wpłaty',approve:'Zatwierdzenie rozliczenia zakończonego meczu'};
   body={...body,reason:typeof body.reason==='string'&&body.reason.trim()?body.reason:reasons[action]??'Operacja płatności'};
   const fingerprint=JSON.stringify([userId,groupId,action,body]);let id=keys.current.get(fingerprint);if(!id){id=crypto.randomUUID();keys.current.set(fingerprint,id);}
-  try{const ack=await manager.call<{ok?:boolean;group_id?:string}>('group_finance_'+action,{...body,group_id:groupId,request_id:id});if(ack?.ok!==true||ack.group_id!==groupId)throw Error('Invalid write acknowledgement');if(!valid())return false;if(!await reload()||!valid())return false;keys.current.delete(fingerprint);setNotice('Operacja potwierdzona i dane odczytane z serwera.');onChanged?.();return true;}
+  try{const ack=await manager.call<{ok?:boolean;group_id?:string}>('group_finance_'+action,{...body,group_id:groupId,request_id:id});if(ack?.ok!==true||ack.group_id!==groupId)throw Error('Invalid write acknowledgement');if(!valid())return false;
+   // Serwer potwierdził decyzję: zgłoszenie znika z listy od razu, bez czekania na odczyt i bez pustego ekranu.
+   const settled=typeof body.payment_id==='string'&&['accept_payment','reject_payment','cancel_payment'].includes(action)?body.payment_id:null;
+   if(settled)setState(s=>({...s,pending:s.pending.filter(r=>r.id!==settled),players:s.players.map(pl=>({...pl,account:{...pl.account,payments:pl.account.payments.filter(r=>r.id!==settled)}}))}));
+   const fresh=await reload(true);if(!valid())return false;
+   // Klucz zostaje, gdy odczyt zawiódł: ponowienie wróci do tej samej, już zatwierdzonej operacji.
+   if(!fresh){setNotice('Operacja potwierdzona. Nie udało się odświeżyć danych, odśwież widok.');return false;}
+   keys.current.delete(fingerprint);setNotice('Operacja potwierdzona i dane odczytane z serwera.');onChanged?.();return true;}
   catch(e){if(valid()){const code=e instanceof AccountError?e.code:'';setError(code==='match_not_finished'?'Mecz jeszcze się nie zakończył. Zatwierdzenie rozliczenia będzie możliwe po planowanym końcu meczu.':code==='pending_payment_exists'?'Zawodnik zgłosił już wpłatę. Odśwież listę i potwierdź istniejące zgłoszenie zamiast tworzyć drugą wpłatę.':code==='already_paid'?'Należność jest już opłacona. Odśwież listę, aby sprawdzić aktualny stan.':code==='payment_processed'||code==='stale_version'?'Dane zmieniły się na serwerze. Odśwież przed kolejną decyzją.':code==='already_approved'?'Ten mecz został już zatwierdzony. Odśwież rozliczenie.':code==='forbidden'?'Nie masz uprawnień do zatwierdzenia tego meczu.':code==='event_cancelled'?'Nie można zatwierdzić odwołanego meczu.':'Nie potwierdzono operacji. Sprawdź stan po odświeżeniu przed ponowną próbą; identyfikator żądania został zachowany.');}return false;}
   finally{flight.current=false;if(alive.current)setBusy(false);}
  }

@@ -151,8 +151,10 @@ export class SessionManager {
       if (generation !== this.generation) throw new AccountError('Sesja została zakończona.', 'session_invalid');
       return result;
     } catch (error) {
-      if (error instanceof AccountError && ['session_invalid', 'network_error', 'service_unavailable', 'server_error'].includes(error.code))
-        await this.problem(error, generation);
+      // Wylogowuje cofnięta sesja, a zgubiona odpowiedź (network_error) wymusza ponowną weryfikację sesji.
+      // Odpowiedź serwera z błędem (503/5xx, limit) przy zwykłej operacji, np. potwierdzeniu wpłaty, nie może
+      // zrzucać użytkownika do ekranu logowania: sesja jest ważna, a operację można ponowić.
+      if (error instanceof AccountError && ['session_invalid', 'network_error'].includes(error.code)) await this.problem(error, generation);
       throw error;
     }
   }

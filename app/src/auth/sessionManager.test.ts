@@ -112,3 +112,20 @@ describe('współdzielone odczyty list',()=>{
     expect(lists).toBe(2);
   });
 });
+
+describe('zwykłe operacje przy chwilowej awarii',()=>{
+  it.each(['service_unavailable','server_error','rate_limited'])('%s nie wylogowuje ani nie usuwa sesji',async code=>{
+    const disk=memory(),first=session();
+    const manager=new SessionManager(disk.store,api(async action=>{if(action==='login')return first;throw new AccountError('Awaria',code);}));
+    await manager.signIn('Fikcyjny',crypto.randomUUID());
+    await expect(manager.call('group_finance_accept_payment')).rejects.toThrow();
+    expect(manager.getSnapshot().phase).toBe('ready');expect(manager.getSnapshot().session).not.toBeNull();expect(disk.peek()===first.refresh_token).toBe(true);
+  });
+  it('cofnięta sesja (session_invalid) nadal wylogowuje',async()=>{
+    const disk=memory(),first=session();
+    const manager=new SessionManager(disk.store,api(async action=>{if(action==='login')return first;throw new AccountError('Cofnięta','session_invalid');}));
+    await manager.signIn('Fikcyjny',crypto.randomUUID());
+    await expect(manager.call('profile')).rejects.toThrow();
+    expect(manager.getSnapshot().phase).toBe('signed_out');expect(disk.peek()).toBeNull();
+  });
+});
