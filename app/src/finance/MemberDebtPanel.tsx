@@ -96,7 +96,7 @@ export default function MemberDebtPanel({manager,userId,groupId,memberId}:{manag
    setAttempt(n=>n+1);window.dispatchEvent(new Event(financeChangedEvent));
   }catch(e){
    const code=e instanceof AccountError?e.code:'';
-   setFormError(code==='already_paid'?'Zawodnik nie ma zaległości do pokrycia.':code==='pending_payment_exists'?'Zawodnik zgłosił już wpłatę. Potwierdź zgłoszenie w rozliczeniach zamiast wpisywać nową.':code==='forbidden'?'Brak uprawnień do zapisania wpłaty.':'Nie potwierdzono zapisu wpłaty. Sprawdź stan po odświeżeniu przed ponowną próbą.');
+   setFormError(code==='already_paid'?'Tej wpłaty nie można przypisać: zawodnik nie ma zaległości za wskazany mecz.':code==='pending_payment_exists'?'Zawodnik zgłosił już wpłatę. Potwierdź zgłoszenie w rozliczeniach zamiast wpisywać nową.':code==='forbidden'?'Brak uprawnień do zapisania wpłaty.':'Nie potwierdzono zapisu wpłaty. Sprawdź stan po odświeżeniu przed ponowną próbą.');
    setAttempt(n=>n+1);
   }finally{setSaving(false);}
  }
@@ -111,10 +111,10 @@ export default function MemberDebtPanel({manager,userId,groupId,memberId}:{manag
   </li>;})}</ul>}
  </>);
  const recordForm=(<>
-  {state.phase==='ready'&&state.debt.totalCents>0&&state.debt.pendingCount===0&&<form className="slm-member-debt-form" onSubmit={e=>{e.preventDefault();void record();}}>
+  {state.phase==='ready'&&state.debt.pendingCount===0&&<form className="slm-member-debt-form" onSubmit={e=>{e.preventDefault();void record();}}>
    <label>Wpłata zawodnika (zł)<input inputMode="decimal" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="np. 100" disabled={saving}/></label>
    <button type="submit" disabled={saving||!amount.trim()}>{saving?'Zapisywanie…':'Zapisz wpłatę'}</button>
-   <p className="slm-muted">Kwota wyższa niż zaległość zostaje na koncie jako nadpłata i pokrywa kolejne mecze.</p>
+   <p className="slm-muted">{state.debt.totalCents>0?'Kwota wyższa niż zaległość zostaje na koncie jako nadpłata i pokrywa kolejne mecze.':'Zawodnik nie ma zaległości — cała kwota zostanie na koncie jako nadpłata i pokryje kolejne mecze.'}</p>
   </form>}
  </>);
  const messages=(<>
@@ -140,8 +140,7 @@ export default function MemberDebtPanel({manager,userId,groupId,memberId}:{manag
  {open&&state.phase==='ready'&&createPortal(<div className="slm-member-debt-backdrop" onClick={e=>{if(e.target===e.currentTarget&&!deciding&&!saving)setOpen(false);}}><div role="dialog" aria-modal="true" aria-labelledby="slm-member-debt-title" className="slm-member-debt-dialog" onKeyDown={e=>{if(e.key==='Escape'&&!deciding&&!saving)setOpen(false);}}>
    <div className="slm-member-debt-dialog-head"><h2 id="slm-member-debt-title">Rozliczenie zawodnika</h2><button type="button" autoFocus aria-label="Zamknij rozliczenie" onClick={()=>setOpen(false)}>×</button></div>
    {state.debt.totalCents>0?<p className="slm-member-debt-total" data-state="owed"><strong>Zaległość: {formatCents(state.debt.totalCents)}</strong> · {state.debt.matches.length} {matchesWord(state.debt.matches.length)}</p>:<p className="slm-member-debt-total" data-state="clear"><strong>Brak zaległości</strong>{state.debt.creditCents>0&&<> · nadpłata {formatCents(state.debt.creditCents)}</>}</p>}
-   {state.debt.payments.length===0&&state.debt.totalCents===0&&<p className="slm-muted">Brak wpłat do obsłużenia.</p>}
-   {paymentsList}
+      {paymentsList}
    {recordForm}
    {messages}
   </div></div>,document.body)}

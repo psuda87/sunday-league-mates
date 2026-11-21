@@ -168,4 +168,18 @@ describe('MemberDebtPanel: wpłata i nadpłata',()=>{
   expect(await within(dialog).findByText(/Zapisano wpłatę 100,00/)).toBeInTheDocument();
   expect(call.mock.calls.find(c=>c[0]==='group_finance_record_payment')![1]).toMatchObject({user_id:'m1',amount_cents:10000});
  });
+ it('lets the admin record an advance for a player with no debt, kept as credit',async()=>{
+  let paid=false;
+  const call=vi.fn(async(a:string,b:Record<string,unknown>={})=>{
+   if(a==='group_finance_record_payment'){paid=true;return {ok:true,group_id:'g'};}
+   return b.user_id==='m1'?acc('m1',{balance_cents:paid?10000:0}):acc('admin',{surplus:[]});});
+  render(<MemberDebtPanel manager={mgr(call)} userId="admin" groupId="g" memberId="m1"/>);
+  expect(await screen.findByText('Brak zaległości')).toBeInTheDocument();
+  expect(screen.getByText(/cała kwota zostanie na koncie jako nadpłata/)).toBeInTheDocument();
+  fireEvent.change(screen.getByLabelText(/Wpłata zawodnika/),{target:{value:'100'}});
+  fireEvent.click(screen.getByRole('button',{name:'Zapisz wpłatę'}));
+  expect(await screen.findByText(/Zapisano wpłatę 100,00/)).toBeInTheDocument();
+  const w=call.mock.calls.find(c=>c[0]==='group_finance_record_payment')![1]!;expect(w).toMatchObject({user_id:'m1',amount_cents:10000});expect(w).not.toHaveProperty('event_id');
+  expect(await screen.findByText(/nadpłata 100,00/)).toBeInTheDocument();
+ });
 });
