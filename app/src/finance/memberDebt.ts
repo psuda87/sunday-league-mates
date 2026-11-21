@@ -1,4 +1,4 @@
-import type {Account} from './contracts';
+import type {Account,Receipt} from './contracts';
 
 export interface MemberDebt {
   /** Suma należności za zakończone, zatwierdzone mecze, które nie są jeszcze opłacone. */
@@ -9,6 +9,8 @@ export interface MemberDebt {
   pendingCount: number;
   /** Nadpłata (saldo dodatnie); zaległość i nadpłata nie występują razem. */
   creditCents: number;
+  /** Wpłaty do decyzji (zgłoszone) i zaksięgowane, które administrator może cofnąć — najnowsze pierwsze zgodnie z odpowiedzią serwera. */
+  payments: Receipt[];
   /** Serwer blokuje zapisy na płatne mecze po dwóch zaległych meczach. */
   blocked: boolean;
 }
@@ -25,6 +27,7 @@ export function memberDebt(a: Account): MemberDebt {
     pendingCents: pending.reduce((sum, p) => sum + p.corrected_amount_cents, 0),
     pendingCount: pending.length,
     creditCents: Math.max(0, a.balance_cents),
+    payments: a.payments.filter(p => p.status === 'pending' || (p.status === 'accepted' && p.corrected_amount_cents > 0)),
     blocked: !a.registration_allowed,
   };
 }

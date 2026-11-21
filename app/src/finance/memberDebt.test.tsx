@@ -88,6 +88,35 @@ describe('MemberDebtPanel: wpłata i nadpłata',()=>{
   unmount();
   const pending=vi.fn(async(a:string,b:Record<string,unknown>={})=>b.user_id==='m1'?{...owing(),payments:[{id:'p',group_id:'g',event_id:null,user_id:'m1',corrected_amount_cents:2500,status:'pending' as const}]}:acc('admin',{surplus:[]}));
   render(<MemberDebtPanel manager={mgr(pending)} userId="admin" groupId="g" memberId="m1"/>);
-  expect(await screen.findByText(/Zgłoszona wpłata czeka/)).toBeInTheDocument();expect(screen.queryByLabelText(/Wpłata zawodnika/)).toBeNull();
+  expect(await screen.findByText(/25,00 zł · zgłoszona, czeka na decyzję/)).toBeInTheDocument();expect(screen.queryByLabelText(/Wpłata zawodnika/)).toBeNull();
+ });
+ it('lets the admin accept a reported payment from the profile and shows the refreshed state',async()=>{
+  let done=false;
+  const call=vi.fn(async(a:string,b:Record<string,unknown>={})=>{
+   if(a==='group_finance_accept_payment'){done=true;return {ok:true,group_id:'g'};}
+   return b.user_id==='m1'?(done?acc('m1',{payments:[{id:'p',group_id:'g',event_id:null,user_id:'m1',corrected_amount_cents:2500,status:'accepted'}]}):{...owing(),payments:[{id:'p',group_id:'g',event_id:null,user_id:'m1',corrected_amount_cents:2500,status:'pending' as const}]}):acc('admin',{surplus:[]});});
+  render(<MemberDebtPanel manager={mgr(call)} userId="admin" groupId="g" memberId="m1"/>);
+  fireEvent.click(await screen.findByRole('button',{name:'Zatwierdź'}));
+  expect(await screen.findByText('Wpłata zatwierdzona.')).toBeInTheDocument();
+  const w=call.mock.calls.find(c=>c[0]==='group_finance_accept_payment')!;
+  expect(w[1]).toMatchObject({group_id:'g',payment_id:'p',expected_amount_cents:2500});expect(typeof w[1]?.request_id).toBe('string');
+  expect(await screen.findByText(/25,00 zł · zaksięgowana/)).toBeInTheDocument();expect(screen.queryByRole('button',{name:'Zatwierdź'})).toBeNull();
+ });
+ it('rejects a report and cancels an accepted payment, and keeps the request id after a failed attempt',async()=>{
+  let fail=true;const reject=vi.fn(async(a:string,b:Record<string,unknown>={})=>{
+   if(a==='group_finance_reject_payment'){if(fail){fail=false;throw new Error('lost');}return {ok:true,group_id:'g'};}
+   return b.user_id==='m1'?{...owing(),payments:[{id:'p',group_id:'g',event_id:null,user_id:'m1',corrected_amount_cents:2500,status:'pending' as const}]}:acc('admin',{surplus:[]});});
+  const {unmount}=render(<MemberDebtPanel manager={mgr(reject)} userId="admin" groupId="g" memberId="m1"/>);
+  fireEvent.click(await screen.findByRole('button',{name:'Odrzuć'}));
+  expect(await screen.findByRole('alert')).toHaveTextContent('Nie potwierdzono operacji');
+  fireEvent.click(await screen.findByRole('button',{name:'Odrzuć'}));
+  await waitFor(()=>expect(reject.mock.calls.filter(c=>c[0]==='group_finance_reject_payment')).toHaveLength(2));
+  const r=reject.mock.calls.filter(c=>c[0]==='group_finance_reject_payment');expect(r[0][1]?.request_id).toBe(r[1][1]?.request_id);expect(r[0][1]).not.toHaveProperty('expected_amount_cents');
+  unmount();
+  const cancel=vi.fn(async(a:string,b:Record<string,unknown>={})=>a==='group_finance_cancel_payment'?{ok:true,group_id:'g'}:b.user_id==='m1'?acc('m1',{payments:[{id:'a',group_id:'g',event_id:'e1',user_id:'m1',corrected_amount_cents:1000,status:'accepted'}]}):acc('admin',{surplus:[]}));
+  render(<MemberDebtPanel manager={mgr(cancel)} userId="admin" groupId="g" memberId="m1"/>);
+  fireEvent.click(await screen.findByRole('button',{name:'Cofnij'}));
+  expect(await screen.findByText('Wpłata cofnięta.')).toBeInTheDocument();
+  expect(cancel.mock.calls.find(c=>c[0]==='group_finance_cancel_payment')![1]).toMatchObject({payment_id:'a',expected_amount_cents:1000,event_id:'e1'});
  });
 });
