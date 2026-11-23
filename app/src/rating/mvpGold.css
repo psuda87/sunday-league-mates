@@ -67,8 +67,12 @@ a.slm-call::before { content: ''; width: 18px; height: 18px; flex: none; backgro
 .slm-premium-events li.slm-live-entry { position: relative; align-items: center; padding-block: 8px; }
 .slm-premium-events li.slm-live-entry > .slm-roster-avatar { align-self: center; margin-block: 0; }
 li.slm-live-entry[data-mvp-gold="true"] { padding-block: 8px; }
-.slm-premium-events li.slm-live-entry .slm-call { position: static; transform: none; margin: 2px 0; min-height: 28px; padding: 0 10px; gap: 6px; font-size: .72rem; }
-.slm-premium-events li.slm-live-entry .slm-call::before { width: 14px; height: 14px; }
+.slm-premium-events li.slm-live-entry .slm-call { position: static; transform: none; margin: 0; min-height: 22px; padding: 0 8px; gap: 4px; font-size: .68rem; order: 1; }
+.slm-premium-events li.slm-live-entry .slm-call::before { width: 12px; height: 12px; }
+/* Zadzwoń w jednej linii z nazwą; reszta wiersza (opis, zarządzanie) pod spodem na całą szerokość */
+.slm-premium-events li.slm-live-entry .slm-demo-person-meta { display: flex; flex-wrap: wrap; align-items: center; column-gap: 8px; row-gap: 4px; }
+.slm-premium-events li.slm-live-entry .slm-demo-person-meta > strong { order: 0; }
+.slm-premium-events li.slm-live-entry .slm-demo-person-meta > :not(strong):not(.slm-call) { order: 2; flex: 1 1 100%; }
 .slm-premium-events li.slm-live-entry .slm-demo-person-meta > strong { display: block; }
 .slm-premium-events li.slm-live-entry .slm-member-stats { margin-right: 4px; }
 
