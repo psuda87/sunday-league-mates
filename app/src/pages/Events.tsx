@@ -1,6 +1,7 @@
 import MatchHeader from '../ui/MatchHeader';
 import type { ReactNode } from 'react';
 import ParticipantGroup, { RosterSummary } from '../ui/ParticipantGroup';
+import MemberStats from '../ui/MemberStats';
 import { IonIcon } from '@ionic/react';
 import { checkmarkCircleOutline, timeOutline, alertCircleOutline } from 'ionicons/icons';
 import MatchSections from '../ui/MatchSections';
@@ -160,6 +161,7 @@ export default function Events({ manager, session, initialEventId, headerAction,
           {!p.member_id && <IonButton size="small" fill="outline" disabled={busy} onClick={() => { setGuestEdit(p.id); setGuestName(p.guest_name ?? ''); setGuestPhone(nationalPhone(p.guest_phone ?? '')); }}>Edytuj gościa</IonButton>}
         </div>}
       </div>
+      {p.member_id && <MemberStats id={p.member_id} />}
     </li>;
   }
   return <section aria-label="Wydarzenia" aria-busy={busy}>

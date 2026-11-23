@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Dispatch } from 'react';
 import { IonAlert, IonIcon } from '@ionic/react';
-import { peopleOutline, shieldCheckmarkOutline, calendarOutline, trophyOutline, footballOutline, flashOutline } from 'ionicons/icons';
+import { peopleOutline, shieldCheckmarkOutline, calendarOutline } from 'ionicons/icons';
 import { useFrozenBack } from '../native/frozenDemoAndroid';
 import MatchHeader from '../ui/MatchHeader';
 import { GroupConsent, GroupRefresh } from '../groups/GroupControls';
@@ -12,13 +12,7 @@ import type { DemoGroup, GroupRequest, GroupWorld } from './groups';
 import type { GroupBinding } from '../groups/model';
 import { GoldTag, useMvpGoldHolders } from '../rating/mvpGold';
 import ParticipantGroup from '../ui/ParticipantGroup';
-import { usePlayerRating } from '../rating/RatingProvider';
-
-function MemberStats({ id }: { id: string }) {
-  const stats = usePlayerRating(id)?.stats;
-  if (!stats) return null;
-  return <span className="slm-member-stats" aria-label={`MVP ${stats.mvp}, gole ${stats.goals}, asysty ${stats.assists}`}><span className="slm-member-stat-mvp" title="MVP"><IonIcon icon={trophyOutline} aria-hidden="true"/>{stats.mvp}</span><span title="Gole"><IonIcon icon={footballOutline} aria-hidden="true"/>{stats.goals}</span><span title="Asysty"><IonIcon icon={flashOutline} aria-hidden="true"/>{stats.assists}</span></span>;
-}
+import MemberStats from '../ui/MemberStats';
 
 type Props={world:GroupWorld;dispatch:Dispatch<Action>;onPlayer:(id:string,groupId:string)=>void;live?:GroupBinding};
 const memberCount=(count:number)=>count===1?'1 członek':`${count} członków`;
