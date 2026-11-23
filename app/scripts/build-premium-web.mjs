@@ -51,26 +51,19 @@ export const PWA_HEAD=[
  +bootPaletteCss
  +'.slm-boot:before{content:"";position:absolute;inset:0;background:'+BOOT_BG+';animation:slm-boot-reveal .8s ease .2s forwards}'
  +'.slm-boot>*{position:relative;z-index:1}'
- +'.slm-boot-bar{animation:slm-boot-fade .5s ease .6s both}'
- +'.slm-boot-crest{position:relative;width:min(46vw,210px);aspect-ratio:420/471;animation:slm-boot-in .8s cubic-bezier(.2,1.2,.4,1) .1s both,slm-boot-glow 2.4s ease-in-out .7s infinite}'
+ +'.slm-boot-crest{position:relative;width:min(46vw,210px);aspect-ratio:420/471;animation:slm-boot-glow 2.4s ease-in-out .7s infinite}'
  +'.slm-boot-crest img{width:100%;height:100%;object-fit:contain;display:block}'
  +'.slm-boot-crest:after{content:"";position:absolute;inset:0;-webkit-mask:url('+BOOT_LOGO+') center/contain no-repeat;mask:url('+BOOT_LOGO+') center/contain no-repeat;'
  +'background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.6) 50%,transparent 65%) -200% 0/250% 100% no-repeat;animation:slm-boot-shine 2.4s ease-in-out .9s infinite}'
- +'.slm-boot-bar{width:min(40vw,150px);height:3px;border-radius:3px;background:rgba(var(--h),.2);overflow:hidden}'
- +'.slm-boot-bar:before{content:"";display:block;width:40%;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--a1),var(--a2),var(--a));animation:slm-boot-bar 1.1s ease-in-out infinite}'
  +'.slm-boot.slm-boot-out{opacity:0;pointer-events:none}'
- +'.slm-boot-text{opacity:.85;animation:slm-boot-fade .9s ease .4s both}'
- +'@keyframes slm-boot-in{from{transform:scale(.8)}to{transform:none}}'
  +'@keyframes slm-boot-reveal{to{opacity:0}}'
  +'@keyframes slm-boot-glow{0%,100%{filter:drop-shadow(0 0 10px rgba(var(--h),.25))}50%{filter:drop-shadow(0 0 26px rgba(var(--h),.6))}}'
  +'@keyframes slm-boot-shine{0%{background-position:-200% 0}60%,100%{background-position:200% 0}}'
- +'@keyframes slm-boot-bar{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}'
- +'@keyframes slm-boot-fade{from{opacity:0}}'
  +'@media (prefers-reduced-motion:reduce){.slm-boot:before{display:none}.slm-boot *,.slm-boot *:before,.slm-boot *:after{animation:none!important}}</style>'
 ].join('\n    ');
 export const BOOT_SPLASH='<div id="slm-boot" class="slm-boot" role="status" aria-label="Uruchamianie Sunday League Mates">'
  +'<div class="slm-boot-crest"><img src="'+BOOT_LOGO+'" alt="" width="420" height="471" /></div>'
- +'<div class="slm-boot-bar"></div><div class="slm-boot-text">Sunday League Mates</div></div>'
+ +'</div>'
  // Nakładka obok #root: React jej nie czyści. /boot-splash.js (synchronicznie, przed pierwszym malowaniem) nadaje kolory profilu i chowa ją po sprawdzeniu sesji.
  +'<script src="/boot-splash.js"></script>';
 export function premiumWebConfig(base,env=process.env){

@@ -1,4 +1,4 @@
-import {useEffect,useRef,useState} from 'react';
+import {useCallback,useEffect,useRef,useState} from 'react';
 import type {SessionManager} from '../auth/sessionManager';
 import {paymentWallet} from './contracts';
 import type {WalletGroup} from './contracts';
@@ -10,7 +10,7 @@ import {eventSummary} from '../events/premiumContracts';
 import {financeChangedEvent,ownPaymentsRequestEvent,takeOwnPaymentsRequest} from './paymentsIntent';
 import './premiumFinance.css';
 
-function OwnPaymentForm({manager,userId,group,onChanged,refreshVersion}:{manager:SessionManager;userId:string;group:WalletGroup;onChanged:()=>void;refreshVersion:number}){
+function OwnPaymentForm({manager,userId,group,onChanged,onRefresh,refreshVersion}:{manager:SessionManager;userId:string;group:WalletGroup;onChanged:()=>void;onRefresh:()=>void;refreshVersion:number}){
  const f=usePremiumFinance(manager,userId,group.group_id,undefined,false,onChanged,false,refreshVersion);
  const [tab,setTab]=useState<'pay'|'history'>('pay'),[amount,setAmount]=useState(''),[eventId,setEventId]=useState(''),[error,setError]=useState('');
  const choices=f.own?paymentChoices(f.own):[];
@@ -31,7 +31,7 @@ function OwnPaymentForm({manager,userId,group,onChanged,refreshVersion}:{manager
   {(error||f.error)&&<p role="alert">{error||f.error}</p>}{f.notice&&<p role="status">{f.notice}</p>}
   {f.loading&&<p role="status">Wczytywanie Twoich płatności…</p>}
   {f.own&&!f.loading&&<>
-   <div role="tablist" aria-label="Moje płatności"><button role="tab" aria-selected={tab==='pay'} onClick={()=>setTab('pay')}>Zgłoś wpłatę</button><button role="tab" aria-selected={tab==='history'} onClick={()=>setTab('history')}>Historia wpłat</button></div>
+   <div className="slm-payments-toolbar"><div role="tablist" aria-label="Moje płatności"><button role="tab" aria-selected={tab==='pay'} onClick={()=>setTab('pay')}>Zgłoś wpłatę</button><button role="tab" aria-selected={tab==='history'} onClick={()=>setTab('history')}>Historia wpłat</button></div><button type="button" onClick={onRefresh}>Odśwież płatności</button></div>
    {tab==='pay'?<div role="tabpanel" aria-label="Zgłoszenie wpłaty">
     <p>Saldo: {formatCents(f.own.balance_cents)}</p>
     {f.own.balance_cents>0&&<p className="slm-credit">Nadpłata: <strong>{formatCents(f.own.balance_cents)}</strong> — zostanie zaliczona na kolejne mecze.</p>}
@@ -49,8 +49,12 @@ function OwnPaymentForm({manager,userId,group,onChanged,refreshVersion}:{manager
  </div>;
 }
 
-export default function PersonalPayments({manager,userId}:{manager:SessionManager;userId:string}){
- const [open,setOpen]=useState(false),[groups,setGroups]=useState<WalletGroup[]|null>(null),[groupId,setGroupId]=useState(''),[error,setError]=useState(''),[revision,setRevision]=useState(0);
+export default function PersonalPayments({manager,userId,open:controlledOpen,onOpenChange}:{manager:SessionManager;userId:string;open?:boolean;onOpenChange?:(open:boolean)=>void}){
+ // Sterowane z profilu: przycisk „Moje płatności” stoi w jednym rzędzie z Edytuj profil / Zmień zdjęcie / Ustawienia.
+ const [innerOpen,setInnerOpen]=useState(false),controlled=controlledOpen!==undefined,open=controlled?controlledOpen:innerOpen;
+ const onOpenChangeRef=useRef(onOpenChange);onOpenChangeRef.current=onOpenChange;
+ const setOpen=useCallback((value:boolean)=>{if(controlled)onOpenChangeRef.current?.(value);else setInnerOpen(value);},[controlled]);
+ const [groups,setGroups]=useState<WalletGroup[]|null>(null),[groupId,setGroupId]=useState(''),[error,setError]=useState(''),[revision,setRevision]=useState(0);
  const generation=useRef(0),section=useRef<HTMLElement>(null);
  // Opened from the notification bell ("Zgłoś wpłatę"): expand and bring the section into view.
  useEffect(()=>{
@@ -84,11 +88,11 @@ export default function PersonalPayments({manager,userId}:{manager:SessionManage
  },[manager,userId,open,revision]);
  const group=groups?.find(g=>g.group_id===groupId);
  return <section ref={section} className="slm-finance slm-premium-finance" aria-label="Płatności własnego profilu">
-  <button type="button" aria-expanded={open} onClick={()=>setOpen(v=>!v)}>Moje płatności</button>
-  {open&&<><h2>Moje płatności</h2>{error&&<p role="alert">{error}</p>}{!groups&&!error&&<p role="status">Wczytywanie płatności…</p>}<button onClick={()=>setRevision(v=>v+1)}>Odśwież płatności</button>
+  {!controlled&&<button type="button" aria-expanded={open} onClick={()=>setOpen(!open)}>Moje płatności</button>}
+  {open&&<><h2>Moje płatności</h2>{error&&<p role="alert">{error}</p>}{!groups&&!error&&<p role="status">Wczytywanie płatności…</p>}{!group&&<button type="button" onClick={()=>setRevision(v=>v+1)}>Odśwież płatności</button>}
    {groups?.length===0&&<p>Nie masz jeszcze rozliczeń w grupach.</p>}
    {groups&&groups.length>1?<label>Grupa<select value={groupId} onChange={e=>setGroupId(e.target.value)}>{groups.map(g=><option key={g.group_id} value={g.group_id}>{g.group_name}</option>)}</select></label>:group&&<p>{group.group_name}</p>}
-   {group&&<OwnPaymentForm key={`${userId}:${group.group_id}`} manager={manager} userId={userId} group={group} refreshVersion={revision} onChanged={()=>{setRevision(v=>v+1);window.dispatchEvent(new Event(financeChangedEvent));}}/>}
+   {group&&<OwnPaymentForm key={`${userId}:${group.group_id}`} manager={manager} userId={userId} group={group} onRefresh={()=>setRevision(v=>v+1)} refreshVersion={revision} onChanged={()=>{setRevision(v=>v+1);window.dispatchEvent(new Event(financeChangedEvent));}}/>}
   </>}
  </section>;
 }

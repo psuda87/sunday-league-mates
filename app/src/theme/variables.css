@@ -4163,3 +4163,23 @@ html::-webkit-scrollbar,
 body::-webkit-scrollbar {
   display: none;
 }
+
+/* Moje płatności: „Odśwież płatności” w jednym rzędzie z zakładkami Zgłoś wpłatę / Historia wpłat. */
+.slm-payments-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
+.slm-payments-toolbar [role="tablist"] { display: contents; }
+.slm-payments-toolbar button { flex: 1 1 auto; }
+
+/* Statystyki zawodnika w liście członków grupy: MVP u góry, gole i asysty pod spodem */
+.slm-member-stats {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 1px 8px;
+  margin-left: auto;
+  font-size: 11px;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+  color: var(--slm-muted, rgba(255, 255, 255, 0.72));
+}
+.slm-member-stats > span { display: inline-flex; align-items: center; gap: 3px; }
+.slm-member-stats ion-icon { font-size: 12px; }
+.slm-member-stats .slm-member-stat-mvp { grid-column: 1 / -1; color: #f2c14e; font-weight: 700; }

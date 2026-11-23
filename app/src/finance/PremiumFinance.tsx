@@ -7,7 +7,7 @@ import {matchDate} from '../events/model';
 import {receiptStatus} from './paymentModel';
 export default function PremiumFinance({manager,userId,groupId,eventId,manage=false,onChanged}:{manager:SessionManager;userId:string;groupId:string;eventId?:string;manage?:boolean;onChanged?:()=>void}){
  const f=usePremiumFinance(manager,userId,groupId,eventId,manage,onChanged);
- const [tab,setTab]=useState<'current'|'history'>('current');
+ const [tab,setTab]=useState<'current'|'history'>('current'),[reminded,setReminded]=useState<Record<string,boolean>>({});
  const admin=!!f.own&&f.own.surplus!==null;
  const title=(id:string)=>f.events.find(e=>e.id===id)?.name??'Mecz';
  const people=f.players.filter(p=>!eventId||f.detail?.participants.some(r=>r.user_id===p.user_id));
@@ -48,6 +48,7 @@ export default function PremiumFinance({manager,userId,groupId,eventId,manage=fa
         <button disabled={f.busy||!p} onClick={()=>{if(p)void f.mutate('reject_payment',{payment_id:p.id,...(p.event_id?{event_id:p.event_id}:{})});}}>Odrzuć</button>
         <button disabled={f.busy||!previous} title={previous?'Cofnij zatwierdzoną wpłatę':'Nie ma zatwierdzonej wpłaty do anulowania'} onClick={()=>{if(previous)void f.mutate('cancel_payment',{payment_id:previous.id,expected_amount_cents:previous.corrected_amount_cents,...(previous.event_id?{event_id:previous.event_id}:{})});}}>Anuluj</button>
        </div>
+       {d&&remaining>0&&!p&&!generalPending&&person.user_id!==userId&&<button type="button" className="slm-payment-remind" disabled={f.busy} onClick={()=>{void f.mutate('remind_payment',{user_id:person.user_id,...(id?{event_id:id}:{})}).then(sent=>{if(sent)setReminded(r=>({...r,[`${person.user_id}:${id??''}`]:true}));});}}>{reminded[`${person.user_id}:${id??''}`]?'Przypomnienie wysłane':'Wyślij przypomnienie'}</button>}
        {tooMuch&&<small>Kwota zgłoszenia przewyższa pozostałą należność za ten mecz. Odrzuć zgłoszenie i zapisz właściwą kwotę.</small>}
        {p&&p.event_id===null&&covered&&<small>Zawodnik nie ma zaległości do pokrycia tą wpłatą, więc nie można jej zaksięgować. Odrzuć zgłoszenie.</small>}
        {p&&p.event_id!==null&&covered&&<small>Wpłata została już zaksięgowana. To zgłoszenie jest nieaktualne — odrzuć tylko zgłoszenie; nie anuluj zaksięgowanej wpłaty.</small>}
