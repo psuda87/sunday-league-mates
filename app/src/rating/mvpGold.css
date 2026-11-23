@@ -67,8 +67,10 @@ a.slm-call::before { content: ''; width: 18px; height: 18px; flex: none; backgro
 .slm-premium-events li.slm-live-entry { position: relative; align-items: center; padding-block: 8px; }
 .slm-premium-events li.slm-live-entry > .slm-roster-avatar { align-self: center; margin-block: 0; }
 li.slm-live-entry[data-mvp-gold="true"] { padding-block: 8px; }
-.slm-premium-events li.slm-live-entry .slm-call { position: absolute; top: 50%; right: 10px; transform: translateY(-50%); margin: 0; min-height: 34px; padding: 0 12px; font-size: .78rem; }
-.slm-premium-events li.slm-live-entry .slm-demo-person-meta > strong { display: block; padding-right: 118px; }
+.slm-premium-events li.slm-live-entry .slm-call { position: static; transform: none; margin: 2px 0; min-height: 28px; padding: 0 10px; gap: 6px; font-size: .72rem; }
+.slm-premium-events li.slm-live-entry .slm-call::before { width: 14px; height: 14px; }
+.slm-premium-events li.slm-live-entry .slm-demo-person-meta > strong { display: block; }
+.slm-premium-events li.slm-live-entry .slm-member-stats { margin-right: 4px; }
 
 /* Refleks także w kółku z inicjałami / zdjęciem w złotym wierszu (lista meczu i grupy). */
 li[data-mvp-gold="true"] .slm-roster-avatar, li[data-mvp-gold="true"] .slm-player-avatar { position: relative; overflow: hidden; border-radius: 50%; box-shadow: 0 0 0 1.5px var(--slm-mvp-gold-2), 0 0 8px rgba(232, 193, 90, .6); }
