@@ -3,7 +3,7 @@ import type { SessionManager } from '../auth/sessionManager';
 
 /** Powiadomienia starsze niż tydzień trafiają do archiwum; każdy widzi wyłącznie swoje (serwer zwraca rekordy sesji). */
 export const ARCHIVE_AFTER_MS = 7 * 24 * 60 * 60 * 1000;
-interface Row { id: string; title: string; body: string; created_at: string }
+interface Row { id: string; title: string; body: string; created_at: string; archived_at?: string | null }
 const PAGE = 50, MAX_PAGES = 4;
 
 export default function NotificationArchive({ manager, userId }: { manager: SessionManager; userId: string }) {
@@ -17,7 +17,7 @@ export default function NotificationArchive({ manager, userId }: { manager: Sess
         if (snapshot.phase !== 'ready' || snapshot.session?.user_id !== userId) throw new Error('session');
         const r = await manager.call<{ notifications?: Row[] }>('notifications_list', { offset: page * PAGE });
         const list = Array.isArray(r?.notifications) ? r.notifications : [];
-        found.push(...list.filter(n => Date.parse(n.created_at) < limit));
+        found.push(...list.filter(n => !!n.archived_at || Date.parse(n.created_at) < limit));
         if (list.length < PAGE) break;
       }
       setRows(found);
@@ -25,7 +25,7 @@ export default function NotificationArchive({ manager, userId }: { manager: Sess
   }
   if (!open) return <section className="slm-notification-archive"><button type="button" onClick={() => { setOpen(true); void load(); }}>Archiwum powiadomień</button></section>;
   return <section className="slm-notification-archive" aria-label="Archiwum powiadomień">
-    <h2>Archiwum powiadomień</h2><p>Powiadomienia starsze niż 7 dni.</p>
+    <h2>Archiwum powiadomień</h2><p>Powiadomienia zarchiwizowane oraz starsze niż 7 dni.</p>
     {error ? <p role="alert">Nie udało się wczytać archiwum. <button type="button" onClick={() => void load()}>Spróbuj ponownie</button></p>
       : rows === null ? <p>Wczytywanie…</p>
       : rows.length === 0 ? <p>Archiwum jest puste.</p>

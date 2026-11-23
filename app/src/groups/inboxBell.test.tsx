@@ -20,8 +20,25 @@ it('pokazuje nieprzeczytane powiadomienia z bazy w dzwonku i pozwala je oznaczy�
  fireEvent.click(bell);
  const panel=screen.getByRole('region',{name:'Powiadomienia'});
  expect(within(panel).getByText('Test powiadomień')).toBeTruthy();
- expect(within(panel).getByText('Treść Test powiadomień')).toBeTruthy();
+ expect(within(panel).queryByText('Treść Test powiadomień')).toBeNull();
  expect(within(panel).getByText('Wczorajsze')).toBeTruthy();expect(within(panel).queryByText('Archiwalne')).toBeNull();
  fireEvent.click(within(panel).getByRole('button',{name:'Oznacz jako przeczytane'}));
  await waitFor(()=>expect(call).toHaveBeenCalledWith('notifications_read_all'));
+});
+
+it('kliknięcie nagłówka otwiera popup z treścią, a Archiwizuj usuwa wpis z listy',async()=>{
+ const {manager,call}=setup();
+ render(<GroupNotifications manager={manager} userId="me" onGroups={()=>{}} refreshKey={false}/>);
+ fireEvent.click(await screen.findByRole('button',{name:/Nowe powiadomienia: 1/}));
+ const panel=screen.getByRole('region',{name:'Powiadomienia'});
+ fireEvent.click(within(panel).getByRole('button',{name:/Test powiadomień/}));
+ const dialog=screen.getByRole('dialog',{name:'Test powiadomień'});
+ expect(within(dialog).getByText('Treść Test powiadomień')).toBeTruthy();
+ await waitFor(()=>expect(call).toHaveBeenCalledWith('notifications_read',{notification_id:'n1'}));
+ // Po archiwizacji serwer nie zwraca już wpisu (ponowne wczytanie listy po zdarzeniu).
+ call.mockImplementation(async(action:string)=>action==='notifications_list'?{notifications:[],unread:0}:action==='group_finance_wallet'?{accounts:[]}:action==='groups_list'?{groups:[]}:{ok:true});
+ fireEvent.click(within(dialog).getByRole('button',{name:'Archiwizuj'}));
+ await waitFor(()=>expect(call).toHaveBeenCalledWith('notifications_archive',{notification_id:'n1'}));
+ await waitFor(()=>expect(screen.queryByRole('dialog')).toBeNull());
+ expect(within(panel).queryByRole('button',{name:/Test powiadomień/})).toBeNull();
 });

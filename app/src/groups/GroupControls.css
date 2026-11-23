@@ -83,6 +83,8 @@
 .slm-inbox li {display:grid;gap:2px;overflow-wrap:anywhere;}
 .slm-inbox li span {opacity:.85;}
 .slm-inbox li time {font-size:.8rem;opacity:.65;}
+.slm-inbox .slm-inbox-open {display:grid;gap:2px;width:100%;min-height:44px;padding:6px 0;border:0;border-radius:0;background:transparent;color:inherit;font-weight:400;text-align:left;}
+.slm-inbox .slm-inbox-open strong {font-weight:700;}
 .slm-inbox-unread strong::before {content:'';display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:50%;background:var(--slm-gold);}
 .slm-inbox button {min-height:44px;padding:8px 14px;border:1px solid var(--slm-gold);border-radius:12px;background:transparent;color:var(--slm-gold);font:inherit;font-weight:700;}
 .slm-notification-archive {margin:12px 0;display:grid;gap:8px;}
@@ -95,3 +97,14 @@
 .slm-app-banner button {min-height:44px;padding:8px 16px;border:1px solid var(--slm-gold);border-radius:12px;background:transparent;color:var(--slm-gold);font:inherit;font-weight:700;}
 .slm-app-banner button.slm-payment-reminder-cta {background:var(--slm-gold);color:#1a1214;}
 @media(min-width:700px){.slm-app-banner{left:auto;max-width:420px;bottom:24px;}}
+
+/* Popup z treścią powiadomienia: pełna treść i „Archiwizuj” (zdecydowane przez właściciela 2026-11-23). */
+.slm-notification-dialog-backdrop {position:fixed;inset:0;z-index:3000;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.72);}
+.slm-notification-dialog {display:grid;gap:8px;width:min(100%,420px);max-height:85vh;overflow:auto;padding:18px;border:1px solid var(--slm-gold);border-radius:16px;background:var(--slm-panel,#1a1214);color:var(--ion-text-color);box-shadow:0 12px 28px -12px var(--slm-shadow,#000);}
+.slm-notification-dialog h2 {margin:0;font-size:1.1rem;overflow-wrap:anywhere;}
+.slm-notification-dialog time {font-size:.8rem;opacity:.65;}
+.slm-notification-dialog p {margin:0;overflow-wrap:anywhere;white-space:pre-line;}
+.slm-notification-dialog-actions {display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;}
+.slm-notification-dialog-actions button {flex:1 1 140px;min-height:44px;padding:8px 14px;border:1px solid var(--slm-gold);border-radius:12px;background:var(--slm-gold);color:#1a1214;font:inherit;font-weight:700;}
+.slm-notification-dialog-actions .slm-notification-dialog-close {background:transparent;color:var(--slm-gold);}
+.slm-notification-dialog-actions button:disabled {opacity:.6;}
