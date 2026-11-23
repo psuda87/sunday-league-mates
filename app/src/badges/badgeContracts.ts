@@ -26,7 +26,7 @@ export function badgeStates(data: PlayerBadges): BadgeState[] {
   for (const b of data.earned) {
     if (!known.has(b.code)) continue;
     const previous = states.get(b.code);
-    if (!previous?.earnedAt || b.earned_at < previous.earnedAt) states.set(b.code, { code: b.code, earnedAt: b.earned_at });
+    if (!previous?.earnedAt || b.earned_at < previous.earnedAt) states.set(b.code, { code: b.code, earnedAt: b.earned_at, groupName: b.group_name ?? undefined, season: b.season ?? undefined });
   }
   return [...states.values()];
 }

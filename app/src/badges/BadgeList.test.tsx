@@ -18,6 +18,22 @@ describe('BadgeList', () => {
     expect(screen.getByText('34/50 meczów')).toBeInTheDocument();
     expect(screen.getByRole('progressbar', { name: 'Postęp: Weteran' })).toHaveAttribute('aria-valuenow', '34');
   });
+  it('kliknięcie zdobytej odznaki otwiera pełnoekranowy widok i da się go zamknąć', () => {
+    render(<BadgeList states={[{ code: 'SLM-MAT-001', earnedAt: '2026-10-12T18:00:00Z' }, { code: 'SLM-MAT-050', current: 34 }]} />);
+    expect(screen.queryByRole('dialog')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Pokaż odznakę: Debiutant' }));
+    const dialog = screen.getByRole('dialog');
+    expect(within(dialog).getByText('Odznaka')).toBeInTheDocument();
+    expect(within(dialog).getByRole('heading', { name: 'Debiutant' })).toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Zamknij' }));
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+  it('niezdobyta odznaka nie otwiera widoku', () => {
+    render(<BadgeList states={[{ code: 'SLM-MAT-050', current: 34 }]} />);
+    fireEvent.click(screen.getByRole('button', { name: /Pokaż pozostałe/ }));
+    fireEvent.click(screen.getByText('Weteran'));
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
   it('bez odznak: zachęta dla własnego profilu, neutralny tekst dla cudzego', () => {
     const { unmount } = render(<BadgeList states={[]} own />);
     expect(screen.getByText(/Zagraj pierwszy mecz/)).toBeInTheDocument();
