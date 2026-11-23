@@ -76,7 +76,7 @@ export default function MemberDebtPanel({manager,userId,groupId,memberId}:{manag
    }else{
     await step(action,fp(action),{payment_id:p.id,...(action==='reject_payment'?{}:{expected_amount_cents:p.corrected_amount_cents}),...scope,reason:reasons[action]});
    }
-   setTyped(t=>{const {[p.id]:_,...rest}=t;return rest;});
+   setTyped(t=>{const rest={...t};delete rest[p.id];return rest;});
    setNotice(action==='accept_payment'?`Wpłata zatwierdzona: ${formatCents(cents)}.`:action==='correct_payment'?`Kwota wpłaty poprawiona: ${formatCents(cents)}.`:action==='reject_payment'?'Zgłoszenie odrzucone.':'Wpłata cofnięta.');
    window.dispatchEvent(new Event(financeChangedEvent));
   }catch(e){
