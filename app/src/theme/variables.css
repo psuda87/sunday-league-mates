@@ -4163,3 +4163,8 @@ html::-webkit-scrollbar,
 body::-webkit-scrollbar {
   display: none;
 }
+
+/* Moje płatności: „Odśwież płatności” w jednym rzędzie z zakładkami Zgłoś wpłatę / Historia wpłat. */
+.slm-payments-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
+.slm-payments-toolbar [role="tablist"] { display: contents; }
+.slm-payments-toolbar button { flex: 1 1 auto; }

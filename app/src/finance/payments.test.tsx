@@ -141,3 +141,30 @@ it('explains why a general report cannot be accepted when there is no debt',asyn
  expect(within(card).getByRole('button',{name:'Akceptuj zgłoszoną wpłatę'})).toBeDisabled();
  expect(within(card).getByText(/nie ma zaległości do pokrycia/)).toBeTruthy();expect(within(card).getByRole('button',{name:'Odrzuć'})).not.toBeDisabled();
 });
+
+it('administrator wysyła przypomnienie innemu zawodnikowi z zaległością, a przy sobie przycisku nie ma',async()=>{
+ const f=fixture('none');
+ const call=vi.fn(async(action:string,body?:Record<string,unknown>)=>{
+  if(action==='group_finance_roster'){const r=await f.call(action,body) as {players:{user_id:string;name:string;account:Account}[]};return {...r,players:[...r.players,{user_id:'p',name:'Gracz P',account:{...r.players[0].account,user_id:'p'}}]};}
+  if(action==='group_finance_detail'){const d=await f.call(action,body) as {participants:{entry_id:string;user_id:string;name:string}[]};return {...d,participants:[...d.participants,{...d.participants[0],entry_id:'entry-p',user_id:'p',name:'Gracz P'}]};}
+  if(action==='group_finance_remind_payment')return {ok:true,group_id:'g'};
+  return f.call(action,body);
+ });
+ const manager={call,subscribe:()=>()=>{},getSnapshot:()=>({phase:'ready',session:{user_id:'u'}})} as unknown as SessionManager;
+ render(<PremiumFinance manager={manager} userId="u" groupId="g" eventId="e" manage/>);
+ const card=await screen.findByRole('article',{name:'Płatności: Gracz P'});
+ expect(within(screen.getByRole('article',{name:/Płatności: Zawodnik fixture/})).queryByRole('button',{name:'Wyślij przypomnienie'})).toBeNull();
+ fireEvent.click(within(card).getByRole('button',{name:'Wyślij przypomnienie'}));
+ await waitFor(()=>expect(call).toHaveBeenCalledWith('group_finance_remind_payment',expect.objectContaining({user_id:'p',event_id:'e',group_id:'g',request_id:expect.any(String)})));
+ expect(await within(await screen.findByRole('article',{name:'Płatności: Gracz P'})).findByRole('button',{name:'Przypomnienie wysłane'})).toBeTruthy();
+});
+
+it('sterowane z profilu: bez własnego przycisku, a Odśwież płatności stoi w rzędzie z zakładkami',async()=>{
+ const f=fixture('none');
+ render(<PersonalPayments manager={f.manager} userId="u" open onOpenChange={()=>{}}/>);
+ await screen.findByRole('tab',{name:'Zgłoś wpłatę'});
+ const toolbar=screen.getByRole('button',{name:'Odśwież płatności'}).parentElement!;
+ expect(within(toolbar).getByRole('tab',{name:'Zgłoś wpłatę'})).toBeTruthy();
+ expect(within(toolbar).getByRole('tab',{name:'Historia wpłat'})).toBeTruthy();
+ expect(screen.queryByRole('button',{name:'Moje płatności'})).toBeNull();
+});

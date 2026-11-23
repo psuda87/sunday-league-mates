@@ -99,7 +99,7 @@
 @media(min-width:700px){.slm-app-banner{left:auto;max-width:420px;bottom:24px;}}
 
 /* Popup z treścią powiadomienia: pełna treść i „Archiwizuj” (zdecydowane przez właściciela 2026-11-23). */
-.slm-notification-dialog-backdrop {position:fixed;inset:0;z-index:3000;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.72);}
+.slm-notification-dialog-backdrop {position:fixed;inset:0;z-index:10020;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.72);}
 .slm-notification-dialog {display:grid;gap:8px;width:min(100%,420px);max-height:85vh;overflow:auto;padding:18px;border:1px solid var(--slm-gold);border-radius:16px;background:var(--slm-panel,#1a1214);color:var(--ion-text-color);box-shadow:0 12px 28px -12px var(--slm-shadow,#000);}
 .slm-notification-dialog h2 {margin:0;font-size:1.1rem;overflow-wrap:anywhere;}
 .slm-notification-dialog time {font-size:.8rem;opacity:.65;}
