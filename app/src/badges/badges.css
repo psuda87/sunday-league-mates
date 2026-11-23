@@ -197,3 +197,14 @@
 @media (prefers-reduced-motion: reduce) {
   .slm-badge-celebration-image { animation: none; box-shadow: 0 0 28px 2px color-mix(in srgb, var(--slm-gold) 35%, transparent); }
 }
+
+/* Zdobyta odznaka otwiera się w tym samym pełnoekranowym widoku co przy zdobyciu. */
+.slm-badge-openable { cursor: pointer; }
+.slm-badge-open {
+  padding: 0;
+  border: 0;
+  background: none;
+  line-height: 0;
+  cursor: pointer;
+}
+.slm-badge-open:focus-visible { outline: 2px solid var(--slm-accent, currentColor); outline-offset: 2px; border-radius: 8px; }

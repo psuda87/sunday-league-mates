@@ -6,9 +6,9 @@ import './badges.css';
 
 /**
  * Jednorazowe okienko „Nowa odznaka!” (zatwierdzone przez właściciela): odznaka powiększa się z poświatą,
- * nazwa i opis, przycisk „Super”. Kilka odznak pokazuje po kolei; prefers-reduced-motion wyłącza ruch (CSS).
+ * nazwa i opis, przycisk „Super”. Ten sam widok otwiera się po kliknięciu zdobytej odznaki na liście (kicker „Odznaka”, przycisk „Zamknij”). Kilka odznak pokazuje po kolei; prefers-reduced-motion wyłącza ruch (CSS).
  */
-export default function NewBadgeCelebration({ badges, onDone }: { badges: readonly EarnedBadge[]; onDone: () => void }) {
+export default function NewBadgeCelebration({ badges, onDone, kicker = 'Nowa odznaka!', buttonLabel = 'Super' }: { badges: readonly EarnedBadge[]; onDone: () => void; kicker?: string; buttonLabel?: string }) {
   const items = badges.map(b => ({ earned: b, badge: BADGES.find(d => d.code === b.code) })).filter(x => x.badge);
   const [index, setIndex] = useState(0);
   const button = useRef<HTMLButtonElement>(null);
@@ -22,13 +22,13 @@ export default function NewBadgeCelebration({ badges, onDone }: { badges: readon
   return createPortal(<div className="slm-badge-celebration-backdrop">
     <div className="slm-badge-celebration" role="dialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={descriptionId}
       onKeyDown={event => { if (event.key === 'Escape') next(); }}>
-      <p className="slm-badge-celebration-kicker">Nowa odznaka!{items.length > 1 ? ` (${index + 1}/${items.length})` : ''}</p>
+      <p className="slm-badge-celebration-kicker">{kicker}{items.length > 1 ? ` (${index + 1}/${items.length})` : ''}</p>
       <div key={badge!.code} className="slm-badge-celebration-image">
         <img src={badgeAsset(badge!.code)} alt="" width={160} height={160} decoding="async"/>
       </div>
       <h2 id={titleId}>{badge!.name}</h2>
       <p id={descriptionId}>{badge!.description}{earned.group_name ? ` · ${earned.group_name}` : ''}{earned.season ? ` · ${earned.season}` : ''}</p>
-      <button ref={button} type="button" onClick={next}>Super</button>
+      <button ref={button} type="button" onClick={next}>{buttonLabel}</button>
     </div>
   </div>, document.body);
 }
