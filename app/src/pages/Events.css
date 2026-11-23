@@ -6,3 +6,4 @@
 .slm-avatar { display: grid; place-items: center; flex: 0 0 2.6rem; height: 2.6rem; border-radius: 50%; background: var(--ion-background-color); color: var(--ion-color-primary); border: 1px solid var(--slm-border); }
 .slm-match { border-bottom: 1px solid var(--slm-border); padding: .75rem 0; }
 .slm-match h2 { font-size: 1.1rem; }
+.slm-participant > .slm-member-stats { flex: 0 0 auto; align-self: center; margin-left: auto; }

@@ -260,3 +260,5 @@
 /* Dialog w portalu: ponad dolnym paskiem, z przewijaniem treści */
 .slm-dialog-portal .slm-join-dialog-backdrop { z-index: 100000; align-items: flex-start; padding-top: max(16px, env(safe-area-inset-top)); padding-bottom: max(16px, env(safe-area-inset-bottom)); }
 .slm-dialog-portal .slm-join-dialog { margin: auto; max-height: calc(100dvh - 32px); }
+.slm-premium-events .slm-live-entry .slm-member-stats {flex:0 0 auto;align-self:center;margin-left:auto;}
+.slm-premium-events .slm-live-entry .slm-demo-person-meta {flex:1 1 auto;}
