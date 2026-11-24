@@ -50,13 +50,14 @@ export default function BadgeList({ states, own = false, label, anchorId }: { st
   const [viewing, setViewing] = useState<BadgeState | null>(null);
   const headingId = useId(), listId = useId();
   const byCode = new Map(states.map(s => [s.code, s]));
-  const earned = BADGES.filter(b => byCode.get(b.code)?.earnedAt)
+  const visible = BADGES.filter(b => !b.exclusive || byCode.has(b.code));
+  const earned = visible.filter(b => byCode.get(b.code)?.earnedAt)
     .sort((a, b) => (byCode.get(b.code)!.earnedAt!).localeCompare(byCode.get(a.code)!.earnedAt!));
-  const locked = BADGES.filter(b => !byCode.get(b.code)?.earnedAt);
+  const locked = visible.filter(b => !byCode.get(b.code)?.earnedAt);
   return <section id={anchorId} className="slm-badges" aria-labelledby={headingId} tabIndex={anchorId ? -1 : undefined}>
     <header className="slm-badges-header">
       <h2 id={headingId}>Odznaki</h2>
-      <span className="slm-badges-count" aria-label={`Zdobyte ${earned.length} z ${BADGES.length}`}>{earned.length}/{BADGES.length}</span>
+      <span className="slm-badges-count" aria-label={`Zdobyte ${earned.length} z ${visible.length}`}>{earned.length}/{visible.length}</span>
     </header>
     {label && <p className="slm-badges-note">{label}</p>}
     {earned.length
