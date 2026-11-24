@@ -163,6 +163,14 @@
       "threshold": 80,
       "asset": "assets/badges/SLM-YRS-2027.webp",
       "season": 2027
+    },
+    {
+      "code": "SLM-JUB-002",
+      "name": "Jubileusz 2 lata",
+      "category": "community",
+      "metric": "special_match",
+      "threshold": 1,
+      "asset": "assets/badges/SLM-JUB-002.webp"
     }
   ]
 }

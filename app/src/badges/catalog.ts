@@ -13,6 +13,8 @@ export interface BadgeDefinition {
   scope: BadgeScope;
   /** Król strzelców: przyznawany za każdy rok kalendarzowy osobno (ta sama grafika). */
   yearly?: boolean;
+  /** Odznaka wewnętrzna jednej grupy: lista pokazuje ją tylko, gdy serwer zwróci dla niej stan (członek grupy lub zdobywca). */
+  exclusive?: boolean;
 }
 
 export const BADGE_CATEGORY_LABEL: Record<BadgeCategory, string> = {
@@ -43,6 +45,7 @@ export const BADGES: readonly BadgeDefinition[] = [
   def('SLM-BEN-010', 'Wieczny rezerwowy', '10 zapisów na rezerwę.', 'humor', 10, 'zapisów na rezerwę'),
   def('SLM-PHX-005', 'Feniks', 'Wygrana po 5 porażkach z rzędu.', 'humor', 1, 'wygrana'),
   def('SLM-LST-005', 'Człowiek ostatniej chwili', '5 zapisów w dniu meczu po 17:00.', 'humor', 5, 'zapisów'),
+  { ...def('SLM-JUB-002', 'Jubileusz 2 lata', 'Gra w jubileuszowym meczu 3 grudnia 2026 w grupie Czwartkowy Baloon. Tylko za ten jeden mecz.', 'community', 1, 'mecz', 'per_group'), exclusive: true },
 ];
 
 export const badgeAsset = (code: string) => `/assets/badges/${code}.webp`;
