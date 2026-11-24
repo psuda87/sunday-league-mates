@@ -26,7 +26,7 @@ const lineupMigration=readFileSync(repo+LINEUPS_MIGRATION,'utf8').replace(/\r\n/
 assert.equal(lineupMigration,execFileSync('git',['show',LINEUPS_STAGE2A+':'+LINEUPS_MIGRATION],{cwd:repo,encoding:'utf8'}).replace(/\r\n/g,'\n'),'Unreviewed lineup migration');
 for(const path of ['vercel.json','app/vercel.json']){
  const config=JSON.parse(readFileSync(repo+path,'utf8'));
- assert.equal(config.git?.deploymentEnabled,false,'Automatic deployment must stay disabled: '+path);
+ assert.deepEqual(config.git?.deploymentEnabled,{main:true},'Automatic deployment must be enabled only for main: '+path);
 }
 const prepare=readFileSync(new URL('./prepare-edge-local.py',import.meta.url),'utf8');
 assert(!/premium318-live|\.worktrees|B22_LOCAL_ONLY/.test(prepare),'Local prep must use canonical sources only');
