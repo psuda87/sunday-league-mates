@@ -1,6 +1,7 @@
 import { useRef,useState } from 'react';
 import { normalizePhoneUpdate,PHONE_ERROR } from '../../supabase/functions/_shared/phone';
 import type { PersonalProfileBinding } from '../ui/personalProfile';
+import InfoHeading from '../ui/InfoTip';
 export default function PhoneEditor({binding,onClose}:{binding:PersonalProfileBinding;onClose:()=>void}){
  const profile=binding.profile!;
  const [phone,setPhone]=useState(profile.phone),[password,setPassword]=useState(''),[error,setError]=useState('');
@@ -17,12 +18,13 @@ export default function PhoneEditor({binding,onClose}:{binding:PersonalProfileBi
   catch{setError('Nie potwierdzono zmiany. Ponów odczyt profilu.');}
   finally{flight.current=false;}
  }}>
-  <h2>Numer telefonu</h2>
-  <p>Numer jest opcjonalny i domyślnie prywatny. Puste pole usuwa numer. {profile.email_account===false?'Po usunięciu numeru nadal możesz logować się swoim loginem; usunięty numer przestanie służyć do logowania.':'Logowanie e-mailem pozostaje bez zmian.'}</p>
+  <InfoHeading title="Numer telefonu">
+   <p>Numer jest opcjonalny i domyślnie prywatny. Puste pole usuwa numer. {profile.email_account===false?'Po usunięciu numeru nadal możesz logować się swoim loginem; usunięty numer przestanie służyć do logowania.':'Logowanie e-mailem pozostaje bez zmian.'}</p>
+   <p>Format: 9 cyfr, także z prefiksem +48 lub 0048.</p>
+   <p>Udostępnianie dotyczy wyłącznie aktualnych członków wspólnych aktywnych grup. Wyłączenie lub usunięcie numeru blokuje jego kolejne odczyty; nie usuwa kopii wcześniej zapisanych przez odbiorców.</p>
+  </InfoHeading>
   <label>Telefon<input type="tel" autoComplete="tel" maxLength={32} value={phone} disabled={binding.saving} onChange={e=>{setPhone(e.target.value);setError('');}}/></label>
-  <p>9 cyfr, także z prefiksem +48 lub 0048.</p>
-  <label><input type="checkbox" checked={share} disabled={binding.saving} onChange={e=>setShare(e.target.checked)}/>Udostępniaj mój numer telefonu członkom moich grup</label>
-  <p>Dotyczy wyłącznie aktualnych członków wspólnych aktywnych grup. Wyłączenie lub usunięcie numeru blokuje jego kolejne odczyty; nie usuwa kopii wcześniej zapisanych przez odbiorców.</p>
+  <label className="slm-switch-row"><span>Pokazuj numer członkom moich grup</span><input type="checkbox" role="switch" className="slm-switch" checked={share} disabled={binding.saving} onChange={e=>setShare(e.target.checked)}/></label>
   <label>Obecne hasło do zmiany telefonu<input type="password" autoComplete="current-password" maxLength={128} value={password} disabled={binding.saving} onChange={e=>setPassword(e.target.value)}/></label>
   {error&&<p role="alert">{error}</p>}
   <div className="slm-identity-actions"><button type="submit" disabled={binding.saving}>Zmień telefon</button><button type="button" disabled={binding.saving} onClick={onClose}>Anuluj zmianę telefonu</button></div>
