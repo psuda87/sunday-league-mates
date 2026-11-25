@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { SessionManager } from '../auth/sessionManager';
+import NotificationDialog from './NotificationDialog';
 
 /** Powiadomienia starsze niż tydzień trafiają do archiwum; każdy widzi wyłącznie swoje (serwer zwraca rekordy sesji). */
 export const ARCHIVE_AFTER_MS = 7 * 24 * 60 * 60 * 1000;
@@ -7,7 +8,7 @@ interface Row { id: string; title: string; body: string; created_at: string; arc
 const PAGE = 50, MAX_PAGES = 4;
 
 export default function NotificationArchive({ manager, userId }: { manager: SessionManager; userId: string }) {
-  const [open, setOpen] = useState(false), [rows, setRows] = useState<Row[] | null>(null), [error, setError] = useState(false), [busy, setBusy] = useState(false);
+  const [open, setOpen] = useState(false), [rows, setRows] = useState<Row[] | null>(null), [error, setError] = useState(false), [busy, setBusy] = useState(false), [shown, setShown] = useState<Row | null>(null);
   async function load() {
     if (busy) return; setBusy(true); setError(false);
     try {
@@ -29,8 +30,10 @@ export default function NotificationArchive({ manager, userId }: { manager: Sess
     {error ? <p role="alert">Nie udało się wczytać archiwum. <button type="button" onClick={() => void load()}>Spróbuj ponownie</button></p>
       : rows === null ? <p>Wczytywanie…</p>
       : rows.length === 0 ? <p>Archiwum jest puste.</p>
-      : <ul className="slm-inbox">{rows.map(n => <li key={n.id}><strong>{n.title}</strong><span>{n.body}</span>
-        <time dateTime={n.created_at}>{new Date(n.created_at).toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' })}</time></li>)}</ul>}
+      : <ul className="slm-archive-tiles">{rows.map(n => <li key={n.id}><button type="button" className="slm-archive-tile" onClick={() => setShown(n)}>
+        <strong>{n.title}</strong><time dateTime={n.created_at}>{new Date(n.created_at).toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' })}</time>
+        <span aria-hidden="true">›</span></button></li>)}</ul>}
+    {shown && <NotificationDialog item={{ ...shown, read_at: null }} onClose={() => setShown(null)}/>}
     <button type="button" onClick={() => setOpen(false)}>Zamknij archiwum</button>
   </section>;
 }

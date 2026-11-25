@@ -108,3 +108,13 @@
 .slm-notification-dialog-actions button {flex:1 1 140px;min-height:44px;padding:8px 14px;border:1px solid var(--slm-gold);border-radius:12px;background:var(--slm-gold);color:#1a1214;font:inherit;font-weight:700;}
 .slm-notification-dialog-actions .slm-notification-dialog-close {background:transparent;color:var(--slm-gold);}
 .slm-notification-dialog-actions button:disabled {opacity:.6;}
+/* Archiwum powiadomień: każdy wpis to kafelek z tematem i datą, treść w popupie (2026-11-25). */
+.slm-archive-tiles {list-style:none;margin:8px 0 12px;padding:0;display:grid;gap:8px;}
+.slm-archive-tile {display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;column-gap:10px;row-gap:2px;align-items:center;width:100%;min-height:56px;padding:10px 14px;border:1px solid var(--slm-border);border-radius:12px;background:var(--slm-panel,rgba(255,255,255,.04));color:inherit;font:inherit;text-align:left;}
+.slm-archive-tile strong {font-weight:700;overflow-wrap:anywhere;}
+.slm-archive-tile time {grid-row:2;font-size:.8rem;opacity:.65;}
+.slm-archive-tile > span {grid-column:2;grid-row:1 / span 2;font-size:1.3rem;color:var(--slm-gold);}
+/* Zaległości na liście członków grupy: opis + ikona, nie tylko kolor. */
+.slm-group-person small.slm-member-debt {display:inline-flex;align-items:center;gap:4px;margin-top:2px;padding:1px 8px;border:1px solid rgba(255,138,101,.55);border-radius:999px;color:#ffb199;font-size:.75rem;font-weight:600;width:fit-content;}
+.slm-group-person small.slm-member-debt[data-severe] {border-color:#ff6b57;background:rgba(255,107,87,.14);color:#ff8f80;}
+.slm-group-person small.slm-member-debt ion-icon {font-size:.95rem;}
