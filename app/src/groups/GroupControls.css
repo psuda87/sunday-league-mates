@@ -118,3 +118,16 @@
 .slm-group-person small.slm-member-debt {display:inline-flex;align-items:center;gap:4px;margin-top:2px;padding:1px 8px;border:1px solid rgba(255,138,101,.55);border-radius:999px;color:#ffb199;font-size:.75rem;font-weight:600;width:fit-content;}
 .slm-group-person small.slm-member-debt[data-severe] {border-color:#ff6b57;background:rgba(255,107,87,.14);color:#ff8f80;}
 .slm-group-person small.slm-member-debt ion-icon {font-size:.95rem;}
+/* Nagłówek z ikoną „i” i przełącznik zamiast dużego checkboxa (2026-11-25). */
+.slm-info-heading {display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.slm-info-heading h2 {margin:0;}
+.slm-info-button {flex:none;display:grid;place-items:center;width:30px;height:30px;min-height:30px;padding:0;border:1.5px solid var(--slm-gold);border-radius:50%;background:transparent;color:var(--slm-gold);font:italic 700 1rem Georgia,serif;}
+.slm-info-button[aria-expanded="true"] {background:var(--slm-gold);color:var(--slm-panel,#111);}
+.slm-info-box {display:grid;gap:6px;margin:8px 0 4px;padding:10px 12px;border:1px solid var(--slm-border);border-left:3px solid var(--slm-gold);border-radius:10px;font-size:.88rem;opacity:.9;}
+.slm-info-box p {margin:0;}
+label.slm-switch-row {display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:12px;min-height:44px;}
+input.slm-switch {appearance:none;-webkit-appearance:none;flex:none;position:relative;width:48px;height:28px;margin:0;border:1px solid var(--slm-border);border-radius:999px;background:rgba(255,255,255,.12);cursor:pointer;transition:background .2s;}
+input.slm-switch::after {content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#cfd6e4;transition:transform .2s;}
+input.slm-switch:checked {background:var(--slm-gold);border-color:var(--slm-gold);}
+input.slm-switch:checked::after {transform:translateX(20px);background:#fff;}
+input.slm-switch:focus-visible {outline:2px solid var(--slm-gold);outline-offset:2px;}

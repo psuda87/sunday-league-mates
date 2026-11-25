@@ -1,4 +1,5 @@
 import { useRef,useState } from 'react';
+import InfoHeading from '../ui/InfoTip';
 import { IonAlert } from '@ionic/react';
 import type { PersonalProfileBinding,IdentityDraft } from '../ui/personalProfile';
 import { profileProblems } from '../account-ui/model';
@@ -12,7 +13,7 @@ export default function PremiumIdentityEditor({binding,onClose}:{binding:Persona
  const preview=mode==='first_name'?first.trim()||nick.trim():mode==='full_name'?full.trim()||nick.trim():nick.trim();
  async function save(draft:IdentityDraft){if(flight.current)return;flight.current=true;try{if(await binding.saveIdentity?.(draft))onClose();else setError('Nie potwierdzono zapisu. Odśwież profil.');}finally{flight.current=false;}}
  return <><form className="slm-identity-editor slm-premium-identity" noValidate aria-label="Edycja publicznej nazwy" onSubmit={e=>{e.preventDefault();if(flight.current||closing.current||binding.saving)return;const problems=profileProblems({nickname:nick,fullName:full,phone:''});if(problems.length||profileProblems({nickname:'Profil',fullName:first,phone:''}).length){setError(problems[0]||'Sprawdź imię.');return;}if(!groups||!p.nickname){setError('Backend nie udostępnia kontraktu nazw. Odśwież profil.');return;}if(number!==''&&!/^\d{1,2}$/.test(number)){setError('Numer: 0–99 lub puste pole.');return;}const draft:IdentityDraft={nickname:nick.trim(),first_name:first.trim(),full_name:full.trim(),display_as:mode,jersey_number:number===''?null:Number(number),group_scope:groups.map(g=>g.group_id).sort(),accept_disclosure:false,request_id:request.current};if(needs)setPending(draft);else void save(draft);}}>
- <h2>Edytuj profil</h2><p>Pseudonim nie zmienia loginu ani sesji. Sposób wyświetlania jest wspólny dla konta; zgody pozostają ograniczone do grup.</p>
+ <InfoHeading title="Edytuj profil"><p>Pseudonim nie zmienia loginu ani sesji. Sposób wyświetlania jest wspólny dla konta; zgody pozostają ograniczone do grup.</p></InfoHeading>
  <label>Pseudonim<input value={nick} maxLength={48} disabled={binding.saving} onChange={e=>setNick(e.target.value)}/></label>
  <label>Imię · wpisz jawnie<input value={first} maxLength={100} disabled={binding.saving} onChange={e=>setFirst(e.target.value)}/></label>
  <label>Imię i nazwisko · opcjonalnie<input value={full} maxLength={100} disabled={binding.saving} onChange={e=>setFull(e.target.value)}/></label>
