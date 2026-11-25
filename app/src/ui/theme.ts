@@ -1,5 +1,5 @@
-export type Palette = 'espana'|'fcb'|'lime'|'deimos'|'gold'|'mint';
-export const palettes:readonly Palette[]=['espana','fcb','lime','deimos','gold','mint'];
+export type Palette = 'espana'|'fcb'|'lime'|'deimos'|'gold'|'ember'|'arctic'|'carbon';
+export const palettes:readonly Palette[]=['espana','fcb','lime','deimos','gold','ember','arctic','carbon'];
 export const paletteKey='slm.palette';
 let paletteEnabled=false;
 let currentPalette:Palette='espana';
