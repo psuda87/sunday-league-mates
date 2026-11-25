@@ -739,3 +739,17 @@ Fixed SLM crest, Ultimate card and natural pitch retain their approved artwork. 
 :root[data-theme="lime"]:not(.ion-palette-dark) { --ion-background-color:#EAF1E3; --ion-background-color-rgb:234,241,227; --slm-border:#AFC4A2; --slm-text-secondary:#3E5246; }
 :root[data-theme="deimos"]:not(.ion-palette-dark) { --ion-background-color:#F0EAF8; --ion-background-color-rgb:240,234,248; --slm-border:#C4B1DC; --slm-text-secondary:#524460; }
 :root:not(.ion-palette-dark) .slm-panel,:root:not(.ion-palette-dark) .slm-group-person,:root:not(.ion-palette-dark) .slm-archive-tile { box-shadow:0 1px 2px rgba(20,24,40,.06),0 4px 14px -6px rgba(20,24,40,.16); }
+
+/* Tryb jasny — wyrazistość motywu (2026-11-25): kolor palety na kartach meczów, dolnym pasku, tytule i tle, żeby przełączenie motywu było od razu widoczne. */
+:root:not(.ion-palette-dark) {
+ --slm-brand-deep:color-mix(in srgb,var(--ion-color-primary) 72%,#000);
+ --slm-photo-veil:color-mix(in srgb,var(--slm-brand-deep) 86%,transparent);
+ --slm-photo-bottom:color-mix(in srgb,var(--slm-brand-deep) 94%,transparent);
+ --slm-match-border:color-mix(in srgb,var(--ion-color-primary) 55%,transparent);
+ --slm-card-side:color-mix(in srgb,var(--slm-brand-deep) 88%,transparent);
+ --slm-card-floor:color-mix(in srgb,var(--slm-brand-deep) 70%,transparent);
+}
+:root:not(.ion-palette-dark) ion-content,:root:not(.ion-palette-dark) body { --background:linear-gradient(180deg,color-mix(in srgb,var(--ion-color-primary) 16%,var(--ion-background-color)) 0,var(--ion-background-color) 320px); }
+:root:not(.ion-palette-dark) .slm-floating-brand h1,:root:not(.ion-palette-dark) .slm-compact-header h1 { color:var(--slm-brand-deep); }
+:root:not(.ion-palette-dark) .slm-demo-nav-surface,:root:not(.ion-palette-dark) .slm-bottom-nav:not(.slm-demo-nav) { background:linear-gradient(180deg,color-mix(in srgb,var(--ion-color-primary) 12%,#fff),color-mix(in srgb,var(--ion-color-primary) 22%,#fff)); border-top:2px solid var(--ion-color-primary); }
+:root:not(.ion-palette-dark) .slm-bottom-nav button[aria-current="page"] { color:#fff; background:var(--ion-color-primary); border-color:transparent; }
