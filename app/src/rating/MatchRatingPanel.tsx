@@ -1,3 +1,4 @@
+import '../groups/GroupControls.css';
 import { useEffect, useState } from 'react';
 import type { SessionManager } from '../auth/sessionManager';
 import { scoreWarnings } from './ratingContracts';
