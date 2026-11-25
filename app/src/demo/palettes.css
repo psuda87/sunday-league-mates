@@ -322,3 +322,216 @@ Fixed SLM crest, Ultimate card and natural pitch retain their approved artwork. 
 :root[data-theme="fcb"].ion-palette-dark,:root[data-theme="lime"].ion-palette-dark,:root[data-theme="deimos"].ion-palette-dark {
  --slm-dark-texture:radial-gradient(ellipse at 80% 10%,var(--slm-glow),transparent 70%);
 }
+
+/* Motyw Gold (2026-11-25): czerń i złoto w duchu MVP Gold. */
+:root[data-theme="gold"]:not(.ion-palette-dark) {
+ --ion-background-color:#F2EDE2;
+ --ion-background-color-rgb:242,237,226;
+ --ion-text-color:#1E1A12;
+ --ion-text-color-rgb:30,26,18;
+ --ion-color-primary:#8A6418;
+ --ion-color-primary-rgb:138,100,24;
+ --ion-color-primary-contrast:#FFFFFF;
+ --ion-color-primary-contrast-rgb:255,255,255;
+ --ion-color-primary-shade:color-mix(in srgb,#8A6418 85%,black);
+ --ion-color-primary-tint:color-mix(in srgb,#8A6418 85%,white);
+ --ion-color-secondary-contrast:#20242A;
+ --slm-panel:#FFFFFF;
+ --slm-card-bottom:#FFFFFF;
+ --slm-card-top:#ECE2CC;
+ --slm-card-edge:#7A5A1220;
+ --slm-text-secondary:#584C36;
+ --slm-border:#C9B78F;
+ --slm-match-border:#7A5A1270;
+ --slm-gold:#7A5A12;
+ --slm-fill:#E2B656;
+ --slm-gold-edge:#F5DB95;
+ --slm-track:#C9B78F;
+ --slm-premium-burgundy:#1C1810;
+ --slm-premium-gold:#E2B656;
+ --slm-button-top:#8A6418;
+ --slm-button-bottom:color-mix(in srgb,#8A6418 82%,black);
+ --slm-button-shadow:#8A641840;
+ --slm-glow:#8A641820;
+ --slm-home-tint:#B07D1E12;
+ --slm-canvas-glow:#8A641830;
+ --slm-canvas-shade:#F2EDE220;
+ --slm-header-glow:#B07D1E25;
+ --slm-nav-active:#7A5A1215;
+ --slm-active-top:#8A64181A;
+ --slm-active-bottom:#8A641808;
+ --slm-photo-line:#7A5A1255;
+ --slm-light-flare:#B07D1E26;
+ --slm-card-light:#7A5A1238;
+ --slm-card-rim:#7A5A1270;
+ --slm-card-burgundy:#B07D1E26;
+ --slm-date-floor:#8A641880;
+ --slm-crest-halo:#7A5A1220;
+ --slm-crest-burgundy:#B07D1E10;
+ --slm-detail-rim:#7A5A1240;
+ --slm-roster-avatar-top:#ECE2CC;
+ --slm-roster-avatar-bottom:#8A641830;
+ --slm-field-bg:#FFFFFF;
+ --slm-field-edge:#7A5A12;
+}
+:root[data-theme="gold"].ion-palette-dark {
+ --ion-background-color:#09090A;
+ --ion-background-color-rgb:9,9,10;
+ --ion-text-color:#F6F1E4;
+ --ion-text-color-rgb:246,241,228;
+ --ion-color-primary:#B8862B;
+ --ion-color-primary-rgb:184,134,43;
+ --ion-color-primary-contrast:#140F05;
+ --ion-color-primary-contrast-rgb:20,15,5;
+ --ion-color-primary-shade:color-mix(in srgb,#B8862B 85%,black);
+ --ion-color-primary-tint:color-mix(in srgb,#B8862B 85%,white);
+ --ion-color-secondary-contrast:#20242A;
+ --slm-panel:#151412;
+ --slm-card-bottom:#151412;
+ --slm-card-top:#211D15;
+ --slm-card-edge:#E8BE6220;
+ --slm-text-secondary:#CFC4A8;
+ --slm-border:#3D3426;
+ --slm-match-border:#E8BE6270;
+ --slm-gold:#E8BE62;
+ --slm-fill:#E8BE62;
+ --slm-gold-edge:#F5DB95;
+ --slm-track:#3D3426;
+ --slm-premium-burgundy:#151412;
+ --slm-premium-gold:#E8BE62;
+ --slm-button-top:#B8862B;
+ --slm-button-bottom:color-mix(in srgb,#B8862B 82%,black);
+ --slm-button-shadow:#B8862B40;
+ --slm-glow:#B8862B20;
+ --slm-home-tint:#C9972F40;
+ --slm-canvas-glow:#B8862B30;
+ --slm-canvas-shade:#09090A20;
+ --slm-header-glow:#C9972F25;
+ --slm-nav-active:#E8BE6215;
+ --slm-active-top:#B8862B70;
+ --slm-active-bottom:#B8862B22;
+ --slm-photo-line:#E8BE6255;
+ --slm-light-flare:#C9972F26;
+ --slm-card-light:#E8BE6238;
+ --slm-card-rim:#E8BE6270;
+ --slm-card-burgundy:#C9972F26;
+ --slm-date-floor:#B8862B80;
+ --slm-crest-halo:#E8BE6220;
+ --slm-crest-burgundy:#C9972F35;
+ --slm-detail-rim:#E8BE6240;
+ --slm-roster-avatar-top:#211D15;
+ --slm-roster-avatar-bottom:#B8862B30;
+ --slm-field-bg:#151412;
+ --slm-field-edge:#E8BE62;
+}
+/* Motyw Mint (2026-11-25): głęboka zieleń morska z miętowym akcentem i koralowym kontrapunktem — kierunek współczesnych aplikacji sportowych. */
+:root[data-theme="mint"]:not(.ion-palette-dark) {
+ --ion-background-color:#EBF4F1;
+ --ion-background-color-rgb:235,244,241;
+ --ion-text-color:#0F241F;
+ --ion-text-color-rgb:15,36,31;
+ --ion-color-primary:#127463;
+ --ion-color-primary-rgb:18,116,99;
+ --ion-color-primary-contrast:#FFFFFF;
+ --ion-color-primary-contrast-rgb:255,255,255;
+ --ion-color-primary-shade:color-mix(in srgb,#127463 85%,black);
+ --ion-color-primary-tint:color-mix(in srgb,#127463 85%,white);
+ --ion-color-secondary-contrast:#20242A;
+ --slm-panel:#FFFFFF;
+ --slm-card-bottom:#FFFFFF;
+ --slm-card-top:#DCEDE7;
+ --slm-card-edge:#0E6B5B20;
+ --slm-text-secondary:#405B54;
+ --slm-border:#AFCCC2;
+ --slm-match-border:#0E6B5B70;
+ --slm-gold:#0E6B5B;
+ --slm-fill:#4FD1B5;
+ --slm-gold-edge:#A8F0DF;
+ --slm-track:#AFCCC2;
+ --slm-premium-burgundy:#0C1F1B;
+ --slm-premium-gold:#4FD1B5;
+ --slm-button-top:#127463;
+ --slm-button-bottom:color-mix(in srgb,#127463 82%,black);
+ --slm-button-shadow:#12746340;
+ --slm-glow:#12746320;
+ --slm-home-tint:#E0735A12;
+ --slm-canvas-glow:#12746330;
+ --slm-canvas-shade:#EBF4F120;
+ --slm-header-glow:#E0735A25;
+ --slm-nav-active:#0E6B5B15;
+ --slm-active-top:#1274631A;
+ --slm-active-bottom:#12746308;
+ --slm-photo-line:#0E6B5B55;
+ --slm-light-flare:#E0735A26;
+ --slm-card-light:#0E6B5B38;
+ --slm-card-rim:#0E6B5B70;
+ --slm-card-burgundy:#E0735A26;
+ --slm-date-floor:#12746380;
+ --slm-crest-halo:#0E6B5B20;
+ --slm-crest-burgundy:#E0735A10;
+ --slm-detail-rim:#0E6B5B40;
+ --slm-roster-avatar-top:#DCEDE7;
+ --slm-roster-avatar-bottom:#12746330;
+ --slm-field-bg:#FFFFFF;
+ --slm-field-edge:#0E6B5B;
+}
+:root[data-theme="mint"].ion-palette-dark {
+ --ion-background-color:#08120F;
+ --ion-background-color-rgb:8,18,15;
+ --ion-text-color:#E3F2EC;
+ --ion-text-color-rgb:227,242,236;
+ --ion-color-primary:#1C8C76;
+ --ion-color-primary-rgb:28,140,118;
+ --ion-color-primary-contrast:#FFFFFF;
+ --ion-color-primary-contrast-rgb:255,255,255;
+ --ion-color-primary-shade:color-mix(in srgb,#1C8C76 85%,black);
+ --ion-color-primary-tint:color-mix(in srgb,#1C8C76 85%,white);
+ --ion-color-secondary-contrast:#20242A;
+ --slm-panel:#11201C;
+ --slm-card-bottom:#11201C;
+ --slm-card-top:#182E28;
+ --slm-card-edge:#6FE3C820;
+ --slm-text-secondary:#A5C4BA;
+ --slm-border:#29433C;
+ --slm-match-border:#6FE3C870;
+ --slm-gold:#6FE3C8;
+ --slm-fill:#6FE3C8;
+ --slm-gold-edge:#B8F5E6;
+ --slm-track:#29433C;
+ --slm-premium-burgundy:#11201C;
+ --slm-premium-gold:#6FE3C8;
+ --slm-button-top:#1C8C76;
+ --slm-button-bottom:color-mix(in srgb,#1C8C76 82%,black);
+ --slm-button-shadow:#1C8C7640;
+ --slm-glow:#1C8C7620;
+ --slm-home-tint:#F08A6E40;
+ --slm-canvas-glow:#1C8C7630;
+ --slm-canvas-shade:#08120F20;
+ --slm-header-glow:#F08A6E25;
+ --slm-nav-active:#6FE3C815;
+ --slm-active-top:#1C8C7670;
+ --slm-active-bottom:#1C8C7622;
+ --slm-photo-line:#6FE3C855;
+ --slm-light-flare:#F08A6E26;
+ --slm-card-light:#6FE3C838;
+ --slm-card-rim:#6FE3C870;
+ --slm-card-burgundy:#F08A6E26;
+ --slm-date-floor:#1C8C7680;
+ --slm-crest-halo:#6FE3C820;
+ --slm-crest-burgundy:#F08A6E35;
+ --slm-detail-rim:#6FE3C840;
+ --slm-roster-avatar-top:#182E28;
+ --slm-roster-avatar-bottom:#1C8C7630;
+ --slm-field-bg:#11201C;
+ --slm-field-edge:#6FE3C8;
+}
+[data-palette=gold] { --swatch-bg:#09090A; --swatch-primary:#B8862B; --swatch-accent:#E8BE62; }
+[data-palette=mint] { --swatch-bg:#08120F; --swatch-primary:#1C8C76; --swatch-accent:#6FE3C8; }
+:root[data-theme="gold"].ion-palette-dark,:root[data-theme="mint"].ion-palette-dark { --slm-dark-texture:radial-gradient(ellipse at 80% 10%,var(--slm-glow),transparent 70%); }
+
+/* Tryb jasny — większy kontrast (2026-11-25): tło wyraźniej odcięte od kart, mocniejsze obramowania i tekst pomocniczy, delikatny cień kart. */
+:root[data-theme="espana"]:not(.ion-palette-dark) { --ion-background-color:#EFEBE3; --ion-background-color-rgb:239,235,227; --slm-border:#C9C1B3; --slm-text-secondary:#4F5057; }
+:root[data-theme="fcb"]:not(.ion-palette-dark) { --ion-background-color:#E9EDF6; --ion-background-color-rgb:233,237,246; --slm-border:#AFBAD2; --slm-text-secondary:#3F4C66; }
+:root[data-theme="lime"]:not(.ion-palette-dark) { --ion-background-color:#EAF1E3; --ion-background-color-rgb:234,241,227; --slm-border:#AFC4A2; --slm-text-secondary:#3E5246; }
+:root[data-theme="deimos"]:not(.ion-palette-dark) { --ion-background-color:#F0EAF8; --ion-background-color-rgb:240,234,248; --slm-border:#C4B1DC; --slm-text-secondary:#524460; }
+:root:not(.ion-palette-dark) .slm-panel,:root:not(.ion-palette-dark) .slm-group-person,:root:not(.ion-palette-dark) .slm-archive-tile { box-shadow:0 1px 2px rgba(20,24,40,.06),0 4px 14px -6px rgba(20,24,40,.16); }
