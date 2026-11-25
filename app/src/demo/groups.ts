@@ -5,7 +5,7 @@ export type GroupPerson=Pick<DemoPlayer,'id'|'name'|'nick'|'portrait'|'portraitE
 export type GroupWorld=Pick<World,'groupState'|'userId'|'notice'>&{players:GroupPerson[]};
 
 export interface DemoGroup {id:string;name:string;description:string;adminId:string;creationKey?:string}
-export interface Membership {groupId:string;playerId:string;joinedAt:string;organizer:boolean;admin?:boolean}
+export interface Membership {groupId:string;playerId:string;joinedAt:string;organizer:boolean;admin?:boolean;overdueMatches?:number}
 export interface GroupRequest {
  id:string;groupId:string;kind:'invite'|'proposal'|'join';status:'pending'|'accepted'|'rejected'|'cancelled';
  targetId:string|null;requestedBy:string;channel:'nick'|'phone';lookupKey?:string;

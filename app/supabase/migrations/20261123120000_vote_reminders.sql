@@ -25,6 +25,7 @@ begin
  return n;
 end $$;
 revoke all on function slm_private.vote_reminders() from public,anon,authenticated;
+grant execute on function slm_private.vote_reminders() to service_role;
 
 -- Wywołanie z cyklicznego przygotowania powiadomień (jak przypomnienia o płatności).
 create or replace function public.slm_notifications_prepare() returns integer

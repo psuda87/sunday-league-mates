@@ -8,7 +8,7 @@ export interface InboxItem { id: string; title: string; body: string; created_at
  * a po kliknięciu otwiera się ten popup z treścią i przyciskiem „Archiwizuj”, który chowa wpis z listy.
  */
 export default function NotificationDialog({ item, busy, error, onArchive, onClose }:
-  { item: InboxItem; busy: boolean; error: boolean; onArchive: () => void; onClose: () => void }) {
+  { item: InboxItem; busy?: boolean; error?: boolean; onArchive?: () => void; onClose: () => void }) {
   const close = useRef<HTMLButtonElement>(null);
   const titleId = useId(), bodyId = useId();
   useEffect(() => { close.current?.focus(); }, [item.id]);
@@ -20,7 +20,7 @@ export default function NotificationDialog({ item, busy, error, onArchive, onClo
       <p id={bodyId}>{item.body}</p>
       {error && <p role="alert">Nie udało się zarchiwizować. Spróbuj ponownie.</p>}
       <div className="slm-notification-dialog-actions">
-        <button type="button" onClick={onArchive} disabled={busy}>{busy ? 'Archiwizuję…' : 'Archiwizuj'}</button>
+        {onArchive && <button type="button" onClick={onArchive} disabled={busy}>{busy ? 'Archiwizuję…' : 'Archiwizuj'}</button>}
         <button ref={close} type="button" className="slm-notification-dialog-close" onClick={onClose}>Zamknij</button>
       </div>
     </div>

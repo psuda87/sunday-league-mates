@@ -1,7 +1,7 @@
 import { useCallback,useEffect,useRef,useState,useSyncExternalStore } from 'react';
 import { AccountError } from '../auth/api';
 import type { SessionManager } from '../auth/sessionManager';
-import type { GroupWorld,GroupPerson } from '../demo/groups';
+import type { GroupWorld,GroupPerson,Membership } from '../demo/groups';
 import type { GroupBinding,GroupDetail,GroupIdentity,GroupRequest,GroupSummary } from './model';
 import { summary,details,requests,member } from './contracts';
 import { normalizePolishPhone } from '../../supabase/functions/_shared/phone';
@@ -12,8 +12,8 @@ export function groupWorld(userId:string,groups:GroupSummary[],inbox:GroupReques
  const groupRows=new Map<string,GroupIdentity>(groups.map(g=>[g.id,g]));
  for(const request of inbox)if(!groupRows.has(request.group_id))groupRows.set(request.group_id,{id:request.group_id,name:request.group_name??'',description:'',admin_id:''});
  const players=new Map<string,GroupPerson>();
- const members=groups.filter(g=>g.id!==detail?.group.id).map(g=>({groupId:g.id,playerId:userId,organizer:g.organizer,admin:g.admin===true,joinedAt:''}));
- if(detail){groupRows.set(detail.group.id,detail.group);for(const m of detail.members){players.set(m.user_id,player(m.user_id,m.display_name??m.nickname,photos[m.user_id]));members.push({groupId:detail.group.id,playerId:m.user_id,organizer:m.organizer,admin:m.admin===true&&m.owner!==true,joinedAt:m.joined_at});}}
+ const members:Membership[]=groups.filter(g=>g.id!==detail?.group.id).map(g=>({groupId:g.id,playerId:userId,organizer:g.organizer,admin:g.admin===true,joinedAt:''}));
+ if(detail){groupRows.set(detail.group.id,detail.group);for(const m of detail.members){players.set(m.user_id,player(m.user_id,m.display_name??m.nickname,photos[m.user_id]));members.push({groupId:detail.group.id,playerId:m.user_id,organizer:m.organizer,admin:m.admin===true&&m.owner!==true,joinedAt:m.joined_at,overdueMatches:typeof m.overdue_matches==='number'&&m.overdue_matches>0?m.overdue_matches:undefined});}}
  const requests=new Map([...inbox,...(detail?.requests??[])].map(r=>[r.id,r]));
  for(const r of requests.values()){
   if(r.actor_id&&r.actor_name&&!players.has(r.actor_id))players.set(r.actor_id,player(r.actor_id,r.actor_name));
