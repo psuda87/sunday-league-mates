@@ -10,5 +10,5 @@ export interface GroupBinding {
  found:{id:string;name:string;description:string;count:number}[];candidates:{id:string;name:string;nick?:string}[];
  requestPhones:Record<string,string>;shareFullName:boolean;shareFirstName?:boolean;displayAs?:'nickname'|'first_name'|'full_name';
  refresh:()=>Promise<void>;open:(id:string)=>Promise<void>;search:(query:string)=>void;findPlayers:(id:string,query:string)=>void;
- create:(name:string,description:string,key:string)=>Promise<string|null>;act:(action:GroupAction)=>void;consent:(share:boolean,confirmNickname?:boolean)=>void;
+ create:(name:string,description:string,key:string)=>Promise<string|null>;act:(action:GroupAction)=>void;consent:(share:boolean,confirmNickname?:boolean)=>void;remindPayment?:(groupId:string,userId:string)=>Promise<boolean>;
 }

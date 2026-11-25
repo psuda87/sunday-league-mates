@@ -114,6 +114,7 @@ export function useGroups(manager:SessionManager,userId:string){
   shareFirstName:state.detail?.members.find(m=>m.user_id===userId)?.share_first_name??false,
   displayAs:state.detail?.members.find(m=>m.user_id===userId)?.display_as,
   shareFullName:state.detail?.members.find(m=>m.user_id===userId)?.share_full_name??false,
+  remindPayment:async(groupId,target)=>{try{const ack=await manager.call<{ok?:boolean}>('group_finance_remind_payment',{group_id:groupId,user_id:target,request_id:crypto.randomUUID(),reason:'Przypomnienie z listy członków'});return ack?.ok===true;}catch{return false;}},
   open:async id=>{selected.current=id;setCandidates([]);await refresh();},
   create:async(name,description,key)=>work(async()=>{const r=await mutate<{group_id:string}>('groups_create',{name,description,request_id:key});selected.current=r.group_id;await refresh();return r.group_id;}),
   consent:(share,confirmNickname=false)=>{void work(async()=>{await mutate('groups_consent',{group_id:state.detail!.group.id,share_full_name:share,confirm_nickname:confirmNickname});window.dispatchEvent(new Event('slm-profile-changed'));await refresh();});},

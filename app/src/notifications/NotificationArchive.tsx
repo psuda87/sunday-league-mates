@@ -7,6 +7,21 @@ export const ARCHIVE_AFTER_MS = 7 * 24 * 60 * 60 * 1000;
 interface Row { id: string; title: string; body: string; created_at: string; archived_at?: string | null }
 const PAGE = 50, MAX_PAGES = 4;
 
+/** Sekcje archiwum (2026-11-25): ostatnie 7 dni, wcześniej w tym miesiącu, potem kolejne miesiące. */
+export function archiveSections(rows: Row[], now = new Date()) {
+  const week = now.getTime() - ARCHIVE_AFTER_MS, sections: { label: string; rows: Row[] }[] = [];
+  const sorted = [...rows].sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
+  for (const row of sorted) {
+    const at = new Date(row.created_at);
+    const label = at.getTime() >= week ? 'Ostatnie 7 dni'
+      : at.getFullYear() === now.getFullYear() && at.getMonth() === now.getMonth() ? 'Wcześniej w tym miesiącu'
+      : at.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' }).replace(/^./, c => c.toUpperCase());
+    const last = sections[sections.length - 1];
+    if (last?.label === label) last.rows.push(row); else sections.push({ label, rows: [row] });
+  }
+  return sections;
+}
+
 export default function NotificationArchive({ manager, userId }: { manager: SessionManager; userId: string }) {
   const [open, setOpen] = useState(false), [rows, setRows] = useState<Row[] | null>(null), [error, setError] = useState(false), [busy, setBusy] = useState(false), [shown, setShown] = useState<Row | null>(null);
   async function load() {
@@ -30,9 +45,11 @@ export default function NotificationArchive({ manager, userId }: { manager: Sess
     {error ? <p role="alert">Nie udało się wczytać archiwum. <button type="button" onClick={() => void load()}>Spróbuj ponownie</button></p>
       : rows === null ? <p>Wczytywanie…</p>
       : rows.length === 0 ? <p>Archiwum jest puste.</p>
-      : <ul className="slm-archive-tiles">{rows.map(n => <li key={n.id}><button type="button" className="slm-archive-tile" onClick={() => setShown(n)}>
+      : archiveSections(rows).map(section => <section key={section.label} className="slm-archive-section" aria-label={section.label}>
+        <h3>{section.label} <span>{section.rows.length}</span></h3>
+        <ul className="slm-archive-tiles">{section.rows.map(n => <li key={n.id}><button type="button" className="slm-archive-tile" onClick={() => setShown(n)}>
         <strong>{n.title}</strong><time dateTime={n.created_at}>{new Date(n.created_at).toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' })}</time>
-        <span aria-hidden="true">›</span></button></li>)}</ul>}
+        <span aria-hidden="true">›</span></button></li>)}</ul></section>)}
     {shown && <NotificationDialog item={{ ...shown, read_at: null }} onClose={() => setShown(null)}/>}
     <button type="button" onClick={() => setOpen(false)}>Zamknij archiwum</button>
   </section>;
