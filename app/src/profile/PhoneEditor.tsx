@@ -49,7 +49,7 @@ export function AccountDeletion({binding}:{binding:PersonalProfileBinding}){
    }else{setPending(true);setError('Nie potwierdzono zakończenia usuwania. Konto może już być zablokowane. Ponów sprawdzenie; nie zamykaj tej strony.');}
   }finally{flight.current=false;setBusy(false);}
  }}>
- <h2>Usuń konto</h2><p>Operacja jest nieodwracalna. Usuniemy konto logowania, profil, telefon, zdjęcia i członkostwa. Pozostaną wyłącznie zredagowane fakty historyczne potrzebne dla integralności rozliczeń i meczów. Grupa z innymi członkami wymaga wcześniejszego przekazania administratora; Twoje grupy jednoosobowe zostaną zamknięte.</p>
+ <InfoHeading title="Usuń konto"><p>Usuniemy konto logowania, profil, telefon, zdjęcia i członkostwa. Pozostaną wyłącznie zredagowane fakty historyczne potrzebne dla integralności rozliczeń i meczów. Grupa z innymi członkami wymaga wcześniejszego przekazania administratora; Twoje grupy jednoosobowe zostaną zamknięte.</p></InfoHeading><p className="slm-danger-note">⚠ Operacja jest nieodwracalna.</p>
  {!pending&&<><label>Obecne hasło do usunięcia konta<input type="password" autoComplete="current-password" value={password} disabled={busy} onChange={e=>setPassword(e.target.value)}/></label><label>Wpisz USUŃ KONTO<input value={confirmation} disabled={busy} onChange={e=>setConfirmation(e.target.value)}/></label></>}
  {error&&<p role="alert">{error}</p>}{busy&&<p role="status">Trwa sprawdzanie operacji…</p>}
  <button type="submit" disabled={busy}>{pending?'Ponów sprawdzenie usuwania':'Nieodwracalnie usuń moje konto'}</button>
