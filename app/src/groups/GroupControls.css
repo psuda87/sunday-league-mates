@@ -115,7 +115,7 @@
 .slm-archive-tile time {grid-row:2;font-size:.8rem;opacity:.65;}
 .slm-archive-tile > span {grid-column:2;grid-row:1 / span 2;font-size:1.3rem;color:var(--slm-gold);}
 /* Zaległości na liście członków grupy: opis + ikona, nie tylko kolor. */
-.slm-group-person small.slm-member-debt {display:inline-flex;align-items:center;gap:4px;margin-top:2px;padding:1px 8px;border:1px solid rgba(255,138,101,.55);border-radius:999px;color:#ffb199;font-size:.75rem;font-weight:600;width:fit-content;}
+.slm-group-person small.slm-member-debt {display:inline-flex;flex-wrap:wrap;max-width:100%;white-space:normal;overflow-wrap:normal;word-break:keep-all;line-height:1.35;align-items:center;gap:4px;margin-top:2px;padding:1px 8px;border:1px solid rgba(255,138,101,.55);border-radius:999px;color:#ffb199;font-size:.75rem;font-weight:600;width:fit-content;}
 .slm-group-person small.slm-member-debt[data-severe] {border-color:#ff6b57;background:rgba(255,107,87,.14);color:#ff8f80;}
 .slm-group-person small.slm-member-debt ion-icon {font-size:.95rem;}
 /* Nagłówek z ikoną „i” i przełącznik zamiast dużego checkboxa (2026-11-25). */
@@ -142,3 +142,7 @@ input.slm-switch.slm-switch:checked::after {transform:translateX(20px);backgroun
 input.slm-switch.slm-switch:focus-visible {outline:2px solid var(--ion-color-primary);outline-offset:3px;}
 @media (prefers-reduced-motion:reduce){input.slm-switch.slm-switch::after{transition:none;}}
 .slm-delete-actions {display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;}
+/* Zaległość w wierszu członka (2026-11-27): przycisk przypomnienia pod wierszem, a nie obok — wiersz nie jest ściskany. */
+.slm-group-roster .slm-roster-list > li:has(> .slm-member-remind) {flex-wrap:wrap;}
+.slm-group-roster .slm-roster-list > li:has(> .slm-member-remind) > .slm-group-person {flex:1 1 100%;width:100%;min-width:0;}
+.slm-group-roster .slm-roster-list > li > .slm-member-remind {flex:0 0 auto;margin:0 0 10px auto;min-height:34px;padding:5px 12px;font-size:.78rem;white-space:nowrap;}
