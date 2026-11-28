@@ -145,4 +145,4 @@ input.slm-switch.slm-switch:focus-visible {outline:2px solid var(--ion-color-pri
 /* Zaległość w wierszu członka (2026-11-27): przycisk przypomnienia pod wierszem, a nie obok — wiersz nie jest ściskany. */
 .slm-group-roster .slm-roster-list > li:has(> .slm-member-remind) {flex-wrap:wrap;}
 .slm-group-roster .slm-roster-list > li:has(> .slm-member-remind) > .slm-group-person {flex:1 1 100%;width:100%;min-width:0;}
-.slm-group-roster .slm-roster-list > li > .slm-member-remind {flex:0 0 auto;margin:0 0 10px auto;min-height:34px;padding:5px 12px;font-size:.78rem;white-space:nowrap;}
+.slm-group-roster .slm-roster-list > li > .slm-member-remind {flex:1 1 100%;width:100%;margin:-10px 0 12px;min-height:38px;padding:6px 12px;font-size:.82rem;white-space:nowrap;}
